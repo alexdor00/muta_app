@@ -1,6 +1,8 @@
 /* Pasos de la bienvenida A02–A04. */
 
+/* Nivel y días: misma altura y misma letra */
 .screen {
+  --choice-size: 48px;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
@@ -76,28 +78,6 @@
 
 .group + .group {
   margin-top: var(--space-8);
-}
-
-/* A02 · foto */
-.photo {
-  width: 100%;
-  max-height: 46dvh;
-  object-fit: contain;
-  object-position: center bottom;
-  mix-blend-mode: multiply; /* el fondo claro de la foto se funde con el de la pantalla */
-}
-
-@media (prefers-color-scheme: dark) {
-  .photo {
-    mix-blend-mode: normal;
-    border-radius: var(--radius-card);
-  }
-}
-
-.photoContent {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
 }
 
 /* A03 · tarjetas de objetivo */
@@ -191,11 +171,11 @@
   display: grid;
   flex: 1;
   place-items: center;
-  min-height: var(--tap-min);
+  height: var(--choice-size);
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--surface);
-  font: var(--text-footnote);
+  font: var(--text-subhead);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -218,21 +198,21 @@
 .day {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: var(--choice-size);
+  height: var(--choice-size);
   border-radius: var(--radius-pill);
   background: var(--surface);
-  font: var(--text-headline);
+  font: var(--text-subhead);
+  font-weight: 600;
   cursor: pointer;
   transition:
-    transform var(--duration-tap) var(--ease),
-    background var(--duration-tap) var(--ease);
+    background var(--duration-tap) var(--ease),
+    color var(--duration-tap) var(--ease);
 }
 
 .day.selected {
   background: var(--label);
   color: var(--bg);
-  transform: scale(1.15);
 }
 
 .pill:has(.radio:focus-visible),

@@ -46,7 +46,7 @@ export type OnboardingAnswers = { goal: Goal; level: Level; daysPerWeek: number 
 /** Lo que sale marcado en el diseño al entrar. */
 export const DEFAULT_ANSWERS: OnboardingAnswers = { goal: 'gain_muscle', level: 'beginner', daysPerWeek: 3 }
 
-export const ONBOARDING_STEPS = 3
+export const ONBOARDING_STEPS = 2
 
 export type Profile = OnboardingAnswers & {
   id: 'me'

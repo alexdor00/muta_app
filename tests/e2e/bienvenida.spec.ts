@@ -22,15 +22,9 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.goto('/bienvenida')
   await page.getByRole('link', { name: 'Comenzar' }).click()
 
-  // A02
-  await expect(page).toHaveURL('/bienvenida/1')
-  await expect(page.getByRole('heading', { name: 'Tu mejor versión empieza hoy' })).toBeVisible()
-  await expect(page.getByText('1/4')).toBeVisible()
-  await capture(page, 'A02-tu-mejor-version')
-  await page.getByRole('link', { name: 'Siguiente' }).click()
-
   // A03: «Ganar músculo» viene marcado; se elige «Perder grasa»
-  await expect(page).toHaveURL('/bienvenida/2')
+  await expect(page).toHaveURL('/bienvenida/1')
+  await expect(page.getByText('1/2')).toBeVisible()
   await expect(page.getByRole('radio', { name: /Ganar músculo/ })).toBeChecked()
   await capture(page, 'A03-define-tu-objetivo')
   await page.getByText('Perder grasa').click()
@@ -38,7 +32,12 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.getByRole('link', { name: 'Siguiente' }).click()
 
   // A04: Principiante y 3 días vienen marcados; se elige Intermedio y 4 días
-  await expect(page).toHaveURL('/bienvenida/3')
+  await expect(page).toHaveURL('/bienvenida/2')
+  await expect(page.getByText('2/2')).toBeVisible()
+  // Nivel y días miden lo mismo de alto
+  const pill = await page.getByText('Principiante').boundingBox()
+  const day = await page.getByText('3', { exact: true }).boundingBox()
+  expect(Math.round(pill!.height)).toBe(Math.round(day!.height))
   await expect(page.getByRole('radio', { name: 'Principiante' })).toBeChecked()
   await expect(page.getByRole('radio', { name: '3' })).toBeChecked()
   await capture(page, 'A04-personaliza-tu-plan')

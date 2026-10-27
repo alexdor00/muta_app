@@ -6,7 +6,6 @@ import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { DayCircles, OptionCards, Pills } from '../../components/Choices.tsx'
 import { DumbbellIcon, FlameIcon, HeartIcon } from '../../components/GoalIcons.tsx'
-import styles from '../../components/Onboarding.module.css'
 import { OnboardingLayout } from '../../components/OnboardingLayout.tsx'
 import {
   answer,
@@ -18,8 +17,7 @@ import {
 } from '../../state/onboarding.ts'
 import { completeOnboarding } from '../../use-cases/completeOnboarding.ts'
 
-// El diseño numera los pasos sobre 4 aunque solo hay 3 pantallas: pendiente de decidir el cuarto.
-const SHOWN_TOTAL = 4
+const STEPS = 2
 
 const GOAL_ICONS: Record<Goal, () => JSX.Element> = {
   gain_muscle: DumbbellIcon,
@@ -35,31 +33,15 @@ function Next(props: { href?: string; onClick?: () => void; disabled?: boolean }
   )
 }
 
-/** A02 · Tu mejor versión empieza hoy. */
-function StepIntro() {
-  return (
-    <OnboardingLayout
-      step={1}
-      total={SHOWN_TOTAL}
-      title="Tu mejor versión empieza hoy"
-      intro="Entrena con un plan diseñado para ti. Hazte tu cuerpo. Haz seguimiento de tu progreso."
-      contentClass={styles.photoContent}
-      action={<Next href={paths.onboarding(2)} />}
-    >
-      <img class={styles.photo} src="/photos/onboarding-zancada.jpg" alt="" />
-    </OnboardingLayout>
-  )
-}
-
 /** A03 · Define tu objetivo. */
 function StepGoal() {
   return (
     <OnboardingLayout
-      step={2}
-      total={SHOWN_TOTAL}
+      step={1}
+      total={STEPS}
       title="Define tu objetivo"
       intro="Elige qué quieres conseguir. Puedes cambiarlo más adelante."
-      action={<Next href={paths.onboarding(3)} />}
+      action={<Next href={paths.onboarding(2)} />}
     >
       <OptionCards
         name="objetivo"
@@ -93,8 +75,8 @@ function StepPlan() {
 
   return (
     <OnboardingLayout
-      step={3}
-      total={SHOWN_TOTAL}
+      step={2}
+      total={STEPS}
       title="Personaliza tu plan"
       intro="Cuéntanos tu nivel y disponibilidad para crear el plan perfecto."
       action={<Next onClick={finish} disabled={saving} />}
@@ -119,15 +101,14 @@ function StepPlan() {
   )
 }
 
-/** A02�A04: un paso por ruta (/bienvenida/1, /2, /3). */
+/** A03–A04: un paso por ruta (/bienvenida/1, /2). */
 export function OnboardingScreen(props: { step: string }) {
-  if (props.step === '1') return <StepIntro />
-  if (props.step === '2') return <StepGoal />
-  if (props.step === '3') return <StepPlan />
+  if (props.step === '1') return <StepGoal />
+  if (props.step === '2') return <StepPlan />
   return (
     <OnboardingLayout
       step={1}
-      total={SHOWN_TOTAL}
+      total={STEPS}
       title="Este paso no existe"
       intro=""
       action={<Next href={paths.welcome} />}
