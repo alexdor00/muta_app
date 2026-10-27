@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run lint && npm run lint:css && npm run typecheck && npm run test && npm run build",
-    "lint:css": "stylelint \"src/**/*.css\""
+    "lint:css": "stylelint \"src/**/*.css\"",
+    "galeria": "node scripts/galeria.cjs"
   },
   "dependencies": {
     "@preact/signals": "^2.11.4",

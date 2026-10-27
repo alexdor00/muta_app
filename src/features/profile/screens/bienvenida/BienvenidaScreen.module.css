@@ -8,13 +8,19 @@
   color: var(--on-photo);
 }
 
+/* Encuadre del diseño A01, medido sobre la altura para que sea igual en cualquier móvil:
+   la foto mide 1,35 veces la pantalla y sube un 5 %, así el moño queda arriba del todo
+   (≈6 % de la altura) sin cortarse y la cintura cae hacia el 70 %. */
 .photo {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: -5%;
+  left: 50%;
+  height: 135%;
+  min-width: 100%;
+  max-width: none;
   object-fit: cover;
   object-position: center top;
+  transform: translateX(-50%);
 }
 
 .scrim {
@@ -23,9 +29,12 @@
   background: var(--photo-scrim);
 }
 
+/* Como en el diseño A01: «MUTA» centrado a ~58 % de la altura y el lema justo debajo (~66 %). */
 .brand {
-  position: relative;
-  margin-top: auto;
+  position: absolute;
+  top: calc(58% - var(--space-8));
+  right: 0;
+  left: 0;
   padding: 0 var(--gutter);
   text-align: center;
 }
@@ -37,11 +46,12 @@
 
 .tagline {
   margin-top: var(--space-2);
-  font: var(--text-subhead);
+  font: var(--text-title-2);
+  font-weight: var(--weight-regular);
 }
 
 .actions {
   position: relative;
-  /* En el diseño, el bloque MUTA queda a unos dos tercios de la altura, lejos del botón. */
-  padding: calc(var(--space-10) * 2) var(--gutter) calc(var(--space-8) + var(--safe-bottom));
+  margin-top: auto;
+  padding: 0 var(--gutter) calc(var(--space-8) + var(--safe-bottom));
 }
