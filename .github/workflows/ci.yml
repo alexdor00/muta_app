@@ -34,3 +34,9 @@ jobs:
 
       - name: Construir
         run: npm run build
+
+      - name: Navegador para los recorridos
+        run: npx playwright install --with-deps chromium
+
+      - name: Recorridos en un móvil simulado
+        run: npm run e2e

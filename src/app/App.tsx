@@ -1,5 +1,6 @@
 import type { ComponentChildren, FunctionComponent } from 'preact'
-import { useLayoutEffect } from 'preact/hooks'
+import { useEffect } from 'preact/hooks'
+import { getDb } from '../shared/data/db.ts'
 import { ErrorBoundary, LocationProvider, Route, Router, lazy, useLocation } from 'preact-iso'
 import { logError } from '../shared/lib/logger.ts'
 import { isFullScreen, paths, patterns } from '../shared/lib/paths.ts'
@@ -64,9 +65,28 @@ const Bienvenida = screen(() =>
   import('../features/profile/screens/bienvenida/BienvenidaScreen.tsx').then((m) => m.BienvenidaScreen),
 )
 
-function GoToToday() {
+// A02–A04: provisional hasta construir los pasos de la bienvenida.
+function OnboardingStepScreen(props: { step: string }) {
+  return (
+    <Pending code={`A0${Number(props.step) + 1}`} title={`Bienvenida · paso ${props.step} de 3`}>
+      <a href={paths.welcome}>‹ Volver</a>
+    </Pending>
+  )
+}
+const OnboardingStep = screen(async () => OnboardingStepScreen)
+
+/** Al abrir la app: la primera vez (sin perfil) va a la bienvenida; después, a Hoy. */
+function GoHome() {
   const { route } = useLocation()
-  useLayoutEffect(() => route(paths.today, true), [route])
+  useEffect(() => {
+    getDb()
+      .then((db) => db.get('profile', 'me'))
+      .then((profile) => route(profile ? paths.today : paths.welcome, true))
+      .catch((error) => {
+        logError(error, 'elegir pantalla de inicio')
+        route(paths.today, true)
+      })
+  }, [route])
   return null
 }
 
@@ -92,7 +112,7 @@ function Layout() {
       <main>
         <ErrorBoundary onError={(error) => logError(error, 'cargar pantalla')}>
           <Router>
-            <Route path="/" component={GoToToday} />
+            <Route path="/" component={GoHome} />
             <Route path={paths.today} component={Hoy} />
             <Route path={paths.training} component={TuPlan} />
             <Route path={paths.routine} component={TuRutina} />
@@ -104,6 +124,7 @@ function Layout() {
             <Route path={paths.progress} component={Progreso} />
             <Route path={paths.profile} component={Perfil} />
             <Route path={paths.welcome} component={Bienvenida} />
+            <Route path={patterns.onboarding} component={OnboardingStep} />
             <Route path="/dev/fallo" component={import.meta.env.DEV ? DevCrash : NotFound} />
             <Route default component={NotFound} />
           </Router>

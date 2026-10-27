@@ -2,6 +2,8 @@
 
 export const paths = {
   welcome: '/bienvenida',
+  /** A02–A04: pasos de la bienvenida (1, 2, 3). */
+  onboarding: (step: number) => `/bienvenida/${step}`,
   today: '/hoy',
   training: '/entreno',
   routine: '/entreno/rutina',
@@ -16,6 +18,7 @@ export const paths = {
 
 // Patrones para el router (mismas rutas, con parámetros).
 export const patterns = {
+  onboarding: '/bienvenida/:step',
   sessionStart: '/entreno/sesion/:sessionId/inicio',
   session: '/entreno/sesion/:sessionId',
   summary: '/entreno/sesion/:sessionId/resumen',
@@ -38,9 +41,10 @@ export function tabOf(path: string): Tab | null {
 }
 
 /**
- * Entrenar va a pantalla completa, sin barra de pestañas, para no salir por error:
- * la sesión en curso y el resumen. La sesión antes de empezar (inicio) sí la lleva.
+ * Pantalla completa, sin barra de pestañas: la bienvenida y entrenar (sesión en curso y resumen),
+ * para no salir por error. La sesión antes de empezar (inicio) sí lleva pestañas.
  */
 export function isFullScreen(path: string): boolean {
+  if (path === paths.welcome || path.startsWith(`${paths.welcome}/`)) return true
   return /^\/entreno\/sesion\/[^/]+(\/resumen)?\/?$/.test(path)
 }

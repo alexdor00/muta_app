@@ -7,6 +7,11 @@ describe('isFullScreen', () => {
     expect(isFullScreen(paths.summary('a1'))).toBe(true)
   })
 
+  it('la bienvenida y sus pasos van a pantalla completa', () => {
+    expect(isFullScreen(paths.welcome)).toBe(true)
+    expect(isFullScreen(paths.onboarding(2))).toBe(true)
+  })
+
   it('el inicio de sesión y el resto de Entreno llevan pestañas', () => {
     expect(isFullScreen(paths.sessionStart('a1'))).toBe(false)
     expect(isFullScreen(paths.training)).toBe(false)

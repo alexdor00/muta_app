@@ -1,0 +1,92 @@
+/*
+ * Sistema de diseño de MUTA (apartado «Sistema de diseño» del documento de rediseño).
+ * Ningún componente escribe un color, un tamaño o una duración a mano: usa estas variables.
+ */
+
+:root {
+  /* Color · claro */
+  --bg: #ffffff;
+  --surface: #f4f4f5;
+  --surface-2: #e9e9eb;
+  --label: #111113;
+  --label-2: #6e6e73;
+  --separator: #e3e3e6;
+  --accent: #ff5a12;
+  --good: #34c759;
+  --warning: #ff9f0a;
+  --critical: #ff3b30;
+  --on-photo: #ffffff;
+  --photo-scrim: linear-gradient(180deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 35%) 45%, rgb(0 0 0 / 85%) 100%);
+
+  /* Tipografía: fuente del sistema (SF Pro en iPhone, Roboto en Android). Tamaños en rem. */
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', Roboto, 'Segoe UI', sans-serif;
+  --text-large-title: 700 2.125rem / 2.5625rem var(--font); /* 34 / 41 */
+  --text-title-1: 700 1.75rem / 2.125rem var(--font); /* 28 / 34 */
+  --text-title-2: 600 1.375rem / 1.75rem var(--font); /* 22 / 28 */
+  --text-headline: 600 1.0625rem / 1.375rem var(--font); /* 17 / 22 */
+  --text-body: 400 1.0625rem / 1.375rem var(--font); /* 17 / 22 */
+  --text-subhead: 400 0.9375rem / 1.25rem var(--font); /* 15 / 20 */
+  --text-footnote: 400 0.8125rem / 1.125rem var(--font); /* 13 / 18 */
+  --text-caption: 500 0.75rem / 1rem var(--font); /* 12 / 16 */
+  --text-big-number: 700 3rem / 3.25rem var(--font); /* 48 / 52 */
+  --text-brand: 800 4rem / 1 var(--font); /* 64: solo el logotipo MUTA de la bienvenida */
+
+  /* Espacio: múltiplos de 4 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --gutter: var(--space-5); /* margen lateral */
+  --gap-block: var(--space-6); /* entre bloques */
+  --gap-inside: var(--space-3); /* dentro de un bloque */
+
+  /* Forma */
+  --radius-chip: 8px;
+  --radius-control: 12px;
+  --radius-card: 20px;
+  --radius-sheet: 28px;
+  --radius-pill: 999px;
+  --tap-min: 44px;
+  --tap-primary: 52px;
+
+  /* Movimiento: la curva de las hojas de iOS */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-tap: 150ms;
+  --duration-sheet: 250ms;
+  --duration-screen: 350ms;
+
+  /* Zonas seguras del móvil (muesca, barra de inicio) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  color-scheme: light dark;
+}
+
+/* Color · oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --label: #f2f2f7;
+    --label-2: #98989f;
+    --separator: #38383a;
+    --accent: #ff6a2a;
+    --good: #30d158;
+    --warning: #ffd60a;
+    --critical: #ff453a;
+  }
+}
+
+/* Reducir movimiento: solo fundidos, sin desplazamientos */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-tap: 0ms;
+    --duration-sheet: 150ms;
+    --duration-screen: 150ms;
+  }
+}

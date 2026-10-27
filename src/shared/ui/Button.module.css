@@ -1,0 +1,44 @@
+.button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--tap-primary);
+  padding: 0 var(--space-10);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: var(--text-headline);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--duration-tap) var(--ease),
+    opacity var(--duration-tap) var(--ease);
+}
+
+.button:active {
+  transform: scale(0.98);
+  opacity: 0.85;
+}
+
+.primary {
+  background: var(--label);
+  color: var(--bg);
+}
+
+.onPhoto {
+  background: var(--on-photo);
+  color: #111113; /* texto negro sobre blanco, también en modo oscuro */
+}
+
+.secondary {
+  background: var(--surface);
+  color: var(--label);
+}
+
+.chevron {
+  position: absolute;
+  right: var(--space-5);
+  width: 8px;
+  height: 14px;
+}
