@@ -2,26 +2,28 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--photo-placeholder);
   color: var(--on-photo);
+  container-type: size; /* la foto se mide con el tamaño de la pantalla (cqw, cqh) */
 }
 
-/* Encuadre del diseño A01, medido sobre la altura para que sea igual en cualquier móvil:
-   la foto mide 1,05 veces la pantalla (casi sin zoom) y sube un 6 %: el moño queda pegado arriba
-   (≈2 % de la altura) sin cortarse, la espalda se ve entera, «Comenzar» cae sobre el glúteo y se ve la pesa. */
+/* La foto llena siempre toda la pantalla (sin tiras a los lados) y casi sin zoom:
+   - alto: el mayor entre 1,05 veces la pantalla y lo que necesita para cubrir el ancho
+     (la foto es 853×1844, proporción 0,4626);
+   - el borde del moño está al 8,1 % del alto de la foto: se sube lo justo para que quede
+     a un pequeño espacio (--space-3) del borde superior, mida lo que mida la foto. */
 .photo {
+  --photo-h: max(105cqh, calc(100cqw / 0.4626));
+
   position: absolute;
-  top: -6%;
+  top: calc(var(--space-3) - var(--photo-h) * 0.081);
   left: 50%;
-  height: 105%;
+  height: var(--photo-h);
   width: auto;
   max-width: none;
-  object-fit: cover;
-  object-position: center top;
   transform: translateX(-50%);
-  mask-image: var(--photo-side-fade);
 }
 
 .scrim {
