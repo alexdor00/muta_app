@@ -15,6 +15,7 @@ export type StoreName =
   | 'userContent'
   | 'photos'
   | 'meta'
+  | 'programs'
 
 type StoreDef = { keyPath: string | string[]; indexes?: Record<string, string | string[]> }
 
@@ -31,7 +32,11 @@ export const STORES: Record<StoreName, StoreDef> = {
   userContent: { keyPath: 'id', indexes: { target: 'target' } },
   photos: { keyPath: 'id', indexes: { date: 'date' } },
   meta: { keyPath: 'key' }, // versión del esquema, última copia, registro de errores
+  programs: { keyPath: 'id' }, // programas de entrenamiento (plantillas completas por semanas)
 }
+
+/** Almacenes que crea cada migración. La 1 crea todos los demás. */
+export const STORES_ADDED_IN: Partial<Record<number, StoreName[]>> = { 2: ['programs'] }
 
 export const STORE_NAMES = Object.keys(STORES) as StoreName[]
 

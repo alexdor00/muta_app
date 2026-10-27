@@ -22,3 +22,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+
+# Programas de entrenamiento de terceros: solo en local, nunca en el repositorio público
+private/

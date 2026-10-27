@@ -2,11 +2,11 @@ import 'fake-indexeddb/auto'
 import { openDB } from 'idb'
 import { describe, expect, it, vi } from 'vitest'
 
-// Simula que existe una versión 2 para comprobar la copia previa y el paso de datos.
+// Simula una versión más nueva que la real para comprobar la copia previa y el paso de datos.
 vi.mock('./index.ts', async (importOriginal) => {
   const real = await importOriginal<typeof import('./index.ts')>()
-  const m002 = vi.fn()
-  const MIGRATIONS = [...real.MIGRATIONS, m002]
+  const next = vi.fn()
+  const MIGRATIONS = [...real.MIGRATIONS, next]
   return { ...real, MIGRATIONS, SCHEMA_VERSION: MIGRATIONS.length }
 })
 
@@ -24,9 +24,10 @@ describe('migraciones', () => {
     v1.close()
 
     const db = await openDatabase('migra')
-    expect(db.version).toBe(2)
-    expect(MIGRATIONS[1]).toHaveBeenCalledOnce()
+    expect(db.version).toBe(MIGRATIONS.length)
+    expect(MIGRATIONS.at(-1)).toHaveBeenCalledOnce()
     expect(await db.get('workouts', 'w1')).toBeDefined()
+    expect([...db.objectStoreNames]).toContain('programs') // creado por la migración 2
 
     const snapshots = await openDB('muta-backups', 1)
     const [copy] = await snapshots.getAll('snapshots')

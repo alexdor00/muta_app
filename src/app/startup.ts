@@ -1,6 +1,7 @@
 import { getDb } from '../shared/data/db.ts'
 import { saveError } from '../shared/data/errorLog.ts'
 import { requestPersistentStorage } from '../shared/data/persist.ts'
+import { seedPrograms } from '../shared/data/programs.ts'
 import { logError, onError } from '../shared/lib/logger.ts'
 import { registerUpdates } from './updates.ts'
 
@@ -12,6 +13,8 @@ export async function startup(): Promise<void> {
   try {
     const db = await getDb()
     onError((entry) => void saveError(db, entry))
+    const added = await seedPrograms(db)
+    if (added) console.info(`Programas cargados en la base de datos: ${added}`)
   } catch (error) {
     logError(error, 'abrir base de datos')
   }
