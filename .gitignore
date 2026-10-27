@@ -1,0 +1,21 @@
+# Dependencias y builds
+node_modules/
+dist/
+dev-dist/
+coverage/
+
+# Pruebas
+test-results/
+playwright-report/
+
+# Entorno
+.env
+.env.*
+!.env.example
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+*.log
+.vscode/*
+!.vscode/extensions.json
