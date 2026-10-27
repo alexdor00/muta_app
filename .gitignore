@@ -11,6 +11,7 @@ playwright-report/
 # Entorno
 .env
 .env.*
+*.local
 !.env.example
 
 # Sistema y editores
