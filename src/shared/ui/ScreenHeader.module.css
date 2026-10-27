@@ -1,0 +1,52 @@
+/* Cabecera de pantalla principal: avatar, acción a la derecha y título grande. */
+
+.header {
+  padding: calc(var(--space-4) + var(--safe-top)) var(--gutter) var(--space-4);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--avatar);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: var(--avatar);
+  height: var(--avatar);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.avatar svg,
+.action svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.action {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  margin-right: calc(var(--space-3) * -1);
+  color: var(--label);
+}
+
+.title {
+  margin-top: var(--space-5);
+  font: var(--text-large-title);
+  font-weight: var(--weight-regular);
+}
+
+.intro {
+  margin-top: var(--space-1);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}

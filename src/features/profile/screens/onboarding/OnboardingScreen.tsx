@@ -57,7 +57,7 @@ function StepGoal() {
   )
 }
 
-/** A04 · Personaliza tu plan. Al terminar guarda el perfil y va a Tu plan. */
+/** A04 · Personaliza tu plan. Al terminar guarda el perfil y lleva a elegir la rutina. */
 function StepPlan() {
   const { route } = useLocation()
   const [saving, setSaving] = useState(false)
@@ -66,7 +66,7 @@ function StepPlan() {
     setSaving(true)
     try {
       await completeOnboarding()
-      route(paths.training, true)
+      route(paths.chooseRoutine, true)
     } catch (error) {
       logError(error, 'guardar bienvenida')
       setSaving(false)

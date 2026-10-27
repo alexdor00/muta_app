@@ -18,6 +18,16 @@
   --on-photo: #ffffff;
   --on-photo-label: #111113; /* texto sobre la píldora blanca encima de una foto (igual en oscuro) */
   --photo-placeholder: #000000; /* fondo mientras carga una foto */
+  /* Fondos de tarjeta con foto mientras no haya foto propia (oscuros: el texto va en blanco) */
+  --tone-1: linear-gradient(135deg, #3a3a3c 0%, #1c1c1e 100%);
+  --tone-2: linear-gradient(135deg, #5b2a86 0%, #2a0f45 100%);
+  --tone-3: linear-gradient(135deg, #8a3b12 0%, #3d1606 100%);
+  --tone-4: linear-gradient(135deg, #1f4e5f 0%, #0b2229 100%);
+  --tone-5: linear-gradient(135deg, #2f5d3a 0%, #102617 100%);
+  --tone-6: linear-gradient(135deg, #5f1f2b 0%, #2a0a10 100%);
+  --photo-card-scrim: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 55%) 100%);
+  --photo-card-height: 192px; /* tarjeta de rutina: proporción de la captura de referencia */
+  --avatar: 40px;
   --photo-scrim: linear-gradient(180deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 35%) 45%, rgb(0 0 0 / 85%) 100%);
 
   /* Tipografía: fuente del sistema (SF Pro en iPhone, Roboto en Android). Tamaños en rem. */

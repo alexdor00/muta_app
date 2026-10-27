@@ -45,6 +45,13 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.getByText('4', { exact: true }).click()
   await page.getByRole('button', { name: 'Siguiente' }).click()
 
+  // Elige tu rutina: intermedio y 4 días → recomienda Cuerpo completo A/B
+  await expect(page).toHaveURL('/entreno/rutinas')
+  const recomendadas = page.getByRole('region', { name: 'Recomendadas para ti' })
+  await expect(recomendadas.getByRole('button').first()).toContainText('Cuerpo completo A/B')
+  await expect(page.getByText('Para 4 días por semana · nivel intermedio')).toBeVisible()
+  await capture(page, 'elegir-rutina')
+  await recomendadas.getByRole('button', { name: /Cuerpo completo A\/B/ }).click()
   await expect(page).toHaveURL('/entreno')
   const profile = await page.evaluate(
     () =>
@@ -57,6 +64,17 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
       }),
   )
   expect(profile).toMatchObject({ goal: 'lose_fat', level: 'intermediate', daysPerWeek: 4 })
+  const plan = await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        const open = indexedDB.open('muta')
+        open.onsuccess = () => {
+          const get = open.result.transaction('plans').objectStore('plans').get('current')
+          get.onsuccess = () => resolve(get.result)
+        }
+      }),
+  )
+  expect(plan).toMatchObject({ programId: 'muta-cuerpo-completo-4d' })
 
   // Con perfil, la app ya no abre en la bienvenida
   await page.goto('/')

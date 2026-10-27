@@ -1,0 +1,27 @@
+/* Elige tu rutina: lista de tarjetas con foto, como la referencia de diseño. */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--gutter);
+}
+
+.section + .section {
+  margin-top: var(--space-8);
+}
+
+.sectionTitle {
+  margin: 0 var(--gutter) var(--gap-inside);
+  font: var(--text-headline);
+}
+
+.page {
+  padding-bottom: var(--space-10);
+}
+
+.message {
+  padding: 0 var(--gutter);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}

@@ -7,6 +7,8 @@ export const paths = {
   today: '/hoy',
   training: '/entreno',
   routine: '/entreno/rutina',
+  /** Elegir rutina (tras la bienvenida, o para cambiarla). */
+  chooseRoutine: '/entreno/rutinas',
   sessionStart: (sessionId: string) => `/entreno/sesion/${sessionId}/inicio`,
   session: (sessionId: string) => `/entreno/sesion/${sessionId}`,
   summary: (sessionId: string) => `/entreno/sesion/${sessionId}/resumen`,

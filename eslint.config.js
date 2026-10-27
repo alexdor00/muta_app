@@ -105,5 +105,11 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Scripts de Node que generan contenido (no forman parte de la app)
+    files: ['scripts/**/*.cjs'],
+    languageOptions: { globals: globals.node, sourceType: 'commonjs' },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
   prettier,
 )

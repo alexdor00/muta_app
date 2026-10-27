@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'preact/hooks'
 import { Button } from '../../shared/ui/Button.tsx'
 import { ChoiceCards, ChoiceCircles, ChoicePills } from '../../shared/ui/Choice.tsx'
+import { PhotoCard } from '../../shared/ui/PhotoCard.tsx'
+import { ScreenHeader } from '../../shared/ui/ScreenHeader.tsx'
 import styles from './DevUiScreen.module.css'
 
 // /dev/ui: todas las piezas de shared/ui juntas, en claro y en oscuro.
@@ -98,6 +100,26 @@ export function DevUiScreen() {
               Sobre foto
             </Button>
           </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class={styles.h2}>Cabecera</h2>
+        <ScreenHeader title="Título de pestaña" intro="Explicación corta" avatarHref="/dev/ui" />
+      </section>
+
+      <section data-testid="photo-cards">
+        <h2 class={styles.h2}>Tarjetas con foto</h2>
+        <div class={styles.stack}>
+          <PhotoCard
+            title="Con foto"
+            subtitle="Subtítulo · 4 días"
+            photo="/photos/bienvenida.jpg"
+            badge="Tu rutina"
+          />
+          {([1, 2, 3, 4, 5, 6] as const).map((tone) => (
+            <PhotoCard key={tone} title={`Tono ${tone}`} subtitle="Sin foto: degradado" tone={tone} />
+          ))}
         </div>
       </section>
 

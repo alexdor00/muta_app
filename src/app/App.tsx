@@ -99,6 +99,11 @@ function DevCrashScreen(): never {
 }
 const DevCrash = screen(async () => DevCrashScreen)
 
+const ElegirRutina = screen(() =>
+  import('../features/training/screens/elegir-rutina/ElegirRutinaScreen.tsx').then(
+    (m) => m.ElegirRutinaScreen,
+  ),
+)
 const DevUi = screen(() => import('./dev/DevUiScreen.tsx').then((m) => m.DevUiScreen))
 
 function Layout() {
@@ -112,6 +117,7 @@ function Layout() {
             <Route path={paths.today} component={Hoy} />
             <Route path={paths.training} component={TuPlan} />
             <Route path={paths.routine} component={TuRutina} />
+            <Route path={paths.chooseRoutine} component={ElegirRutina} />
             <Route path={patterns.sessionStart} component={SesionInicio} />
             <Route path={patterns.summary} component={Resumen} />
             <Route path={patterns.session} component={Sesion} />
