@@ -34,3 +34,6 @@ export const STORES: Record<StoreName, StoreDef> = {
 }
 
 export const STORE_NAMES = Object.keys(STORES) as StoreName[]
+
+/** Estado de un entreno en el almacén workouts (índice status). */
+export const WORKOUT_STATUS = { inProgress: 'in_progress', finished: 'finished' } as const
