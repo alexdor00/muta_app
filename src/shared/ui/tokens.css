@@ -25,6 +25,8 @@
   --tone-4: linear-gradient(135deg, #1f4e5f 0%, #0b2229 100%);
   --tone-5: linear-gradient(135deg, #2f5d3a 0%, #102617 100%);
   --tone-6: linear-gradient(135deg, #5f1f2b 0%, #2a0a10 100%);
+  /* Difuminado lateral de una foto que no llena el ancho (pantallas más anchas que la foto) */
+  --photo-side-fade: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
   --photo-card-scrim: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 55%) 100%);
   --photo-card-height: 192px; /* tarjeta de rutina: proporción de la captura de referencia */
   --avatar: 40px;
