@@ -36,9 +36,21 @@
   color: var(--label);
 }
 
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .chevron {
-  position: absolute;
-  right: var(--space-5);
   width: 8px;
   height: 14px;
+}
+
+.edge {
+  position: absolute;
+  right: var(--space-5);
+}
+
+.inline {
+  margin-left: var(--space-3);
 }

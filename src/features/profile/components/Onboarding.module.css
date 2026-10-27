@@ -1,0 +1,242 @@
+/* Pasos de la bienvenida A02–A04. */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: calc(var(--space-6) + var(--safe-top)) var(--gutter) calc(var(--space-8) + var(--safe-bottom));
+  background: var(--bg);
+}
+
+.step {
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+.title {
+  margin-top: var(--space-3);
+  font: var(--text-title-1);
+  text-wrap: balance; /* «Tu mejor versión / empieza hoy», como en el diseño */
+}
+
+.intro {
+  margin-top: var(--space-2);
+  font: var(--text-subhead);
+  color: var(--label-2);
+  text-wrap: pretty;
+}
+
+.content {
+  flex: 1;
+  margin-top: var(--gap-block);
+}
+
+.footer {
+  margin-top: var(--gap-block);
+}
+
+/* Elementos que entran al cambiar de paso */
+.screen > * {
+  animation: appear var(--duration-screen) var(--ease) both;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* Botón de opción real, oculto: el aspecto lo da su etiqueta */
+.radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  margin-bottom: var(--gap-inside);
+  padding: 0;
+  font: var(--text-headline);
+}
+
+.group + .group {
+  margin-top: var(--space-8);
+}
+
+/* A02 · foto */
+.photo {
+  width: 100%;
+  max-height: 46dvh;
+  object-fit: contain;
+  object-position: center bottom;
+  mix-blend-mode: multiply; /* el fondo claro de la foto se funde con el de la pantalla */
+}
+
+@media (prefers-color-scheme: dark) {
+  .photo {
+    mix-blend-mode: normal;
+    border-radius: var(--radius-card);
+  }
+}
+
+.photoContent {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* A03 · tarjetas de objetivo */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-inside);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 72px;
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid var(--separator);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  cursor: pointer;
+  transition: border-color var(--duration-tap) var(--ease);
+}
+
+.option.selected {
+  border-color: var(--accent);
+}
+
+.option:has(.radio:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+}
+
+.selected .icon {
+  background: var(--label);
+  color: var(--bg);
+}
+
+.icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.optionText {
+  flex: 1;
+}
+
+.optionTitle {
+  display: block;
+  font: var(--text-subhead);
+  font-weight: 600;
+}
+
+.optionDetail {
+  display: block;
+  margin-top: 2px;
+  font: var(--text-caption);
+  font-weight: 400;
+  color: var(--label-2);
+}
+
+.dot {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--separator);
+  border-radius: var(--radius-pill);
+}
+
+.selected .dot {
+  border-color: var(--accent);
+  background: radial-gradient(circle, var(--accent) 0 4px, transparent 5px);
+}
+
+/* A04 · nivel */
+.pills {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.pill {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: var(--text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--duration-tap) var(--ease),
+    color var(--duration-tap) var(--ease);
+}
+
+.pill.selected {
+  background: var(--label);
+  color: var(--bg);
+}
+
+/* A04 · días por semana */
+.days {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: var(--text-headline);
+  cursor: pointer;
+  transition:
+    transform var(--duration-tap) var(--ease),
+    background var(--duration-tap) var(--ease);
+}
+
+.day.selected {
+  background: var(--label);
+  color: var(--bg);
+  transform: scale(1.15);
+}
+
+.pill:has(.radio:focus-visible),
+.day:has(.radio:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

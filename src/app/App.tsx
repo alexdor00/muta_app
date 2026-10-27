@@ -65,15 +65,9 @@ const Bienvenida = screen(() =>
   import('../features/profile/screens/bienvenida/BienvenidaScreen.tsx').then((m) => m.BienvenidaScreen),
 )
 
-// A02–A04: provisional hasta construir los pasos de la bienvenida.
-function OnboardingStepScreen(props: { step: string }) {
-  return (
-    <Pending code={`A0${Number(props.step) + 1}`} title={`Bienvenida · paso ${props.step} de 3`}>
-      <a href={paths.welcome}>‹ Volver</a>
-    </Pending>
-  )
-}
-const OnboardingStep = screen(async () => OnboardingStepScreen)
+const OnboardingStep = screen(() =>
+  import('../features/profile/screens/onboarding/OnboardingScreen.tsx').then((m) => m.OnboardingScreen),
+)
 
 /** Al abrir la app: la primera vez (sin perfil) va a la bienvenida; después, a Hoy. */
 function GoHome() {

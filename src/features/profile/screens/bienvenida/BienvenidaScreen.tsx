@@ -15,7 +15,7 @@ export function BienvenidaScreen() {
         <p class={styles.tagline}>Entrena. Come. Evoluciona.</p>
       </div>
       <div class={styles.actions}>
-        <Button variant="onPhoto" chevron href={paths.onboarding(1)}>
+        <Button variant="onPhoto" chevron="edge" href={paths.onboarding(1)}>
           Comenzar
         </Button>
       </div>

@@ -5,27 +5,28 @@ type Props = {
   children: ComponentChildren
   /** primary: píldora negra · onPhoto: píldora blanca sobre foto · secondary: gris */
   variant?: 'primary' | 'onPhoto' | 'secondary'
-  /** Flecha › cuando lleva a otra pantalla. */
-  chevron?: boolean
+  /** Flecha › cuando lleva a otra pantalla: pegada al borde (A01) o junto al texto (A02–A04). */
+  chevron?: 'edge' | 'inline'
+  disabled?: boolean
   href?: string
   onClick?: () => void
 }
 
-function Chevron() {
+function Chevron(props: { at: 'edge' | 'inline' }) {
   return (
-    <svg class={styles.chevron} viewBox="0 0 8 14" aria-hidden="true">
+    <svg class={`${styles.chevron} ${styles[props.at]}`} viewBox="0 0 8 14" aria-hidden="true">
       <path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
     </svg>
   )
 }
 
 /** Botón principal de la pantalla (una sola acción principal por pantalla). */
-export function Button({ children, variant = 'primary', chevron = false, href, onClick }: Props) {
+export function Button({ children, variant = 'primary', chevron, disabled = false, href, onClick }: Props) {
   const className = `${styles.button} ${styles[variant]}`
   const content = (
     <>
       {children}
-      {chevron && <Chevron />}
+      {chevron && <Chevron at={chevron} />}
     </>
   )
   if (href) {
@@ -36,7 +37,7 @@ export function Button({ children, variant = 'primary', chevron = false, href, o
     )
   }
   return (
-    <button type="button" class={className} onClick={onClick}>
+    <button type="button" class={className} onClick={onClick} disabled={disabled}>
       {content}
     </button>
   )
