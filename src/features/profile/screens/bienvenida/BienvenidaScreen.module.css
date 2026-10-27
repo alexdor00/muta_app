@@ -32,10 +32,10 @@
   background: var(--photo-scrim);
 }
 
-/* Como en el diseño A01: «MUTA» centrado a ~58 % de la altura y el lema justo debajo (~66 %). */
+/* «MUTA» y el lema por debajo de la cintura (desde el 69 % de la altura): la espalda se ve entera. */
 .brand {
   position: absolute;
-  top: calc(58% - var(--space-8));
+  top: 69%;
   right: 0;
   left: 0;
   padding: 0 var(--gutter);
