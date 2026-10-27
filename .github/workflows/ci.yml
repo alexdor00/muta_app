@@ -26,6 +26,9 @@ jobs:
       - name: Linter y fronteras entre áreas
         run: npm run lint
 
+      - name: CSS solo con tokens
+        run: npm run lint:css
+
       - name: Tipos
         run: npm run typecheck
 

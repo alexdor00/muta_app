@@ -16,6 +16,8 @@
   --warning: #ff9f0a;
   --critical: #ff3b30;
   --on-photo: #ffffff;
+  --on-photo-label: #111113; /* texto sobre la píldora blanca encima de una foto (igual en oscuro) */
+  --photo-placeholder: #000000; /* fondo mientras carga una foto */
   --photo-scrim: linear-gradient(180deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 35%) 45%, rgb(0 0 0 / 85%) 100%);
 
   /* Tipografía: fuente del sistema (SF Pro en iPhone, Roboto en Android). Tamaños en rem. */
@@ -54,11 +56,36 @@
   --tap-min: 44px;
   --tap-primary: 52px;
 
+  /* Alturas de control: todo lo que se toca usa una de estas */
+  --control-sm: 36px; /* chip pequeño */
+  --control: 48px; /* opción: pastilla, círculo, campo */
+  --control-lg: var(--tap-primary); /* botón principal */
+  --row: 72px; /* fila o tarjeta de opción con dos líneas */
+
+  /* Iconos y marcas */
+  --icon-xs: 14px; /* flecha › */
+  --icon-sm: 20px; /* círculo de selección */
+  --icon: 22px; /* icono dentro de una insignia */
+  --badge: 44px; /* círculo con icono */
+  --radio-dot: 4px; /* punto del círculo de selección */
+
+  /* Líneas */
+  --hairline: 1px;
+  --border: 1.5px;
+  --focus-ring: 2px;
+
+  /* Peso de letra (cuando un texto necesita otro peso sin cambiar su tamaño) */
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
   /* Movimiento: la curva de las hojas de iOS */
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
   --duration-tap: 150ms;
   --duration-sheet: 250ms;
   --duration-screen: 350ms;
+  --rise: 8px; /* desplazamiento al aparecer */
+  --press-scale: 0.98; /* encogimiento al pulsar */
 
   /* Zonas seguras del móvil (muesca, barra de inicio) */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -67,9 +94,9 @@
   color-scheme: light dark;
 }
 
-/* Color · oscuro */
+/* Color · oscuro: el del sistema, o forzado con data-theme="dark" (página /dev/ui) */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #000000;
     --surface: #1c1c1e;
     --surface-2: #2c2c2e;
@@ -81,6 +108,24 @@
     --warning: #ffd60a;
     --critical: #ff453a;
   }
+}
+
+:root[data-theme='dark'] {
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+  --label: #f2f2f7;
+  --label-2: #98989f;
+  --separator: #38383a;
+  --accent: #ff6a2a;
+  --good: #30d158;
+  --warning: #ffd60a;
+  --critical: #ff453a;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 /* Reducir movimiento: solo fundidos, sin desplazamientos */

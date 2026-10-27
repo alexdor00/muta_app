@@ -59,6 +59,26 @@ img {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: var(--focus-ring) solid var(--accent);
+  outline-offset: var(--focus-ring);
+}
+
+/* Entrada común de los elementos de una pantalla: class="appear" */
+.appear {
+  animation: appear var(--duration-screen) var(--ease) both;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+  }
 }

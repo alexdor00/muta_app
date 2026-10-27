@@ -1,0 +1,160 @@
+/* Opciones: un grupo de botones de opción con tres aspectos (tarjeta, pastilla, círculo). */
+
+.group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.group + .group {
+  margin-top: var(--space-8);
+}
+
+.legend {
+  margin-bottom: var(--gap-inside);
+  padding: 0;
+  font: var(--text-headline);
+}
+
+.hiddenLegend {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Botón de opción real, oculto: el aspecto lo da su etiqueta */
+.radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.item {
+  cursor: pointer;
+  transition:
+    background var(--duration-tap) var(--ease),
+    border-color var(--duration-tap) var(--ease),
+    color var(--duration-tap) var(--ease);
+}
+
+.item:has(.radio:focus-visible) {
+  outline: var(--focus-ring) solid var(--accent);
+  outline-offset: var(--focus-ring);
+}
+
+/* Pastillas y círculos: misma altura y misma letra */
+.pills {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.days {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pill,
+.circle {
+  display: grid;
+  place-items: center;
+  height: var(--control);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.pill {
+  flex: 1;
+  padding: 0 var(--space-3);
+}
+
+.circle {
+  width: var(--control);
+}
+
+.pill.selected,
+.circle.selected {
+  background: var(--label);
+  color: var(--bg);
+}
+
+/* Tarjetas */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-inside);
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--row);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.card.selected {
+  border-color: var(--accent);
+}
+
+.badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--badge);
+  height: var(--badge);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+}
+
+.badge svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.selected .badge {
+  background: var(--label);
+  color: var(--bg);
+}
+
+.text {
+  flex: 1;
+}
+
+.title {
+  display: block;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.detail {
+  display: block;
+  margin-top: var(--space-1);
+  font: var(--text-caption);
+  font-weight: var(--weight-regular);
+  color: var(--label-2);
+}
+
+.dot {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-pill);
+}
+
+.selected .dot {
+  border-color: var(--accent);
+  background: radial-gradient(
+    circle,
+    var(--accent) 0 var(--radio-dot),
+    transparent calc(var(--radio-dot) + var(--space-1) / 4)
+  );
+}

@@ -99,6 +99,8 @@ function DevCrashScreen(): never {
 }
 const DevCrash = screen(async () => DevCrashScreen)
 
+const DevUi = screen(() => import('./dev/DevUiScreen.tsx').then((m) => m.DevUiScreen))
+
 function Layout() {
   const { path } = useLocation()
   return (
@@ -120,6 +122,7 @@ function Layout() {
             <Route path={paths.welcome} component={Bienvenida} />
             <Route path={patterns.onboarding} component={OnboardingStep} />
             <Route path="/dev/fallo" component={import.meta.env.DEV ? DevCrash : NotFound} />
+            <Route path="/dev/ui" component={DevUi} />
             <Route default component={NotFound} />
           </Router>
         </ErrorBoundary>

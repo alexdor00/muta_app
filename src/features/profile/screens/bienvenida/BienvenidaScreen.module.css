@@ -4,7 +4,7 @@
   flex-direction: column;
   min-height: 100dvh;
   overflow: hidden;
-  background: #000000; /* mientras carga la foto */
+  background: var(--photo-placeholder);
   color: var(--on-photo);
 }
 
@@ -44,24 +44,4 @@
   position: relative;
   /* En el diseño, el bloque MUTA queda a unos dos tercios de la altura, lejos del botón. */
   padding: calc(var(--space-10) * 2) var(--gutter) calc(var(--space-8) + var(--safe-bottom));
-}
-
-.brand,
-.actions {
-  animation: appear var(--duration-screen) var(--ease) both;
-}
-
-@keyframes appear {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  @keyframes appear {
-    from {
-      opacity: 0;
-    }
-  }
 }

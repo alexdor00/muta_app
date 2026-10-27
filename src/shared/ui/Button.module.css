@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: var(--tap-primary);
+  min-height: var(--control-lg);
   padding: 0 var(--space-10);
   border: 0;
   border-radius: var(--radius-pill);
@@ -17,7 +17,7 @@
 }
 
 .button:active {
-  transform: scale(0.98);
+  transform: scale(var(--press-scale));
   opacity: 0.85;
 }
 
@@ -28,7 +28,7 @@
 
 .onPhoto {
   background: var(--on-photo);
-  color: #111113; /* texto negro sobre blanco, también en modo oscuro */
+  color: var(--on-photo-label);
 }
 
 .secondary {
@@ -42,8 +42,8 @@
 }
 
 .chevron {
-  width: 8px;
-  height: 14px;
+  width: calc(var(--icon-xs) * 4 / 7);
+  height: var(--icon-xs);
 }
 
 .edge {

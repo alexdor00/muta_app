@@ -8,13 +8,13 @@ export function BienvenidaScreen() {
     <section class={styles.screen} aria-labelledby="bienvenida-titulo">
       <img class={styles.photo} src="/photos/bienvenida.jpg" alt="" fetchpriority="high" />
       <div class={styles.scrim} />
-      <div class={styles.brand}>
+      <div class={`${styles.brand} appear`}>
         <h1 id="bienvenida-titulo" class={styles.logo}>
           MUTA
         </h1>
         <p class={styles.tagline}>Entrena. Come. Evoluciona.</p>
       </div>
-      <div class={styles.actions}>
+      <div class={`${styles.actions} appear`}>
         <Button variant="onPhoto" chevron="edge" href={paths.onboarding(1)}>
           Comenzar
         </Button>

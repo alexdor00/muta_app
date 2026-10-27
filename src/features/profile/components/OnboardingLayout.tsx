@@ -6,26 +6,25 @@ type Props = {
   total: number
   title: string
   intro: string
-  /** Contenido del paso (foto, opciones…). */
+  /** Contenido del paso (opciones…). */
   children: ComponentChildren
-  contentClass?: string
   /** El botón «Siguiente». */
   action: ComponentChildren
 }
 
-/** Esqueleto común de A02–A04: «1/4», título, explicación, contenido y botón abajo. */
+/** Esqueleto común de A03–A04: «1/2», título, explicación, contenido y botón abajo. */
 export function OnboardingLayout(props: Props) {
   return (
     <section class={styles.screen} aria-labelledby="onboarding-title">
-      <p class={styles.step}>
+      <p class={`${styles.step} appear`}>
         {props.step}/{props.total}
       </p>
-      <h1 id="onboarding-title" class={styles.title}>
+      <h1 id="onboarding-title" class={`${styles.title} appear`}>
         {props.title}
       </h1>
-      <p class={styles.intro}>{props.intro}</p>
-      <div class={`${styles.content} ${props.contentClass ?? ''}`}>{props.children}</div>
-      <div class={styles.footer}>{props.action}</div>
+      <p class={`${styles.intro} appear`}>{props.intro}</p>
+      <div class={`${styles.content} appear`}>{props.children}</div>
+      <div class={`${styles.footer} appear`}>{props.action}</div>
     </section>
   )
 }

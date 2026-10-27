@@ -1,0 +1,67 @@
+/* /dev/ui: muestra de todas las piezas del sistema de diseño. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  padding: calc(var(--space-6) + var(--safe-top)) var(--gutter) var(--space-10);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.h1 {
+  font: var(--text-title-1);
+}
+
+.h2 {
+  margin-bottom: var(--gap-inside);
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-inside);
+}
+
+.type {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.tokenName {
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: var(--row);
+  padding: var(--space-2);
+  border: var(--hairline) solid var(--separator);
+  border-radius: var(--radius-control);
+  font: var(--text-caption);
+}
+
+.photo {
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--photo-placeholder);
+}

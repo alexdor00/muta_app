@@ -4,7 +4,7 @@ import { useLocation } from 'preact-iso'
 import { logError } from '../../../../shared/lib/logger.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { DayCircles, OptionCards, Pills } from '../../components/Choices.tsx'
+import { ChoiceCards, ChoiceCircles, ChoicePills } from '../../../../shared/ui/Choice.tsx'
 import { DumbbellIcon, FlameIcon, HeartIcon } from '../../components/GoalIcons.tsx'
 import { OnboardingLayout } from '../../components/OnboardingLayout.tsx'
 import {
@@ -43,7 +43,7 @@ function StepGoal() {
       intro="Elige qué quieres conseguir. Puedes cambiarlo más adelante."
       action={<Next href={paths.onboarding(2)} />}
     >
-      <OptionCards
+      <ChoiceCards
         name="objetivo"
         legend="Objetivo"
         value={onboardingAnswers.value.goal}
@@ -81,7 +81,7 @@ function StepPlan() {
       intro="Cuéntanos tu nivel y disponibilidad para crear el plan perfecto."
       action={<Next onClick={finish} disabled={saving} />}
     >
-      <Pills
+      <ChoicePills
         name="nivel"
         legend="Nivel"
         showLegend
@@ -89,7 +89,7 @@ function StepPlan() {
         onChange={(level) => answer({ level })}
         options={levelOptions.map((level) => ({ value: level.id, label: level.label }))}
       />
-      <DayCircles
+      <ChoiceCircles
         name="dias"
         legend="Días por semana"
         showLegend
