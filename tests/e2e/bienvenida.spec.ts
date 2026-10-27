@@ -48,10 +48,17 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   // Elige tu rutina: intermedio y 4 días → recomienda Cuerpo completo A/B
   await expect(page).toHaveURL('/entreno/rutinas')
   const recomendadas = page.getByRole('region', { name: 'Recomendadas para ti' })
-  await expect(recomendadas.getByRole('button').first()).toContainText('Cuerpo completo A/B')
   await expect(page.getByText('Para 4 días por semana · nivel intermedio')).toBeVisible()
   await capture(page, 'elegir-rutina')
-  await recomendadas.getByRole('button', { name: /Cuerpo completo A\/B/ }).click()
+  // Una tarjeta por tipo de entrenamiento; Hipertrofia (con Cuerpo completo A/B) va primero
+  await expect(recomendadas.getByRole('button').first()).toContainText('Hipertrofia')
+  await recomendadas.getByRole('button', { name: /Hipertrofia/ }).click()
+  await expect(page).toHaveURL('/entreno/rutinas/hipertrofia?seccion=para-ti')
+  await capture(page, 'familia-rutina')
+  await page
+    .getByRole('region', { name: 'Para ti' })
+    .getByRole('button', { name: /Cuerpo completo A\/B/ })
+    .click()
   await expect(page).toHaveURL('/entreno')
   const profile = await page.evaluate(
     () =>

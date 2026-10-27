@@ -3,8 +3,13 @@
 export type Level = 'beginner' | 'intermediate' | 'advanced'
 export type Goal = 'gain_muscle' | 'lose_fat' | 'feel_better'
 
+export type FamilyId =
+  'hipertrofia' | 'ppl' | 'frecuencia' | 'fuerza' | 'gluteo' | 'esencial' | 'base' | 'casa'
+
 export type CatalogEntry = {
   id: string
+  /** Tipo de entrenamiento: las tarjetas se agrupan por familia. */
+  family: FamilyId
   /** Título grande de la tarjeta. */
   title: string
   /** Línea pequeña: tipo de reparto y días. */
@@ -25,6 +30,7 @@ export const CATALOG: CatalogEntry[] = [
   // Propias de MUTA (docs/conocimiento §8)
   {
     id: 'muta-cuerpo-completo-4d',
+    family: 'hipertrofia',
     title: 'Cuerpo completo A/B',
     subtitle: 'Cuerpo completo · 4 días',
     days: [3, 4],
@@ -34,6 +40,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'muta-ppl-6d',
+    family: 'ppl',
     title: 'Empuje, tirón y pierna',
     subtitle: 'Empuje, tirón y pierna · 6 días',
     days: [5, 6],
@@ -44,6 +51,7 @@ export const CATALOG: CatalogEntry[] = [
   // Esencial 45 min
   {
     id: 'esencial-45min-2d',
+    family: 'esencial',
     title: 'Esencial 45 min',
     subtitle: 'Cuerpo completo · 2 días',
     days: [2],
@@ -53,6 +61,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'esencial-45min-3d',
+    family: 'esencial',
     title: 'Esencial 45 min',
     subtitle: 'Cuerpo completo, torso y pierna · 3 días',
     days: [3],
@@ -62,6 +71,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'esencial-45min-4d',
+    family: 'esencial',
     title: 'Esencial 45 min',
     subtitle: 'Torso y pierna · 4 días',
     days: [4],
@@ -71,6 +81,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'esencial-45min-5d',
+    family: 'esencial',
     title: 'Esencial 45 min',
     subtitle: 'Torso, pierna, empuje y tirón · 5 días',
     days: [5],
@@ -81,6 +92,7 @@ export const CATALOG: CatalogEntry[] = [
   // Hipertrofia (dos fases)
   {
     id: 'hipertrofia-cuerpo-completo-5d-f1',
+    family: 'hipertrofia',
     title: 'Hipertrofia · Fase 1',
     subtitle: 'Cuerpo completo · 5 días',
     days: [5],
@@ -90,6 +102,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'hipertrofia-cuerpo-completo-5d-f2',
+    family: 'hipertrofia',
     title: 'Hipertrofia · Fase 2',
     subtitle: 'Cuerpo completo · 5 días',
     days: [5],
@@ -99,6 +112,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'hipertrofia-torso-pierna-f1',
+    family: 'hipertrofia',
     title: 'Hipertrofia · Fase 1',
     subtitle: 'Torso y pierna · 5 días',
     days: [4, 5],
@@ -108,6 +122,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'hipertrofia-torso-pierna-f2',
+    family: 'hipertrofia',
     title: 'Hipertrofia · Fase 2',
     subtitle: 'Torso y pierna · 5 días',
     days: [4, 5],
@@ -117,6 +132,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'hipertrofia-ppl-6d-f1',
+    family: 'hipertrofia',
     title: 'Hipertrofia · Fase 1',
     subtitle: 'Empuje, tirón y pierna · 6 días',
     days: [6],
@@ -126,6 +142,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'hipertrofia-ppl-6d-f2',
+    family: 'hipertrofia',
     title: 'Hipertrofia · Fase 2',
     subtitle: 'Empuje, tirón y pierna · 6 días',
     days: [6],
@@ -136,6 +153,7 @@ export const CATALOG: CatalogEntry[] = [
   // Frecuencia alta
   {
     id: 'frecuencia-alta-cuerpo-completo-4d',
+    family: 'frecuencia',
     title: 'Frecuencia alta',
     subtitle: 'Cuerpo completo · 4 días',
     days: [4],
@@ -145,6 +163,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'frecuencia-alta-cuerpo-completo-5d',
+    family: 'frecuencia',
     title: 'Frecuencia alta',
     subtitle: 'Cuerpo completo · 5 días',
     days: [5],
@@ -155,6 +174,7 @@ export const CATALOG: CatalogEntry[] = [
   // Fuerza e hipertrofia
   {
     id: 'fuerza-hipertrofia-1-6d',
+    family: 'fuerza',
     title: 'Fuerza e hipertrofia 1',
     subtitle: 'Cuerpo completo · 5–6 días',
     days: [5, 6],
@@ -164,6 +184,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'fuerza-hipertrofia-2-4d',
+    family: 'fuerza',
     title: 'Fuerza e hipertrofia 2',
     subtitle: 'Cuerpo completo · 4 días',
     days: [4],
@@ -173,6 +194,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'fuerza-hipertrofia-2-6d',
+    family: 'fuerza',
     title: 'Fuerza e hipertrofia 2',
     subtitle: 'Cuerpo completo · 5–6 días',
     days: [5, 6],
@@ -182,6 +204,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'fuerza-hipertrofia-3-5d',
+    family: 'fuerza',
     title: 'Fuerza e hipertrofia 3',
     subtitle: 'Cuerpo completo · 5 días',
     days: [5],
@@ -192,6 +215,7 @@ export const CATALOG: CatalogEntry[] = [
   // Empuje, tirón y pierna completo (tres fases)
   {
     id: 'ppl-completo-4d',
+    family: 'ppl',
     title: 'Empuje, tirón y pierna',
     subtitle: 'Tres fases · 4 días',
     days: [4],
@@ -201,6 +225,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'ppl-completo-5d',
+    family: 'ppl',
     title: 'Empuje, tirón y pierna',
     subtitle: 'Tres fases · 5 días',
     days: [5],
@@ -210,6 +235,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'ppl-completo-6d',
+    family: 'ppl',
     title: 'Empuje, tirón y pierna',
     subtitle: 'Tres fases · 6 días',
     days: [6],
@@ -219,6 +245,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'ppl-5d-editado',
+    family: 'ppl',
     title: 'Empuje, tirón y pierna',
     subtitle: 'Versión editada · 5 días',
     days: [5],
@@ -229,6 +256,7 @@ export const CATALOG: CatalogEntry[] = [
   // Programas que venían en PDF
   {
     id: 'mujer-base',
+    family: 'base',
     title: 'Base',
     subtitle: 'Cuerpo completo, torso y pierna o por grupos · 3–5 días',
     days: [3, 4, 5],
@@ -238,6 +266,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'mujer-casa',
+    family: 'casa',
     title: 'En casa',
     subtitle: 'Peso corporal, mancuernas y bandas · 3–4 días',
     days: [3, 4],
@@ -247,6 +276,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'gluteos',
+    family: 'gluteo',
     title: 'Glúteo',
     subtitle: 'Especialización · 5 días',
     days: [5],
@@ -256,6 +286,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'mujer-especializacion',
+    family: 'gluteo',
     title: 'Tren inferior',
     subtitle: 'Especialización · 6 días',
     days: [6],
@@ -265,6 +296,7 @@ export const CATALOG: CatalogEntry[] = [
   },
   {
     id: 'mujer-optimizacion',
+    family: 'fuerza',
     title: 'Optimización',
     subtitle: 'Fuerza e hipertrofia · 5 días',
     days: [5],

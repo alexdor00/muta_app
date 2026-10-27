@@ -5,31 +5,26 @@ import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { PhotoCard } from '../../../../shared/ui/PhotoCard.tsx'
 import { ScreenHeader } from '../../../../shared/ui/ScreenHeader.tsx'
-import { routines, type CatalogEntry } from '../../state/routines.ts'
+import { familySummary, groupByFamily, routines, type CatalogEntry } from '../../state/routines.ts'
 import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
 import { loadRoutines } from '../../use-cases/loadRoutines.ts'
 import styles from './ElegirRutinaScreen.module.css'
 
 const LEVEL_LABEL = { beginner: 'principiante', intermediate: 'intermedio', advanced: 'avanzado' } as const
+type Section = 'para-ti' | 'cinco-dias' | 'otras'
 
 /**
- * Elige tu rutina: las recomendadas según la bienvenida; para un principiante que pidió
- * más de 4 días, también las de 5; el resto, escondido detrás de «Ver rutinas de otros días».
+ * Elige tu rutina: una tarjeta por tipo de entrenamiento (familia).
+ * - Recomendadas: familias con alguna rutina de tus días y tu nivel.
+ * - Principiante que pidió más de 4 días: además, las familias con rutinas de 5.
+ * - El resto, detrás de «Ver rutinas de otros días».
+ * Al tocar una familia se ven sus versiones; si solo tiene una, se elige directamente.
  */
 export function ElegirRutinaScreen() {
   const { route } = useLocation()
   const [showOthers, setShowOthers] = useState(false)
   useEffect(() => void loadRoutines(), [])
   const state = routines.value
-
-  async function choose(id: string, adjusted: boolean) {
-    try {
-      await chooseRoutine(id, adjusted ? 'beginner' : null)
-      route(paths.training)
-    } catch (error) {
-      logError(error, 'elegir rutina')
-    }
-  }
 
   if (state.status !== 'ready') {
     return (
@@ -42,57 +37,67 @@ export function ElegirRutinaScreen() {
     )
   }
 
-  const intro = state.profile
-    ? `Para ${state.profile.daysPerWeek} días por semana · nivel ${LEVEL_LABEL[state.profile.level]}`
+  const ready = state
+  const intro = ready.profile
+    ? `Para ${ready.profile.daysPerWeek} días por semana · nivel ${LEVEL_LABEL[ready.profile.level]}`
     : undefined
 
-  const cards = (list: CatalogEntry[]) => (
+  async function open(section: Section, entries: CatalogEntry[]) {
+    if (entries.length > 1) {
+      route(paths.routineFamily(entries[0].family, section))
+      return
+    }
+    try {
+      const [entry] = entries
+      await chooseRoutine(entry.id, ready.adjusted.has(entry.id) ? 'beginner' : null)
+      route(paths.training)
+    } catch (error) {
+      logError(error, 'elegir rutina')
+    }
+  }
+
+  const familyCards = (section: Section, entries: CatalogEntry[]) => (
     <div class={styles.list}>
-      {list.map((entry) => {
-        const adjusted = state.adjusted.has(entry.id)
-        const badge =
-          entry.id === state.currentId ? 'Tu rutina' : adjusted ? 'Ajustada a tu nivel' : undefined
-        return (
-          <PhotoCard
-            key={entry.id}
-            title={entry.title}
-            subtitle={entry.subtitle}
-            tone={entry.tone}
-            badge={badge}
-            onClick={() => void choose(entry.id, adjusted)}
-          />
-        )
-      })}
+      {groupByFamily(entries).map(({ family, entries: group }) => (
+        <PhotoCard
+          key={family.id}
+          title={family.title}
+          subtitle={familySummary(group)}
+          tone={family.tone}
+          badge={group.some((e) => e.id === ready.currentId) ? 'Tu rutina' : undefined}
+          onClick={() => void open(section, group)}
+        />
+      ))}
     </div>
   )
 
   return (
     <div class={styles.page}>
       <ScreenHeader title="Elige tu rutina" intro={intro} avatarHref={paths.profile} />
-      {state.notice && (
+      {ready.notice && (
         <p class={styles.notice} role="note">
-          {state.notice}
+          {ready.notice}
         </p>
       )}
 
       <section class={styles.section} aria-label="Recomendadas para ti">
         <h2 class={styles.sectionTitle}>Recomendadas para ti</h2>
-        {cards(state.recommended)}
+        {familyCards('para-ti', ready.recommended)}
       </section>
 
-      {state.alsoAllowed.length > 0 && (
+      {ready.alsoAllowed.length > 0 && (
         <section class={styles.section} aria-label="Hasta 5 días">
           <h2 class={styles.sectionTitle}>Si prefieres 5 días</h2>
-          {cards(state.alsoAllowed)}
+          {familyCards('cinco-dias', ready.alsoAllowed)}
         </section>
       )}
 
-      {state.others.length > 0 && (
+      {ready.others.length > 0 && (
         <section class={styles.section} aria-label="Otras rutinas">
           {showOthers ? (
             <>
               <h2 class={styles.sectionTitle}>Rutinas de otros días</h2>
-              {cards(state.others)}
+              {familyCards('otras', ready.others)}
             </>
           ) : (
             <div class={styles.more}>

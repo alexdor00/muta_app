@@ -104,6 +104,11 @@ const ElegirRutina = screen(() =>
     (m) => m.ElegirRutinaScreen,
   ),
 )
+const FamiliaRutina = screen(() =>
+  import('../features/training/screens/elegir-rutina/FamiliaRutinaScreen.tsx').then(
+    (m) => m.FamiliaRutinaScreen,
+  ),
+)
 const DevUi = screen(() => import('./dev/DevUiScreen.tsx').then((m) => m.DevUiScreen))
 
 function Layout() {
@@ -118,6 +123,7 @@ function Layout() {
             <Route path={paths.training} component={TuPlan} />
             <Route path={paths.routine} component={TuRutina} />
             <Route path={paths.chooseRoutine} component={ElegirRutina} />
+            <Route path={patterns.routineFamily} component={FamiliaRutina} />
             <Route path={patterns.sessionStart} component={SesionInicio} />
             <Route path={patterns.summary} component={Resumen} />
             <Route path={patterns.session} component={Sesion} />

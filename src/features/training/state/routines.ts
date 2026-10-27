@@ -19,3 +19,7 @@ export type RoutinesState =
 export const routines = signal<RoutinesState>({ status: 'loading' })
 
 export type { CatalogEntry }
+
+// Agrupar por familia (las pantallas no usan el dominio directamente)
+export { FAMILIES, familySummary, groupByFamily, type FamilyGroup } from '../domain/families.ts'
+export type { FamilyId } from '../domain/catalog.ts'
