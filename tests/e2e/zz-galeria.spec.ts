@@ -119,6 +119,17 @@ test('galería de pantallas', async ({ browser }) => {
         'Elige tu rutina · otras rutinas desplegadas',
         'Lo que no es de tus días queda escondido detrás de «Ver rutinas de otros días».',
       )
+      await page
+        .getByRole('region', { name: 'Recomendadas para ti' })
+        .getByRole('button', { name: /Hipertrofia/ })
+        .click()
+      await expect(page).toHaveURL(/\/entreno\/rutinas\/hipertrofia/)
+      await shot(
+        page,
+        '10b-familia-hipertrofia',
+        'Tipo de rutina · Hipertrofia',
+        'Al tocar una familia: arriba «Para ti» (las versiones que encajan con tus días y nivel) y debajo «Más de este tipo». Se puede elegir cualquiera.',
+      )
     }
     if (file === '09-rutinas-intermedio-2') {
       // Con una rutina elegida: etiqueta «Tu rutina» y la app ya abre en Hoy
