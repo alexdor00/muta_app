@@ -10,6 +10,29 @@ export const GOALS: { id: Goal; title: string; detail: string }[] = [
   { id: 'feel_better', title: 'Sentirte mejor', detail: 'Más energía, mejor salud' },
 ]
 
+/** Fase de alimentación y entreno que marca cada objetivo. */
+export type Phase = 'bulk' | 'cut' | 'maintenance'
+
+/**
+ * Ganar músculo → volumen (superávit pequeño), perder grasa → definición (déficit),
+ * sentirte mejor → mantenimiento (comer lo que gastas).
+ */
+const PHASE_BY_GOAL: Record<Goal, Phase> = {
+  gain_muscle: 'bulk',
+  lose_fat: 'cut',
+  feel_better: 'maintenance',
+}
+
+export function phaseOf(goal: Goal): Phase {
+  return PHASE_BY_GOAL[goal]
+}
+
+export const PHASE_LABELS: Record<Phase, string> = {
+  bulk: 'Volumen',
+  cut: 'Definición',
+  maintenance: 'Mantenimiento',
+}
+
 export const LEVELS: { id: Level; label: string }[] = [
   { id: 'beginner', label: 'Principiante' },
   { id: 'intermediate', label: 'Intermedio' },

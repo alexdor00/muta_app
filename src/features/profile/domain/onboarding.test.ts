@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildProfile, DEFAULT_ANSWERS, isValidAnswers } from './onboarding.ts'
+import { buildProfile, DEFAULT_ANSWERS, isValidAnswers, PHASE_LABELS, phaseOf } from './onboarding.ts'
 
 describe('bienvenida', () => {
   it('las respuestas por defecto son las marcadas en el diseño', () => {
@@ -22,6 +22,13 @@ describe('bienvenida', () => {
       updatedAt: '2026-10-27T10:00:00.000Z',
       deletedAt: null,
     })
+  })
+
+  it('cada objetivo marca su fase: volumen, definición o mantenimiento', () => {
+    expect(phaseOf('gain_muscle')).toBe('bulk')
+    expect(phaseOf('lose_fat')).toBe('cut')
+    expect(phaseOf('feel_better')).toBe('maintenance')
+    expect(PHASE_LABELS[phaseOf('feel_better')]).toBe('Mantenimiento')
   })
 
   it('rechaza días fuera de 2 a 6', () => {
