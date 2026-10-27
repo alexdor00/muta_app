@@ -274,26 +274,63 @@ export const CATALOG: CatalogEntry[] = [
   },
 ]
 
-export type Recommendation = { recommended: CatalogEntry[]; others: CatalogEntry[] }
+/** A un principiante se le recomiendan como mucho 4 días y puede elegir hasta 5. */
+export const BEGINNER_RECOMMENDED_DAYS = 4
+export const BEGINNER_MAX_DAYS = 5
+
+export type Recommendation = {
+  recommended: CatalogEntry[]
+  /** Principiante que pidió más de 4 días: las de 5, que puede elegir aunque no se recomienden. */
+  alsoAllowed: CatalogEntry[]
+  others: CatalogEntry[]
+  /** Rutinas de nivel intermedio que se ajustan a principiante al elegirlas. */
+  adjusted: ReadonlySet<string>
+  /** Días con los que se ha buscado (puede ser menos de los elegidos). */
+  targetDays: number
+  /** Aviso cuando se buscan menos días de los elegidos. */
+  notice: string | null
+}
+
+/** ¿Se ajusta esta rutina para este nivel? Solo las de intermedio cuando eres principiante. */
+export function needsBeginnerAdjust(entry: CatalogEntry, level: Level): boolean {
+  return level === 'beginner' && !entry.levels.includes('beginner') && entry.levels.includes('intermediate')
+}
 
 /**
  * Rutinas que encajan con lo elegido en la bienvenida: los mismos días por semana y el nivel.
- * Si ninguna encaja del todo, se recomiendan las del día más cercano. El resto va en «Otras».
- * Solo entran las que estén disponibles (propias o cargadas en local).
+ * - Principiante: como mucho 5 días (con aviso), y también las de intermedio, que se ajustan.
+ * - Si ninguna encaja del todo, se recomiendan las del día más cercano.
+ * - El resto va en «otras». Solo entran las disponibles (propias o cargadas en local).
  */
 export function recommend(
   profile: { daysPerWeek: number; level: Level },
   available: ReadonlySet<string>,
 ): Recommendation {
+  const beginner = profile.level === 'beginner'
+  const targetDays = beginner ? Math.min(profile.daysPerWeek, BEGINNER_RECOMMENDED_DAYS) : profile.daysPerWeek
+  const notice =
+    targetDays < profile.daysPerWeek
+      ? `Empezando, más días no es mejor: con ${targetDays} progresas igual y recuperas mejor. Si lo prefieres, puedes elegir una de ${BEGINNER_MAX_DAYS} como máximo.`
+      : null
+
   const list = CATALOG.filter((entry) => entry.origin === 'muta' || available.has(entry.id))
-  const fitsLevel = (entry: CatalogEntry) => entry.levels.includes(profile.level)
-  const distance = (entry: CatalogEntry) =>
-    Math.min(...entry.days.map((d) => Math.abs(d - profile.daysPerWeek)))
+  const fitsLevel = (entry: CatalogEntry) =>
+    entry.levels.includes(profile.level) || needsBeginnerAdjust(entry, profile.level)
+  const distance = (entry: CatalogEntry) => Math.min(...entry.days.map((d) => Math.abs(d - targetDays)))
   const candidates = list.filter(fitsLevel)
   const best = Math.min(...candidates.map(distance))
-  const recommended = candidates
-    .filter((entry) => distance(entry) === best)
-    .sort((a, b) => Number(b.origin === 'muta') - Number(a.origin === 'muta'))
-  const others = list.filter((entry) => !recommended.includes(entry))
-  return { recommended, others }
+  // Primero las pensadas para tu nivel (las propias delante); al final las ajustadas.
+  const rank = (entry: CatalogEntry) =>
+    (needsBeginnerAdjust(entry, profile.level) ? 2 : 0) + (entry.origin === 'muta' ? 0 : 1)
+  const byRank = (a: CatalogEntry, b: CatalogEntry) => rank(a) - rank(b)
+  const recommended = candidates.filter((entry) => distance(entry) === best).sort(byRank)
+  const alsoAllowed =
+    beginner && profile.daysPerWeek > targetDays
+      ? candidates
+          .filter((entry) => !recommended.includes(entry) && entry.days.includes(BEGINNER_MAX_DAYS))
+          .sort(byRank)
+      : []
+  const others = list.filter((entry) => !recommended.includes(entry) && !alsoAllowed.includes(entry))
+  const adjusted = new Set(list.filter((e) => needsBeginnerAdjust(e, profile.level)).map((e) => e.id))
+  return { recommended, alsoAllowed, others, adjusted, targetDays, notice }
 }

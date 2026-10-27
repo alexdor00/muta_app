@@ -17,8 +17,17 @@ export async function loadRoutines(): Promise<void> {
         : null
     const available = new Set((await db.getAllKeys('programs')).map(String))
     const plan = (await db.get('plans', 'current')) as { programId?: string } | undefined
-    const { recommended, others } = recommend(profile ?? { daysPerWeek: 3, level: 'beginner' }, available)
-    routines.value = { status: 'ready', profile, recommended, others, currentId: plan?.programId ?? null }
+    const rec = recommend(profile ?? { daysPerWeek: 3, level: 'beginner' }, available)
+    routines.value = {
+      status: 'ready',
+      profile,
+      recommended: rec.recommended,
+      alsoAllowed: rec.alsoAllowed,
+      others: rec.others,
+      adjusted: rec.adjusted,
+      notice: rec.notice,
+      currentId: plan?.programId ?? null,
+    }
   } catch (error) {
     logError(error, 'cargar rutinas')
     routines.value = { status: 'error' }

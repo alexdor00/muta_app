@@ -41,6 +41,20 @@ export const LEVELS: { id: Level; label: string }[] = [
 
 export const DAYS_OPTIONS = [2, 3, 4, 5, 6] as const
 
+/** Un principiante puede elegir como mucho 5 días por semana. */
+export const BEGINNER_MAX_DAYS = 5
+
+/** Días que se pueden elegir con este nivel. */
+export function daysFor(level: Level): number[] {
+  return DAYS_OPTIONS.filter((days) => level !== 'beginner' || days <= BEGINNER_MAX_DAYS)
+}
+
+/** Al cambiar el nivel, los días se quedan dentro de lo permitido. */
+export function clampDays(answers: OnboardingAnswers): OnboardingAnswers {
+  const allowed = daysFor(answers.level)
+  return allowed.includes(answers.daysPerWeek) ? answers : { ...answers, daysPerWeek: Math.max(...allowed) }
+}
+
 export type OnboardingAnswers = { goal: Goal; level: Level; daysPerWeek: number }
 
 /** Lo que sale marcado en el diseño al entrar. */

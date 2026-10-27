@@ -32,6 +32,43 @@ describe('recommend', () => {
     expect(recommended.some((e) => others.includes(e))).toBe(false)
   })
 
+  it('principiante con 5 o 6 días: se recomiendan de 4, con aviso, y puede elegir de 5', () => {
+    for (const days of [5, 6]) {
+      const r = recommend({ daysPerWeek: days, level: 'beginner' }, everything)
+      expect(r.targetDays).toBe(4)
+      expect(r.notice).toMatch(/más días no es mejor/)
+      expect(r.recommended.every((e) => e.days.includes(4))).toBe(true)
+      expect(r.alsoAllowed.length).toBeGreaterThan(0)
+      expect(r.alsoAllowed.every((e) => e.days.includes(5))).toBe(true)
+      // Nunca se le ofrece una solo de 6 días
+      expect([...r.recommended, ...r.alsoAllowed].some((e) => e.days.every((d) => d > 5))).toBe(false)
+    }
+  })
+
+  it('principiante con 4 días o menos: sin aviso ni opciones de 5', () => {
+    const r = recommend({ daysPerWeek: 4, level: 'beginner' }, everything)
+    expect(r.notice).toBeNull()
+    expect(r.alsoAllowed).toEqual([])
+  })
+
+  it('principiante: las de intermedio entran ajustadas; las solo de avanzado no', () => {
+    const r = recommend({ daysPerWeek: 5, level: 'beginner' }, everything)
+    const ids = r.alsoAllowed.map((e) => e.id)
+    expect(ids).toContain('hipertrofia-cuerpo-completo-5d-f1')
+    expect(r.adjusted.has('hipertrofia-cuerpo-completo-5d-f1')).toBe(true)
+    expect(ids).not.toContain('fuerza-hipertrofia-3-5d') // solo avanzado
+    expect(r.adjusted.has('esencial-45min-5d')).toBe(false) // ya es para principiante
+    // Las pensadas para su nivel van antes que las ajustadas
+    const firstAdjusted = ids.findIndex((id) => r.adjusted.has(id))
+    expect(ids.slice(firstAdjusted).every((id) => r.adjusted.has(id))).toBe(true)
+  })
+
+  it('intermedio y avanzado no llevan aviso ni ajustes', () => {
+    const r = recommend({ daysPerWeek: 6, level: 'intermediate' }, everything)
+    expect(r.notice).toBeNull()
+    expect(r.adjusted.size).toBe(0)
+  })
+
   it('cada id del catálogo es único', () => {
     expect(new Set(CATALOG.map((e) => e.id)).size).toBe(CATALOG.length)
   })

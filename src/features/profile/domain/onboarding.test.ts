@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { buildProfile, DEFAULT_ANSWERS, isValidAnswers, PHASE_LABELS, phaseOf } from './onboarding.ts'
+import {
+  buildProfile,
+  clampDays,
+  daysFor,
+  DEFAULT_ANSWERS,
+  isValidAnswers,
+  PHASE_LABELS,
+  phaseOf,
+} from './onboarding.ts'
 
 describe('bienvenida', () => {
   it('las respuestas por defecto son las marcadas en el diseño', () => {
@@ -29,6 +37,13 @@ describe('bienvenida', () => {
     expect(phaseOf('lose_fat')).toBe('cut')
     expect(phaseOf('feel_better')).toBe('maintenance')
     expect(PHASE_LABELS[phaseOf('feel_better')]).toBe('Mantenimiento')
+  })
+
+  it('principiante: como mucho 5 días; al pasar a principiante, 6 baja a 5', () => {
+    expect(daysFor('beginner')).toEqual([2, 3, 4, 5])
+    expect(daysFor('intermediate')).toEqual([2, 3, 4, 5, 6])
+    expect(clampDays({ goal: 'gain_muscle', level: 'beginner', daysPerWeek: 6 }).daysPerWeek).toBe(5)
+    expect(clampDays({ goal: 'gain_muscle', level: 'beginner', daysPerWeek: 3 }).daysPerWeek).toBe(3)
   })
 
   it('rechaza días fuera de 2 a 6', () => {

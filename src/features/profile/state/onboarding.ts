@@ -1,6 +1,7 @@
 import { signal } from '@preact/signals'
 import {
-  DAYS_OPTIONS,
+  clampDays,
+  daysFor,
   DEFAULT_ANSWERS,
   GOALS,
   LEVELS,
@@ -12,11 +13,11 @@ import {
 export const onboardingAnswers = signal<OnboardingAnswers>(DEFAULT_ANSWERS)
 
 export function answer(changes: Partial<OnboardingAnswers>): void {
-  onboardingAnswers.value = { ...onboardingAnswers.value, ...changes }
+  onboardingAnswers.value = clampDays({ ...onboardingAnswers.value, ...changes })
 }
 
 // Opciones que enseñan las pantallas (salen del dominio; las pantallas no lo usan directamente).
 export const goalOptions = GOALS
 export const levelOptions = LEVELS
-export const daysOptions = DAYS_OPTIONS
+export const daysOptionsFor = daysFor
 export type { Goal }

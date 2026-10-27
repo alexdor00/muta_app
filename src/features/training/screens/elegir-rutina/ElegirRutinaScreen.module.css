@@ -25,3 +25,15 @@
   font: var(--text-subhead);
   color: var(--label-2);
 }
+
+.notice {
+  margin: 0 var(--gutter) var(--gap-block);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: var(--text-footnote);
+}
+
+.more {
+  padding: 0 var(--gutter);
+}

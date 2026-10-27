@@ -9,7 +9,7 @@ import { DumbbellIcon, FlameIcon, HeartIcon } from '../../components/GoalIcons.t
 import { OnboardingLayout } from '../../components/OnboardingLayout.tsx'
 import {
   answer,
-  daysOptions,
+  daysOptionsFor,
   goalOptions,
   levelOptions,
   onboardingAnswers,
@@ -95,7 +95,10 @@ function StepPlan() {
         showLegend
         value={onboardingAnswers.value.daysPerWeek}
         onChange={(daysPerWeek) => answer({ daysPerWeek })}
-        options={daysOptions.map((days) => ({ value: days, label: String(days) }))}
+        options={daysOptionsFor(onboardingAnswers.value.level).map((days) => ({
+          value: days,
+          label: String(days),
+        }))}
       />
     </OnboardingLayout>
   )
