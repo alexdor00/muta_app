@@ -5,6 +5,7 @@
 import fs from 'node:fs'
 import { chromium } from '@playwright/test'
 import { CATALOG, sourceOf } from '../src/features/training/domain/catalog.ts'
+import { rirLabel } from '../src/features/training/domain/routineView.ts'
 import { MUSCLES, type MuscleId } from '../src/features/training/domain/muscles.ts'
 import { selectVariant } from '../src/features/training/domain/programInfo.ts'
 import { representativeWeek, weeklySets } from '../src/features/training/domain/programLevel.ts'
@@ -54,7 +55,7 @@ for (const entry of CATALOG) {
     }
     sessions += `<tr class="session"><td colspan="5">${esc(day.name)}</td></tr>`
     for (const e of visible(day.exercises)) {
-      const effort = e.percent1RM ? e.percent1RM : e.rpe ? `RPE ${e.rpe}` : '—'
+      const effort = e.percent1RM ? e.percent1RM : e.rpe ? rirLabel(e.rpe) : '—'
       sessions += `<tr><td class="ex">${esc(e.name)}</td><td>${esc(e.sets ?? '–')}</td><td>${esc(e.reps ?? '–')}</td><td>${esc(effort)}</td><td>${esc(e.rest ?? '—')}</td></tr>`
     }
   }
@@ -97,7 +98,7 @@ const page = `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>
   tr { break-inside: avoid; }
 </style></head><body>
 <h1>Fichas de rutinas</h1>
-<p class="lead">Cada rutina exactamente como está diseñada, igual para todos los niveles: su semana representativa ejercicio a ejercicio y las series directas por semana y músculo. El nivel y el objetivo solo sirven para recomendar; el volumen lo ajustará el coach según cómo respondas (1–2 series de un músculo, una cosa cada vez).</p>
+<p class="lead">Cada rutina exactamente como está diseñada, igual para todos los niveles: su semana representativa ejercicio a ejercicio y las series directas por semana y músculo. Esfuerzo en RIR (repeticiones en reserva = 10 − RPE) o en % de tu máximo. El nivel y el objetivo solo sirven para recomendar; el volumen lo ajustará el coach según cómo respondas (1–2 series de un músculo, una cosa cada vez).</p>
 <ol class="index">${index}</ol>
 ${html}
 </body></html>`

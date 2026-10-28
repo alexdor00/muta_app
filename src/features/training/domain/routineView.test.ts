@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type { CatalogEntry } from './catalog.ts'
 import type { ProgramInfo } from './programInfo.ts'
-import { activeFilters, durationOf, matches, metaLines, restNote, routineView } from './routineView.ts'
+import {
+  activeFilters,
+  durationOf,
+  matches,
+  metaLines,
+  restNote,
+  rirLabel,
+  routineView,
+} from './routineView.ts'
 
 const entry: CatalogEntry = { id: 'x', title: 'X', days: [4], tone: 1, origin: 'muta', family: 'muta' }
 const info = (over: Partial<ProgramInfo> = {}): ProgramInfo => ({
@@ -108,5 +116,16 @@ describe('detalle', () => {
     const session = adapted.phases[0].weeks[0].days[0]
     expect(session.type === 'session' && session.exercises.some((e) => e.status === 'changed')).toBe(true)
     expect(adapted.phases[0].weeks[0].days[1]).toEqual({ type: 'rest', note: 'Descanso · 1–2 días' })
+  })
+})
+
+describe('esfuerzo en RIR', () => {
+  it('convierte el RPE del programa a repeticiones en reserva', () => {
+    expect(rirLabel('8')).toBe('RIR 2')
+    expect(rirLabel('7-8')).toBe('RIR 2-3')
+    expect(rirLabel('~9-10')).toBe('RIR ~0-1')
+    expect(rirLabel('RPE8')).toBe('RIR 2')
+    expect(rirLabel('8.5')).toBe('RIR 1.5')
+    expect(rirLabel('N/A')).toBe('N/A')
   })
 })

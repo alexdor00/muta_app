@@ -85,7 +85,7 @@ export type ExerciseView = {
   name: string
   /** «3 × 8-10». */
   prescription: string
-  /** «RPE 8» o «75 %». */
+  /** «RIR 2» o «75 %». */
   effort: string | null
   rest: string | null
   status: 'same' | 'changed' | 'added' | 'removed'
@@ -98,14 +98,25 @@ export type DayView =
 export type WeekView = { week: number; days: DayView[] }
 export type PhaseView = { title: string | null; weeks: WeekView[] }
 
+/**
+ * El esfuerzo se enseña en RIR (repeticiones en reserva = 10 − RPE). Los programas guardan el RPE
+ * original («8», «7-8», «~9-10»); un rango se invierte («7-8» → «RIR 2-3»). Sin número, tal cual.
+ */
+export function rirLabel(rpe: string): string {
+  const nums = [...rpe.matchAll(/\d+(?:[.,]\d+)?/g)].map((m) => Number(m[0].replace(',', '.')))
+  if (!nums.length || nums.some((n) => n > 10)) return rpe
+  const rir = [...new Set(nums.map((n) => Math.round((10 - n) * 10) / 10))].sort((a, b) => a - b)
+  return `RIR ${rpe.trim().startsWith('~') ? '~' : ''}${rir.join('-')}`
+}
+
 function exerciseView(e: Exercise): ExerciseView {
   const status = e.removed ? 'removed' : e.added ? 'added' : e.original ? 'changed' : 'same'
-  const effort = e.percent1RM ? e.percent1RM : e.rpe ? `RPE ${e.rpe}` : null
+  const effort = e.percent1RM ? e.percent1RM : e.rpe ? rirLabel(e.rpe) : null
   const before =
     status === 'changed' && e.original
       ? [
           e.original.sets !== e.sets ? `${e.original.sets} series` : null,
-          e.original.rpe !== e.rpe && e.original.rpe ? `RPE ${e.original.rpe}` : null,
+          e.original.rpe !== e.rpe && e.original.rpe ? rirLabel(e.original.rpe) : null,
         ]
           .filter(Boolean)
           .join(' · ') || null
