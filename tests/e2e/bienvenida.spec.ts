@@ -68,14 +68,11 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.getByRole('button', { name: 'Ver 1 rutina' }).click()
   await page.getByRole('link', { name: /Cuerpo completo A\/B/ }).click()
 
-  // Detalle: «Adaptar a mí» con lo del perfil (intermedio, definición → mantener)
+  // Detalle: la rutina tal cual, sin selector de nivel
   await expect(page).toHaveURL('/entreno/programa/muta-cuerpo-completo-4d')
-  await page.getByRole('button', { name: 'Adaptar a mí' }).click()
-  await expect(page.getByRole('radio', { name: 'Intermedio' })).toBeChecked()
-  await expect(page.getByRole('radio', { name: 'Mantener músculo' })).toBeChecked()
-  await expect(page.getByRole('list', { name: 'Cambios por músculo' })).toBeVisible()
-  await capture(page, 'rutina-adaptada')
-  await page.getByRole('button', { name: 'Empezar mi versión' }).click()
+  await expect(page.getByRole('button', { name: 'Adaptar a mí' })).toHaveCount(0)
+  await capture(page, 'rutina')
+  await page.getByRole('button', { name: 'Empezar esta rutina' }).click()
   await expect(page).toHaveURL('/entreno')
   const profile = await page.evaluate(
     () =>
@@ -100,7 +97,7 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   )
   expect(plan).toMatchObject({
     programId: 'muta-cuerpo-completo-4d',
-    adaptation: { level: 'intermediate', goal: 'maintain' },
+    adaptation: null,
   })
 
   // Con perfil, la app ya no abre en la bienvenida

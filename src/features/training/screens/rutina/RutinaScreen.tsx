@@ -3,28 +3,18 @@ import { useLocation } from 'preact-iso'
 import { logError } from '../../../../shared/lib/logger.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { ChoiceChips, ChoicePills } from '../../../../shared/ui/Choice.tsx'
+import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
 import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
-import { CATEGORIES, routineDetail, type Adaptation, type Level } from '../../state/routines.ts'
+import { CATEGORIES, routineDetail } from '../../state/routines.ts'
 import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
-import { adaptRoutine, openRoutine } from '../../use-cases/routineDetail.ts'
+import { openRoutine } from '../../use-cases/routineDetail.ts'
 import styles from './RutinaScreen.module.css'
 
-const LEVELS: { value: Level; label: string }[] = [
-  { value: 'beginner', label: 'Principiante' },
-  { value: 'intermediate', label: 'Intermedio' },
-  { value: 'advanced', label: 'Avanzado' },
-]
-const GOALS: { value: Adaptation['goal']; label: string }[] = [
-  { value: 'maintain', label: 'Mantener músculo' },
-  { value: 'develop', label: 'Ganar músculo' },
-]
 const STATUS = { added: 'Añadido', removed: 'Quitado', changed: 'Ajustado', same: null } as const
 
 /**
- * Detalle de una rutina: datos clave, «Adaptar a mí» (nivel y objetivo de las series),
- * estructura por fases, semanas y días con sus descansos, y «Empezar esta rutina».
+ * Detalle de una rutina tal cual está diseñada: datos clave, estructura por fases, semanas y días con sus descansos, y «Empezar esta rutina».
  */
 export function RutinaScreen(props: { id: string }) {
   const { route } = useLocation()
@@ -45,7 +35,7 @@ export function RutinaScreen(props: { id: string }) {
     )
   }
 
-  const { item, adaptation, suggested, phases, changes } = state
+  const { item, phases } = state
   const { entry, info } = item
   const back = paths.routineCategory(item.categories[0] ?? 'hipertrofia')
   const currentPhase = phases[Math.min(phase, phases.length - 1)]
@@ -53,7 +43,7 @@ export function RutinaScreen(props: { id: string }) {
 
   async function start() {
     try {
-      await chooseRoutine(entry.id, adaptation)
+      await chooseRoutine(entry.id)
       route(paths.training)
     } catch (error) {
       logError(error, 'empezar rutina')
@@ -104,59 +94,8 @@ export function RutinaScreen(props: { id: string }) {
         ))}
       </dl>
 
-      <section class={styles.adapt} aria-label="Adaptar a mí">
-        <h2 class={styles.h2}>Adaptar a mí</h2>
-        <p class={styles.text}>
-          Ajusta las series de cada músculo a tu nivel y a lo que buscas, con los rangos de tu base de
-          conocimiento. La rutina original no se pierde.
-        </p>
-        {adaptation ? (
-          <>
-            <div class={styles.choices}>
-              <ChoicePills
-                name="nivel"
-                legend="Nivel"
-                showLegend
-                options={LEVELS}
-                value={adaptation.level}
-                onChange={(level) => adaptRoutine({ ...adaptation, level })}
-              />
-              <ChoicePills
-                name="objetivo"
-                legend="Las series para"
-                showLegend
-                options={GOALS}
-                value={adaptation.goal}
-                onChange={(goal) => adaptRoutine({ ...adaptation, goal })}
-              />
-            </div>
-            {changes.length > 0 ? (
-              <ul class={styles.changes} aria-label="Cambios por músculo">
-                {changes.map((c) => (
-                  <li key={c.muscle}>
-                    <span>{c.muscle}</span>
-                    <span class={styles.change}>
-                      {c.before} → <b>{c.after}</b> series/semana
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p class={styles.text}>Ya encaja con tu nivel y objetivo: no hace falta cambiar nada.</p>
-            )}
-            <Button variant="secondary" onClick={() => adaptRoutine(null)}>
-              Ver la original
-            </Button>
-          </>
-        ) : (
-          <Button variant="secondary" onClick={() => adaptRoutine(suggested)}>
-            Adaptar a mí
-          </Button>
-        )}
-      </section>
-
       <section class={styles.structure} aria-label="Estructura">
-        <h2 class={styles.h2}>{adaptation ? 'Tu versión' : 'Estructura'}</h2>
+        <h2 class={styles.h2}>Estructura</h2>
         {phases.length > 1 && (
           <ChoiceChips
             name="fase"
@@ -222,9 +161,7 @@ export function RutinaScreen(props: { id: string }) {
       </section>
 
       <div class={styles.footer}>
-        <Button onClick={() => void start()}>
-          {adaptation ? 'Empezar mi versión' : 'Empezar esta rutina'}
-        </Button>
+        <Button onClick={() => void start()}>Empezar esta rutina</Button>
       </div>
     </div>
   )

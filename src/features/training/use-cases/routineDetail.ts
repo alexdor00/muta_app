@@ -2,24 +2,16 @@ import { getDb } from '../../../shared/data/db.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import cuerpoCompleto from '../../../shared/content/programs/muta-cuerpo-completo-4d.json'
 import ppl from '../../../shared/content/programs/muta-ppl-6d.json'
-import type { SetsGoal } from '../domain/adaptVolume.ts'
-import { CATALOG, sourceOf, type Phase } from '../domain/catalog.ts'
+import { CATALOG, sourceOf } from '../domain/catalog.ts'
 import { selectVariant, type ProgramData } from '../domain/programInfo.ts'
-import { metaLines, routineView, type Adaptation } from '../domain/routineView.ts'
+import { metaLines, phasesView } from '../domain/routineView.ts'
 import { routineDetail, routines } from '../state/routines.ts'
 import { INFO, loadRoutines } from './loadRoutines.ts'
 
 /** Programas propios de MUTA: van en el código. */
 export const BUILT_IN: Record<string, unknown> = { [cuerpoCompleto.id]: cuerpoCompleto, [ppl.id]: ppl }
 
-let program: ProgramData | null = null
-let days = 0
-
-/** Objetivo de las series según la fase: definición y mantenimiento → mantener; volumen → ganar. */
-export const goalForPhase = (phase: Phase | null): SetsGoal =>
-  phase === 'bulk' || !phase ? 'develop' : 'maintain'
-
-/** Abre una rutina: carga su programa (propio o local) y la enseña sin adaptar. */
+/** Abre una rutina: carga su programa (propio o local) y la enseña tal cual está diseñada. */
 export async function openRoutine(id: string): Promise<void> {
   routineDetail.value = { status: 'loading' }
   try {
@@ -38,8 +30,6 @@ export async function openRoutine(id: string): Promise<void> {
       routineDetail.value = { status: 'missing' }
       return
     }
-    program = selectVariant(raw, entry.variant)
-    days = Math.max(...entry.days)
     const item = state.items.find((i) => i.entry.id === id) ?? {
       entry,
       info,
@@ -48,26 +38,13 @@ export async function openRoutine(id: string): Promise<void> {
       allowed: false,
       lines: metaLines(entry, info),
     }
-    const suggested: Adaptation = {
-      level: state.profile?.level ?? 'intermediate',
-      goal: goalForPhase(state.profile?.phase ?? null),
-    }
     routineDetail.value = {
       status: 'ready',
       item,
-      adaptation: null,
-      suggested,
-      ...routineView(program as never, days, null),
+      phases: phasesView(selectVariant(raw, entry.variant) as never),
     }
   } catch (error) {
     logError(error, 'abrir rutina')
     routineDetail.value = { status: 'missing' }
   }
-}
-
-/** «Adaptar a mí»: aplica (o quita, con null) el ajuste de nivel y objetivo. */
-export function adaptRoutine(adaptation: Adaptation | null): void {
-  const state = routineDetail.value
-  if (state.status !== 'ready' || !program) return
-  routineDetail.value = { ...state, adaptation, ...routineView(program as never, days, adaptation) }
 }

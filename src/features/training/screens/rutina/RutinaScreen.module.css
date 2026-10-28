@@ -37,54 +37,6 @@
   color: var(--label-2);
 }
 
-.adapt {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  margin: var(--space-8) var(--gutter) 0;
-  padding: var(--space-5);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-}
-
-.adapt .text {
-  margin-top: calc(var(--space-2) * -1);
-}
-
-.choices {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.choices fieldset + fieldset {
-  margin-top: 0;
-}
-
-.changes {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font: var(--text-subhead);
-}
-
-.changes li {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.change {
-  color: var(--label-2);
-}
-
-.change b {
-  color: var(--label);
-}
-
 .structure {
   display: flex;
   flex-direction: column;

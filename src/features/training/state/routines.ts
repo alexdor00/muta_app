@@ -2,7 +2,7 @@ import { signal } from '@preact/signals'
 import type { CatalogEntry, Level, Phase } from '../domain/catalog.ts'
 import type { Category, CategoryId } from '../domain/categories.ts'
 import type { ProgramInfo } from '../domain/programInfo.ts'
-import type { Adaptation, PhaseView, VolumeChange } from '../domain/routineView.ts'
+import type { Adaptation, PhaseView } from '../domain/routineView.ts'
 
 /** Una rutina lista para enseñar. */
 export type RoutineItem = {
@@ -41,12 +41,8 @@ export type DetailState =
   | {
       status: 'ready'
       item: RoutineItem
-      /** «Adaptar a mí»: nivel y objetivo de las series. Sin adaptar, null. */
-      adaptation: Adaptation | null
-      /** Lo que se propone al pulsar «Adaptar a mí» (del perfil). */
-      suggested: Adaptation
+      /** La rutina tal cual: el volumen solo lo ajustará el coach según cómo respondas. */
       phases: PhaseView[]
-      changes: VolumeChange[]
     }
 
 /** Rutina abierta en detalle. */

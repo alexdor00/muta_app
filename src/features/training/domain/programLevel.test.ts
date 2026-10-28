@@ -10,7 +10,7 @@ const ex = (originalName: string, sets: number, kind: 'heavy' | 'compound' | 'is
   sets,
   kind,
   rpe: '9',
-  percent1RM: null,
+  percent1RM: null as string | null,
 })
 const program = (days: ReturnType<typeof ex>[][]) => ({
   blocks: [{ weeks: [{ week: 1, days: days.map((exercises) => ({ exercises })) }] }],
@@ -141,5 +141,47 @@ describe('adaptar para mantener', () => {
     const sets = programLevel(out, 2).sets
     expect(sets.dorsal!).toBeLessThanOrEqual(4) // mantener dorsal 2–4
     expect(sets.cuadriceps!).toBeLessThanOrEqual(6) // mantener cuádriceps 4–6
+  })
+})
+
+describe('rutinas especiales', () => {
+  it('los básicos por %1RM no se tocan; solo los accesorios', () => {
+    const p = program([
+      [
+        { ...ex('Back Squat', 5, 'heavy'), percent1RM: '80 %' },
+        ex('Leg Press', 4),
+        ex('Leg Extension', 4, 'isolation'),
+      ],
+      [{ ...ex('Back Squat', 5, 'heavy'), percent1RM: '75 %' }, ex('Hack Squat', 4)],
+    ])
+    const out = adaptToLevel(p, 'beginner', 2)
+    const day = out.blocks[0].weeks[0].days[0] as {
+      exercises: { sets: unknown; percent1RM: string | null }[]
+    }
+    expect(day.exercises[0].sets).toBe(5)
+    expect(day.exercises.slice(1).some((e) => e.sets !== 4)).toBe(true)
+  })
+
+  it('conserva las olas de volumen: la semana de descarga sigue siendo más ligera', () => {
+    const week = (n: number, sets: number) => ({
+      week: n,
+      days: [
+        {
+          exercises: [
+            ex('Bench Press', sets),
+            ex('Incline DB Press', sets),
+            ex('Cable Fly', sets, 'isolation'),
+          ],
+        },
+      ],
+    })
+    const p = { blocks: [{ weeks: [week(1, 4), week(2, 4), week(3, 4), week(4, 2)] }] }
+    const out = adaptToLevel(p, 'beginner', 1)
+    const total = (i: number) =>
+      (out.blocks[0].weeks[i].days[0] as { exercises: { sets: number }[] }).exercises.reduce(
+        (n, e) => n + e.sets,
+        0,
+      )
+    expect(total(3)).toBeLessThan(total(0))
   })
 })

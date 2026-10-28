@@ -2,9 +2,10 @@ import type { Level } from './catalog.ts'
 import { muscleOf } from './muscleOf.ts'
 import { rangeFor, type MuscleId } from './muscles.ts'
 import { emphasisOf } from './programInfo.ts'
-import { levelFromSets, weeklySets } from './programLevel.ts'
+import { levelFromSets, representativeWeek, weeklySets } from './programLevel.ts'
 
-// Adapta una rutina a un nivel músculo a músculo (docs/conocimiento, Parte II §4 «calibración»):
+// Las rutinas se enseñan y se empiezan tal cual. Esto es para el coach: cuando tus datos lo pidan
+// (estancado, sin recuperar), ajusta el volumen músculo a músculo (docs/conocimiento, Parte II §4):
 // - Por debajo del rango: +1 serie al ejercicio con menos series del músculo
 //   (máx. 4 por ejercicio, 5 en aislamientos; sin pasar de 11 series del músculo en la sesión).
 // - Por encima: −1 serie al ejercicio con más series (primero aislamientos), mínimo 1.
@@ -83,7 +84,13 @@ function adaptWeek(week: Week, level: Level, daysPerWeek: number, goal: SetsGoal
       days.flatMap((day) =>
         day.exercises
           .filter(
-            (e) => counts(day, e) && muscleOf(e) === muscle && Number.isFinite(setsOf(e)) && setsOf(e) > 0,
+            // Los básicos por %1RM siguen una periodización calculada: no se tocan.
+            (e) =>
+              counts(day, e) &&
+              !e.percent1RM &&
+              muscleOf(e) === muscle &&
+              Number.isFinite(setsOf(e)) &&
+              setsOf(e) > 0,
           )
           .map((e) => ({ day, e })),
       )
@@ -176,11 +183,44 @@ export function adaptToLevel<P extends { blocks: Block[] }>(
 ): P {
   return {
     ...program,
-    blocks: program.blocks.map((block) => ({
-      ...block,
-      weeks: block.weeks.map((w) => adaptWeek(w, level, daysPerWeek, goal)),
-    })),
+    blocks: program.blocks.map((block) => {
+      // El ajuste se calcula en la semana representativa de cada fase y se aplica igual a todas
+      // sus semanas: así se conservan las olas de volumen (introducción, descarga, sobrecarga).
+      const rep = representativeWeek({ blocks: [block] } as never) as Week
+      const adaptedRep = adaptWeek(rep, level, daysPerWeek, goal)
+      return { ...block, weeks: block.weeks.map((w) => applyLike(w, rep, adaptedRep)) }
+    }),
   }
+}
+
+/** Aplica a una semana los mismos cambios que se hicieron en la semana modelo (mismo día y ejercicio). */
+function applyLike(week: Week, model: Week, adapted: Week): Week {
+  const out: Week = structuredClone(week)
+  out.days.forEach((day, d) => {
+    const before = model.days[d]
+    const after = adapted.days[d]
+    if (!('exercises' in day) || !before || !after || !('exercises' in before) || !('exercises' in after))
+      return
+    before.exercises.forEach((orig, i) => {
+      const next = after.exercises[i]
+      const target = day.exercises[i]
+      if (!next || !target || target.name !== orig.name) return
+      const delta = setsOf(next) - setsOf(orig)
+      if (delta !== 0 && Number.isFinite(setsOf(target))) {
+        target.original ??= { sets: target.sets, rpe: target.rpe }
+        target.sets = next.removed ? 0 : Math.max(1, setsOf(target) + delta)
+        if (next.removed) target.removed = true
+      }
+      if (next.rpe !== orig.rpe && !target.percent1RM) {
+        target.original ??= { sets: target.sets, rpe: target.rpe }
+        target.rpe = next.rpe
+      }
+    })
+    for (const extra of after.exercises.slice(before.exercises.length)) {
+      if (extra.added) day.exercises.push(structuredClone(extra))
+    }
+  })
+  return out
 }
 
 /** Series semanales antes y después, para enseñar qué ha cambiado. */

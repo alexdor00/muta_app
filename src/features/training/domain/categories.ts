@@ -85,3 +85,11 @@ export function categorize(info: ProgramInfo, curated: { foundation?: boolean } 
     out.push('hipertrofia')
   return out.length ? out : ['hipertrofia']
 }
+
+/**
+ * Rutinas especiales que no se adaptan: las minimalistas (su poco volumen es intencionado).
+ * En las de fuerza se adaptan solo los accesorios: los básicos por %1RM no se tocan (adaptVolume).
+ */
+export function isAdaptable(categories: CategoryId[]): boolean {
+  return !categories.includes('minimalista')
+}

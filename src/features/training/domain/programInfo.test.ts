@@ -139,3 +139,12 @@ describe('tipos de entrenamiento', () => {
     expect(categorize(infoOf(glute, 3))).toContain('gluteo')
   })
 })
+
+describe('rutinas que no se adaptan', () => {
+  it('las minimalistas se usan tal cual', async () => {
+    const { isAdaptable } = await import('./categories.ts')
+    expect(isAdaptable(['minimalista'])).toBe(false)
+    expect(isAdaptable(['hipertrofia'])).toBe(true)
+    expect(isAdaptable(['fuerza', 'gluteo'])).toBe(true)
+  })
+})
