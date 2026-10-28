@@ -49,7 +49,7 @@ export function ElegirRutinaScreen() {
     }
     try {
       const [entry] = entries
-      await chooseRoutine(entry.id, ready.adjusted.has(entry.id) ? 'beginner' : null)
+      await chooseRoutine(entry.id, ready.adjusted.has(entry.id) ? (ready.profile?.level ?? null) : null)
       route(paths.training)
     } catch (error) {
       logError(error, 'elegir rutina')

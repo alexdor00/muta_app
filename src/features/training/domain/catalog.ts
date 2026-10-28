@@ -16,15 +16,11 @@ export type CatalogEntry = {
   subtitle: string
   /** Días por semana para los que está pensada (puede ser más de uno). */
   days: number[]
-  levels: Level[]
   /** Aspecto de la tarjeta mientras no haya foto propia (1–6, ver tokens.css). */
   tone: 1 | 2 | 3 | 4 | 5 | 6
   /** Propias de MUTA (siempre disponibles) o locales (carpeta private/). */
   origin: 'muta' | 'local'
 }
-
-const ALL: Level[] = ['beginner', 'intermediate', 'advanced']
-const MID: Level[] = ['intermediate', 'advanced']
 
 export const CATALOG: CatalogEntry[] = [
   // Propias de MUTA (docs/conocimiento §8)
@@ -34,7 +30,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Cuerpo completo A/B',
     subtitle: 'Cuerpo completo · 4 días',
     days: [3, 4],
-    levels: ALL,
     tone: 1,
     origin: 'muta',
   },
@@ -44,7 +39,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Empuje, tirón y pierna',
     subtitle: 'Empuje, tirón y pierna · 6 días',
     days: [5, 6],
-    levels: MID,
     tone: 2,
     origin: 'muta',
   },
@@ -55,7 +49,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Esencial 45 min',
     subtitle: 'Cuerpo completo · 2 días',
     days: [2],
-    levels: ALL,
     tone: 3,
     origin: 'local',
   },
@@ -65,7 +58,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Esencial 45 min',
     subtitle: 'Cuerpo completo, torso y pierna · 3 días',
     days: [3],
-    levels: ALL,
     tone: 3,
     origin: 'local',
   },
@@ -75,7 +67,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Esencial 45 min',
     subtitle: 'Torso y pierna · 4 días',
     days: [4],
-    levels: ALL,
     tone: 3,
     origin: 'local',
   },
@@ -85,7 +76,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Esencial 45 min',
     subtitle: 'Torso, pierna, empuje y tirón · 5 días',
     days: [5],
-    levels: ALL,
     tone: 3,
     origin: 'local',
   },
@@ -96,7 +86,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Hipertrofia · Fase 1',
     subtitle: 'Cuerpo completo · 5 días',
     days: [5],
-    levels: MID,
     tone: 4,
     origin: 'local',
   },
@@ -106,7 +95,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Hipertrofia · Fase 2',
     subtitle: 'Cuerpo completo · 5 días',
     days: [5],
-    levels: MID,
     tone: 4,
     origin: 'local',
   },
@@ -116,7 +104,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Hipertrofia · Fase 1',
     subtitle: 'Torso y pierna · 5 días',
     days: [4, 5],
-    levels: MID,
     tone: 4,
     origin: 'local',
   },
@@ -126,7 +113,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Hipertrofia · Fase 2',
     subtitle: 'Torso y pierna · 5 días',
     days: [4, 5],
-    levels: MID,
     tone: 4,
     origin: 'local',
   },
@@ -136,7 +122,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Hipertrofia · Fase 1',
     subtitle: 'Empuje, tirón y pierna · 6 días',
     days: [6],
-    levels: MID,
     tone: 4,
     origin: 'local',
   },
@@ -146,7 +131,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Hipertrofia · Fase 2',
     subtitle: 'Empuje, tirón y pierna · 6 días',
     days: [6],
-    levels: MID,
     tone: 4,
     origin: 'local',
   },
@@ -157,7 +141,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Frecuencia alta',
     subtitle: 'Cuerpo completo · 4 días',
     days: [4],
-    levels: MID,
     tone: 5,
     origin: 'local',
   },
@@ -167,7 +150,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Frecuencia alta',
     subtitle: 'Cuerpo completo · 5 días',
     days: [5],
-    levels: MID,
     tone: 5,
     origin: 'local',
   },
@@ -178,7 +160,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Fuerza e hipertrofia 1',
     subtitle: 'Cuerpo completo · 5–6 días',
     days: [5, 6],
-    levels: MID,
     tone: 6,
     origin: 'local',
   },
@@ -188,7 +169,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Fuerza e hipertrofia 2',
     subtitle: 'Cuerpo completo · 4 días',
     days: [4],
-    levels: MID,
     tone: 6,
     origin: 'local',
   },
@@ -198,7 +178,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Fuerza e hipertrofia 2',
     subtitle: 'Cuerpo completo · 5–6 días',
     days: [5, 6],
-    levels: MID,
     tone: 6,
     origin: 'local',
   },
@@ -208,7 +187,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Fuerza e hipertrofia 3',
     subtitle: 'Cuerpo completo · 5 días',
     days: [5],
-    levels: ['advanced'],
     tone: 6,
     origin: 'local',
   },
@@ -219,7 +197,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Empuje, tirón y pierna',
     subtitle: 'Tres fases · 4 días',
     days: [4],
-    levels: MID,
     tone: 2,
     origin: 'local',
   },
@@ -229,7 +206,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Empuje, tirón y pierna',
     subtitle: 'Tres fases · 5 días',
     days: [5],
-    levels: MID,
     tone: 2,
     origin: 'local',
   },
@@ -239,7 +215,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Empuje, tirón y pierna',
     subtitle: 'Tres fases · 6 días',
     days: [6],
-    levels: MID,
     tone: 2,
     origin: 'local',
   },
@@ -249,7 +224,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Empuje, tirón y pierna',
     subtitle: 'Versión editada · 5 días',
     days: [5],
-    levels: MID,
     tone: 2,
     origin: 'local',
   },
@@ -260,7 +234,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Base',
     subtitle: 'Cuerpo completo, torso y pierna o por grupos · 3–5 días',
     days: [3, 4, 5],
-    levels: ['beginner', 'intermediate'],
     tone: 1,
     origin: 'local',
   },
@@ -270,7 +243,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'En casa',
     subtitle: 'Peso corporal, mancuernas y bandas · 3–4 días',
     days: [3, 4],
-    levels: ALL,
     tone: 5,
     origin: 'local',
   },
@@ -280,7 +252,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Glúteo',
     subtitle: 'Especialización · 5 días',
     days: [5],
-    levels: MID,
     tone: 3,
     origin: 'local',
   },
@@ -290,7 +261,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Tren inferior',
     subtitle: 'Especialización · 6 días',
     days: [6],
-    levels: MID,
     tone: 3,
     origin: 'local',
   },
@@ -300,7 +270,6 @@ export const CATALOG: CatalogEntry[] = [
     title: 'Optimización',
     subtitle: 'Fuerza e hipertrofia · 5 días',
     days: [5],
-    levels: ['advanced'],
     tone: 6,
     origin: 'local',
   },
@@ -315,7 +284,7 @@ export type Recommendation = {
   /** Principiante que pidió más de 4 días: las de 5, que puede elegir aunque no se recomienden. */
   alsoAllowed: CatalogEntry[]
   others: CatalogEntry[]
-  /** Rutinas de nivel intermedio que se ajustan a principiante al elegirlas. */
+  /** Rutinas cuyo nivel medido no es el tuyo: se adaptan al elegirlas. */
   adjusted: ReadonlySet<string>
   /** Días con los que se ha buscado (puede ser menos de los elegidos). */
   targetDays: number
@@ -323,20 +292,36 @@ export type Recommendation = {
   notice: string | null
 }
 
-/** ¿Se ajusta esta rutina para este nivel? Solo las de intermedio cuando eres principiante. */
-export function needsBeginnerAdjust(entry: CatalogEntry, level: Level): boolean {
-  return level === 'beginner' && !entry.levels.includes('beginner') && entry.levels.includes('intermediate')
+const ORDER: Level[] = ['beginner', 'intermediate', 'advanced']
+/** Nivel medido de cada rutina (id → nivel). Lo carga el caso de uso desde shared/content. */
+export type MeasuredLevels = Readonly<Record<string, Level>>
+
+/**
+ * Nivel de la rutina medido por sus series semanales por músculo frente a los rangos de
+ * docs/conocimiento (scripts/program-levels.ts → shared/content/program-levels.json, que pasa el caso de uso).
+ */
+export function levelOf(entry: CatalogEntry, measured: MeasuredLevels): Level {
+  return measured[entry.id] ?? 'intermediate'
+}
+
+/** ¿Hay que adaptarla? Siempre que su nivel medido no sea el tuyo. */
+export function needsAdjust(entry: CatalogEntry, level: Level, measured: MeasuredLevels): boolean {
+  return levelOf(entry, measured) !== level
 }
 
 /**
- * Rutinas que encajan con lo elegido en la bienvenida: los mismos días por semana y el nivel.
- * - Principiante: como mucho 5 días (con aviso), y también las de intermedio, que se ajustan.
- * - Si ninguna encaja del todo, se recomiendan las del día más cercano.
+ * Rutinas que encajan con lo elegido en la bienvenida (días y nivel).
+ * - Cualquier rutina vale para cualquier nivel: si su nivel medido no es el tuyo, se adapta
+ *   músculo a músculo al elegirla (domain/adaptVolume.ts).
+ * - Principiante: se recomiendan como mucho 4 días (con aviso) y puede elegir hasta 5.
+ * - Si ninguna es de tus días exactos, las del número de días más cercano.
+ * - Orden: primero las de tu nivel (las de MUTA delante), después las adaptadas, de nivel más cercano a más lejano.
  * - El resto va en «otras». Solo entran las disponibles (propias o cargadas en local).
  */
 export function recommend(
   profile: { daysPerWeek: number; level: Level },
   available: ReadonlySet<string>,
+  measured: MeasuredLevels,
 ): Recommendation {
   const beginner = profile.level === 'beginner'
   const targetDays = beginner ? Math.min(profile.daysPerWeek, BEGINNER_RECOMMENDED_DAYS) : profile.daysPerWeek
@@ -346,14 +331,13 @@ export function recommend(
       : null
 
   const list = CATALOG.filter((entry) => entry.origin === 'muta' || available.has(entry.id))
-  const fitsLevel = (entry: CatalogEntry) =>
-    entry.levels.includes(profile.level) || needsBeginnerAdjust(entry, profile.level)
+  const allowedDays = (entry: CatalogEntry) => !beginner || entry.days.some((d) => d <= BEGINNER_MAX_DAYS)
+  const candidates = list.filter(allowedDays)
   const distance = (entry: CatalogEntry) => Math.min(...entry.days.map((d) => Math.abs(d - targetDays)))
-  const candidates = list.filter(fitsLevel)
   const best = Math.min(...candidates.map(distance))
-  // Primero las pensadas para tu nivel (las propias delante); al final las ajustadas.
-  const rank = (entry: CatalogEntry) =>
-    (needsBeginnerAdjust(entry, profile.level) ? 2 : 0) + (entry.origin === 'muta' ? 0 : 1)
+  const levelGap = (entry: CatalogEntry) =>
+    Math.abs(ORDER.indexOf(levelOf(entry, measured)) - ORDER.indexOf(profile.level))
+  const rank = (entry: CatalogEntry) => levelGap(entry) * 2 + (entry.origin === 'muta' ? 0 : 1)
   const byRank = (a: CatalogEntry, b: CatalogEntry) => rank(a) - rank(b)
   const recommended = candidates.filter((entry) => distance(entry) === best).sort(byRank)
   const alsoAllowed =
@@ -363,6 +347,6 @@ export function recommend(
           .sort(byRank)
       : []
   const others = list.filter((entry) => !recommended.includes(entry) && !alsoAllowed.includes(entry))
-  const adjusted = new Set(list.filter((e) => needsBeginnerAdjust(e, profile.level)).map((e) => e.id))
+  const adjusted = new Set(list.filter((e) => needsAdjust(e, profile.level, measured)).map((e) => e.id))
   return { recommended, alsoAllowed, others, adjusted, targetDays, notice }
 }

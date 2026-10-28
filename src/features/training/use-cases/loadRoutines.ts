@@ -1,9 +1,15 @@
 import { getDb } from '../../../shared/data/db.ts'
 import { logError } from '../../../shared/lib/logger.ts'
-import { recommend, type Level } from '../domain/catalog.ts'
+import levels from '../../../shared/content/program-levels.json'
+import { recommend, type Level, type MeasuredLevels } from '../domain/catalog.ts'
 import { routines } from '../state/routines.ts'
 
 const LEVELS: Level[] = ['beginner', 'intermediate', 'advanced']
+
+/** Nivel medido de cada rutina por sus series (scripts/program-levels.ts). */
+const MEASURED: MeasuredLevels = Object.fromEntries(
+  Object.entries(levels).map(([id, v]) => [id, (v as { level: Level }).level]),
+)
 
 /** Carga las rutinas recomendadas según el perfil (días por semana y nivel). */
 export async function loadRoutines(): Promise<void> {
@@ -17,7 +23,7 @@ export async function loadRoutines(): Promise<void> {
         : null
     const available = new Set((await db.getAllKeys('programs')).map(String))
     const plan = (await db.get('plans', 'current')) as { programId?: string } | undefined
-    const rec = recommend(profile ?? { daysPerWeek: 3, level: 'beginner' }, available)
+    const rec = recommend(profile ?? { daysPerWeek: 3, level: 'beginner' }, available, MEASURED)
     routines.value = {
       status: 'ready',
       profile,

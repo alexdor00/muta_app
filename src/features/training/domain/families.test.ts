@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { CATALOG, recommend } from './catalog.ts'
+import { CATALOG, recommend, type MeasuredLevels } from './catalog.ts'
 import { FAMILIES, familySummary, groupByFamily } from './families.ts'
 
+// Niveles de prueba: unas de cada (las reales los mide scripts/program-levels.ts)
+const MEASURED: MeasuredLevels = Object.fromEntries(
+  CATALOG.map((e, i) => [e.id, (['beginner', 'intermediate', 'advanced'] as const)[i % 3]]),
+)
 const everything = new Set(CATALOG.map((e) => e.id))
 
 describe('familias', () => {
@@ -11,7 +15,7 @@ describe('familias', () => {
   })
 
   it('agrupa sin perder ni repetir rutinas y respeta el orden', () => {
-    const { recommended } = recommend({ daysPerWeek: 4, level: 'intermediate' }, everything)
+    const { recommended } = recommend({ daysPerWeek: 4, level: 'intermediate' }, everything, MEASURED)
     const groups = groupByFamily(recommended)
     expect(groups.flatMap((g) => g.entries)).toHaveLength(recommended.length)
     expect(groups[0].entries[0]).toBe(recommended[0])
@@ -19,7 +23,7 @@ describe('familias', () => {
   })
 
   it('con 4 días e intermedio hay muchas menos tarjetas que rutinas', () => {
-    const { recommended } = recommend({ daysPerWeek: 4, level: 'intermediate' }, everything)
+    const { recommended } = recommend({ daysPerWeek: 4, level: 'intermediate' }, everything, MEASURED)
     expect(groupByFamily(recommended).length).toBeLessThan(recommended.length)
   })
 

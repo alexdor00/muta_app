@@ -57,7 +57,7 @@ export function FamiliaRutinaScreen(props: { family: string; query?: Record<stri
   async function choose(id: string) {
     if (state.status !== 'ready') return
     try {
-      await chooseRoutine(id, state.adjusted.has(id) ? 'beginner' : null)
+      await chooseRoutine(id, state.adjusted.has(id) ? (state.profile?.level ?? null) : null)
       route(paths.training)
     } catch (error) {
       logError(error, 'elegir rutina')

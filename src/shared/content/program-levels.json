@@ -1,0 +1,640 @@
+{
+  "muta-cuerpo-completo-4d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 2,
+      "intermediate": 7,
+      "advanced": 7
+    },
+    "sets": {
+      "aductores": 2,
+      "cuadriceps": 10,
+      "espalda_alta": 3,
+      "triceps": 6,
+      "dorsal": 9,
+      "gemelo": 6,
+      "femoral": 7,
+      "pecho": 8,
+      "biceps": 6,
+      "hombro_ant": 2,
+      "hombro_lat": 6,
+      "core": 4,
+      "hombro_post": 2,
+      "gluteo": 3
+    },
+    "days": 4
+  },
+  "muta-ppl-6d": {
+    "level": "intermediate",
+    "outside": {
+      "beginner": 2,
+      "intermediate": 0,
+      "advanced": 0
+    },
+    "sets": {
+      "pecho": 10,
+      "biceps": 10,
+      "hombro_ant": 4,
+      "hombro_lat": 8,
+      "espalda_alta": 6,
+      "dorsal": 6,
+      "triceps": 8,
+      "gemelo": 6,
+      "hombro_post": 2,
+      "aductores": 2,
+      "cuadriceps": 12,
+      "femoral": 8,
+      "gluteo": 7,
+      "core": 4
+    },
+    "days": 6
+  },
+  "esencial-45min-2d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 21,
+      "intermediate": 41,
+      "advanced": 41
+    },
+    "sets": {
+      "femoral": 3,
+      "pecho": 4,
+      "cuadriceps": 3,
+      "dorsal": 2,
+      "hombro_lat": 1,
+      "triceps": 1,
+      "gemelo": 1,
+      "espalda_alta": 2,
+      "biceps": 1,
+      "core": 1
+    },
+    "days": 2
+  },
+  "esencial-45min-3d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 12,
+      "intermediate": 30,
+      "advanced": 30
+    },
+    "sets": {
+      "pecho": 4,
+      "cuadriceps": 6,
+      "espalda_alta": 2,
+      "femoral": 3,
+      "biceps": 3,
+      "hombro_lat": 1,
+      "core": 3,
+      "dorsal": 4,
+      "hombro_ant": 2,
+      "triceps": 2,
+      "gemelo": 2
+    },
+    "days": 3
+  },
+  "esencial-45min-4d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 5,
+      "intermediate": 22,
+      "advanced": 22
+    },
+    "sets": {
+      "dorsal": 6,
+      "pecho": 4,
+      "hombro_ant": 4,
+      "biceps": 4,
+      "triceps": 4,
+      "cuadriceps": 6,
+      "femoral": 3,
+      "core": 4,
+      "gemelo": 4,
+      "espalda_alta": 2,
+      "hombro_lat": 2
+    },
+    "days": 4
+  },
+  "esencial-45min-5d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 5,
+      "intermediate": 21,
+      "advanced": 21
+    },
+    "sets": {
+      "pecho": 4,
+      "dorsal": 8,
+      "hombro_ant": 5,
+      "triceps": 5,
+      "biceps": 4,
+      "cuadriceps": 6,
+      "femoral": 3,
+      "gemelo": 4,
+      "core": 4,
+      "hombro_lat": 2,
+      "espalda_alta": 2,
+      "hombro_post": 2
+    },
+    "days": 5
+  },
+  "hipertrofia-cuerpo-completo-5d-f1": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 2,
+      "intermediate": 6,
+      "advanced": 6
+    },
+    "sets": {
+      "dorsal": 7,
+      "pecho": 9,
+      "femoral": 6,
+      "cuadriceps": 9,
+      "hombro_post": 6,
+      "core": 5,
+      "hombro_lat": 6,
+      "espalda_alta": 6,
+      "hombro_ant": 3,
+      "gemelo": 6,
+      "biceps": 7,
+      "triceps": 7,
+      "gluteo": 2,
+      "aductores": 2
+    },
+    "days": 5
+  },
+  "hipertrofia-cuerpo-completo-5d-f2": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 3,
+      "intermediate": 6,
+      "advanced": 6
+    },
+    "sets": {
+      "dorsal": 6,
+      "pecho": 8,
+      "femoral": 9,
+      "cuadriceps": 11,
+      "hombro_lat": 6,
+      "gemelo": 6,
+      "espalda_alta": 6,
+      "gluteo": 3,
+      "triceps": 7,
+      "biceps": 8,
+      "hombro_ant": 3,
+      "aductores": 3,
+      "hombro_post": 3,
+      "core": 3
+    },
+    "days": 5
+  },
+  "hipertrofia-torso-pierna-f1": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 3,
+      "intermediate": 3,
+      "advanced": 3
+    },
+    "sets": {
+      "hombro_lat": 6,
+      "dorsal": 9,
+      "pecho": 10,
+      "espalda_alta": 6,
+      "triceps": 7,
+      "femoral": 8,
+      "aductores": 6,
+      "cuadriceps": 12,
+      "gemelo": 6,
+      "hombro_ant": 3,
+      "biceps": 7,
+      "hombro_post": 3,
+      "core": 3
+    },
+    "days": 5
+  },
+  "hipertrofia-torso-pierna-f2": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 2,
+      "intermediate": 4,
+      "advanced": 4
+    },
+    "sets": {
+      "hombro_lat": 6,
+      "dorsal": 6,
+      "pecho": 8,
+      "espalda_alta": 6,
+      "biceps": 8,
+      "femoral": 9,
+      "cuadriceps": 11,
+      "gemelo": 6,
+      "gluteo": 5,
+      "hombro_post": 3,
+      "triceps": 8,
+      "aductores": 3,
+      "core": 3
+    },
+    "days": 5
+  },
+  "hipertrofia-ppl-6d-f1": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 0.7,
+      "intermediate": 5.4,
+      "advanced": 5.4
+    },
+    "sets": {
+      "dorsal": 6,
+      "femoral": 6,
+      "espalda_alta": 4.5,
+      "biceps": 9.8,
+      "hombro_post": 4.5,
+      "hombro_lat": 6.8,
+      "pecho": 7.5,
+      "triceps": 10.5,
+      "core": 7.5,
+      "aductores": 4.5,
+      "cuadriceps": 9.8,
+      "gemelo": 4.5,
+      "gluteo": 3.8,
+      "hombro_ant": 2.3
+    },
+    "days": 6
+  },
+  "hipertrofia-ppl-6d-f2": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 5,
+      "intermediate": 7.2,
+      "advanced": 7.2
+    },
+    "sets": {
+      "dorsal": 7.5,
+      "espalda_alta": 6.8,
+      "hombro_post": 4.5,
+      "biceps": 12,
+      "core": 6,
+      "hombro_lat": 4.5,
+      "pecho": 8.3,
+      "hombro_ant": 4.5,
+      "triceps": 12.8,
+      "femoral": 6.8,
+      "cuadriceps": 8.3,
+      "gemelo": 4.5,
+      "gluteo": 3.8,
+      "aductores": 2.3
+    },
+    "days": 6
+  },
+  "frecuencia-alta-cuerpo-completo-4d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 1,
+      "intermediate": 2,
+      "advanced": 2
+    },
+    "sets": {
+      "cuadriceps": 10,
+      "pecho": 11,
+      "femoral": 7,
+      "dorsal": 6,
+      "gluteo": 7,
+      "biceps": 6,
+      "gemelo": 6,
+      "espalda_alta": 9,
+      "hombro_ant": 7,
+      "triceps": 6,
+      "hombro_lat": 6,
+      "core": 6,
+      "hombro_post": 3
+    },
+    "days": 4
+  },
+  "frecuencia-alta-cuerpo-completo-5d": {
+    "level": "intermediate",
+    "outside": {
+      "beginner": 9,
+      "intermediate": 0,
+      "advanced": 0
+    },
+    "sets": {
+      "cuadriceps": 10,
+      "pecho": 14,
+      "femoral": 9,
+      "dorsal": 12,
+      "biceps": 8,
+      "core": 6,
+      "espalda_alta": 9,
+      "hombro_ant": 7,
+      "triceps": 6,
+      "gemelo": 8,
+      "hombro_lat": 9,
+      "gluteo": 7,
+      "hombro_post": 3
+    },
+    "days": 5
+  },
+  "fuerza-hipertrofia-1-6d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 10,
+      "intermediate": 10,
+      "advanced": 10
+    },
+    "sets": {
+      "gluteo": 12,
+      "cuadriceps": 10,
+      "femoral": 3,
+      "gemelo": 8,
+      "pecho": 13,
+      "dorsal": 10,
+      "hombro_post": 2,
+      "hombro_lat": 6,
+      "biceps": 6,
+      "core": 8,
+      "hombro_ant": 3,
+      "espalda_alta": 4,
+      "triceps": 2,
+      "cuello": 3
+    },
+    "days": 6
+  },
+  "fuerza-hipertrofia-2-4d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 4,
+      "intermediate": 12,
+      "advanced": 12
+    },
+    "sets": {
+      "cuadriceps": 9,
+      "pecho": 12,
+      "dorsal": 6,
+      "femoral": 6,
+      "hombro_post": 8,
+      "gluteo": 7,
+      "hombro_ant": 4,
+      "espalda_alta": 8,
+      "biceps": 3,
+      "gemelo": 3,
+      "triceps": 4,
+      "hombro_lat": 4
+    },
+    "days": 4
+  },
+  "fuerza-hipertrofia-2-6d": {
+    "level": "intermediate",
+    "outside": {
+      "beginner": 8,
+      "intermediate": 7,
+      "advanced": 7
+    },
+    "sets": {
+      "cuadriceps": 9,
+      "pecho": 12,
+      "dorsal": 6,
+      "femoral": 6,
+      "hombro_post": 8,
+      "gluteo": 7,
+      "hombro_ant": 4,
+      "espalda_alta": 11,
+      "biceps": 10,
+      "triceps": 11,
+      "hombro_lat": 4,
+      "gemelo": 3,
+      "cuello": 3
+    },
+    "days": 6
+  },
+  "fuerza-hipertrofia-3-5d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 2,
+      "intermediate": 13,
+      "advanced": 13
+    },
+    "sets": {
+      "cuadriceps": 6,
+      "hombro_ant": 2,
+      "femoral": 5,
+      "espalda_alta": 6,
+      "pecho": 5,
+      "biceps": 6,
+      "hombro_post": 6,
+      "gemelo": 3,
+      "triceps": 5,
+      "dorsal": 6,
+      "gluteo": 6,
+      "hombro_lat": 3
+    },
+    "days": 5
+  },
+  "ppl-completo-4d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 7,
+      "intermediate": 17,
+      "advanced": 17
+    },
+    "sets": {
+      "cuadriceps": 8,
+      "femoral": 8,
+      "gemelo": 4,
+      "core": 3,
+      "pecho": 5,
+      "hombro_ant": 3,
+      "hombro_lat": 3,
+      "triceps": 9,
+      "dorsal": 11,
+      "espalda_alta": 3,
+      "hombro_post": 3,
+      "biceps": 5,
+      "gluteo": 1
+    },
+    "days": 4
+  },
+  "ppl-completo-5d": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 9,
+      "intermediate": 10,
+      "advanced": 10
+    },
+    "sets": {
+      "pecho": 5,
+      "hombro_ant": 3,
+      "hombro_lat": 6,
+      "triceps": 9,
+      "dorsal": 12,
+      "espalda_alta": 3,
+      "hombro_post": 3,
+      "biceps": 8,
+      "cuadriceps": 12,
+      "femoral": 11,
+      "gemelo": 8,
+      "core": 6,
+      "gluteo": 1
+    },
+    "days": 5
+  },
+  "ppl-completo-6d": {
+    "level": "advanced",
+    "outside": {
+      "beginner": 14,
+      "intermediate": 9,
+      "advanced": 7
+    },
+    "sets": {
+      "pecho": 8,
+      "hombro_ant": 8,
+      "hombro_lat": 6,
+      "triceps": 12,
+      "dorsal": 14,
+      "espalda_alta": 6,
+      "hombro_post": 6,
+      "biceps": 8,
+      "cuadriceps": 12,
+      "femoral": 11,
+      "gemelo": 8,
+      "core": 6,
+      "gluteo": 1
+    },
+    "days": 6
+  },
+  "ppl-5d-editado": {
+    "level": "advanced",
+    "outside": {
+      "beginner": 16,
+      "intermediate": 14,
+      "advanced": 11
+    },
+    "sets": {
+      "pecho": 11,
+      "hombro_ant": 6,
+      "hombro_lat": 3,
+      "triceps": 8,
+      "dorsal": 15,
+      "espalda_alta": 9,
+      "hombro_post": 3,
+      "biceps": 6,
+      "cuadriceps": 13,
+      "femoral": 11,
+      "gemelo": 7,
+      "gluteo": 1,
+      "core": 3
+    },
+    "days": 5
+  },
+  "mujer-base": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 16,
+      "intermediate": 26,
+      "advanced": 26
+    },
+    "sets": {
+      "cuadriceps": 5,
+      "hombro_ant": 7,
+      "gluteo": 16,
+      "dorsal": 6,
+      "femoral": 5,
+      "core": 3,
+      "pecho": 3,
+      "hombro_lat": 2,
+      "biceps": 2,
+      "hombro_post": 3,
+      "gemelo": 2,
+      "triceps": 2
+    },
+    "days": 5
+  },
+  "mujer-casa": {
+    "level": "beginner",
+    "outside": {
+      "beginner": 9.7,
+      "intermediate": 16.7,
+      "advanced": 16.7
+    },
+    "sets": {
+      "cuadriceps": 9.3,
+      "pecho": 7.3,
+      "gluteo": 12.7,
+      "espalda_alta": 3.3,
+      "core": 9.3,
+      "femoral": 6,
+      "dorsal": 2,
+      "hombro_lat": 2,
+      "hombro_ant": 2,
+      "triceps": 4,
+      "biceps": 2
+    },
+    "days": 4
+  },
+  "gluteos": {
+    "level": "advanced",
+    "outside": {
+      "beginner": 20,
+      "intermediate": 11,
+      "advanced": 7
+    },
+    "sets": {
+      "cuadriceps": 9,
+      "femoral": 9,
+      "gluteo": 25,
+      "core": 8,
+      "pecho": 6,
+      "dorsal": 12,
+      "hombro_lat": 7,
+      "hombro_post": 4,
+      "gemelo": 3,
+      "espalda_alta": 3
+    },
+    "days": 5
+  },
+  "mujer-especializacion": {
+    "level": "advanced",
+    "outside": {
+      "beginner": 28,
+      "intermediate": 25,
+      "advanced": 21
+    },
+    "sets": {
+      "cuadriceps": 8,
+      "gluteo": 32,
+      "femoral": 11,
+      "core": 6,
+      "hombro_ant": 7,
+      "dorsal": 10,
+      "triceps": 8,
+      "hombro_lat": 6,
+      "hombro_post": 9,
+      "gemelo": 3,
+      "pecho": 3,
+      "espalda_alta": 3,
+      "biceps": 3
+    },
+    "days": 6
+  },
+  "mujer-optimizacion": {
+    "level": "advanced",
+    "outside": {
+      "beginner": 19,
+      "intermediate": 10,
+      "advanced": 6
+    },
+    "sets": {
+      "gluteo": 26,
+      "cuadriceps": 10,
+      "femoral": 6,
+      "gemelo": 4,
+      "core": 5,
+      "hombro_ant": 10,
+      "dorsal": 11,
+      "pecho": 7,
+      "hombro_lat": 6,
+      "biceps": 6,
+      "triceps": 6,
+      "espalda_alta": 6
+    },
+    "days": 5
+  }
+}
