@@ -1,11 +1,17 @@
 {
   "muta-cuerpo-completo-4d": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 4,
+      "rests": 0
+    },
     "outside": {
       "beginner": 2,
       "intermediate": 7,
       "advanced": 7
     },
+    "outsideMaintain": 17,
     "sets": {
       "aductores": 2,
       "cuadriceps": 10,
@@ -26,11 +32,17 @@
   },
   "muta-ppl-6d": {
     "level": "intermediate",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 6,
+      "rests": 0
+    },
     "outside": {
       "beginner": 2,
       "intermediate": 0,
       "advanced": 0
     },
+    "outsideMaintain": 30,
     "sets": {
       "pecho": 10,
       "biceps": 10,
@@ -51,11 +63,17 @@
   },
   "esencial-45min-2d": {
     "level": "beginner",
+    "volume": "maintain",
+    "cycle": {
+      "sessions": 2,
+      "rests": 2
+    },
     "outside": {
       "beginner": 21,
       "intermediate": 41,
       "advanced": 41
     },
+    "outsideMaintain": 11,
     "sets": {
       "femoral": 3,
       "pecho": 4,
@@ -72,11 +90,17 @@
   },
   "esencial-45min-3d": {
     "level": "beginner",
+    "volume": "maintain",
+    "cycle": {
+      "sessions": 3,
+      "rests": 3
+    },
     "outside": {
       "beginner": 12,
       "intermediate": 30,
       "advanced": 30
     },
+    "outsideMaintain": 5,
     "sets": {
       "pecho": 4,
       "cuadriceps": 6,
@@ -94,11 +118,17 @@
   },
   "esencial-45min-4d": {
     "level": "beginner",
+    "volume": "maintain",
+    "cycle": {
+      "sessions": 4,
+      "rests": 2
+    },
     "outside": {
       "beginner": 5,
       "intermediate": 22,
       "advanced": 22
     },
+    "outsideMaintain": 4,
     "sets": {
       "dorsal": 6,
       "pecho": 4,
@@ -116,11 +146,17 @@
   },
   "esencial-45min-5d": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 5,
       "intermediate": 21,
       "advanced": 21
     },
+    "outsideMaintain": 6,
     "sets": {
       "pecho": 4,
       "dorsal": 8,
@@ -139,11 +175,17 @@
   },
   "hipertrofia-cuerpo-completo-5d-f1": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 2,
       "intermediate": 6,
       "advanced": 6
     },
+    "outsideMaintain": 22,
     "sets": {
       "dorsal": 7,
       "pecho": 9,
@@ -164,11 +206,17 @@
   },
   "hipertrofia-cuerpo-completo-5d-f2": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 3,
       "intermediate": 6,
       "advanced": 6
     },
+    "outsideMaintain": 22,
     "sets": {
       "dorsal": 6,
       "pecho": 8,
@@ -189,11 +237,17 @@
   },
   "hipertrofia-torso-pierna-f1": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 3,
       "intermediate": 3,
       "advanced": 3
     },
+    "outsideMaintain": 28,
     "sets": {
       "hombro_lat": 6,
       "dorsal": 9,
@@ -213,11 +267,17 @@
   },
   "hipertrofia-torso-pierna-f2": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 2,
       "intermediate": 4,
       "advanced": 4
     },
+    "outsideMaintain": 23,
     "sets": {
       "hombro_lat": 6,
       "dorsal": 6,
@@ -237,11 +297,17 @@
   },
   "hipertrofia-ppl-6d-f1": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 8,
+      "rests": 4
+    },
     "outside": {
       "beginner": 0.7,
       "intermediate": 5.4,
       "advanced": 5.4
     },
+    "outsideMaintain": 25.4,
     "sets": {
       "dorsal": 6,
       "femoral": 6,
@@ -262,11 +328,17 @@
   },
   "hipertrofia-ppl-6d-f2": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 8,
+      "rests": 2
+    },
     "outside": {
       "beginner": 5,
       "intermediate": 7.2,
       "advanced": 7.2
     },
+    "outsideMaintain": 31,
     "sets": {
       "dorsal": 7.5,
       "espalda_alta": 6.8,
@@ -287,11 +359,17 @@
   },
   "frecuencia-alta-cuerpo-completo-4d": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 4,
+      "rests": 0
+    },
     "outside": {
       "beginner": 1,
       "intermediate": 2,
       "advanced": 2
     },
+    "outsideMaintain": 27,
     "sets": {
       "cuadriceps": 10,
       "pecho": 11,
@@ -311,11 +389,17 @@
   },
   "frecuencia-alta-cuerpo-completo-5d": {
     "level": "intermediate",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 0
+    },
     "outside": {
       "beginner": 9,
       "intermediate": 0,
       "advanced": 0
     },
+    "outsideMaintain": 45,
     "sets": {
       "cuadriceps": 10,
       "pecho": 14,
@@ -335,11 +419,17 @@
   },
   "fuerza-hipertrofia-1-6d": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 10,
       "intermediate": 10,
       "advanced": 10
     },
+    "outsideMaintain": 33,
     "sets": {
       "gluteo": 12,
       "cuadriceps": 10,
@@ -360,11 +450,17 @@
   },
   "fuerza-hipertrofia-2-4d": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 4,
+      "rests": 2
+    },
     "outside": {
       "beginner": 4,
       "intermediate": 12,
       "advanced": 12
     },
+    "outsideMaintain": 22,
     "sets": {
       "cuadriceps": 9,
       "pecho": 12,
@@ -383,11 +479,17 @@
   },
   "fuerza-hipertrofia-2-6d": {
     "level": "intermediate",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 8,
       "intermediate": 7,
       "advanced": 7
     },
+    "outsideMaintain": 36,
     "sets": {
       "cuadriceps": 9,
       "pecho": 12,
@@ -407,11 +509,17 @@
   },
   "fuerza-hipertrofia-3-5d": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 2,
       "intermediate": 13,
       "advanced": 13
     },
+    "outsideMaintain": 8,
     "sets": {
       "cuadriceps": 6,
       "hombro_ant": 2,
@@ -430,11 +538,17 @@
   },
   "ppl-completo-4d": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 4,
+      "rests": 2
+    },
     "outside": {
       "beginner": 7,
       "intermediate": 17,
       "advanced": 17
     },
+    "outsideMaintain": 19,
     "sets": {
       "cuadriceps": 8,
       "femoral": 8,
@@ -454,11 +568,17 @@
   },
   "ppl-completo-5d": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 2
+    },
     "outside": {
       "beginner": 9,
       "intermediate": 10,
       "advanced": 10
     },
+    "outsideMaintain": 34,
     "sets": {
       "pecho": 5,
       "hombro_ant": 3,
@@ -478,11 +598,17 @@
   },
   "ppl-completo-6d": {
     "level": "advanced",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 6,
+      "rests": 1
+    },
     "outside": {
       "beginner": 14,
       "intermediate": 9,
       "advanced": 7
     },
+    "outsideMaintain": 49,
     "sets": {
       "pecho": 8,
       "hombro_ant": 8,
@@ -502,11 +628,17 @@
   },
   "ppl-5d-editado": {
     "level": "advanced",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 1
+    },
     "outside": {
       "beginner": 16,
       "intermediate": 14,
       "advanced": 11
     },
+    "outsideMaintain": 45,
     "sets": {
       "pecho": 11,
       "hombro_ant": 6,
@@ -526,11 +658,17 @@
   },
   "mujer-base": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 3,
+      "rests": 0
+    },
     "outside": {
       "beginner": 16,
       "intermediate": 26,
       "advanced": 26
     },
+    "outsideMaintain": 19,
     "sets": {
       "cuadriceps": 5,
       "hombro_ant": 7,
@@ -549,11 +687,17 @@
   },
   "mujer-casa": {
     "level": "beginner",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 6,
+      "rests": 0
+    },
     "outside": {
       "beginner": 9.7,
       "intermediate": 16.7,
       "advanced": 16.7
     },
+    "outsideMaintain": 21.6,
     "sets": {
       "cuadriceps": 9.3,
       "pecho": 7.3,
@@ -571,11 +715,17 @@
   },
   "gluteos": {
     "level": "advanced",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 0
+    },
     "outside": {
       "beginner": 20,
       "intermediate": 11,
       "advanced": 7
     },
+    "outsideMaintain": 40,
     "sets": {
       "cuadriceps": 9,
       "femoral": 9,
@@ -592,11 +742,17 @@
   },
   "mujer-especializacion": {
     "level": "advanced",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 6,
+      "rests": 0
+    },
     "outside": {
       "beginner": 28,
       "intermediate": 25,
       "advanced": 21
     },
+    "outsideMaintain": 52,
     "sets": {
       "cuadriceps": 8,
       "gluteo": 32,
@@ -616,11 +772,17 @@
   },
   "mujer-optimizacion": {
     "level": "advanced",
+    "volume": "develop",
+    "cycle": {
+      "sessions": 5,
+      "rests": 0
+    },
     "outside": {
       "beginner": 19,
       "intermediate": 10,
       "advanced": 6
     },
+    "outsideMaintain": 44,
     "sets": {
       "gluteo": 26,
       "cuadriceps": 10,

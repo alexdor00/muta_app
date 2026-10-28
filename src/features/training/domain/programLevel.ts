@@ -130,7 +130,40 @@ export function levelFromSets(sets: SetsByMuscle): LevelFit {
   return { level, outside, perMuscle }
 }
 
-export function programLevel(program: Program, daysPerWeek: number): LevelFit & { sets: SetsByMuscle } {
+/**
+ * Series que quedan fuera de los rangos «mantener» (iguales para todos los niveles).
+ * Si es menos que con «desarrollar» del mejor nivel, la rutina es de volumen de mantenimiento.
+ */
+export function outsideMaintain(sets: SetsByMuscle): number {
+  return (
+    Math.round(
+      MUSCLE_IDS.filter((m) => (sets[m] ?? 0) > 0).reduce(
+        (n, m) => n + distance(sets[m]!, rangeFor(m, 'intermediate', 'maintain')),
+        0,
+      ) * 10,
+    ) / 10
+  )
+}
+
+export type Volume = 'maintain' | 'develop'
+
+/** Ciclo de la rutina: sesiones y descansos que trae el archivo (no tiene por qué ser una semana). */
+export function cycleOf(program: Program): { sessions: number; rests: number } {
+  const week = program.blocks[0].weeks[0]
+  return { sessions: sessionsOf(week), rests: week.days.filter((d) => 'rest' in d).length }
+}
+
+export function programLevel(
+  program: Program,
+  daysPerWeek: number,
+): LevelFit & { sets: SetsByMuscle; volume: Volume; outsideMaintain: number } {
   const sets = weeklySets(representativeWeek(program), daysPerWeek)
-  return { ...levelFromSets(sets), sets }
+  const fit = levelFromSets(sets)
+  const maintain = outsideMaintain(sets)
+  return {
+    ...fit,
+    sets,
+    outsideMaintain: maintain,
+    volume: maintain < fit.outside[fit.level] ? 'maintain' : 'develop',
+  }
 }

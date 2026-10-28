@@ -50,8 +50,10 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   const recomendadas = page.getByRole('region', { name: 'Recomendadas para ti' })
   await expect(page.getByText('Para 4 días por semana · nivel intermedio')).toBeVisible()
   await capture(page, 'elegir-rutina')
-  // Una tarjeta por tipo de entrenamiento; Hipertrofia (con Cuerpo completo A/B) va primero
-  await expect(recomendadas.getByRole('button').first()).toContainText('Hipertrofia')
+  // Una tarjeta por tipo de entrenamiento. Perder grasa = definición: primero el volumen de
+  // mantenimiento (Esencial); Hipertrofia (con Cuerpo completo A/B) sigue entre las recomendadas.
+  await expect(recomendadas.getByRole('button').first()).toContainText('Esencial 45 min')
+  await expect(recomendadas.getByRole('button').first()).toContainText('volumen de mantenimiento')
   await recomendadas.getByRole('button', { name: /Hipertrofia/ }).click()
   await expect(page).toHaveURL('/entreno/rutinas/hipertrofia?seccion=para-ti')
   await capture(page, 'familia-rutina')

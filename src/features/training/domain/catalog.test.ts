@@ -51,6 +51,21 @@ describe('recommend', () => {
     expect(others.map((e) => e.id)).toEqual(['muta-ppl-6d'])
   })
 
+  it('definición y mantenimiento: primero las de volumen de mantenimiento; volumen: al revés', () => {
+    const volumes = Object.fromEntries(
+      CATALOG.map((e) => [e.id, e.family === 'esencial' ? 'maintain' : 'develop'] as const),
+    )
+    const cut = recommend({ daysPerWeek: 3, level: 'beginner', phase: 'cut' }, everything, MEASURED, volumes)
+    expect(cut.recommended[0].family).toBe('esencial')
+    const bulk = recommend(
+      { daysPerWeek: 3, level: 'beginner', phase: 'bulk' },
+      everything,
+      MEASURED,
+      volumes,
+    )
+    expect(bulk.recommended[0].family).not.toBe('esencial')
+  })
+
   it('lo que no se recomienda queda en «otras» y no se repite', () => {
     const { recommended, alsoAllowed, others } = recommend(
       { daysPerWeek: 4, level: 'advanced' },

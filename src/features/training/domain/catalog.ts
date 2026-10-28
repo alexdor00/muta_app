@@ -296,6 +296,12 @@ const ORDER: Level[] = ['beginner', 'intermediate', 'advanced']
 /** Nivel medido de cada rutina (id → nivel). Lo carga el caso de uso desde shared/content. */
 export type MeasuredLevels = Readonly<Record<string, Level>>
 
+/** Volumen medido: mantenimiento o desarrollo (rangos «mantener» frente a «desarrollar»). */
+export type MeasuredVolumes = Readonly<Record<string, 'maintain' | 'develop'>>
+
+/** Fase del perfil: volumen, definición o mantenimiento (sale del objetivo). */
+export type Phase = 'bulk' | 'cut' | 'maintenance'
+
 /**
  * Nivel de la rutina medido por sus series semanales por músculo frente a los rangos de
  * docs/conocimiento (scripts/program-levels.ts → shared/content/program-levels.json, que pasa el caso de uso).
@@ -315,13 +321,15 @@ export function needsAdjust(entry: CatalogEntry, level: Level, measured: Measure
  *   músculo a músculo al elegirla (domain/adaptVolume.ts).
  * - Principiante: se recomiendan como mucho 4 días (con aviso) y puede elegir hasta 5.
  * - Si ninguna es de tus días exactos, las del número de días más cercano.
- * - Orden: primero las de tu nivel (las de MUTA delante), después las adaptadas, de nivel más cercano a más lejano.
+ * - Orden: en definición y mantenimiento, primero las de volumen de mantenimiento (en volumen, al revés);
+ *   después las de tu nivel (las de MUTA delante), después las adaptadas, de nivel más cercano a más lejano.
  * - El resto va en «otras». Solo entran las disponibles (propias o cargadas en local).
  */
 export function recommend(
-  profile: { daysPerWeek: number; level: Level },
+  profile: { daysPerWeek: number; level: Level; phase?: Phase },
   available: ReadonlySet<string>,
   measured: MeasuredLevels,
+  volumes: MeasuredVolumes = {},
 ): Recommendation {
   const beginner = profile.level === 'beginner'
   const targetDays = beginner ? Math.min(profile.daysPerWeek, BEGINNER_RECOMMENDED_DAYS) : profile.daysPerWeek
@@ -337,7 +345,12 @@ export function recommend(
   const best = Math.min(...candidates.map(distance))
   const levelGap = (entry: CatalogEntry) =>
     Math.abs(ORDER.indexOf(levelOf(entry, measured)) - ORDER.indexOf(profile.level))
-  const rank = (entry: CatalogEntry) => levelGap(entry) * 2 + (entry.origin === 'muta' ? 0 : 1)
+  // En definición y mantenimiento van primero las de volumen de mantenimiento; en volumen, las de desarrollar.
+  const wantsMaintain = profile.phase === 'cut' || profile.phase === 'maintenance'
+  const phaseGap = (entry: CatalogEntry) =>
+    profile.phase ? Number((volumes[entry.id] === 'maintain') !== wantsMaintain) : 0
+  const rank = (entry: CatalogEntry) =>
+    phaseGap(entry) * 4 + levelGap(entry) * 2 + (entry.origin === 'muta' ? 0 : 1)
   const byRank = (a: CatalogEntry, b: CatalogEntry) => rank(a) - rank(b)
   const recommended = candidates.filter((entry) => distance(entry) === best).sort(byRank)
   const alsoAllowed =
