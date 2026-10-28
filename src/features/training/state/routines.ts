@@ -4,7 +4,6 @@ import type { Category, CategoryId } from '../domain/categories.ts'
 import type { ProgramInfo } from '../domain/programInfo.ts'
 import type { Adaptation, PhaseView } from '../domain/routineView.ts'
 import type { OptionalExercise, PriorityChoice } from '../domain/priorities.ts'
-import type { SwapChoice } from '../domain/swaps.ts'
 import type { WeakChoice, WeakTable } from '../domain/weakPoints.ts'
 
 /** Una rutina lista para enseñar. */
@@ -48,8 +47,6 @@ export type DetailState =
       phases: PhaseView[]
       weak: WeakView | null
       priorities: PriorityView | null
-      /** Sustitutos elegidos: ejercicio original → sustituto. */
-      swaps: SwapChoice
     }
 
 /** Prioridades de una rutina de MUTA: músculos, ejercicios opcionales y lo elegido. */
@@ -74,7 +71,6 @@ export const routineDetail = signal<DetailState>({ status: 'loading' })
 export { CATEGORIES } from '../domain/categories.ts'
 export { aboutOf, type About } from '../domain/about.ts'
 export type { WeakChoice, WeakTable } from '../domain/weakPoints.ts'
-export type { SwapChoice } from '../domain/swaps.ts'
 export type { Slot } from '../domain/slots.ts'
 export type { PriorityChoice } from '../domain/priorities.ts'
 export { DEFAULT_MINUTES, MAX_PRIORITIES } from '../domain/priorities.ts'

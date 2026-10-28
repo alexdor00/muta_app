@@ -21,7 +21,7 @@ import {
   type WeakChoice,
 } from '../../state/routines.ts'
 import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
-import { openRoutine, setPriorities, setSwap, setWeakPoints } from '../../use-cases/routineDetail.ts'
+import { openRoutine, setPriorities, setWeakPoints } from '../../use-cases/routineDetail.ts'
 import styles from './RutinaScreen.module.css'
 
 const STATUS = { added: 'Añadido', removed: 'Quitado', changed: 'Ajustado', same: null } as const
@@ -54,7 +54,7 @@ export function RutinaScreen(props: { id: string }) {
     )
   }
 
-  const { item, phases, weak, priorities, swaps } = state
+  const { item, phases, weak, priorities } = state
   const { entry, info } = item
   const back = paths.routineCategory(item.categories[0] ?? 'muta')
   const about = aboutOf(entry)
@@ -67,7 +67,6 @@ export function RutinaScreen(props: { id: string }) {
       await chooseRoutine(entry.id, {
         weakPoints: weak?.choice ?? null,
         priorities: priorities?.choice ?? null,
-        swaps,
       })
       route(paths.training)
     } catch (error) {
@@ -81,16 +80,6 @@ export function RutinaScreen(props: { id: string }) {
   const anySlot = currentWeek.days.some((d) => d.type === 'session' && d.exercises.some((e) => e.slot))
 
   function panelFor(slot: Slot, id: string): SlotPanelProps | null {
-    if (slot.kind === 'swap') {
-      return {
-        id,
-        kind: 'swap',
-        original: slot.key,
-        options: slot.options,
-        value: slot.chosen,
-        onPick: (name) => setSwap(slot.key, name),
-      }
-    }
     if (slot.kind === 'optional' && priorities) {
       const o = priorities.optionals.find((x) => x.key === slot.key)
       return {
@@ -102,6 +91,15 @@ export function RutinaScreen(props: { id: string }) {
         off: slot.off,
         minutes: priorities.minutes,
         onSet: (include) => setPrior({ optionals: { ...prior.optionals, [slot.key]: include } }),
+        original: o?.name ?? '',
+        options: slot.options,
+        value: slot.chosen,
+        onPick: (name) => {
+          const rest = Object.fromEntries(
+            Object.entries(prior.alternatives ?? {}).filter(([key]) => key !== slot.key),
+          )
+          setPrior({ alternatives: name ? { ...rest, [slot.key]: name } : rest })
+        },
       }
     }
     if (slot.kind === 'weak' && weak) {

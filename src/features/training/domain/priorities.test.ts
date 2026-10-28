@@ -184,6 +184,8 @@ describe('los opcionales quitados no desaparecen', () => {
       key: 'Hombro anterior|Press militar',
       off: true,
       why: 'rule',
+      options: [],
+      chosen: null,
     })
     const hand = applyPriorities(
       program,
@@ -219,6 +221,35 @@ describe('los opcionales quitados no desaparecen', () => {
       key: 'Aductores|Opc',
       off: true,
       why: 'time',
+      options: [],
+      chosen: null,
     })
+  })
+
+  it('el ejercicio que pones es uno de los que permite el documento', () => {
+    const p = {
+      blocks: [
+        {
+          weeks: [
+            {
+              days: [
+                {
+                  name: 'Día',
+                  exercises: [{ ...ex('Opc', 'Aductores', true, 2), substitutions: ['Otro', 'Otro 2'] }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    const pick = (alternative: string) =>
+      applyPriorities(
+        p,
+        { priorities: [], optionals: {}, alternatives: { 'Aductores|Opc': alternative }, maxMinutes: null },
+        'intermediate',
+      ).blocks[0].weeks[0].days[0] as { exercises: { name: string }[] }
+    expect(pick('Otro 2').exercises[0].name).toBe('Otro 2')
+    expect(pick('Inventado').exercises[0].name).toBe('Opc')
   })
 })

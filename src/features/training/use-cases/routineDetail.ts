@@ -17,7 +17,6 @@ import {
 } from '../domain/priorities.ts'
 import { selectVariant, type ProgramData } from '../domain/programInfo.ts'
 import { metaLines, phasesView } from '../domain/routineView.ts'
-import { applySwaps, type SwapChoice } from '../domain/swaps.ts'
 import { applyWeakPoints, hasWeakPoints, type WeakChoice, type WeakTable } from '../domain/weakPoints.ts'
 import {
   routineDetail,
@@ -41,7 +40,6 @@ let open: {
 } | null = null
 let weakChoice: WeakChoice | null = null
 let priorityChoice: PriorityChoice | null = null
-let swapChoice: SwapChoice = {}
 
 /** Calcula lo que se ve con las elecciones de ahora: prioridades primero (quitan opcionales), luego el punto débil. */
 function show() {
@@ -66,14 +64,12 @@ function show() {
     : null
   let shown: Program = afterPriorities
   if (table) shown = applyWeakPoints(shown as never, table, weakChoice) as Program
-  shown = applySwaps(shown as never, swapChoice) as Program
   routineDetail.value = {
     status: 'ready',
     item,
     phases: phasesView(shown as never),
     weak,
     priorities,
-    swaps: swapChoice,
   }
 }
 
@@ -83,7 +79,6 @@ export async function openRoutine(id: string): Promise<void> {
   open = null
   weakChoice = null
   priorityChoice = null
-  swapChoice = {}
   try {
     if (routines.value.status !== 'ready') await loadRoutines()
     const state = routines.value
@@ -122,13 +117,11 @@ export async function openRoutine(id: string): Promise<void> {
           programId?: string
           weakPoints?: WeakChoice | null
           priorities?: PriorityChoice | null
-          swaps?: SwapChoice
         }
       | undefined
     if (plan?.programId === id) {
       weakChoice = plan.weakPoints ?? null
       priorityChoice = plan.priorities ?? null
-      swapChoice = plan.swaps ?? {}
     }
     show()
   } catch (error) {
@@ -146,12 +139,5 @@ export function setWeakPoints(choice: WeakChoice | null): void {
 /** Guarda tus prioridades y los opcionales que decides a mano, y recalcula lo que ves. */
 export function setPriorities(choice: PriorityChoice | null): void {
   priorityChoice = choice
-  show()
-}
-
-/** Pone un sustituto (o vuelve al original con `null`) y recalcula lo que ves. */
-export function setSwap(original: string, substitute: string | null): void {
-  const rest = Object.fromEntries(Object.entries(swapChoice).filter(([key]) => key !== original))
-  swapChoice = substitute ? { ...rest, [original]: substitute } : rest
   show()
 }

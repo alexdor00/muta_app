@@ -23,9 +23,7 @@ export type SlotPanelProps = Common &
         off: boolean
         minutes: number | null
         onSet: (include: boolean) => void
-      }
-    | {
-        kind: 'swap'
+        /** Ejercicio original del hueco y los que el documento permite en su lugar. */
         original: string
         options: string[]
         value: string | null
@@ -132,25 +130,23 @@ export function SlotPanel(props: SlotPanelProps) {
           onChange={(v) => props.onSet(v === 'on')}
         />
         {why && <p class={styles.note}>{why}</p>}
-      </div>
-    )
-  }
-
-  if (props.kind === 'swap') {
-    const cards = [
-      { value: NONE, label: props.original, detail: 'Ejercicio original', icon: '1' },
-      ...props.options.map((o, i) => ({ value: o, label: o, detail: undefined, icon: String(i + 2) })),
-    ]
-    return (
-      <div class={styles.panel}>
-        <p class={styles.hint}>El programa permite sustituir este ejercicio por otro.</p>
-        <ChoiceCards
-          name={`${props.id}-sustituto`}
-          legend="Ejercicio"
-          options={cards}
-          value={props.value ?? NONE}
-          onChange={(v) => props.onPick(v === NONE ? null : v)}
-        />
+        {props.options.length > 0 && (
+          <ChoiceCards
+            name={`${props.id}-ejercicio`}
+            legend="Ejercicio"
+            options={[
+              { value: NONE, label: props.original, detail: 'El de la rutina', icon: '1' },
+              ...props.options.map((o, i) => ({
+                value: o,
+                label: o,
+                detail: undefined,
+                icon: String(i + 2),
+              })),
+            ]}
+            value={props.value ?? NONE}
+            onChange={(v) => props.onPick(v === NONE ? null : v)}
+          />
+        )}
       </div>
     )
   }

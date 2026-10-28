@@ -21,6 +21,8 @@ export type PriorityChoice = {
   priorities: string[]
   /** Lo que has decidido a mano de cada opcional; el resto sigue las reglas. */
   optionals: Record<string, boolean>
+  /** Ejercicio del documento que pones en un opcional (clave del opcional → nombre). */
+  alternatives?: Record<string, string>
   /** Minutos máximos por sesión: sin decir, 75; `null`, sin límite. */
   maxMinutes?: number | null
 }
@@ -115,7 +117,9 @@ function fitDay(
     )
     if (lastOptional >= 0) {
       list = list.map((e, i) =>
-        i === lastOptional ? { ...e, slot: { kind: 'optional', key: keyOf(e), off: true, why: 'time' } } : e,
+        i === lastOptional && e.slot?.kind === 'optional'
+          ? { ...e, slot: { ...e.slot, off: true, why: 'time' } }
+          : e,
       )
       continue
     }
@@ -164,12 +168,25 @@ export function applyPriorities<P extends Program>(
             if (!o) return e
             const on = isIncluded(o, choice, level)
             const hand = choice?.optionals[o.key] !== undefined
+            const allowed = Array.isArray(e.substitutions) ? (e.substitutions as string[]) : []
+            const wanted = choice?.alternatives?.[o.key]
+            const chosen = wanted && allowed.includes(wanted) ? wanted : null
             return {
               ...e,
-              slot: { kind: 'optional', key: o.key, off: !on, why: on ? null : hand ? 'hand' : 'rule' },
+              slot: {
+                kind: 'optional',
+                key: o.key,
+                off: !on,
+                why: on ? null : hand ? 'hand' : 'rule',
+                options: allowed,
+                chosen,
+              },
             }
           })
           if (limit != null) exercises = fitDay(exercises, limit, prio, manual)
+          exercises = exercises.map((e) =>
+            e.slot?.kind === 'optional' && e.slot.chosen ? { ...e, name: e.slot.chosen } : e,
+          )
           return { ...day, exercises }
         }),
       })),
