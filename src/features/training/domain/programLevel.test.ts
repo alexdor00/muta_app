@@ -100,8 +100,8 @@ describe('adaptar a un nivel', () => {
   it('principiante: baja cada músculo a su rango quitando primero aislamientos, y RPE 7/8', () => {
     expect(programLevel(base, 2).sets.pecho).toBe(12)
     const out = adaptToLevel(base, 'beginner', 2)
-    // El pecho alto es el énfasis de la rutina: baja al máximo de prioridad de principiante (10)
-    expect(programLevel(out, 2).sets.pecho).toBe(10)
+    // 12 series no es énfasis (no pasa de 10 + 2): baja al máximo de principiante (8)
+    expect(programLevel(out, 2).sets.pecho).toBe(8)
     const day1 = out.blocks[0].weeks[0].days[0] as {
       exercises: { name: string; sets: unknown; rpe: unknown; original?: unknown }[]
     }

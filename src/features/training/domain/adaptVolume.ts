@@ -1,6 +1,7 @@
 import type { Level } from './catalog.ts'
 import { muscleOf } from './muscleOf.ts'
 import { rangeFor, type MuscleId } from './muscles.ts'
+import { emphasisOf } from './programInfo.ts'
 import { levelFromSets, weeklySets } from './programLevel.ts'
 
 // Adapta una rutina a un nivel músculo a músculo (docs/conocimiento, Parte II §4 «calibración»):
@@ -61,14 +62,17 @@ function adaptWeek(week: Week, level: Level, daysPerWeek: number, goal: SetsGoal
   const factor = Math.min(1, daysPerWeek / Math.max(1, sessions(copy).length))
   const days = sessions(copy)
 
-  for (const { muscle, priority } of fit.perMuscle) {
-    // Mantener: rango «mantener» salvo los músculos de énfasis de la rutina, que siguen en
-    // «desarrollar» (lo que hace especial a la rutina no se pierde). Ganar: «desarrollar» o
-    // «prioridad» para los de énfasis.
+  // Solo los músculos que la rutina especializa de verdad (énfasis: exceso claro sobre «desarrollar»)
+  // usan el rango de prioridad; el resto, el de su nivel. Así un principiante no hereda volumen de más.
+  const emphasis = new Set(emphasisOf(weekly))
+  for (const { muscle } of fit.perMuscle) {
+    // Mantener: rango «mantener» salvo los de énfasis, que siguen en «desarrollar» (lo que hace
+    // especial a la rutina no se pierde). Ganar: «desarrollar», o «prioridad» para los de énfasis.
+    const special = emphasis.has(muscle)
     const range =
       goal === 'maintain'
-        ? rangeFor(muscle, level, priority[level] ? 'develop' : 'maintain')
-        : rangeFor(muscle, level, priority[level] ? 'priority' : 'develop')
+        ? rangeFor(muscle, level, special ? 'develop' : 'maintain')
+        : rangeFor(muscle, level, special ? 'priority' : 'develop')
     // Cambio en series del ciclo (la semana del archivo puede tener más sesiones que días reales)
     let current = weekly[muscle]!
     const step = factor

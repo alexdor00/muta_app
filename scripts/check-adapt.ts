@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import { adaptToLevel, type SetsGoal } from '../src/features/training/domain/adaptVolume.ts'
 import { CATALOG, sourceOf, type Level } from '../src/features/training/domain/catalog.ts'
 import { MUSCLES, rangeFor } from '../src/features/training/domain/muscles.ts'
-import { selectVariant } from '../src/features/training/domain/programInfo.ts'
+import { emphasisOf, selectVariant } from '../src/features/training/domain/programInfo.ts'
 import {
   levelFromSets,
   representativeWeek,
@@ -25,18 +25,14 @@ for (const entry of CATALOG) {
   const rep = representativeWeek(program)
   const index = program.blocks[0].weeks.indexOf(rep)
   const originalFit = levelFromSets(weeklySets(rep, days))
+  const emphasis = new Set(emphasisOf(weeklySets(rep, days)))
   for (const goal of ['develop', 'maintain'] as SetsGoal[]) {
     for (const level of ['beginner', 'intermediate', 'advanced'] as Level[]) {
       const sets = weeklySets(adaptToLevel(program, level, days, goal).blocks[0].weeks[index], days)
       for (const m of originalFit.perMuscle) {
+        const special = emphasis.has(m.muscle)
         const mode =
-          goal === 'maintain'
-            ? m.priority[level]
-              ? 'develop'
-              : 'maintain'
-            : m.priority[level]
-              ? 'priority'
-              : 'develop'
+          goal === 'maintain' ? (special ? 'develop' : 'maintain') : special ? 'priority' : 'develop'
         const [min, max] = rangeFor(m.muscle, level, mode)
         const s = sets[m.muscle] ?? 0
         checks++
