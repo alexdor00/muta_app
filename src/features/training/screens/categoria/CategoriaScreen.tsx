@@ -55,6 +55,10 @@ const VOLUME_OPTIONS: Option[] = [
   { value: 'medio', label: 'Medio' },
   { value: 'alto', label: 'Alto' },
 ]
+const BASICS_OPTIONS: Option[] = [
+  { value: ALL, label: 'Todas' },
+  { value: 'si', label: 'Mejoran los básicos' },
+]
 const CYCLE_OPTIONS: Option[] = [
   { value: ALL, label: 'Todos' },
   { value: 'semanal', label: 'Semanal' },
@@ -139,7 +143,7 @@ export function CategoriaScreen(props: { category: string }) {
               <ListRow
                 key={item.entry.id}
                 title={item.entry.title}
-                lines={item.lines}
+                lines={aboutOf(item.entry)?.basics ? [...item.lines, 'Mejora los básicos'] : item.lines}
                 eyebrow={current ? 'Tu rutina' : item.recommended ? 'Para tus días' : undefined}
                 href={paths.routineDetail(item.entry.id)}
                 tone={item.entry.tone}
@@ -254,6 +258,14 @@ export function CategoriaScreen(props: { category: string }) {
               options={CYCLE_OPTIONS}
               value={value('cycle')}
               onChange={(v) => set('cycle', v)}
+            />
+            <ChoiceChips
+              name="f-basicos"
+              legend="Fuerza"
+              showLegend
+              options={BASICS_OPTIONS}
+              value={value('basics')}
+              onChange={(v) => set('basics', v)}
             />
           </div>
         </Sheet>

@@ -37,3 +37,11 @@
   background: var(--surface-2);
   font: var(--text-footnote);
 }
+
+.basics {
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-2);
+  font: var(--text-subhead);
+}

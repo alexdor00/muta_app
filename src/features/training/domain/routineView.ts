@@ -1,3 +1,4 @@
+import { aboutOf } from './about.ts'
 import { adaptToLevel, type SetsGoal } from './adaptVolume.ts'
 import type { CatalogEntry, Level } from './catalog.ts'
 import { MUSCLES, type MuscleId } from './muscles.ts'
@@ -39,6 +40,8 @@ export type Filters = {
   duration?: Duration
   volume?: VolumeTier
   cycle?: 'semanal' | 'rota'
+  /** «si»: solo las que buscan mejorar los básicos. */
+  basics?: 'si'
 }
 
 /** Corta ≤ 45 min · media 50–65 · larga ≥ 70. */
@@ -53,6 +56,7 @@ export function matches(item: { entry: CatalogEntry; info: ProgramInfo }, f: Fil
   if (f.duration && durationOf(info.minutes) !== f.duration) return false
   if (f.volume && info.volume !== f.volume) return false
   if (f.cycle && (f.cycle === 'rota') !== info.cycle.rotating) return false
+  if (f.basics && !aboutOf(entry)?.basics) return false
   return true
 }
 

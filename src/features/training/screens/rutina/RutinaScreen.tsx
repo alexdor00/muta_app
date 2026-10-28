@@ -76,6 +76,7 @@ export function RutinaScreen(props: { id: string }) {
     ['Reparto', info.splitLabel],
     ['Volumen', `${info.volume[0].toUpperCase()}${info.volume.slice(1)}`],
     ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
+    ...(about?.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),
   ]
 
   return (

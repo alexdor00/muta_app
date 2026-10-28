@@ -21,3 +21,27 @@ describe('de qué trata cada rutina', () => {
     expect(text).not.toMatch(/nippard|buttermore|jeff|stephanie|yates|meadows/i)
   })
 })
+
+describe('mejora los básicos', () => {
+  const marked = CATALOG.filter((e) => aboutOf(e)?.basics).map((e) => e.id)
+
+  it('solo las que lo dicen como objetivo en su documento', () => {
+    expect(marked).toEqual([
+      'fuerza-hipertrofia-1-6d',
+      'fuerza-hipertrofia-2-4d',
+      'fuerza-hipertrofia-2-6d',
+      'fuerza-hipertrofia-3-5d',
+      'especializacion-sentadilla',
+      'especializacion-banca',
+      'ppl-tecnica',
+      'torso-pierna',
+      'mujer-especializacion',
+    ])
+  })
+
+  it('el filtro «mejoran los básicos» deja justo esas', async () => {
+    const { matches } = await import('./routineView.ts')
+    const item = (e: (typeof CATALOG)[number]) => ({ entry: e, info: {} as never })
+    expect(CATALOG.filter((e) => matches(item(e), { basics: 'si' })).map((e) => e.id)).toEqual(marked)
+  })
+})

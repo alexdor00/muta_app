@@ -11,6 +11,8 @@ export type About = {
   forWho: string
   /** Cómo funciona: estructura, progresión y lo que la hace distinta. */
   how: string[]
+  /** Si el documento dice que busca mejorar los básicos (fuerza), con sus palabras resumidas. */
+  basics?: string
   /** Detalle de esta versión concreta (días, nivel, origen). */
   note?: string
 }
@@ -69,6 +71,8 @@ const PROGRAMS = {
     ],
   },
   'powerbuilding-1': {
+    basics:
+      'Uno de sus dos objetivos principales es aumentar la fuerza máxima en los levantamientos fundamentales.',
     summary:
       'Fuerza e hipertrofia a partes iguales: subir sentadilla, banca y peso muerto mientras ganas músculo de forma proporcionada. Es la base de la serie.',
     forWho: 'Intermedio-avanzado (unos 2–5 años entrenando en serio).',
@@ -79,6 +83,8 @@ const PROGRAMS = {
     ],
   },
   'powerbuilding-2': {
+    basics:
+      'Desarrolla una gran capacidad de trabajo en los «Big 3» (sentadilla, banca y peso muerto) y sus accesorios, para convertirla en fuerza máxima.',
     summary:
       'Fuerza e hipertrofia, segunda entrega de la serie: construye tolerancia al volumen con más peso en la hipertrofia.',
     forWho: 'Intermedio-avanzado que quiere seguir ganando músculo sin dejar de mejorar los tres básicos.',
@@ -89,6 +95,8 @@ const PROGRAMS = {
     ],
   },
   'powerbuilding-3': {
+    basics:
+      'Su objetivo principal es llegar a un pico de fuerza máxima en los «Big 3»: sentadilla, banca y peso muerto.',
     summary:
       'Fuerza e hipertrofia, tercera entrega de la serie: convierte el trabajo acumulado en fuerza máxima en sentadilla, banca y peso muerto.',
     forWho: 'Intermedio-avanzado que ya tiene una buena base de volumen y técnica.',
@@ -110,6 +118,8 @@ const PROGRAMS = {
     ],
   },
   'ppl-tecnica': {
+    basics:
+      'Su objetivo secundario es aumentar la fuerza general en los movimientos compuestos fundamentales.',
     summary:
       'Empuje, tirón y pierna de 16 semanas para maximizar músculo; ganar fuerza en los básicos es el objetivo secundario.',
     forWho:
@@ -121,6 +131,7 @@ const PROGRAMS = {
     ],
   },
   'torso-pierna': {
+    basics: 'Su objetivo principal es maximizar la hipertrofia y el desarrollo de fuerza.',
     summary:
       'Torso y pierna 6 días para ganar tamaño y fuerza, con técnicas de intensidad avanzadas y trabajo de puntos débiles.',
     forWho:
@@ -133,6 +144,7 @@ const PROGRAMS = {
     ],
   },
   sentadilla: {
+    basics: 'Todo el programa busca subir tu sentadilla, con un test de fuerza máxima en la semana 10.',
     summary: 'Especialización para subir tu sentadilla en 10 semanas.',
     forWho: 'Quien ya entrena con regularidad y quiere priorizar la sentadilla durante 10 semanas.',
     how: [
@@ -143,6 +155,7 @@ const PROGRAMS = {
     note: 'El original solo trae los días de pierna. Los días de torso son el día de muestra que propone el propio programa, con su reparto recomendado.',
   },
   banca: {
+    basics: 'Todo el programa busca subir tu press banca, con un pico de fuerza máxima al final.',
     summary:
       'Especialización para subir tu press banca en 8 semanas, dentro de un programa de cuerpo completo.',
     forWho: 'Quien ya entrena con regularidad y quiere priorizar el press banca.',
@@ -173,6 +186,8 @@ const PROGRAMS = {
     ],
   },
   'mujer-especializacion': {
+    basics:
+      'Su objetivo secundario es aumentar la fuerza general en los movimientos compuestos fundamentales.',
     summary:
       'Desarrollo completo con foco en glúteo, hombro, abdomen y espalda. El objetivo secundario es ganar fuerza en los básicos.',
     forWho: 'Mujeres con al menos 1–3 años entrenando en serio.',
