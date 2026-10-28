@@ -15,34 +15,32 @@ export type WeakTableView =
   { mode: 'table'; muscles: Muscle[] } | { mode: 'pick'; min: number; max: number; muscles: Muscle[] }
 export type WeakChoiceView =
   | { mode: 'table'; muscle: string; e1: string | null; e2: string | null }
-  | { mode: 'pick'; picks: { muscle: string; option: string }[] }
+  | { mode: 'pick'; picks: { muscle: string; option: string }[]; slots?: Record<string, string[]> }
 
 type Props = {
   table: WeakTableView
   choice: WeakChoiceView | null
-  /** El ejercicio 1 se puede dejar sin elegir. */
-  e1Optional: boolean
+  /** Días con hueco de «elige tus músculos» (Torso y pierna). */
+  slots: { key: string; side: 'upper' | 'lower' }[]
+  /** Reparto que se aplica si no lo cambias. */
+  auto: Record<string, string[]>
   onChange: (choice: WeakChoiceView) => void
 }
 
 const NONE = ''
-const count = (n: number) => `${n} ${n === 1 ? 'ejercicio' : 'ejercicios'}`
 const UNSET = '__sin_elegir'
+const count = (n: number) => `${n} ${n === 1 ? 'ejercicio' : 'ejercicios'}`
 
-function Badge(props: { required: boolean }) {
-  return (
-    <span class={`${styles.badge} ${props.required ? styles.required : ''}`}>
-      {props.required ? 'Obligatorio' : 'Opcional'}
-    </span>
-  )
+function Badge() {
+  return <span class={styles.badge}>Opcional</span>
 }
 
+/** Tarjetas de ejercicios; «No añadir» deja el hueco libre. */
 function Options(props: {
   name: string
   legend: string
   options: Option[]
   value: string | null
-  /** Con permiso de no elegir: añade «No añadir». */
   skippable: boolean
   onChange: (value: string | null) => void
 }) {
@@ -66,12 +64,7 @@ function Options(props: {
 }
 
 /** Un músculo y, de su tabla, un ejercicio 1 y, si quieres, un ejercicio 2 (Culturismo). */
-function TablePicker({
-  table,
-  choice,
-  e1Optional,
-  onChange,
-}: Props & { table: { mode: 'table'; muscles: Muscle[] } }) {
+function TablePicker({ table, choice, onChange }: Props & { table: { mode: 'table'; muscles: Muscle[] } }) {
   const current = choice?.mode === 'table' ? choice : null
   const muscle = table.muscles.find((m) => m.id === current?.muscle)
   return (
@@ -99,7 +92,7 @@ function TablePicker({
       {muscle && muscle.e1.length > 0 && current && (
         <section class={styles.block}>
           <h3 class={styles.h3}>
-            Ejercicio 1 <Badge required={!e1Optional} />
+            Ejercicio 1 <Badge />
           </h3>
           <p class={styles.hint}>Elige uno solo; no los hagas todos el mismo día.</p>
           <Options
@@ -107,7 +100,7 @@ function TablePicker({
             legend="Ejercicio 1"
             options={muscle.e1}
             value={current.e1}
-            skippable={e1Optional}
+            skippable
             onChange={(e1) => onChange({ ...current, e1 })}
           />
         </section>
@@ -116,7 +109,7 @@ function TablePicker({
       {muscle && muscle.e2.length > 0 && current && (
         <section class={styles.block}>
           <h3 class={styles.h3}>
-            Ejercicio 2 <Badge required={false} />
+            Ejercicio 2 <Badge />
           </h3>
           <p class={styles.hint}>
             Solo si tu punto débil se siente recuperado; si está cansado o dolorido, sáltalo.
@@ -135,15 +128,33 @@ function TablePicker({
   )
 }
 
-/** Entre 2 y 3 músculos y un ejercicio de cada uno, para todo el programa (Torso y pierna). */
+/** Los músculos que quieras, un ejercicio de cada uno y en qué día va cada uno (Torso y pierna). */
 function PickPicker({
   table,
   choice,
+  slots,
+  auto,
   onChange,
 }: Props & { table: { mode: 'pick'; min: number; max: number; muscles: Muscle[] } }) {
   const picks = choice?.mode === 'pick' ? choice.picks : []
-  const full = picks.length >= table.max
+  const given = choice?.mode === 'pick' ? choice.slots : undefined
   const chosen = new Set(picks.map((p) => p.muscle))
+  const label = (id: string) => table.muscles.find((m) => m.id === id)?.label ?? id
+
+  // El reparto que has tocado se conserva, sin los músculos que ya no están elegidos
+  const change = (next: { muscle: string; option: string }[], slotsNext = given) => {
+    const keep = new Set(next.map((p) => p.muscle))
+    onChange({
+      mode: 'pick',
+      picks: next,
+      slots:
+        slotsNext &&
+        Object.fromEntries(
+          Object.entries(slotsNext).map(([k, ids]) => [k, ids.filter((id) => keep.has(id))]),
+        ),
+    })
+  }
+
   const tiles = (group: 'upper' | 'lower', legend: string) => (
     <Tiles
       name={`grupo-${group}`}
@@ -152,35 +163,29 @@ function PickPicker({
       mode="multi"
       options={table.muscles
         .filter((m) => m.group === group)
-        .map((m) => ({
-          value: m.id,
-          label: m.label,
-          detail: count(m.e1.length),
-          disabled: full && !chosen.has(m.id),
-        }))}
+        .map((m) => ({ value: m.id, label: m.label, detail: count(m.e1.length) }))}
       value={picks
         .map((p) => p.muscle)
         .filter((id) => table.muscles.find((m) => m.id === id)?.group === group)}
       onChange={(ids) => {
         const others = picks.filter((p) => table.muscles.find((m) => m.id === p.muscle)?.group !== group)
         const mine = ids.map((id) => picks.find((p) => p.muscle === id) ?? { muscle: id, option: NONE })
-        onChange({ mode: 'pick', picks: [...others, ...mine] })
+        change([...others, ...mine], undefined) // al cambiar los músculos, el reparto vuelve a ser automático
       }}
     />
   )
+
   return (
     <div class={styles.picker}>
       <section class={styles.block}>
         <h3 class={styles.h3}>
-          Elige {table.min} o {table.max} puntos débiles <Badge required />
+          Elige tus puntos débiles <Badge />
         </h3>
         <p class={styles.hint}>
-          Al menos uno de torso y uno de pierna, y sé constante: mantén los mismos todo el programa para no
-          entrenar solo lo que más te gusta.
+          El programa recomienda {table.min} o {table.max} y que sean siempre los mismos, para no entrenar
+          solo lo que más te gusta.
         </p>
-        <p class={styles.counter}>
-          {picks.length} de {table.max} elegidos
-        </p>
+        <p class={styles.counter}>{picks.length} elegidos</p>
       </section>
       <section class={styles.block}>{tiles('upper', 'Torso')}</section>
       <section class={styles.block}>{tiles('lower', 'Pierna')}</section>
@@ -199,20 +204,39 @@ function PickPicker({
               value={p.option || null}
               skippable={false}
               onChange={(option) =>
-                onChange({
-                  mode: 'pick',
-                  picks: picks.map((x) => (x.muscle === p.muscle ? { ...x, option: option ?? NONE } : x)),
-                })
+                change(picks.map((x) => (x.muscle === p.muscle ? { ...x, option: option ?? NONE } : x)))
               }
             />
           </section>
         )
       })}
+
+      {picks.length > 0 && slots.length > 0 && (
+        <section class={styles.block}>
+          <h3 class={styles.h3}>¿En qué día?</h3>
+          <p class={styles.hint}>
+            Ya los he repartido; cámbialo como quieras. Si marcas varios en un día, se alternan por semana;
+            sin marcar ninguno, ese día queda libre.
+          </p>
+          {slots.map((slot) => (
+            <Tiles
+              key={slot.key}
+              name={`dia-${slot.key}`}
+              legend={slot.key}
+              showLegend
+              mode="multi"
+              options={picks.map((p) => ({ value: p.muscle, label: label(p.muscle) }))}
+              value={(given ?? auto)[slot.key]?.filter((id) => chosen.has(id)) ?? []}
+              onChange={(ids) => change(picks, { ...(given ?? auto), [slot.key]: ids })}
+            />
+          ))}
+        </section>
+      )}
     </div>
   )
 }
 
-/** Selector de punto débil: el contenido de la hoja «Tu punto débil». */
+/** Selector de punto débil: el contenido de la hoja «Antes de empezar». */
 export function WeakPointPicker(props: Props) {
   return props.table.mode === 'table' ? (
     <TablePicker {...props} table={props.table} />

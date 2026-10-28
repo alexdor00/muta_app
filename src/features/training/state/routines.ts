@@ -4,7 +4,7 @@ import type { Category, CategoryId } from '../domain/categories.ts'
 import type { ProgramInfo } from '../domain/programInfo.ts'
 import type { Adaptation, PhaseView } from '../domain/routineView.ts'
 import type { OptionalExercise, PriorityChoice } from '../domain/priorities.ts'
-import type { WeakChoice, WeakNeeds, WeakTable } from '../domain/weakPoints.ts'
+import type { WeakChoice, WeakSlot, WeakTable } from '../domain/weakPoints.ts'
 
 /** Una rutina lista para enseñar. */
 export type RoutineItem = {
@@ -52,22 +52,20 @@ export type DetailState =
 /** Prioridades de una rutina de MUTA: músculos, ejercicios opcionales y lo elegido. */
 export type PriorityView = {
   muscles: string[]
-  optionals: (OptionalExercise & { included: boolean; reason: string | null })[]
+  optionals: (OptionalExercise & { included: boolean; trimmed: boolean; reason: string | null })[]
   choice: PriorityChoice | null
   max: number
-  summary: string[]
+  /** Minutos por sesión que se aplican (75 por defecto); null = sin límite. */
+  minutes: number | null
 }
 
-/** Punto débil de una rutina: la tabla, lo elegido y si falta algo obligatorio. */
+/** Punto débil de una rutina: la tabla, los días con hueco y lo elegido. Nada es obligatorio. */
 export type WeakView = {
   table: WeakTable
+  slots: WeakSlot[]
+  /** Reparto de músculos por día que se aplica si no lo cambias (Torso y pierna). */
+  auto: Record<string, string[]>
   choice: WeakChoice | null
-  needs: WeakNeeds
-  /** Hay que elegir para empezar (el ejercicio 1 no es opcional, o hay que elegir 2-3 músculos). */
-  required: boolean
-  /** Lo obligatorio está elegido. */
-  complete: boolean
-  summary: string[]
 }
 
 /** Rutina abierta en detalle. */
@@ -75,9 +73,9 @@ export const routineDetail = signal<DetailState>({ status: 'loading' })
 
 export { CATEGORIES } from '../domain/categories.ts'
 export { aboutOf, type About } from '../domain/about.ts'
-export type { WeakChoice, WeakNeeds, WeakTable } from '../domain/weakPoints.ts'
+export type { WeakChoice, WeakSlot, WeakTable } from '../domain/weakPoints.ts'
 export type { PriorityChoice } from '../domain/priorities.ts'
-export { MAX_PRIORITIES } from '../domain/priorities.ts'
+export { DEFAULT_MINUTES, MAX_PRIORITIES } from '../domain/priorities.ts'
 export type { Adaptation, Category, CategoryId, CatalogEntry, Level, PhaseView }
 export { activeFilters, matches, type Filters } from '../domain/routineView.ts'
 export { SPLIT_LABEL, type Split, type VolumeTier } from '../domain/programInfo.ts'

@@ -29,8 +29,7 @@ export function RutinaScreen(props: { id: string }) {
   const [phase, setPhase] = useState(0)
   const [week, setWeek] = useState(0)
   const infoSheet = useSheet('info')
-  const weakSheet = useSheet('punto-debil')
-  const priorSheet = useSheet('prioridades')
+  const startSheet = useSheet('empezar')
   useEffect(() => void openRoutine(props.id), [props.id])
   const state = routineDetail.value
 
@@ -52,11 +51,10 @@ export function RutinaScreen(props: { id: string }) {
   const currentPhase = phases[Math.min(phase, phases.length - 1)]
   const currentWeek = currentPhase.weeks[Math.min(week, currentPhase.weeks.length - 1)]
 
-  // Si falta algo obligatorio del punto débil, el botón principal abre el selector en vez de empezar
-  const pending = !!weak && weak.required && !weak.complete
+  // Con elecciones posibles (prioridades o punto débil), «Empezar» abre antes la hoja para personalizar
+  const custom = !!weak || !!priorities
 
-  async function start() {
-    if (pending) return weakSheet.show()
+  async function begin() {
     try {
       await chooseRoutine(entry.id, {
         weakPoints: weak?.choice ?? null,
@@ -125,90 +123,6 @@ export function RutinaScreen(props: { id: string }) {
         ))}
       </dl>
 
-      {weak && (
-        <section class={styles.weak} aria-label="Punto débil">
-          <div class={styles.weakHead}>
-            <h2 class={styles.h2}>Tu punto débil</h2>
-            <span class={`${styles.tag} ${weak.required ? styles.required : ''}`}>
-              {weak.required ? 'Obligatorio' : 'Opcional'}
-            </span>
-          </div>
-          {weak.summary.length ? (
-            <ul class={styles.summary}>
-              {weak.summary.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-          ) : (
-            <p class={styles.text}>
-              {weak.table.mode === 'pick'
-                ? 'Elige 2 o 3 músculos y un ejercicio de cada uno; se repiten durante todo el programa.'
-                : 'Elige el músculo que más quieres mejorar: los huecos de la rutina se llenan con ejercicios suyos.'}
-            </p>
-          )}
-          <Button variant="secondary" onClick={weakSheet.show}>
-            {weak.choice ? 'Cambiar mi punto débil' : 'Elegir mi punto débil'}
-          </Button>
-        </section>
-      )}
-      {weakSheet.open && weak && (
-        <Sheet
-          title="Tu punto débil"
-          onClose={weakSheet.close}
-          footer={
-            <Button disabled={weak.required && !weak.complete} onClick={weakSheet.close}>
-              {weak.required && !weak.complete ? 'Falta algo obligatorio' : 'Listo'}
-            </Button>
-          }
-        >
-          <WeakPointPicker
-            table={weak.table}
-            choice={weak.choice}
-            e1Optional={weak.needs.e1Optional}
-            onChange={setWeakPoints}
-          />
-        </Sheet>
-      )}
-
-      {priorities && (
-        <section class={styles.weak} aria-label="Prioridades">
-          <div class={styles.weakHead}>
-            <h2 class={styles.h2}>Tus prioridades</h2>
-            <span class={styles.tag}>Opcional</span>
-          </div>
-          {priorities.summary.length ? (
-            <ul class={styles.summary}>
-              {priorities.summary.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-          ) : (
-            <p class={styles.text}>
-              Elige hasta {priorities.max} músculos que quieras mejorar más y qué ejercicios opcionales
-              quieres hacer. Sin elegir, sigo las reglas de tu nivel.
-            </p>
-          )}
-          <Button variant="secondary" onClick={priorSheet.show}>
-            {priorities.choice ? 'Cambiar mis prioridades' : 'Elegir mis prioridades'}
-          </Button>
-        </section>
-      )}
-      {priorSheet.open && priorities && (
-        <Sheet
-          title="Tus prioridades"
-          onClose={priorSheet.close}
-          footer={<Button onClick={priorSheet.close}>Listo</Button>}
-        >
-          <PriorityPicker
-            muscles={priorities.muscles}
-            optionals={priorities.optionals}
-            choice={priorities.choice}
-            max={priorities.max}
-            onChange={setPriorities}
-          />
-        </Sheet>
-      )}
-
       <section class={styles.structure} aria-label="Estructura">
         <h2 class={styles.h2}>Estructura</h2>
         {phases.length > 1 && (
@@ -276,9 +190,35 @@ export function RutinaScreen(props: { id: string }) {
       </section>
 
       <div class={styles.footer}>
-        <Button onClick={() => void start()}>
-          {pending ? 'Elige tu punto débil para empezar' : 'Empezar esta rutina'}
-        </Button>
+        <Button onClick={() => (custom ? startSheet.show() : void begin())}>Empezar esta rutina</Button>
+        {startSheet.open && custom && (
+          <Sheet
+            title="Antes de empezar"
+            onClose={startSheet.close}
+            footer={<Button onClick={() => void begin()}>Empezar rutina</Button>}
+          >
+            <p class={styles.intro}>Todo es opcional: personaliza tu rutina o empieza tal como está.</p>
+            {priorities && (
+              <PriorityPicker
+                muscles={priorities.muscles}
+                optionals={priorities.optionals}
+                choice={priorities.choice}
+                max={priorities.max}
+                minutes={priorities.minutes}
+                onChange={setPriorities}
+              />
+            )}
+            {weak && (
+              <WeakPointPicker
+                table={weak.table}
+                choice={weak.choice}
+                slots={weak.slots}
+                auto={weak.auto}
+                onChange={setWeakPoints}
+              />
+            )}
+          </Sheet>
+        )}
       </div>
     </div>
   )

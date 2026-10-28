@@ -7,10 +7,10 @@ import {
   applyPriorities,
   hasPriorities,
   isIncluded,
+  limitOf,
   MAX_PRIORITIES,
   musclesOf,
   optionalsOf,
-  prioritySummary,
   reasonOf,
   type PriorityChoice,
 } from '../domain/priorities.ts'
@@ -18,12 +18,10 @@ import { selectVariant, type ProgramData } from '../domain/programInfo.ts'
 import { metaLines, phasesView } from '../domain/routineView.ts'
 import {
   applyWeakPoints,
+  autoSlots,
   hasWeakPoints,
-  isComplete,
-  weakNeeds,
-  weakSummary,
+  slotsOf,
   type WeakChoice,
-  type WeakNeeds,
   type WeakTable,
 } from '../domain/weakPoints.ts'
 import {
@@ -43,7 +41,6 @@ let open: {
   item: RoutineItem
   program: Program
   table: WeakTable | null
-  needs: WeakNeeds
   level: Level
   canPrioritize: boolean
 } | null = null
@@ -53,31 +50,34 @@ let priorityChoice: PriorityChoice | null = null
 /** Calcula lo que se ve con las elecciones de ahora: prioridades primero (quitan opcionales), luego el punto débil. */
 function show() {
   if (!open) return
-  const { item, program, table, needs, level, canPrioritize } = open
+  const { item, program, table, level, canPrioritize } = open
+  const slots = table ? slotsOf(program as never) : []
   const weak: WeakView | null = table
     ? {
         table,
+        slots,
+        auto: weakChoice?.mode === 'pick' ? autoSlots(table, weakChoice.picks, slots) : {},
         choice: weakChoice,
-        needs,
-        required: table.mode === 'pick' || !needs.e1Optional,
-        complete: isComplete(table, weakChoice, needs),
-        summary: weakSummary(table, weakChoice),
       }
     : null
+  const afterPriorities: Program = canPrioritize
+    ? applyPriorities(program as never, priorityChoice, level)
+    : program
+  // Opcionales que siguen en la rutina tras la regla de tiempo
+  const present = new Set(canPrioritize ? optionalsOf(afterPriorities as never).map((o) => o.key) : [])
   const priorities: PriorityView | null = canPrioritize
     ? {
         muscles: musclesOf(program as never),
-        optionals: optionalsOf(program as never).map((o) => ({
-          ...o,
-          included: isIncluded(o, priorityChoice, level),
-          reason: reasonOf(o.muscle),
-        })),
+        optionals: optionalsOf(program as never).map((o) => {
+          const included = isIncluded(o, priorityChoice, level)
+          return { ...o, included, trimmed: included && !present.has(o.key), reason: reasonOf(o.muscle) }
+        }),
         choice: priorityChoice,
         max: MAX_PRIORITIES,
-        summary: prioritySummary(priorityChoice),
+        minutes: limitOf(priorityChoice),
       }
     : null
-  let shown: Program = canPrioritize ? applyPriorities(program as never, priorityChoice, level) : program
+  let shown: Program = afterPriorities
   if (table) shown = applyWeakPoints(shown as never, table, weakChoice) as Program
   routineDetail.value = { status: 'ready', item, phases: phasesView(shown as never), weak, priorities }
 }
@@ -117,7 +117,6 @@ export async function openRoutine(id: string): Promise<void> {
       item,
       program,
       table: hasWeakPoints(program) ? program.weakPoints! : null,
-      needs: weakNeeds(program),
       level: state.profile?.level ?? 'intermediate',
       canPrioritize: hasPriorities(program as never),
     }
