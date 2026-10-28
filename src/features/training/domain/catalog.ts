@@ -141,7 +141,7 @@ export const CATALOG: CatalogEntry[] = [
     id: 'especializacion-sentadilla',
     family: 'fuerza',
     title: 'Especialización · sentadilla',
-    days: [6],
+    days: [4],
     tone: 6,
   }),
   local({

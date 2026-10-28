@@ -152,7 +152,7 @@ const PROGRAMS = {
       'Descarga y bloque 2 (pico): menos volumen y más intensidad para convertir lo acumulado en fuerza máxima.',
       'Semana 10 de test: máximo con RIR 0,5–1, o tantas repeticiones como puedas con el 95 % de tu máximo anterior.',
     ],
-    note: 'El original solo trae los días de pierna. Los días de torso son el día de muestra que propone el propio programa, con su reparto recomendado.',
+    note: 'El original solo trae los 4 días de pierna por semana: dice que no incluye trabajo directo de torso. Para completar la semana propone repartos y entrenos de torso de muestra, que aquí no se incluyen.',
   },
   banca: {
     basics: 'Todo el programa busca subir tu press banca, con un pico de fuerza máxima al final.',
