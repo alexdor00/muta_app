@@ -48,7 +48,8 @@
                   "technique": null,
                   "substitutions": [],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "En el descanso del press."
                 },
                 {
                   "name": "Press plano en máquina",
@@ -82,7 +83,8 @@
                   "technique": null,
                   "substitutions": ["Curl predicador a una mano", "Curl concentrado"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Día de empuje, intercalado entre los press (también en superserie)."
                 },
                 {
                   "name": "Press militar en máquina",
@@ -116,7 +118,8 @@
                   "technique": null,
                   "substitutions": [],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Día de empuje, intercalado entre los press (también en superserie)."
                 },
                 {
                   "name": "Laterales en polea",
@@ -185,7 +188,8 @@
                     "Laterales con banda"
                   ],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "En el hueco que no compite, en los descansos del remo."
                 },
                 {
                   "name": "Jalón al pecho",
@@ -229,7 +233,8 @@
                     "Fondos entre bancos"
                   ],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Día de tirón, intercalado entre ejercicios de espalda."
                 },
                 {
                   "name": "Elevación de talones de pie",
@@ -246,7 +251,8 @@
                   "technique": null,
                   "substitutions": ["Elevación de talones en prensa", "Elevación de talones a una pierna"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Entre series de prensa o hack, o en el primer día de tirón mientras se recupera el tríceps."
                 },
                 {
                   "name": "Vuelos posteriores",
@@ -280,7 +286,8 @@
                   "technique": null,
                   "substitutions": ["Press francés en polea", "Extensión sobre la cabeza con mancuerna"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Día de tirón, intercalado entre ejercicios de espalda."
                 }
               ]
             },
@@ -409,7 +416,8 @@
                   "technique": null,
                   "substitutions": ["Crunch en máquina", "Crunch en polea", "Crunch en suelo"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "En huecos que no compiten: segundo hueco del tirón A o primero del empuje B; en superserie con las laterales al final."
                 },
                 {
                   "name": "Press plano en máquina",
@@ -443,7 +451,8 @@
                   "technique": null,
                   "substitutions": ["Curl inclinado con mancuernas"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Día de empuje, intercalado entre los press (también en superserie)."
                 },
                 {
                   "name": "Cruces en polea baja",
@@ -477,7 +486,8 @@
                   "technique": null,
                   "substitutions": ["Curl concentrado", "Curl araña"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Día de empuje, intercalado entre los press (también en superserie)."
                 },
                 {
                   "name": "Press militar en máquina",
@@ -537,7 +547,8 @@
                   "technique": null,
                   "substitutions": ["Curl femoral sentado", "Curl nórdico"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Prefatiga: que limiten los isquios en el rumano."
                 },
                 {
                   "name": "Peso muerto rumano",
@@ -593,7 +604,8 @@
                     "Fondos entre bancos"
                   ],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Día de tirón, intercalado entre ejercicios de espalda."
                 },
                 {
                   "name": "Remo con pecho apoyado (codos abiertos)",
@@ -627,7 +639,8 @@
                   "technique": null,
                   "substitutions": ["Press francés en polea", "Extensión sobre la cabeza con mancuerna"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Día de tirón, intercalado entre ejercicios de espalda."
                 }
               ]
             },
@@ -671,7 +684,8 @@
                   "technique": null,
                   "substitutions": ["Elevación de talones de pie", "Elevación de talones a una pierna"],
                   "notes": null,
-                  "filled": ["reps", "rpe", "rest"]
+                  "filled": ["reps", "rpe", "rest"],
+                  "tip": "Entre series de prensa o hack, o en el primer día de tirón mientras se recupera el tríceps."
                 },
                 {
                   "name": "Sentadilla búlgara",

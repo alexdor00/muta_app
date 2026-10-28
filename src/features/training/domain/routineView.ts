@@ -82,6 +82,7 @@ type Exercise = {
   muscle?: string
   originalName?: string
   slot?: Slot
+  tip?: string
 }
 type Day = { name: string; exercises: Exercise[] } | { rest: true; note?: string }
 type Week = { week: number; days: Day[] }
@@ -99,6 +100,8 @@ export type ExerciseView = {
   before: string | null
   /** Si se puede cambiar desde la rutina (se pinta con un tono suave y se despliega). */
   slot: Slot | null
+  /** Indicación del documento para ese ejercicio (solo texto). */
+  tip: string | null
 }
 export type DayView =
   | { type: 'session'; name: string; minutes: number; exercises: ExerciseView[] }
@@ -138,6 +141,7 @@ function exerciseView(e: Exercise): ExerciseView {
     status: status === 'changed' && !before ? 'same' : status,
     before,
     slot: e.slot ?? null,
+    tip: e.tip ?? null,
   }
 }
 

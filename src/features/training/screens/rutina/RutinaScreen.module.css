@@ -201,3 +201,8 @@
 .slotPanel {
   margin-top: var(--space-2);
 }
+
+.tipText {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}

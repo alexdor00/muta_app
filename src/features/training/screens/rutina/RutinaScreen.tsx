@@ -77,7 +77,9 @@ export function RutinaScreen(props: { id: string }) {
   // ── Lo que se despliega bajo cada fila que se puede cambiar
   const prior = priorities?.choice ?? NO_PRIORITY
   const setPrior = (change: Partial<PriorityChoice>) => setPriorities({ ...prior, ...change })
-  const anySlot = currentWeek.days.some((d) => d.type === 'session' && d.exercises.some((e) => e.slot))
+  const anySlot = currentWeek.days.some(
+    (d) => d.type === 'session' && d.exercises.some((e) => e.slot || e.tip),
+  )
 
   function panelFor(slot: Slot, id: string): SlotPanelProps | null {
     if (slot.kind === 'optional' && priorities) {
@@ -208,7 +210,7 @@ export function RutinaScreen(props: { id: string }) {
         <h2 class={styles.h2}>Estructura</h2>
         {anySlot && (
           <p class={styles.hintLine}>
-            Los ejercicios con fondo gris oscuro se pueden sustituir, elegir o quitar: púlsalos.
+            Los ejercicios con fondo gris oscuro se pueden elegir o quitar, o llevan una indicación: púlsalos.
           </p>
         )}
         {phases.length > 1 && (
@@ -267,7 +269,7 @@ export function RutinaScreen(props: { id: string }) {
                           </span>
                         </>
                       )
-                      if (!panel) {
+                      if (!panel && !e.tip) {
                         return (
                           <li
                             key={j}
@@ -295,7 +297,8 @@ export function RutinaScreen(props: { id: string }) {
                           </button>
                           {open === id && (
                             <div class={styles.slotPanel}>
-                              <SlotPanel {...panel} />
+                              {panel && <SlotPanel {...panel} />}
+                              {e.tip && <p class={styles.tipText}>{e.tip}</p>}
                             </div>
                           )}
                         </li>
