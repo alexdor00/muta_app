@@ -51,6 +51,12 @@
   left: var(--gutter);
 }
 
+.action {
+  position: absolute;
+  top: calc(var(--space-6) + var(--safe-top));
+  right: var(--gutter);
+}
+
 .text {
   position: absolute;
   right: var(--gutter);

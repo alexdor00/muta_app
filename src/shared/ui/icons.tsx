@@ -41,3 +41,14 @@ export function CloseIcon() {
     </svg>
   )
 }
+
+/** «!» dentro de un círculo: información de lo que trata algo. */
+export function InfoIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5v6" />
+      <path d="M12 16.5v.01" />
+    </svg>
+  )
+}

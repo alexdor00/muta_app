@@ -1,0 +1,39 @@
+/* Información de una rutina dentro de la hoja: resumen, para quién y cómo funciona. */
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.summary {
+  font: var(--text-body);
+}
+
+.h3 {
+  margin-top: var(--space-4);
+  font: var(--text-headline);
+}
+
+.text {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-5);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.note {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-2);
+  font: var(--text-footnote);
+}

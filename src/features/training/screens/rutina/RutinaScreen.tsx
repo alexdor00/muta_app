@@ -6,7 +6,12 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
 import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
-import { CATEGORIES, routineDetail } from '../../state/routines.ts'
+import { InfoIcon } from '../../../../shared/ui/icons.tsx'
+import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
+import { Sheet } from '../../../../shared/ui/Sheet.tsx'
+import { useSheet } from '../../../../shared/ui/useSheet.ts'
+import { RoutineAbout } from '../../components/RoutineAbout.tsx'
+import { aboutOf, CATEGORIES, routineDetail } from '../../state/routines.ts'
 import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
 import { openRoutine } from '../../use-cases/routineDetail.ts'
 import styles from './RutinaScreen.module.css'
@@ -21,6 +26,7 @@ export function RutinaScreen(props: { id: string }) {
   const hero = useRef<HTMLElement>(null)
   const [phase, setPhase] = useState(0)
   const [week, setWeek] = useState(0)
+  const infoSheet = useSheet('info')
   useEffect(() => void openRoutine(props.id), [props.id])
   const state = routineDetail.value
 
@@ -38,6 +44,7 @@ export function RutinaScreen(props: { id: string }) {
   const { item, phases } = state
   const { entry, info } = item
   const back = paths.routineCategory(item.categories[0] ?? 'muta')
+  const about = aboutOf(entry)
   const currentPhase = phases[Math.min(phase, phases.length - 1)]
   const currentWeek = currentPhase.weeks[Math.min(week, currentPhase.weeks.length - 1)]
 
@@ -83,7 +90,19 @@ export function RutinaScreen(props: { id: string }) {
         tone={entry.tone}
         backHref={back}
         heroRef={hero}
+        action={
+          about && (
+            <RoundButton label="De qué trata esta rutina" onClick={infoSheet.show}>
+              <InfoIcon />
+            </RoundButton>
+          )
+        }
       />
+      {infoSheet.open && about && (
+        <Sheet title={entry.title} onClose={infoSheet.close}>
+          <RoutineAbout about={about} />
+        </Sheet>
+      )}
 
       <dl class={styles.facts}>
         {facts.map(([label, value]) => (

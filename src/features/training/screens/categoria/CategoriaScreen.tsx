@@ -4,13 +4,15 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
 import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
-import { BookmarkIcon, SlidersIcon } from '../../../../shared/ui/icons.tsx'
+import { BookmarkIcon, InfoIcon, SlidersIcon } from '../../../../shared/ui/icons.tsx'
 import { ListRow } from '../../../../shared/ui/ListRow.tsx'
 import { PillButton } from '../../../../shared/ui/PillButton.tsx'
 import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
+import { RoutineAbout } from '../../components/RoutineAbout.tsx'
 import {
+  aboutOf,
   activeFilters,
   CATEGORIES,
   matches,
@@ -69,6 +71,8 @@ const thumbDays = (days: number[]) =>
 export function CategoriaScreen(props: { category: string }) {
   const hero = useRef<HTMLElement>(null)
   const filtersSheet = useSheet('filtros')
+  const infoSheet = useSheet('info')
+  const [info, setInfo] = useState<RoutineItem | null>(null)
   const [filters, setFilters] = useState<Filters>({})
   useEffect(() => {
     if (routines.value.status !== 'ready') void loadRoutines()
@@ -142,14 +146,28 @@ export function CategoriaScreen(props: { category: string }) {
                 thumbBig={thumbDays(item.entry.days)}
                 thumbSmall="días"
                 trailing={
-                  <RoundButton
-                    label={saved ? 'Quitar de guardadas' : 'Guardar'}
-                    variant="plain"
-                    pressed={saved}
-                    onClick={() => void toggleSaved(item.entry.id)}
-                  >
-                    <BookmarkIcon filled={saved} />
-                  </RoundButton>
+                  <span class={styles.actions}>
+                    {aboutOf(item.entry) && (
+                      <RoundButton
+                        label={`De qué trata ${item.entry.title}`}
+                        variant="plain"
+                        onClick={() => {
+                          setInfo(item)
+                          infoSheet.show()
+                        }}
+                      >
+                        <InfoIcon />
+                      </RoundButton>
+                    )}
+                    <RoundButton
+                      label={saved ? 'Quitar de guardadas' : 'Guardar'}
+                      variant="plain"
+                      pressed={saved}
+                      onClick={() => void toggleSaved(item.entry.id)}
+                    >
+                      <BookmarkIcon filled={saved} />
+                    </RoundButton>
+                  </span>
                 }
               />
             )
@@ -174,6 +192,11 @@ export function CategoriaScreen(props: { category: string }) {
         )
       )}
 
+      {infoSheet.open && info && aboutOf(info.entry) && (
+        <Sheet title={info.entry.title} onClose={infoSheet.close}>
+          <RoutineAbout about={aboutOf(info.entry)!} />
+        </Sheet>
+      )}
       {filtersSheet.open && (
         <Sheet
           title="Filtros"

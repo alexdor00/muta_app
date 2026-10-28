@@ -12,10 +12,12 @@ type Props = {
   backHref: string
   /** Se pasa para saber cuándo deja de verse (barra compacta). */
   heroRef?: { current: HTMLElement | null }
+  /** Botón redondo arriba a la derecha (p. ej. la «!» de información). */
+  action?: ComponentChildren
 }
 
 /** Cabecera de una categoría o una rutina: foto a todo el ancho y el título encima. */
-export function HeroHeader({ title, description, photo, tone = 1, backHref, heroRef }: Props) {
+export function HeroHeader({ title, description, photo, tone = 1, backHref, heroRef, action }: Props) {
   return (
     <header class={`${styles.hero} ${styles[`t${tone}`]}`} ref={heroRef as never}>
       {photo && <img class={styles.photo} src={photo} alt="" />}
@@ -25,6 +27,7 @@ export function HeroHeader({ title, description, photo, tone = 1, backHref, hero
           <ChevronLeftIcon />
         </RoundButton>
       </div>
+      {action && <div class={styles.action}>{action}</div>}
       <div class={`${styles.text} appear`}>
         <h1 class={styles.title}>{title}</h1>
         {description && <p class={styles.description}>{description}</p>}

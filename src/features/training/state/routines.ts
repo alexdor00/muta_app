@@ -49,6 +49,7 @@ export type DetailState =
 export const routineDetail = signal<DetailState>({ status: 'loading' })
 
 export { CATEGORIES } from '../domain/categories.ts'
+export { aboutOf, type About } from '../domain/about.ts'
 export type { Adaptation, Category, CategoryId, CatalogEntry, Level, PhaseView }
 export { activeFilters, matches, type Filters } from '../domain/routineView.ts'
 export { SPLIT_LABEL, type Split, type VolumeTier } from '../domain/programInfo.ts'

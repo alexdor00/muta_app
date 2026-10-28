@@ -156,6 +156,30 @@ export const CATALOG: CatalogEntry[] = [
   local({ id: 'ppl-completo-5d', family: 'ppl', title: 'PPL en 3 fases · 5 días', days: [5], tone: 2 }),
   local({ id: 'ppl-completo-6d', family: 'ppl', title: 'PPL en 3 fases · 6 días', days: [6], tone: 2 }),
   local({ id: 'ppl-5d-editado', family: 'ppl', title: 'PPL · tu versión editada', days: [5], tone: 2 }),
+  local({ id: 'ppl-tecnica', family: 'ppl', title: 'PPL técnica y pico · 16 semanas', days: [6], tone: 2 }),
+  // Torso y pierna por olas
+  local({
+    id: 'torso-pierna',
+    family: 'torso-pierna',
+    title: 'Torso y pierna · tamaño y fuerza',
+    days: [6],
+    tone: 4,
+  }),
+  // Extras: vuelta al gimnasio tras un parón (dos versiones)
+  local({
+    id: 'vuelta-ppl',
+    family: 'extras',
+    title: 'Vuelta al gimnasio · 6 días',
+    days: [6],
+    tone: 5,
+  }),
+  local({
+    id: 'vuelta-torso-pierna',
+    family: 'extras',
+    title: 'Vuelta al gimnasio · 4 días',
+    days: [4],
+    tone: 5,
+  }),
   // Base: tres rutinas en un archivo (cada una con dos bloques de 4 semanas)
   local({
     id: 'base-3d',

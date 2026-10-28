@@ -71,6 +71,11 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   // Detalle: la rutina tal cual, sin selector de nivel
   await expect(page).toHaveURL('/entreno/programa/muta-cuerpo-completo-4d')
   await expect(page.getByRole('button', { name: 'Adaptar a mí' })).toHaveCount(0)
+  // La «!» explica de qué trata la rutina
+  await page.getByRole('button', { name: 'De qué trata esta rutina' }).click()
+  await expect(page.getByRole('dialog', { name: 'Cuerpo completo A/B' })).toContainText('Para quién')
+  await capture(page, 'rutina-info')
+  await page.getByRole('button', { name: 'Cerrar' }).click()
   await capture(page, 'rutina')
   await page.getByRole('button', { name: 'Empezar esta rutina' }).click()
   await expect(page).toHaveURL('/entreno')
