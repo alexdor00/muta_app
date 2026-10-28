@@ -145,3 +145,45 @@
   background: var(--bg);
   transform: translateX(-50%);
 }
+
+/* Punto débil: tarjeta con lo elegido y el botón que abre el selector */
+.weak {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: var(--space-8) var(--gutter) 0;
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.weakHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.tag {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+}
+
+.required {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--text-subhead);
+}

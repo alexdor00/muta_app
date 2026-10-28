@@ -11,9 +11,10 @@ import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { RoutineAbout } from '../../components/RoutineAbout.tsx'
+import { WeakPointPicker } from '../../components/WeakPointPicker.tsx'
 import { aboutOf, CATEGORIES, routineDetail } from '../../state/routines.ts'
 import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
-import { openRoutine } from '../../use-cases/routineDetail.ts'
+import { openRoutine, setWeakPoints } from '../../use-cases/routineDetail.ts'
 import styles from './RutinaScreen.module.css'
 
 const STATUS = { added: 'Añadido', removed: 'Quitado', changed: 'Ajustado', same: null } as const
@@ -27,6 +28,7 @@ export function RutinaScreen(props: { id: string }) {
   const [phase, setPhase] = useState(0)
   const [week, setWeek] = useState(0)
   const infoSheet = useSheet('info')
+  const weakSheet = useSheet('punto-debil')
   useEffect(() => void openRoutine(props.id), [props.id])
   const state = routineDetail.value
 
@@ -41,16 +43,20 @@ export function RutinaScreen(props: { id: string }) {
     )
   }
 
-  const { item, phases } = state
+  const { item, phases, weak } = state
   const { entry, info } = item
   const back = paths.routineCategory(item.categories[0] ?? 'muta')
   const about = aboutOf(entry)
   const currentPhase = phases[Math.min(phase, phases.length - 1)]
   const currentWeek = currentPhase.weeks[Math.min(week, currentPhase.weeks.length - 1)]
 
+  // Si falta algo obligatorio del punto débil, el botón principal abre el selector en vez de empezar
+  const pending = !!weak && weak.required && !weak.complete
+
   async function start() {
+    if (pending) return weakSheet.show()
     try {
-      await chooseRoutine(entry.id)
+      await chooseRoutine(entry.id, null, weak?.choice ?? null)
       route(paths.training)
     } catch (error) {
       logError(error, 'empezar rutina')
@@ -113,6 +119,51 @@ export function RutinaScreen(props: { id: string }) {
           </div>
         ))}
       </dl>
+
+      {weak && (
+        <section class={styles.weak} aria-label="Punto débil">
+          <div class={styles.weakHead}>
+            <h2 class={styles.h2}>Tu punto débil</h2>
+            <span class={`${styles.tag} ${weak.required ? styles.required : ''}`}>
+              {weak.required ? 'Obligatorio' : 'Opcional'}
+            </span>
+          </div>
+          {weak.summary.length ? (
+            <ul class={styles.summary}>
+              {weak.summary.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : (
+            <p class={styles.text}>
+              {weak.table.mode === 'pick'
+                ? 'Elige 2 o 3 músculos y un ejercicio de cada uno; se repiten durante todo el programa.'
+                : 'Elige el músculo que más quieres mejorar: los huecos de la rutina se llenan con ejercicios suyos.'}
+            </p>
+          )}
+          <Button variant="secondary" onClick={weakSheet.show}>
+            {weak.choice ? 'Cambiar mi punto débil' : 'Elegir mi punto débil'}
+          </Button>
+        </section>
+      )}
+      {weakSheet.open && weak && (
+        <Sheet
+          title="Tu punto débil"
+          onClose={weakSheet.close}
+          footer={
+            <Button disabled={weak.required && !weak.complete} onClick={weakSheet.close}>
+              {weak.required && !weak.complete ? 'Falta algo obligatorio' : 'Listo'}
+            </Button>
+          }
+        >
+          <WeakPointPicker
+            table={weak.table}
+            choice={weak.choice}
+            e1Optional={weak.needs.e1Optional}
+            onChange={setWeakPoints}
+          />
+        </Sheet>
+      )}
 
       <section class={styles.structure} aria-label="Estructura">
         <h2 class={styles.h2}>Estructura</h2>
@@ -181,7 +232,9 @@ export function RutinaScreen(props: { id: string }) {
       </section>
 
       <div class={styles.footer}>
-        <Button onClick={() => void start()}>Empezar esta rutina</Button>
+        <Button onClick={() => void start()}>
+          {pending ? 'Elige tu punto débil para empezar' : 'Empezar esta rutina'}
+        </Button>
       </div>
     </div>
   )

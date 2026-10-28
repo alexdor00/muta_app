@@ -3,6 +3,7 @@ import type { CatalogEntry, Level, Phase } from '../domain/catalog.ts'
 import type { Category, CategoryId } from '../domain/categories.ts'
 import type { ProgramInfo } from '../domain/programInfo.ts'
 import type { Adaptation, PhaseView } from '../domain/routineView.ts'
+import type { WeakChoice, WeakNeeds, WeakTable } from '../domain/weakPoints.ts'
 
 /** Una rutina lista para enseñar. */
 export type RoutineItem = {
@@ -43,13 +44,27 @@ export type DetailState =
       item: RoutineItem
       /** La rutina tal cual: el volumen solo lo ajustará el coach según cómo respondas. */
       phases: PhaseView[]
+      weak: WeakView | null
     }
+
+/** Punto débil de una rutina: la tabla, lo elegido y si falta algo obligatorio. */
+export type WeakView = {
+  table: WeakTable
+  choice: WeakChoice | null
+  needs: WeakNeeds
+  /** Hay que elegir para empezar (el ejercicio 1 no es opcional, o hay que elegir 2-3 músculos). */
+  required: boolean
+  /** Lo obligatorio está elegido. */
+  complete: boolean
+  summary: string[]
+}
 
 /** Rutina abierta en detalle. */
 export const routineDetail = signal<DetailState>({ status: 'loading' })
 
 export { CATEGORIES } from '../domain/categories.ts'
 export { aboutOf, type About } from '../domain/about.ts'
+export type { WeakChoice, WeakNeeds, WeakTable } from '../domain/weakPoints.ts'
 export type { Adaptation, Category, CategoryId, CatalogEntry, Level, PhaseView }
 export { activeFilters, matches, type Filters } from '../domain/routineView.ts'
 export { SPLIT_LABEL, type Split, type VolumeTier } from '../domain/programInfo.ts'

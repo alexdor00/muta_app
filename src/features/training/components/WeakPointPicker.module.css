@@ -1,0 +1,53 @@
+/* Selector de punto débil: bloques con título, ayuda y opciones. */
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-inside);
+}
+
+.h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-headline);
+}
+
+.hint {
+  margin-top: calc(var(--space-2) * -1);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.counter {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.badge {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+}
+
+.required {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.advice {
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: var(--text-subhead);
+}

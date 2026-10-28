@@ -7,6 +7,7 @@ import { PillButton } from '../../shared/ui/PillButton.tsx'
 import { RoundButton } from '../../shared/ui/RoundButton.tsx'
 import { PhotoCard } from '../../shared/ui/PhotoCard.tsx'
 import { ScreenHeader } from '../../shared/ui/ScreenHeader.tsx'
+import { Tiles } from '../../shared/ui/Tiles.tsx'
 import styles from './DevUiScreen.module.css'
 
 // /dev/ui: todas las piezas de shared/ui juntas, en claro y en oscuro.
@@ -45,6 +46,8 @@ export function DevUiScreen() {
   const [days, setDays] = useState(3)
   const [goal, setGoal] = useState('a')
   const [chip, setChip] = useState('Todos')
+  const [muscle, setMuscle] = useState(['hombros'])
+  const [muscles, setMuscles] = useState(['pecho', 'gemelos'])
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -162,6 +165,49 @@ export function DevUiScreen() {
               value: v,
               label: v,
             }))}
+          />
+        </div>
+      </section>
+
+      <section data-testid="tiles">
+        <h2 class={styles.h2}>Azulejos</h2>
+        <div class={styles.stack}>
+          <Tiles
+            name="dev-un-musculo"
+            legend="Uno (círculo)"
+            showLegend
+            value={muscle}
+            onChange={setMuscle}
+            options={[
+              { value: 'hombros', label: 'Hombros', detail: '3 ejercicios' },
+              { value: 'dorsales', label: 'Dorsales (anchura de espalda)', detail: '3 ejercicios' },
+              { value: 'isquios', label: 'Isquiotibiales', detail: 'Consejo' },
+              { value: 'gemelos', label: 'Gemelos', detail: '2 ejercicios' },
+            ]}
+          />
+          <Tiles
+            name="dev-varios"
+            legend="Varios, con tope de 3 (casilla)"
+            showLegend
+            mode="multi"
+            value={muscles}
+            onChange={setMuscles}
+            options={[
+              { value: 'pecho', label: 'Pecho', detail: '2 ejercicios' },
+              {
+                value: 'biceps',
+                label: 'Bíceps',
+                detail: '3 ejercicios',
+                disabled: muscles.length >= 3 && !muscles.includes('biceps'),
+              },
+              { value: 'gemelos', label: 'Gemelos', detail: '2 ejercicios' },
+              {
+                value: 'abdomen',
+                label: 'Abdomen',
+                detail: '3 ejercicios',
+                disabled: muscles.length >= 3 && !muscles.includes('abdomen'),
+              },
+            ]}
           />
         </div>
       </section>

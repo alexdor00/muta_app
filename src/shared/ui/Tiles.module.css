@@ -1,0 +1,106 @@
+/* Azulejos: opciones cortas en dos columnas; la elegida se pinta en negro con una marca. */
+
+.group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  margin-bottom: var(--gap-inside);
+  padding: 0;
+  font: var(--text-headline);
+}
+
+.hiddenLegend {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--control-lg);
+  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-4);
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  cursor: pointer;
+  transition:
+    background var(--duration-tap) var(--ease),
+    border-color var(--duration-tap) var(--ease),
+    color var(--duration-tap) var(--ease);
+}
+
+.tile:has(.input:focus-visible) {
+  outline: var(--focus-ring) solid var(--accent);
+  outline-offset: var(--focus-ring);
+}
+
+/* Botón de opción real, oculto: el aspecto lo da su etiqueta */
+.input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.selected {
+  border-color: var(--label);
+  background: var(--label);
+  color: var(--bg);
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.label {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-wrap: balance;
+}
+
+.detail {
+  margin-top: var(--space-1);
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+.selected .detail {
+  color: inherit;
+}
+
+.mark {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: grid;
+  place-items: center;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-pill);
+}
+
+.selected .mark {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.mark svg {
+  width: var(--space-3);
+  height: var(--space-3);
+}
