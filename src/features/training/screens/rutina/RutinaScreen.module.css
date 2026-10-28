@@ -146,7 +146,7 @@
   transform: translateX(-50%);
 }
 
-/* Filas que se pueden cambiar: tono naranja suave, flecha y panel desplegable */
+/* Filas que se pueden cambiar: gris más oscuro, flecha y panel desplegable */
 .hintLine {
   font: var(--text-footnote);
   color: var(--label-2);
@@ -164,9 +164,9 @@
   gap: var(--space-3);
   width: 100%;
   padding: var(--space-3);
-  border: var(--border) solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border: var(--border) solid var(--separator);
   border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  background: var(--surface-2);
   color: inherit;
   font: inherit;
   text-align: left;
@@ -185,7 +185,7 @@
   place-items: center;
   width: var(--icon);
   height: var(--icon);
-  color: var(--accent);
+  color: var(--label-2);
   transition: transform var(--duration-tap) var(--ease);
 }
 

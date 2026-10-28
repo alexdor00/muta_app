@@ -78,7 +78,7 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.getByRole('button', { name: 'Cerrar' }).click()
   await capture(page, 'rutina')
 
-  // Los ejercicios opcionales salen en la propia rutina (fondo naranja) y se deciden al pulsarlos.
+  // Los ejercicios opcionales salen en la propia rutina (fondo gris) y se deciden al pulsarlos.
   // Regla de MUTA: el hombro anterior solo entra si es prioridad, así que sale «Quitado».
   await page
     .getByRole('button', { name: /Press militar en máquina/ })

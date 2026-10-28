@@ -29,7 +29,7 @@ const NO_PRIORITY: PriorityChoice = { priorities: [], optionals: {} }
 
 /**
  * Detalle de una rutina: datos clave, estructura por fases, semanas y días, y «Empezar esta rutina».
- * Los ejercicios que se pueden cambiar salen con un tono naranja suave y, al pulsarlos, se despliegan
+ * Los ejercicios que se pueden cambiar salen con un gris más oscuro y, al pulsarlos, se despliegan
  * con sus opciones (opcionales de MUTA, puntos débiles de Culturismo y de Torso y pierna).
  */
 export function RutinaScreen(props: { id: string }) {
@@ -210,7 +210,7 @@ export function RutinaScreen(props: { id: string }) {
         <h2 class={styles.h2}>Estructura</h2>
         {anySlot && (
           <p class={styles.hintLine}>
-            Los ejercicios con fondo naranja se pueden sustituir, elegir o quitar: púlsalos.
+            Los ejercicios con fondo gris oscuro se pueden sustituir, elegir o quitar: púlsalos.
           </p>
         )}
         {phases.length > 1 && (
