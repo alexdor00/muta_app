@@ -78,11 +78,14 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.getByRole('button', { name: 'Cerrar' }).click()
   await capture(page, 'rutina')
 
-  // Los ejercicios opcionales salen en la propia rutina (fondo naranja) y se cambian al pulsarlos.
-  // Regla de MUTA: el hombro anterior solo entra si es prioridad.
-  await page.getByRole('button', { name: 'Tus prioridades y duración' }).click()
-  await page.getByText('Hombro anterior', { exact: true }).first().click()
-  await capture(page, 'prioridades')
+  // Los ejercicios opcionales salen en la propia rutina (fondo naranja) y se deciden al pulsarlos.
+  // Regla de MUTA: el hombro anterior solo entra si es prioridad, así que sale «Quitado».
+  await page
+    .getByRole('button', { name: /Press militar en máquina/ })
+    .first()
+    .click()
+  await page.getByText('Hacerlo', { exact: true }).click()
+  await capture(page, 'opcional-desplegado')
   await page.getByRole('button', { name: 'Empezar esta rutina' }).click()
   await expect(page).toHaveURL('/entreno')
   const profile = await page.evaluate(
@@ -109,7 +112,7 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   expect(plan).toMatchObject({
     programId: 'muta-cuerpo-completo-4d',
     adaptation: null,
-    priorities: { priorities: ['Hombro anterior'] },
+    priorities: { optionals: { 'Hombro anterior|Press militar en máquina': true } },
   })
 
   // Con perfil, la app ya no abre en la bienvenida

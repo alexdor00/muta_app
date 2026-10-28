@@ -8,3 +8,5 @@ export type Slot =
   | { kind: 'weak'; which: 1 | 2; filled: boolean }
   /** Hueco de «tus puntos débiles» de Torso y pierna: uno por día. */
   | { kind: 'pick'; day: string; filled: boolean }
+  /** Ejercicio con sustitutos que da el propio programa: puedes dejar el original o poner uno de ellos. */
+  | { kind: 'swap'; key: string; options: string[]; chosen: string | null }

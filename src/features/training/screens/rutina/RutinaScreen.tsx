@@ -10,7 +10,6 @@ import { ChevronDownIcon, InfoIcon } from '../../../../shared/ui/icons.tsx'
 import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
-import { PriorityBar } from '../../components/PriorityBar.tsx'
 import { RoutineAbout } from '../../components/RoutineAbout.tsx'
 import { SlotPanel, type SlotPanelProps } from '../../components/SlotPanel.tsx'
 import {
@@ -22,7 +21,7 @@ import {
   type WeakChoice,
 } from '../../state/routines.ts'
 import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
-import { openRoutine, setPriorities, setWeakPoints } from '../../use-cases/routineDetail.ts'
+import { openRoutine, setPriorities, setSwap, setWeakPoints } from '../../use-cases/routineDetail.ts'
 import styles from './RutinaScreen.module.css'
 
 const STATUS = { added: 'Añadido', removed: 'Quitado', changed: 'Ajustado', same: null } as const
@@ -55,7 +54,7 @@ export function RutinaScreen(props: { id: string }) {
     )
   }
 
-  const { item, phases, weak, priorities } = state
+  const { item, phases, weak, priorities, swaps } = state
   const { entry, info } = item
   const back = paths.routineCategory(item.categories[0] ?? 'muta')
   const about = aboutOf(entry)
@@ -68,6 +67,7 @@ export function RutinaScreen(props: { id: string }) {
       await chooseRoutine(entry.id, {
         weakPoints: weak?.choice ?? null,
         priorities: priorities?.choice ?? null,
+        swaps,
       })
       route(paths.training)
     } catch (error) {
@@ -78,8 +78,19 @@ export function RutinaScreen(props: { id: string }) {
   // ── Lo que se despliega bajo cada fila que se puede cambiar
   const prior = priorities?.choice ?? NO_PRIORITY
   const setPrior = (change: Partial<PriorityChoice>) => setPriorities({ ...prior, ...change })
+  const anySlot = currentWeek.days.some((d) => d.type === 'session' && d.exercises.some((e) => e.slot))
 
   function panelFor(slot: Slot, id: string): SlotPanelProps | null {
+    if (slot.kind === 'swap') {
+      return {
+        id,
+        kind: 'swap',
+        original: slot.key,
+        options: slot.options,
+        value: slot.chosen,
+        onPick: (name) => setSwap(slot.key, name),
+      }
+    }
     if (slot.kind === 'optional' && priorities) {
       const o = priorities.optionals.find((x) => x.key === slot.key)
       return {
@@ -160,11 +171,6 @@ export function RutinaScreen(props: { id: string }) {
     ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
     ...(about?.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),
   ]
-  const priorityLine = [
-    prior.priorities.length ? prior.priorities.join(', ') : 'Sin prioridades',
-    priorities?.minutes ? `${priorities.minutes} min` : 'sin límite',
-  ].join(' · ')
-
   return (
     <div class={styles.page}>
       <CompactBar title={entry.title} backHref={back} watch={hero} />
@@ -202,38 +208,10 @@ export function RutinaScreen(props: { id: string }) {
 
       <section class={styles.structure} aria-label="Estructura">
         <h2 class={styles.h2}>Estructura</h2>
-        {(weak || priorities) && (
-          <p class={styles.hintLine}>Los ejercicios con fondo naranja se pueden cambiar: púlsalos.</p>
-        )}
-        {priorities && (
-          <div class={open === 'prioridades' ? styles.open : ''}>
-            <button
-              type="button"
-              class={styles.slotRow}
-              aria-expanded={open === 'prioridades'}
-              onClick={() => toggle('prioridades')}
-            >
-              <span class={styles.slotText}>
-                <span class={styles.exName}>Tus prioridades y duración</span>
-                <span class={styles.exMeta}>{priorityLine}</span>
-              </span>
-              <span class={styles.chevron}>
-                <ChevronDownIcon />
-              </span>
-            </button>
-            {open === 'prioridades' && (
-              <div class={styles.slotPanel}>
-                <PriorityBar
-                  muscles={priorities.muscles}
-                  priorities={prior.priorities}
-                  max={priorities.max}
-                  minutes={priorities.minutes}
-                  onPriorities={(list) => setPrior({ priorities: list })}
-                  onMinutes={(maxMinutes) => setPrior({ maxMinutes })}
-                />
-              </div>
-            )}
-          </div>
+        {anySlot && (
+          <p class={styles.hintLine}>
+            Los ejercicios con fondo naranja se pueden sustituir, elegir o quitar: púlsalos.
+          </p>
         )}
         {phases.length > 1 && (
           <ChoiceChips
