@@ -61,3 +61,12 @@ export function CheckIcon() {
     </svg>
   )
 }
+
+/** Flecha hacia abajo de lo que se despliega. */
+export function ChevronDownIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M5 9l7 7 7-7" />
+    </svg>
+  )
+}

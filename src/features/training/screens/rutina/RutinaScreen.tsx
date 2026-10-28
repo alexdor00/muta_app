@@ -6,30 +6,41 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
 import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
-import { InfoIcon } from '../../../../shared/ui/icons.tsx'
+import { ChevronDownIcon, InfoIcon } from '../../../../shared/ui/icons.tsx'
 import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
+import { PriorityBar } from '../../components/PriorityBar.tsx'
 import { RoutineAbout } from '../../components/RoutineAbout.tsx'
-import { PriorityPicker } from '../../components/PriorityPicker.tsx'
-import { WeakPointPicker } from '../../components/WeakPointPicker.tsx'
-import { aboutOf, CATEGORIES, routineDetail } from '../../state/routines.ts'
+import { SlotPanel, type SlotPanelProps } from '../../components/SlotPanel.tsx'
+import {
+  aboutOf,
+  CATEGORIES,
+  routineDetail,
+  type PriorityChoice,
+  type Slot,
+  type WeakChoice,
+} from '../../state/routines.ts'
 import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
 import { openRoutine, setPriorities, setWeakPoints } from '../../use-cases/routineDetail.ts'
 import styles from './RutinaScreen.module.css'
 
 const STATUS = { added: 'Añadido', removed: 'Quitado', changed: 'Ajustado', same: null } as const
+const NO_PRIORITY: PriorityChoice = { priorities: [], optionals: {} }
 
 /**
- * Detalle de una rutina tal cual está diseñada: datos clave, estructura por fases, semanas y días con sus descansos, y «Empezar esta rutina».
+ * Detalle de una rutina: datos clave, estructura por fases, semanas y días, y «Empezar esta rutina».
+ * Los ejercicios que se pueden cambiar salen con un tono naranja suave y, al pulsarlos, se despliegan
+ * con sus opciones (opcionales de MUTA, puntos débiles de Culturismo y de Torso y pierna).
  */
 export function RutinaScreen(props: { id: string }) {
   const { route } = useLocation()
   const hero = useRef<HTMLElement>(null)
   const [phase, setPhase] = useState(0)
   const [week, setWeek] = useState(0)
+  /** Fila desplegada (fase-semana-día-fila) o el panel de prioridades. */
+  const [open, setOpen] = useState<string | null>(null)
   const infoSheet = useSheet('info')
-  const startSheet = useSheet('empezar')
   useEffect(() => void openRoutine(props.id), [props.id])
   const state = routineDetail.value
 
@@ -50,9 +61,7 @@ export function RutinaScreen(props: { id: string }) {
   const about = aboutOf(entry)
   const currentPhase = phases[Math.min(phase, phases.length - 1)]
   const currentWeek = currentPhase.weeks[Math.min(week, currentPhase.weeks.length - 1)]
-
-  // Con elecciones posibles (prioridades o punto débil), «Empezar» abre antes la hoja para personalizar
-  const custom = !!weak || !!priorities
+  const toggle = (id: string) => setOpen((now) => (now === id ? null : id))
 
   async function begin() {
     try {
@@ -64,6 +73,70 @@ export function RutinaScreen(props: { id: string }) {
     } catch (error) {
       logError(error, 'empezar rutina')
     }
+  }
+
+  // ── Lo que se despliega bajo cada fila que se puede cambiar
+  const prior = priorities?.choice ?? NO_PRIORITY
+  const setPrior = (change: Partial<PriorityChoice>) => setPriorities({ ...prior, ...change })
+
+  function panelFor(slot: Slot, id: string): SlotPanelProps | null {
+    if (slot.kind === 'optional' && priorities) {
+      const o = priorities.optionals.find((x) => x.key === slot.key)
+      return {
+        id,
+        kind: 'optional',
+        muscle: o?.muscle ?? '',
+        reason: o?.reason ?? null,
+        why: slot.why,
+        off: slot.off,
+        minutes: priorities.minutes,
+        onSet: (include) => setPrior({ optionals: { ...prior.optionals, [slot.key]: include } }),
+      }
+    }
+    if (slot.kind === 'weak' && weak) {
+      const now = weak.choice?.mode === 'table' ? weak.choice : null
+      const put = (change: Partial<{ e1: string | null; e2: string | null }>) =>
+        setWeakPoints({
+          mode: 'table',
+          muscle: now?.muscle ?? '',
+          e1: now?.e1 ?? null,
+          e2: now?.e2 ?? null,
+          ...change,
+        })
+      return {
+        id,
+        kind: 'weak',
+        which: slot.which,
+        muscles: weak.table.muscles,
+        muscle: now?.muscle ?? null,
+        value: slot.which === 1 ? (now?.e1 ?? null) : (now?.e2 ?? null),
+        onMuscle: (muscle) => setWeakPoints({ mode: 'table', muscle, e1: null, e2: null }),
+        onOption: (en) => put(slot.which === 1 ? { e1: en } : { e2: en }),
+      }
+    }
+    if (slot.kind === 'pick' && weak) {
+      const slots = weak.choice?.mode === 'pick' ? weak.choice.slots : {}
+      const mine = slots[slot.day] ?? null
+      const set = (value: { muscle: string; option: string } | null): WeakChoice => ({
+        mode: 'pick',
+        slots: { ...slots, [slot.day]: value },
+      })
+      const recommended =
+        weak.table.mode === 'pick'
+          ? `El programa recomienda ${weak.table.min} o ${weak.table.max} músculos, siempre los mismos.`
+          : ''
+      return {
+        id,
+        kind: 'pick',
+        recommendation: recommended,
+        muscles: weak.table.muscles,
+        muscle: mine?.muscle ?? null,
+        value: mine?.option || null,
+        onMuscle: (muscle) => setWeakPoints(set({ muscle, option: '' })),
+        onOption: (en) => setWeakPoints(set(en && mine ? { muscle: mine.muscle, option: en } : null)),
+      }
+    }
+    return null
   }
 
   const facts: [string, string][] = [
@@ -87,6 +160,10 @@ export function RutinaScreen(props: { id: string }) {
     ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
     ...(about?.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),
   ]
+  const priorityLine = [
+    prior.priorities.length ? prior.priorities.join(', ') : 'Sin prioridades',
+    priorities?.minutes ? `${priorities.minutes} min` : 'sin límite',
+  ].join(' · ')
 
   return (
     <div class={styles.page}>
@@ -125,6 +202,39 @@ export function RutinaScreen(props: { id: string }) {
 
       <section class={styles.structure} aria-label="Estructura">
         <h2 class={styles.h2}>Estructura</h2>
+        {(weak || priorities) && (
+          <p class={styles.hintLine}>Los ejercicios con fondo naranja se pueden cambiar: púlsalos.</p>
+        )}
+        {priorities && (
+          <div class={open === 'prioridades' ? styles.open : ''}>
+            <button
+              type="button"
+              class={styles.slotRow}
+              aria-expanded={open === 'prioridades'}
+              onClick={() => toggle('prioridades')}
+            >
+              <span class={styles.slotText}>
+                <span class={styles.exName}>Tus prioridades y duración</span>
+                <span class={styles.exMeta}>{priorityLine}</span>
+              </span>
+              <span class={styles.chevron}>
+                <ChevronDownIcon />
+              </span>
+            </button>
+            {open === 'prioridades' && (
+              <div class={styles.slotPanel}>
+                <PriorityBar
+                  muscles={priorities.muscles}
+                  priorities={prior.priorities}
+                  max={priorities.max}
+                  minutes={priorities.minutes}
+                  onPriorities={(list) => setPrior({ priorities: list })}
+                  onMinutes={(maxMinutes) => setPrior({ maxMinutes })}
+                />
+              </div>
+            )}
+          </div>
+        )}
         {phases.length > 1 && (
           <ChoiceChips
             name="fase"
@@ -157,7 +267,7 @@ export function RutinaScreen(props: { id: string }) {
               </li>
             ) : (
               <li key={`s${i}`} class={styles.session}>
-                <details>
+                <details open={day.exercises.some((e) => e.slot)}>
                   <summary class={styles.summary}>
                     <span class={styles.sessionName}>{day.name}</span>
                     <span class={styles.sessionMeta}>
@@ -166,21 +276,55 @@ export function RutinaScreen(props: { id: string }) {
                     </span>
                   </summary>
                   <ul class={styles.exercises}>
-                    {day.exercises.map((e, j) => (
-                      <li
-                        key={j}
-                        class={`${styles.exercise} ${e.status === 'removed' ? styles.removed : ''}`}
-                      >
-                        <span class={styles.exName}>
-                          {e.name}
-                          {STATUS[e.status] && <span class={styles.tag}>{STATUS[e.status]}</span>}
-                        </span>
-                        <span class={styles.exMeta}>
-                          {[e.prescription, e.effort, e.rest].filter(Boolean).join(' · ')}
-                          {e.before && <span class={styles.before}> (antes: {e.before})</span>}
-                        </span>
-                      </li>
-                    ))}
+                    {day.exercises.map((e, j) => {
+                      const id = `${phase}-${week}-${i}-${j}`
+                      const panel = e.slot ? panelFor(e.slot, id) : null
+                      const body = (
+                        <>
+                          <span class={styles.exName}>
+                            {e.name}
+                            {STATUS[e.status] && <span class={styles.tag}>{STATUS[e.status]}</span>}
+                          </span>
+                          <span class={styles.exMeta}>
+                            {[e.prescription, e.effort, e.rest].filter(Boolean).join(' · ')}
+                            {e.before && <span class={styles.before}> (antes: {e.before})</span>}
+                          </span>
+                        </>
+                      )
+                      if (!panel) {
+                        return (
+                          <li
+                            key={j}
+                            class={`${styles.exercise} ${e.status === 'removed' ? styles.removed : ''}`}
+                          >
+                            {body}
+                          </li>
+                        )
+                      }
+                      return (
+                        <li
+                          key={j}
+                          class={`${styles.exercise} ${styles.slotItem} ${e.status === 'removed' ? styles.removed : ''} ${open === id ? styles.open : ''}`}
+                        >
+                          <button
+                            type="button"
+                            class={styles.slotRow}
+                            aria-expanded={open === id}
+                            onClick={() => toggle(id)}
+                          >
+                            <span class={styles.slotText}>{body}</span>
+                            <span class={styles.chevron}>
+                              <ChevronDownIcon />
+                            </span>
+                          </button>
+                          {open === id && (
+                            <div class={styles.slotPanel}>
+                              <SlotPanel {...panel} />
+                            </div>
+                          )}
+                        </li>
+                      )
+                    })}
                   </ul>
                 </details>
               </li>
@@ -190,35 +334,7 @@ export function RutinaScreen(props: { id: string }) {
       </section>
 
       <div class={styles.footer}>
-        <Button onClick={() => (custom ? startSheet.show() : void begin())}>Empezar esta rutina</Button>
-        {startSheet.open && custom && (
-          <Sheet
-            title="Antes de empezar"
-            onClose={startSheet.close}
-            footer={<Button onClick={() => void begin()}>Empezar rutina</Button>}
-          >
-            <p class={styles.intro}>Todo es opcional: personaliza tu rutina o empieza tal como está.</p>
-            {priorities && (
-              <PriorityPicker
-                muscles={priorities.muscles}
-                optionals={priorities.optionals}
-                choice={priorities.choice}
-                max={priorities.max}
-                minutes={priorities.minutes}
-                onChange={setPriorities}
-              />
-            )}
-            {weak && (
-              <WeakPointPicker
-                table={weak.table}
-                choice={weak.choice}
-                slots={weak.slots}
-                auto={weak.auto}
-                onChange={setWeakPoints}
-              />
-            )}
-          </Sheet>
-        )}
+        <Button onClick={() => void begin()}>Empezar esta rutina</Button>
       </div>
     </div>
   )

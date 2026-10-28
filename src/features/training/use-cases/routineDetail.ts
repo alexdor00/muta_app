@@ -12,18 +12,12 @@ import {
   musclesOf,
   optionalsOf,
   reasonOf,
+  trimmedKeys,
   type PriorityChoice,
 } from '../domain/priorities.ts'
 import { selectVariant, type ProgramData } from '../domain/programInfo.ts'
 import { metaLines, phasesView } from '../domain/routineView.ts'
-import {
-  applyWeakPoints,
-  autoSlots,
-  hasWeakPoints,
-  slotsOf,
-  type WeakChoice,
-  type WeakTable,
-} from '../domain/weakPoints.ts'
+import { applyWeakPoints, hasWeakPoints, type WeakChoice, type WeakTable } from '../domain/weakPoints.ts'
 import {
   routineDetail,
   routines,
@@ -51,26 +45,17 @@ let priorityChoice: PriorityChoice | null = null
 function show() {
   if (!open) return
   const { item, program, table, level, canPrioritize } = open
-  const slots = table ? slotsOf(program as never) : []
-  const weak: WeakView | null = table
-    ? {
-        table,
-        slots,
-        auto: weakChoice?.mode === 'pick' ? autoSlots(table, weakChoice.picks, slots) : {},
-        choice: weakChoice,
-      }
-    : null
+  const weak: WeakView | null = table ? { table, choice: weakChoice } : null
   const afterPriorities: Program = canPrioritize
     ? applyPriorities(program as never, priorityChoice, level)
     : program
-  // Opcionales que siguen en la rutina tras la regla de tiempo
-  const present = new Set(canPrioritize ? optionalsOf(afterPriorities as never).map((o) => o.key) : [])
+  const trimmed = canPrioritize ? trimmedKeys(afterPriorities as never) : new Set<string>()
   const priorities: PriorityView | null = canPrioritize
     ? {
         muscles: musclesOf(program as never),
         optionals: optionalsOf(program as never).map((o) => {
           const included = isIncluded(o, priorityChoice, level)
-          return { ...o, included, trimmed: included && !present.has(o.key), reason: reasonOf(o.muscle) }
+          return { ...o, included, trimmed: trimmed.has(o.key), reason: reasonOf(o.muscle) }
         }),
         choice: priorityChoice,
         max: MAX_PRIORITIES,

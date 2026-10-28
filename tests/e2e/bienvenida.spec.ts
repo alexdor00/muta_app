@@ -78,14 +78,12 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.getByRole('button', { name: 'Cerrar' }).click()
   await capture(page, 'rutina')
 
-  // Al empezar se puede personalizar (todo opcional). Regla de MUTA: el hombro anterior solo entra si es prioridad
-  expect(await page.content()).not.toContain('Press militar en máquina')
+  // Los ejercicios opcionales salen en la propia rutina (fondo naranja) y se cambian al pulsarlos.
+  // Regla de MUTA: el hombro anterior solo entra si es prioridad.
+  await page.getByRole('button', { name: 'Tus prioridades y duración' }).click()
+  await page.getByText('Hombro anterior', { exact: true }).first().click()
+  await capture(page, 'prioridades')
   await page.getByRole('button', { name: 'Empezar esta rutina' }).click()
-  const hoja = page.getByRole('dialog', { name: 'Antes de empezar' })
-  await hoja.getByText('Hombro anterior', { exact: true }).first().click()
-  await capture(page, 'antes-de-empezar')
-  expect(await page.content()).toContain('Press militar en máquina')
-  await page.getByRole('button', { name: 'Empezar rutina' }).click()
   await expect(page).toHaveURL('/entreno')
   const profile = await page.evaluate(
     () =>

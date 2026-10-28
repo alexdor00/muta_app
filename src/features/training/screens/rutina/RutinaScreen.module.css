@@ -146,8 +146,58 @@
   transform: translateX(-50%);
 }
 
-.intro {
-  margin-bottom: var(--space-6);
-  font: var(--text-subhead);
+/* Filas que se pueden cambiar: tono naranja suave, flecha y panel desplegable */
+.hintLine {
+  font: var(--text-footnote);
   color: var(--label-2);
+}
+
+.slotItem {
+  padding: var(--space-1) 0;
+  border-top: 0;
+}
+
+.slotRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3);
+  border: var(--border) solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.slotText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.chevron {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  color: var(--accent);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.chevron svg {
+  width: 100%;
+  height: 100%;
+}
+
+.open .chevron {
+  transform: rotate(180deg);
+}
+
+.slotPanel {
+  margin-top: var(--space-2);
 }

@@ -1,16 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import {
-  applyWeakPoints,
-  autoSlots,
-  hasWeakPoints,
-  slotsOf,
-  type WeakChoice,
-  type WeakTable,
-} from './weakPoints.ts'
+import { applyWeakPoints, dropEmptyHoles, hasWeakPoints, type WeakTable } from './weakPoints.ts'
 
 const ex = (name: string) => ({ name, originalName: name, sets: 3, reps: '8-12', rpe: '8', rest: '2 min' })
 const day = (name: string, ...names: string[]) => ({ name, exercises: names.map(ex) })
 const opt = (en: string) => ({ en, es: `ES ${en}` })
+const rowsOf = (p: { blocks: { weeks: { days: unknown[] }[] }[] }, week = 0) =>
+  p.blocks[0].weeks[week].days.flatMap(
+    (d) => (d as { exercises?: { name: string; slot?: unknown }[] }).exercises ?? [],
+  )
 
 const TABLE: WeakTable = {
   mode: 'table',
@@ -25,44 +22,65 @@ const TABLE: WeakTable = {
     { id: 'isquios', label: 'Isquiotibiales', advice: 'Ya lleva mucho volumen.', e1: [], e2: [] },
   ],
 }
-const cuerpo = (first: string) => ({
+const cuerpo = {
   weakPoints: TABLE,
   blocks: [
     {
       title: null,
-      weeks: [{ week: 1, days: [day('Brazos', first, 'Weak Point Exercise 2 (optional)', 'Curl')] }],
+      weeks: [
+        {
+          week: 1,
+          days: [day('Brazos', 'Weak Point Exercise 1', 'Weak Point Exercise 2 (optional)', 'Curl')],
+        },
+      ],
     },
   ],
-})
-const names = (p: ReturnType<typeof cuerpo>) =>
-  p.blocks[0].weeks[0].days.flatMap((d) => ('exercises' in d ? d.exercises.map((e) => e.name) : []))
+}
 
 describe('puntos débiles · tabla (Culturismo)', () => {
-  const p = cuerpo('Weak Point Exercise 1')
+  it('los huecos se ven marcados y «a elegir» mientras no elijas', () => {
+    const out = applyWeakPoints(cuerpo, TABLE, null)
+    expect(rowsOf(out).map((e) => e.name)).toEqual([
+      'Weak Point Exercise 1',
+      'Weak Point Exercise 2 (optional)',
+      'Curl',
+    ])
+    expect(rowsOf(out)[0].slot).toEqual({ kind: 'weak', which: 1, filled: false })
+    expect(rowsOf(out)[2].slot).toBeUndefined()
+    expect(hasWeakPoints(cuerpo)).toBe(true)
+    expect(hasWeakPoints({ blocks: [] })).toBe(false)
+  })
 
-  it('pone los ejercicios elegidos y quita el hueco que no usas', () => {
-    const out = applyWeakPoints(p, TABLE, { mode: 'table', muscle: 'hombros', e1: 'Lateral B', e2: null })
-    expect(names(out as never)).toEqual(['ES Lateral B', 'Curl'])
-    const both = applyWeakPoints(p, TABLE, {
+  it('pone el ejercicio elegido en su hueco y deja el otro a elegir', () => {
+    const out = applyWeakPoints(cuerpo, TABLE, {
+      mode: 'table',
+      muscle: 'hombros',
+      e1: 'Lateral B',
+      e2: null,
+    })
+    expect(rowsOf(out).map((e) => e.name)).toEqual([
+      'ES Lateral B',
+      'Weak Point Exercise 2 (optional)',
+      'Curl',
+    ])
+    expect(rowsOf(out)[0].slot).toEqual({ kind: 'weak', which: 1, filled: true })
+    expect(rowsOf(out)[1].slot).toEqual({ kind: 'weak', which: 2, filled: false })
+  })
+
+  it('el ejercicio 1 es libre: se puede elegir solo el 2', () => {
+    const out = applyWeakPoints(cuerpo, TABLE, { mode: 'table', muscle: 'hombros', e1: null, e2: 'Press A' })
+    expect(rowsOf(out).map((e) => e.name)).toEqual(['Weak Point Exercise 1', 'ES Press A', 'Curl'])
+  })
+
+  it('para entrenar, los huecos sin elegir se quitan', () => {
+    const out = applyWeakPoints(cuerpo, TABLE, {
       mode: 'table',
       muscle: 'hombros',
       e1: 'Lateral A',
-      e2: 'Press A',
+      e2: null,
     })
-    expect(names(both as never)).toEqual(['ES Lateral A', 'ES Press A', 'Curl'])
-  })
-
-  it('se puede dejar el ejercicio 1 sin elegir: nada es obligatorio', () => {
-    const out = applyWeakPoints(p, TABLE, { mode: 'table', muscle: 'hombros', e1: null, e2: 'Press A' })
-    expect(names(out as never)).toEqual(['ES Press A', 'Curl'])
-  })
-
-  it('sin elegir, los huecos se quedan; con un músculo de solo consejo, desaparecen', () => {
-    expect(applyWeakPoints(p, TABLE, null)).toBe(p)
-    const out = applyWeakPoints(p, TABLE, { mode: 'table', muscle: 'isquios', e1: null, e2: null })
-    expect(names(out as never)).toEqual(['Curl'])
-    expect(hasWeakPoints(p)).toBe(true)
-    expect(hasWeakPoints({ blocks: [] })).toBe(false)
+    expect(rowsOf(dropEmptyHoles(out)).map((e) => e.name)).toEqual(['ES Lateral A', 'Curl'])
+    expect(rowsOf(dropEmptyHoles(applyWeakPoints(cuerpo, TABLE, null))).map((e) => e.name)).toEqual(['Curl'])
   })
 })
 
@@ -74,7 +92,6 @@ const PICK: WeakTable = {
     { id: 'pecho', label: 'Pecho', group: 'upper', advice: null, e1: [opt('Fly')], e2: [] },
     { id: 'biceps', label: 'Bíceps', group: 'upper', advice: null, e1: [opt('Curl X')], e2: [] },
     { id: 'gemelos', label: 'Gemelos', group: 'lower', advice: null, e1: [opt('Calf')], e2: [] },
-    { id: 'abs', label: 'Abdomen', group: 'lower', advice: null, e1: [opt('Crunch')], e2: [] },
   ],
 }
 const torso = {
@@ -93,59 +110,35 @@ const torso = {
     },
   ],
 }
-const picks = [
-  { muscle: 'pecho', option: 'Fly' },
-  { muscle: 'biceps', option: 'Curl X' },
-  { muscle: 'gemelos', option: 'Calf' },
-]
-const week = (p: { blocks: { weeks: { days: unknown[] }[] }[] }, i: number) =>
-  p.blocks[0].weeks[i].days.map((d) => (d as { exercises?: { name: string }[] }).exercises?.[0]?.name ?? '—')
 
-describe('puntos débiles · repartir músculos (Torso y pierna)', () => {
-  it('encuentra los días con hueco y de qué lado son', () => {
-    expect(slotsOf(torso as never)).toEqual([
-      { key: 'Torso 1', side: 'upper' },
-      { key: 'Pierna 1', side: 'lower' },
-      { key: 'Torso 2', side: 'upper' },
+describe('puntos débiles · un músculo por día (Torso y pierna)', () => {
+  it('cada día con hueco se marca con su nombre', () => {
+    const out = applyWeakPoints(torso, PICK, null)
+    expect(rowsOf(out).map((e) => e.slot)).toEqual([
+      { kind: 'pick', day: 'Torso 1', filled: false },
+      { kind: 'pick', day: 'Pierna 1', filled: false },
+      { kind: 'pick', day: 'Torso 2', filled: false },
     ])
   })
 
-  it('reparte solo, por orden: torso en días de torso y pierna en días de pierna', () => {
-    expect(autoSlots(PICK, picks, slotsOf(torso as never))).toEqual({
-      'Torso 1': ['pecho'],
-      'Pierna 1': ['gemelos'],
-      'Torso 2': ['biceps'],
-    })
-    const out = applyWeakPoints(torso as never, PICK, { mode: 'pick', picks })
-    expect(week(out, 0)).toEqual(['ES Fly', 'ES Calf', 'ES Curl X'])
-    expect(week(out, 1)).toEqual(['ES Fly', 'ES Calf', 'ES Curl X'])
-  })
-
-  it('con menos músculos que días, se repiten; con más, se alternan por semana', () => {
-    expect(autoSlots(PICK, [picks[0]], slotsOf(torso as never))).toEqual({
-      'Torso 1': ['pecho'],
-      'Pierna 1': [],
-      'Torso 2': ['pecho'],
-    })
-    const dos = [picks[0], picks[2], { muscle: 'abs', option: 'Crunch' }]
-    const out = applyWeakPoints(torso as never, PICK, { mode: 'pick', picks: dos })
-    expect([week(out, 0)[1], week(out, 1)[1]]).toEqual(['ES Calf', 'ES Crunch'])
-  })
-
-  it('el reparto lo decides tú: cualquier músculo en cualquier día, o el día libre', () => {
-    const choice: WeakChoice = {
+  it('el reparto lo decides tú: cualquier músculo en cualquier día, igual en todas las semanas', () => {
+    const out = applyWeakPoints(torso, PICK, {
       mode: 'pick',
-      picks,
-      slots: { 'Torso 1': ['gemelos'], 'Pierna 1': [], 'Torso 2': ['pecho', 'biceps'] },
-    }
-    const out = applyWeakPoints(torso as never, PICK, choice)
-    expect(week(out, 0)).toEqual(['ES Calf', '—', 'ES Fly'])
-    expect(week(out, 1)).toEqual(['ES Calf', '—', 'ES Curl X'])
+      slots: {
+        'Torso 1': { muscle: 'gemelos', option: 'Calf' },
+        'Torso 2': { muscle: 'pecho', option: 'Fly' },
+        'Pierna 1': null,
+      },
+    })
+    for (const week of [0, 1])
+      expect(rowsOf(out, week).map((e) => e.name)).toEqual(['ES Calf', 'LOWER BODY WEAK POINT 1', 'ES Fly'])
   })
 
-  it('sin elegir nada, los huecos se quitan o se quedan según haya elección', () => {
-    expect(applyWeakPoints(torso as never, PICK, null)).toBe(torso)
-    const out = applyWeakPoints(torso as never, PICK, { mode: 'pick', picks: [] })
-    expect(week(out, 0)).toEqual(['—', '—', '—'])
+  it('una opción que no existe no se aplica', () => {
+    const out = applyWeakPoints(torso, PICK, {
+      mode: 'pick',
+      slots: { 'Torso 1': { muscle: 'pecho', option: 'Inventado' } },
+    })
+    expect(rowsOf(out)[0].name).toBe('UPPER BODY WEAK POINT 1')
   })
 })

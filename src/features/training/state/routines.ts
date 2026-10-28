@@ -4,7 +4,7 @@ import type { Category, CategoryId } from '../domain/categories.ts'
 import type { ProgramInfo } from '../domain/programInfo.ts'
 import type { Adaptation, PhaseView } from '../domain/routineView.ts'
 import type { OptionalExercise, PriorityChoice } from '../domain/priorities.ts'
-import type { WeakChoice, WeakSlot, WeakTable } from '../domain/weakPoints.ts'
+import type { WeakChoice, WeakTable } from '../domain/weakPoints.ts'
 
 /** Una rutina lista para enseñar. */
 export type RoutineItem = {
@@ -59,12 +59,9 @@ export type PriorityView = {
   minutes: number | null
 }
 
-/** Punto débil de una rutina: la tabla, los días con hueco y lo elegido. Nada es obligatorio. */
+/** Punto débil de una rutina: la tabla y lo elegido. Nada es obligatorio. */
 export type WeakView = {
   table: WeakTable
-  slots: WeakSlot[]
-  /** Reparto de músculos por día que se aplica si no lo cambias (Torso y pierna). */
-  auto: Record<string, string[]>
   choice: WeakChoice | null
 }
 
@@ -73,7 +70,8 @@ export const routineDetail = signal<DetailState>({ status: 'loading' })
 
 export { CATEGORIES } from '../domain/categories.ts'
 export { aboutOf, type About } from '../domain/about.ts'
-export type { WeakChoice, WeakSlot, WeakTable } from '../domain/weakPoints.ts'
+export type { WeakChoice, WeakTable } from '../domain/weakPoints.ts'
+export type { Slot } from '../domain/slots.ts'
 export type { PriorityChoice } from '../domain/priorities.ts'
 export { DEFAULT_MINUTES, MAX_PRIORITIES } from '../domain/priorities.ts'
 export type { Adaptation, Category, CategoryId, CatalogEntry, Level, PhaseView }

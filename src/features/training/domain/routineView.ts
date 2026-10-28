@@ -1,4 +1,5 @@
 import { aboutOf } from './about.ts'
+import type { Slot } from './slots.ts'
 import { adaptToLevel, type SetsGoal } from './adaptVolume.ts'
 import type { CatalogEntry, Level } from './catalog.ts'
 import { MUSCLES, type MuscleId } from './muscles.ts'
@@ -80,6 +81,7 @@ type Exercise = {
   removed?: boolean
   muscle?: string
   originalName?: string
+  slot?: Slot
 }
 type Day = { name: string; exercises: Exercise[] } | { rest: true; note?: string }
 type Week = { week: number; days: Day[] }
@@ -95,6 +97,8 @@ export type ExerciseView = {
   status: 'same' | 'changed' | 'added' | 'removed'
   /** Lo que ponía la rutina original, si ha cambiado. */
   before: string | null
+  /** Si se puede cambiar desde la rutina (se pinta con un tono suave y se despliega). */
+  slot: Slot | null
 }
 export type DayView =
   | { type: 'session'; name: string; minutes: number; exercises: ExerciseView[] }
@@ -114,7 +118,8 @@ export function rirLabel(rpe: string): string {
 }
 
 function exerciseView(e: Exercise): ExerciseView {
-  const status = e.removed ? 'removed' : e.added ? 'added' : e.original ? 'changed' : 'same'
+  const off = e.slot?.kind === 'optional' && e.slot.off
+  const status = e.removed || off ? 'removed' : e.added ? 'added' : e.original ? 'changed' : 'same'
   const effort = e.percent1RM ? e.percent1RM : e.rpe ? rirLabel(e.rpe) : null
   const before =
     status === 'changed' && e.original
@@ -132,6 +137,7 @@ function exerciseView(e: Exercise): ExerciseView {
     rest: e.rest,
     status: status === 'changed' && !before ? 'same' : status,
     before,
+    slot: e.slot ?? null,
   }
 }
 
@@ -150,7 +156,12 @@ export function phasesView(program: Program): PhaseView[] {
           : {
               type: 'session',
               name: d.name,
-              minutes: Math.round(sessionMinutes(d.exercises) / 5) * 5,
+              minutes:
+                Math.round(
+                  sessionMinutes(
+                    d.exercises.filter((e) => !(e.slot?.kind === 'optional' && e.slot.off)) as never,
+                  ) / 5,
+                ) * 5,
               exercises: visible(d.exercises).map(exerciseView),
             },
       ),

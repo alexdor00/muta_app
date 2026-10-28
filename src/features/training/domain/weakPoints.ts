@@ -1,9 +1,12 @@
+import type { Slot } from './slots.ts'
+
 // Puntos débiles: algunas rutinas dejan huecos para que elijas un ejercicio según el músculo que más
 // quieras mejorar. Hay dos formas, tal como las describen los documentos originales:
 // - «table» (Culturismo): eliges UN músculo y, de su tabla, un ejercicio 1 y, si quieres, un ejercicio 2.
-// - «pick» (Torso y pierna): eliges músculos (el programa recomienda 2 o 3) y un ejercicio de cada uno,
-//   y los repartes entre los días que tienen hueco.
-// Nada es obligatorio: lo que dejes sin elegir, el hueco se quita.
+// - «pick» (Torso y pierna): eliges, día a día, un músculo y un ejercicio suyo (el programa recomienda
+//   2 o 3 músculos, siempre los mismos).
+// Cada hueco se ve en la rutina con un tono suave y, al pulsarlo, se despliega con las opciones.
+// Nada es obligatorio: un hueco sin elegir se queda como «a elegir» y no cuenta al entrenar.
 
 export type WeakOption = { en: string; es: string; note?: string }
 export type WeakMuscle = {
@@ -22,21 +25,15 @@ export type WeakTable =
 
 export type WeakChoice =
   | { mode: 'table'; muscle: string; e1: string | null; e2: string | null }
-  | {
-      mode: 'pick'
-      picks: { muscle: string; option: string }[]
-      /** Músculos de cada día con hueco (varios se alternan por semana). Sin decidir, se reparte solo. */
-      slots?: Record<string, string[]>
-    }
-
-/** Un día con hueco de punto débil y de qué lado es. */
-export type WeakSlot = { key: string; side: 'upper' | 'lower' }
+  /** Un músculo y su ejercicio por día con hueco (clave: nombre del día, p. ej. «Torso 1»). */
+  | { mode: 'pick'; slots: Record<string, { muscle: string; option: string } | null> }
 
 type Exercise = {
   name: string
   originalName?: string
   notes?: string | null
   substitutions?: string[]
+  slot?: Slot
   [key: string]: unknown
 }
 type Day = { name: string; exercises: Exercise[] } | { rest: true }
@@ -56,107 +53,81 @@ const rowsOf = (program: Program) =>
 export const hasWeakPoints = (program: Program): program is Program & { weakPoints: WeakTable } =>
   !!program.weakPoints && rowsOf(program).some((e) => TABLE_ROW.test(nameOf(e)) || PICK_ROW.test(nameOf(e)))
 
-/** Los días con hueco de «elige tus músculos», en orden. */
-export function slotsOf(program: Program): WeakSlot[] {
-  const out = new Map<string, WeakSlot>()
-  for (const block of program.blocks)
-    for (const week of block.weeks)
-      for (const day of week.days) {
-        if (!('exercises' in day)) continue
-        const side = day.exercises
-          .map(nameOf)
-          .find((n) => PICK_ROW.test(n))
-          ?.match(PICK_ROW)?.[1]
-        if (side && !out.has(day.name))
-          out.set(day.name, { key: day.name, side: side.toLowerCase() as 'upper' | 'lower' })
-      }
-  return [...out.values()]
-}
+export const muscleOf = (table: WeakTable, id: string) => table.muscles.find((m) => m.id === id)
+const optionOf = (list: WeakOption[], en: string | null | undefined) =>
+  en ? list.find((o) => o.en === en) : undefined
 
-const muscleOf = (table: WeakTable, id: string) => table.muscles.find((m) => m.id === id)
-const optionOf = (list: WeakOption[], en: string | null) => (en ? list.find((o) => o.en === en) : undefined)
-
-/**
- * Reparto automático de tus músculos entre los días con hueco: los de torso por orden en los días de
- * torso y los de pierna en los de pierna. Con más músculos que días, los sobrantes se alternan por
- * semana; con menos, se repiten.
- */
-export function autoSlots(
-  table: WeakTable,
-  picks: { muscle: string }[],
-  slots: WeakSlot[],
-): Record<string, string[]> {
-  const out: Record<string, string[]> = Object.fromEntries(slots.map((s) => [s.key, []]))
-  for (const side of ['upper', 'lower'] as const) {
-    const mine = slots.filter((s) => s.side === side)
-    const ids = picks.filter((p) => muscleOf(table, p.muscle)?.group === side).map((p) => p.muscle)
-    if (!mine.length || !ids.length) continue
-    if (ids.length < mine.length) mine.forEach((s, i) => out[s.key].push(ids[i % ids.length]))
-    else ids.forEach((id, j) => out[mine[j % mine.length].key].push(id))
-  }
-  return out
-}
-
-const swap = (e: Exercise, o: WeakOption): Exercise => ({
+const filled = (e: Exercise, o: WeakOption, slot: Slot): Exercise => ({
   ...e,
   name: o.es,
   originalName: o.en,
   substitutions: [],
   notes: o.note ?? null,
   kind: 'isolation',
+  slot,
 })
 
 /**
- * La rutina con la elección puesta en los huecos. Sin elegir, los huecos se quedan como están.
- * Un hueco sin ejercicio elegido desaparece.
+ * La rutina con la elección puesta en los huecos. Cada hueco queda marcado (`slot`) y, si no hay
+ * elección para él, se queda tal cual («a elegir»): no se borra, para poder elegir cuando quieras.
  */
 export function applyWeakPoints(program: Program, table: WeakTable, choice: WeakChoice | null): Program {
-  if (!choice || choice.mode !== table.mode) return program
-  const slots =
-    choice.mode === 'pick' ? (choice.slots ?? autoSlots(table, choice.picks, slotsOf(program))) : {}
-  let weekIndex = -1
+  const mine = choice?.mode === table.mode ? choice : null
   return {
     ...program,
     blocks: program.blocks.map((block) => ({
       ...block,
-      weeks: block.weeks.map((week) => {
-        weekIndex++
-        return {
-          ...week,
-          days: week.days.map((day): Day => {
-            if (!('exercises' in day)) return day
-            const out: Exercise[] = []
-            for (const e of day.exercises) {
+      weeks: block.weeks.map((week) => ({
+        ...week,
+        days: week.days.map((day): Day => {
+          if (!('exercises' in day)) return day
+          return {
+            ...day,
+            exercises: day.exercises.map((e): Exercise => {
               const name = nameOf(e)
-              if (table.mode === 'table' && choice.mode === 'table') {
-                const slot = name.match(TABLE_ROW)?.[1]
-                if (!slot) {
-                  out.push(e)
-                  continue
-                }
-                const m = muscleOf(table, choice.muscle)
-                const o = m && optionOf(slot === '1' ? m.e1 : m.e2, slot === '1' ? choice.e1 : choice.e2)
-                if (o) out.push(swap(e, o))
-                else if (!m) out.push(e) // músculo desconocido: se deja el hueco
-                // sin ejercicio (sin elegir o solo consejo): el hueco se quita
-                continue
+              const which = name.match(TABLE_ROW)?.[1]
+              if (which && table.mode === 'table') {
+                const slot: Slot = { kind: 'weak', which: which === '1' ? 1 : 2, filled: false }
+                const c = mine?.mode === 'table' ? mine : null
+                const m = c && muscleOf(table, c.muscle)
+                const o = m && optionOf(which === '1' ? m.e1 : m.e2, which === '1' ? c.e1 : c.e2)
+                return o ? filled(e, o, { ...slot, filled: true }) : { ...e, slot }
               }
-              if (!PICK_ROW.test(name) || choice.mode !== 'pick') {
-                out.push(e)
-                continue
+              if (PICK_ROW.test(name) && table.mode === 'pick') {
+                const slot: Slot = { kind: 'pick', day: day.name, filled: false }
+                const c = mine?.mode === 'pick' ? mine.slots[day.name] : null
+                const m = c && muscleOf(table, c.muscle)
+                const o = m && optionOf(m.e1, c.option)
+                return o ? filled(e, o, { ...slot, filled: true }) : { ...e, slot }
               }
-              const ids = slots[day.name] ?? []
-              const id = ids.length ? ids[weekIndex % ids.length] : null
-              const pick = id ? choice.picks.find((p) => p.muscle === id) : undefined
-              const m = pick && muscleOf(table, pick.muscle)
-              const o = m && optionOf(m.e1, pick!.option)
-              if (o) out.push(swap(e, o))
-              // sin músculo ese día: el hueco se quita
-            }
-            return { ...day, exercises: out }
-          }),
-        }
-      }),
+              return e
+            }),
+          }
+        }),
+      })),
+    })),
+  }
+}
+
+/** Quita los huecos sin elegir (para entrenar: lo que no elegiste no cuenta). */
+export function dropEmptyHoles<P extends { blocks: { weeks: { days: unknown[] }[] }[] }>(program: P): P {
+  return {
+    ...program,
+    blocks: program.blocks.map((b) => ({
+      ...b,
+      weeks: b.weeks.map((w) => ({
+        ...w,
+        days: w.days.map((d) => {
+          const day = d as Day
+          if (!('exercises' in day)) return d
+          return {
+            ...day,
+            exercises: day.exercises.filter(
+              (e) => !((e.slot?.kind === 'weak' || e.slot?.kind === 'pick') && !e.slot.filled),
+            ),
+          }
+        }),
+      })),
     })),
   }
 }

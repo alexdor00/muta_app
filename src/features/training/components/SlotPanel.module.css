@@ -1,0 +1,28 @@
+/* Lo que se despliega bajo una fila que se puede cambiar. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+
+.muscles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.hint {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.note {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-footnote);
+}

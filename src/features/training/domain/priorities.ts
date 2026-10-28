@@ -1,5 +1,6 @@
 import type { Level } from './catalog.ts'
 import { sessionMinutes } from './programInfo.ts'
+import type { Slot } from './slots.ts'
 
 // Prioridades de las rutinas de MUTA: tienen ejercicios opcionales (huecos «opc») que dependen de lo
 // que quieras mejorar (docs/conocimiento, reglas del generador):
@@ -33,6 +34,7 @@ type Exercise = {
   sets?: number | string | null
   original?: { sets: number | string | null; rpe: string | null }
   rpe?: string | null
+  slot?: Slot
   [key: string]: unknown
 }
 type Day = { name: string; exercises: Exercise[] } | { rest: true }
@@ -92,10 +94,12 @@ export function isIncluded(o: OptionalExercise, choice: PriorityChoice | null, l
 export const limitOf = (choice: PriorityChoice | null): number | null =>
   choice?.maxMinutes === undefined ? DEFAULT_MINUTES : choice.maxMinutes
 
+const isOff = (e: Exercise) => e.slot?.kind === 'optional' && e.slot.off
+
 /**
  * Regla de tiempo: mientras la sesión pase del límite, se quita el último opcional que no sea
  * prioritario (ni lo hayas puesto tú a mano); si no queda ninguno, −1 serie al ejercicio con más series
- * no prioritario.
+ * no prioritario. Los opcionales quitados se quedan en la rutina marcados, para poder volver a ponerlos.
  */
 function fitDay(
   exercises: Exercise[],
@@ -105,16 +109,18 @@ function fitDay(
 ): Exercise[] {
   let list = exercises
   let guard = 100
-  while (sessionMinutes(list as never) > limit && guard--) {
+  while (sessionMinutes(list.filter((e) => !isOff(e)) as never) > limit && guard--) {
     const lastOptional = list.findLastIndex(
-      (e) => e.optional && !protectedMuscles.has(String(e.muscle)) && !manual.has(keyOf(e)),
+      (e) => e.optional && !isOff(e) && !protectedMuscles.has(String(e.muscle)) && !manual.has(keyOf(e)),
     )
     if (lastOptional >= 0) {
-      list = list.filter((_, i) => i !== lastOptional)
+      list = list.map((e, i) =>
+        i === lastOptional ? { ...e, slot: { kind: 'optional', key: keyOf(e), off: true, why: 'time' } } : e,
+      )
       continue
     }
     const most = list
-      .filter((e) => !protectedMuscles.has(String(e.muscle)) && setsOf(e) > MIN_SETS)
+      .filter((e) => !isOff(e) && !protectedMuscles.has(String(e.muscle)) && setsOf(e) > MIN_SETS)
       .sort((a, b) => setsOf(b) - setsOf(a))[0]
     if (!most) break
     list = list.map((e) =>
@@ -130,25 +136,21 @@ function fitDay(
   return list
 }
 
-/** La rutina con tus prioridades: sin los opcionales que no entran y ajustada a tus minutos. */
+/** La rutina con tus prioridades: cada opcional marcado como puesto o quitado, y ajustada a tus minutos. */
 export function applyPriorities<P extends Program>(
   program: P,
   choice: PriorityChoice | null,
   level: Level,
 ): P {
-  const skip = new Set(
-    optionalsOf(program)
-      .filter((o) => !isIncluded(o, choice, level))
-      .map((o) => o.key),
-  )
+  const options = new Map(optionalsOf(program).map((o) => [o.key, o]))
   const limit = limitOf(choice)
+  if (!options.size && limit == null) return program
   const prio = new Set(choice?.priorities ?? [])
   const manual = new Set(
     Object.entries(choice?.optionals ?? {})
       .filter(([, on]) => on)
       .map(([k]) => k),
   )
-  if (!skip.size && limit == null) return program
   return {
     ...program,
     blocks: program.blocks.map((block) => ({
@@ -157,11 +159,29 @@ export function applyPriorities<P extends Program>(
         ...week,
         days: week.days.map((day): Day => {
           if (!('exercises' in day)) return day
-          let exercises = day.exercises.filter((e) => !(e.optional && skip.has(keyOf(e))))
+          let exercises = day.exercises.map((e): Exercise => {
+            const o = e.optional ? options.get(keyOf(e)) : undefined
+            if (!o) return e
+            const on = isIncluded(o, choice, level)
+            const hand = choice?.optionals[o.key] !== undefined
+            return {
+              ...e,
+              slot: { kind: 'optional', key: o.key, off: !on, why: on ? null : hand ? 'hand' : 'rule' },
+            }
+          })
           if (limit != null) exercises = fitDay(exercises, limit, prio, manual)
           return { ...day, exercises }
         }),
       })),
     })),
   }
+}
+
+/** Opcionales que la regla de tiempo ha quitado (tras aplicar tus prioridades). */
+export function trimmedKeys(program: Program): Set<string> {
+  return new Set(
+    rows(program).flatMap(({ e }) =>
+      e.slot?.kind === 'optional' && e.slot.off && e.slot.why === 'time' ? [e.slot.key] : [],
+    ),
+  )
 }
