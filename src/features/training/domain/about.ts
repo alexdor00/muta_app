@@ -43,8 +43,8 @@ const PROGRAMS = {
       'Hipertrofia pura, primera fase. Todo gira en torno a la tensión en el músculo: técnica estricta, bajada controlada de 2–4 segundos y llegar al máximo estiramiento.',
     forWho: 'Intermedio-avanzado que quiere ganar músculo, sin objetivos de fuerza máxima.',
     how: [
-      '10 semanas en dos bloques de 5: «construcción» y «novedad», que cambia ejercicios, rangos y técnicas para dar un estímulo nuevo.',
-      'La semana 5 es de semidescarga: algo menos de volumen y sin llegar al fallo.',
+      'Dos bloques de 5 semanas, «construcción» y «novedad»; el segundo cambia ejercicios, rangos y técnicas para dar un estímulo nuevo.',
+      'La semana 5 es de semidescarga y separa los dos bloques: algo menos de volumen y sin llegar al fallo.',
       'Las primeras series son algo más suaves y la última se lleva al fallo o casi (RIR 0–1); las técnicas de intensidad, solo en la última.',
       'Incluye un día de punto débil y brazos: eliges el músculo que quieres priorizar.',
     ],
@@ -89,7 +89,7 @@ const PROGRAMS = {
       'Fuerza e hipertrofia, segunda entrega de la serie: construye tolerancia al volumen con más peso en la hipertrofia.',
     forWho: 'Intermedio-avanzado que quiere seguir ganando músculo sin dejar de mejorar los tres básicos.',
     how: [
-      'Más variedad de ejercicios y rangos de repeticiones más altos que la primera entrega.',
+      'Más variedad de ejercicios y rangos de repeticiones más altos, además del trabajo de fuerza.',
       'Los básicos siguen por porcentaje de tu máximo; los accesorios, por esfuerzo (RIR).',
       'Prepara la tercera entrega, centrada en la fuerza máxima.',
     ],
@@ -181,7 +181,7 @@ const PROGRAMS = {
     forWho: 'Quien quiere priorizar el glúteo sin descuidar el resto del cuerpo.',
     how: [
       'Bloque 1 de acumulación y bloque 2 metabólico.',
-      'Hip thrust como ejercicio estrella y sentadilla por porcentaje de tu máximo.',
+      'Incluye hip thrust y sentadilla por porcentaje de tu máximo.',
       'Superseries (A1/A2): haces las dos seguidas y descansas después de la segunda.',
     ],
   },
