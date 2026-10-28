@@ -26,7 +26,9 @@ for (const entry of CATALOG) {
   const program = selectVariant(JSON.parse(fs.readFileSync(file, 'utf8')), entry.variant)
   const days = Math.max(...entry.days)
   // Rutinas especiales (minimalistas): no se adaptan
-  if (!isAdaptable(categorize(infoOf(program, days), { foundation: entry.foundation }))) {
+  if (
+    !isAdaptable(categorize(infoOf(program, days), { foundation: entry.foundation, intent: entry.intent }))
+  ) {
     console.log(`${entry.id}: especial, no se adapta`)
     continue
   }

@@ -7,6 +7,8 @@ export type Level = 'beginner' | 'intermediate' | 'advanced'
 /** Fase del perfil: volumen, definición o mantenimiento (sale del objetivo). */
 export type Phase = 'bulk' | 'cut' | 'maintenance'
 
+export type Intent = 'hypertrophy' | 'strength'
+
 export type CatalogEntry = {
   id: string
   title: string
@@ -21,6 +23,11 @@ export type CatalogEntry = {
   variant?: Variant
   /** Curada: programa para aprender técnica (no se puede medir con series). */
   foundation?: boolean
+  /**
+   * Curada: intención del original cuando la medida engaña (hipertrofia que programa los básicos
+   * por %1RM; especialización de fuerza completada con días de torso que diluyen el %1RM).
+   */
+  intent?: Intent
 }
 
 const local = (e: Omit<CatalogEntry, 'origin'>): CatalogEntry => ({ ...e, origin: 'local' })
@@ -62,13 +69,40 @@ export const CATALOG: CatalogEntry[] = [
     tone: 4,
   }),
   // Frecuencia alta
-  local({ id: 'frecuencia-alta-cuerpo-completo-4d', title: 'Frecuencia alta · 4 días', days: [4], tone: 5 }),
-  local({ id: 'frecuencia-alta-cuerpo-completo-5d', title: 'Frecuencia alta · 5 días', days: [5], tone: 5 }),
+  local({
+    id: 'frecuencia-alta-cuerpo-completo-4d',
+    title: 'Frecuencia alta · 4 días',
+    days: [4],
+    tone: 5,
+    intent: 'hypertrophy',
+  }),
+  local({
+    id: 'frecuencia-alta-cuerpo-completo-5d',
+    title: 'Frecuencia alta · 5 días',
+    days: [5],
+    tone: 5,
+    intent: 'hypertrophy',
+  }),
   // Fuerza e hipertrofia
   local({ id: 'fuerza-hipertrofia-1-6d', title: 'Fuerza e hipertrofia 1', days: [5, 6], tone: 6 }),
   local({ id: 'fuerza-hipertrofia-2-4d', title: 'Fuerza e hipertrofia 2 · 4 días', days: [4], tone: 6 }),
   local({ id: 'fuerza-hipertrofia-2-6d', title: 'Fuerza e hipertrofia 2 · 5–6 días', days: [5, 6], tone: 6 }),
   local({ id: 'fuerza-hipertrofia-3-5d', title: 'Fuerza e hipertrofia 3', days: [5], tone: 6 }),
+  // Especialización en un básico (10 y 8 semanas, con test o pico al final)
+  local({
+    id: 'especializacion-sentadilla',
+    title: 'Especialización · sentadilla',
+    days: [6],
+    tone: 6,
+    intent: 'strength',
+  }),
+  local({
+    id: 'especializacion-banca',
+    title: 'Especialización · press banca',
+    days: [5],
+    tone: 6,
+    intent: 'strength',
+  }),
   // Empuje, tirón y pierna en tres fases
   local({ id: 'ppl-completo-4d', title: 'PPL en 3 fases · 4 días', days: [4], tone: 2 }),
   local({ id: 'ppl-completo-5d', title: 'PPL en 3 fases · 5 días', days: [5], tone: 2 }),

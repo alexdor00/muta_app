@@ -450,7 +450,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["fuerza"]
+    "categories": ["hipertrofia"]
   },
   "frecuencia-alta-cuerpo-completo-5d": {
     "sets": {
@@ -485,7 +485,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["fuerza"]
+    "categories": ["hipertrofia"]
   },
   "fuerza-hipertrofia-1-6d": {
     "sets": {
@@ -623,6 +623,79 @@
       "rests": 2,
       "rotating": false,
       "restNotes": ["días de descanso"]
+    },
+    "categories": ["fuerza"]
+  },
+  "especializacion-sentadilla": {
+    "sets": {
+      "cuadriceps": 23,
+      "femoral": 8,
+      "gluteo": 15,
+      "core": 6,
+      "gemelo": 6,
+      "pecho": 10,
+      "dorsal": 6,
+      "hombro_ant": 4,
+      "espalda_alta": 4,
+      "hombro_post": 4,
+      "biceps": 6,
+      "triceps": 6
+    },
+    "volume": "medio",
+    "volumeRatio": 0.85,
+    "emphasis": ["cuadriceps", "gluteo"],
+    "minutes": 55,
+    "setsPerExercise": 2.66,
+    "strengthShare": 0.1,
+    "equipment": "gym",
+    "split": "torso-pierna",
+    "splitLabel": "Torso y pierna",
+    "weeks": 10,
+    "phases": [
+      "Bloque 1 - Acumulación de volumen",
+      "Descarga",
+      "Bloque 2 - Pico de fuerza",
+      "Semana de test"
+    ],
+    "cycle": {
+      "sessions": 6,
+      "rests": 1,
+      "rotating": false,
+      "restNotes": []
+    },
+    "categories": ["fuerza", "gluteo"]
+  },
+  "especializacion-banca": {
+    "sets": {
+      "pecho": 25,
+      "dorsal": 10,
+      "espalda_alta": 9,
+      "triceps": 4,
+      "biceps": 2,
+      "cuadriceps": 12,
+      "femoral": 9,
+      "gluteo": 7,
+      "hombro_post": 6,
+      "hombro_ant": 2,
+      "hombro_lat": 3,
+      "gemelo": 3
+    },
+    "volume": "medio",
+    "volumeRatio": 0.8,
+    "emphasis": ["pecho"],
+    "minutes": 65,
+    "setsPerExercise": 2.99,
+    "strengthShare": 0.17,
+    "equipment": "gym",
+    "split": "torso-pierna",
+    "splitLabel": "Torso y pierna",
+    "weeks": 8,
+    "phases": ["Bloque 1 - Acumulación de volumen", "Bloque 2 - Pico de fuerza"],
+    "cycle": {
+      "sessions": 5,
+      "rests": 0,
+      "rotating": false,
+      "restNotes": []
     },
     "categories": ["fuerza"]
   },
@@ -1042,7 +1115,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["casa"]
+    "categories": ["casa", "gluteo"]
   },
   "casa-cuerpo-completo-2": {
     "sets": {

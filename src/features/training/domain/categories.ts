@@ -1,3 +1,4 @@
+import type { Intent } from './catalog.ts'
 import type { ProgramInfo } from './programInfo.ts'
 
 // Tipos de entrenamiento. Cada rutina entra en los que cumpla (puede ser más de uno).
@@ -61,25 +62,32 @@ export const STRENGTH_SHARE = 0.12
 export const MINIMAL_SETS = 2
 export const MINIMAL_MINUTES = 50
 
+/** Lo que no se puede medir: intención del original y especialización de su etapa. */
+export type Curation = { foundation?: boolean; intent?: Intent; gluteStage?: boolean }
+
 /**
  * Tipos de una rutina:
  * - En casa: sin barras, máquinas ni poleas.
  * - Primeros pasos: curada (programas de técnica).
  * - Minimalista: gimnasio, ≤ 2 series por ejercicio y ≤ 50 min por sesión.
- * - Fuerza e hipertrofia: ≥ 12 % de las series por %1RM.
- * - Glúteo y pierna: el glúteo es músculo prioritario de la rutina.
+ * - Fuerza e hipertrofia: ≥ 12 % de las series por %1RM, salvo que la intención del original
+ *   (curada) diga otra cosa: hipertrofia con básicos por %1RM, o especialización de fuerza.
+ * - Glúteo y pierna: el glúteo es músculo prioritario de la rutina o de su etapa del programa
+ *   (rutinas hermanas del mismo archivo y bloque).
  * - Hipertrofia: gimnasio y ninguna de las anteriores (salvo casa/primeros pasos, que no aplican).
  */
-export function categorize(info: ProgramInfo, curated: { foundation?: boolean } = {}): CategoryId[] {
+export function categorize(info: ProgramInfo, curated: Curation = {}): CategoryId[] {
   const out: CategoryId[] = []
   if (info.equipment === 'home') out.push('casa')
   if (curated.foundation) out.push('primeros-pasos')
   const minimal =
     info.equipment === 'gym' && info.setsPerExercise <= MINIMAL_SETS && info.minutes <= MINIMAL_MINUTES
   if (minimal) out.push('minimalista')
-  const strength = info.strengthShare >= STRENGTH_SHARE
+  const strength =
+    curated.intent === 'strength' ||
+    (info.strengthShare >= STRENGTH_SHARE && curated.intent !== 'hypertrophy')
   if (strength) out.push('fuerza')
-  const glute = info.emphasis.includes('gluteo')
+  const glute = info.emphasis.includes('gluteo') || !!curated.gluteStage
   if (glute) out.push('gluteo')
   if (info.equipment === 'gym' && !minimal && !strength && !glute && !curated.foundation)
     out.push('hipertrofia')

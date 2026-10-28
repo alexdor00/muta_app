@@ -110,6 +110,24 @@ describe('tipos de entrenamiento', () => {
     expect(categorize(infoOf(strong, 3))).toContain('fuerza')
   })
 
+  it('la intención del original manda sobre la medida del %1RM', () => {
+    const strong = program({
+      name: 'Cuerpo completo #1',
+      exercises: [ex('Back Squat', 4, { percent1RM: '75 %' }), ex('Lat Pulldown', 3), ex('Leg Press', 3)],
+    })
+    expect(categorize(infoOf(strong, 3), { intent: 'hypertrophy' })).toEqual(['hipertrofia'])
+    const diluted = program({
+      name: 'Cuerpo completo #1',
+      exercises: [ex('Lat Pulldown', 4), ex('Leg Press', 3)],
+    })
+    expect(categorize(infoOf(diluted, 3), { intent: 'strength' })).toEqual(['fuerza'])
+  })
+
+  it('glúteo: también si lo es su etapa del programa', () => {
+    const p = program({ name: 'Torso #1', exercises: [ex('Lat Pulldown', 3), ex('Leg Press', 3)] })
+    expect(categorize(infoOf(p, 3), { gluteStage: true })).toEqual(['gluteo'])
+  })
+
   it('minimalista: ≤ 2 series por ejercicio y ≤ 50 min', () => {
     const minimal = program({
       name: 'Cuerpo completo',
