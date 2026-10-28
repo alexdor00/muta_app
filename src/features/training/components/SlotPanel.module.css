@@ -26,3 +26,19 @@
   background: var(--bg);
   font: var(--text-footnote);
 }
+
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-subhead);
+}

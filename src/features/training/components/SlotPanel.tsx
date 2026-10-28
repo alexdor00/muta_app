@@ -1,4 +1,5 @@
-import { ChoiceCards, ChoiceChips, ChoicePills } from '../../../shared/ui/Choice.tsx'
+import { useState } from 'preact/hooks'
+import { ChoiceList, ChoicePills } from '../../../shared/ui/Choice.tsx'
 import styles from './SlotPanel.module.css'
 
 type Option = { en: string; es: string; note?: string }
@@ -53,32 +54,50 @@ export type SlotPanelProps = Common &
 const NONE = ''
 const UNSET = '__sin_elegir'
 
-/** Músculos como etiquetas: una sola fila, o dos («Torso» y «Pierna») cuando hay grupos. */
-function MuscleChips(props: {
+const plain = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+const GROUP = { upper: 'Torso', lower: 'Pierna' } as const
+
+/**
+ * Búsqueda por grupo muscular: escribes («pec», «glút»…) y salen los músculos que coinciden. Con un músculo
+ * elegido y nada escrito, se ve solo ese; al escribir vuelve la lista.
+ */
+function MuscleSearch(props: {
   id: string
   muscles: Muscle[]
   value: string | null
   onChange: (id: string) => void
 }) {
-  const groups: { legend: string; list: Muscle[] }[] = props.muscles.some((m) => m.group)
-    ? [
-        { legend: 'Torso', list: props.muscles.filter((m) => m.group === 'upper') },
-        { legend: 'Pierna', list: props.muscles.filter((m) => m.group === 'lower') },
-      ]
-    : [{ legend: 'Músculo', list: props.muscles }]
+  const [query, setQuery] = useState('')
+  const found = props.muscles.filter((m) => plain(m.label).includes(plain(query.trim())))
+  const shown = query.trim() || !props.value ? found : props.muscles.filter((m) => m.id === props.value)
   return (
-    <div class={styles.muscles}>
-      {groups.map((g) => (
-        <ChoiceChips
-          key={g.legend}
-          name={`${props.id}-${g.legend}`}
-          legend={g.legend}
-          showLegend={groups.length > 1}
-          options={g.list.map((m) => ({ value: m.id, label: m.label }))}
-          value={g.list.some((m) => m.id === props.value) ? (props.value as string) : UNSET}
-          onChange={props.onChange}
+    <div class={styles.search}>
+      <input
+        class={styles.searchInput}
+        type="search"
+        placeholder="Buscar grupo muscular"
+        aria-label="Buscar grupo muscular"
+        value={query}
+        onInput={(event) => setQuery((event.currentTarget as HTMLInputElement).value)}
+      />
+      {shown.length ? (
+        <ChoiceList
+          name={`${props.id}-musculo`}
+          legend="Grupo muscular"
+          options={shown.map((m) => ({
+            value: m.id,
+            label: m.label,
+            detail: m.group ? GROUP[m.group] : undefined,
+          }))}
+          value={props.value ?? UNSET}
+          onChange={(id) => {
+            setQuery('')
+            props.onChange(id)
+          }}
         />
-      ))}
+      ) : (
+        <p class={styles.hint}>Ningún grupo muscular coincide.</p>
+      )}
     </div>
   )
 }
@@ -90,15 +109,15 @@ function Options(props: {
   skipLabel: string
   onChange: (en: string | null) => void
 }) {
-  const cards = [
-    ...props.options.map((o, i) => ({ value: o.en, label: o.es, detail: o.note, icon: String(i + 1) })),
-    { value: NONE, label: props.skipLabel, detail: undefined, icon: '–' },
+  const list = [
+    ...props.options.map((o) => ({ value: o.en, label: o.es, detail: o.note })),
+    { value: NONE, label: props.skipLabel, detail: undefined },
   ]
   return (
-    <ChoiceCards
+    <ChoiceList
       name={`${props.id}-ejercicio`}
       legend="Ejercicio"
-      options={cards}
+      options={list}
       value={props.value ?? UNSET}
       onChange={(v) => props.onChange(v === NONE ? null : v)}
     />
@@ -131,17 +150,12 @@ export function SlotPanel(props: SlotPanelProps) {
         />
         {why && <p class={styles.note}>{why}</p>}
         {props.options.length > 0 && (
-          <ChoiceCards
+          <ChoiceList
             name={`${props.id}-ejercicio`}
             legend="Ejercicio"
             options={[
-              { value: NONE, label: props.original, detail: 'El de la rutina', icon: '1' },
-              ...props.options.map((o, i) => ({
-                value: o,
-                label: o,
-                detail: undefined,
-                icon: String(i + 2),
-              })),
+              { value: NONE, label: props.original, detail: 'original' },
+              ...props.options.map((o) => ({ value: o, label: o, detail: undefined })),
             ]}
             value={props.value ?? NONE}
             onChange={(v) => props.onPick(v === NONE ? null : v)}
@@ -167,7 +181,7 @@ export function SlotPanel(props: SlotPanelProps) {
           ? `${props.recommendation} Elige un músculo y uno de sus ejercicios.`
           : 'Elige un músculo y uno solo de sus ejercicios.'}
       </p>
-      <MuscleChips id={props.id} muscles={props.muscles} value={props.muscle} onChange={props.onMuscle} />
+      <MuscleSearch id={props.id} muscles={props.muscles} value={props.muscle} onChange={props.onMuscle} />
       {muscle?.advice && <p class={styles.note}>{muscle.advice}</p>}
       {muscle && options.length > 0 && (
         <Options

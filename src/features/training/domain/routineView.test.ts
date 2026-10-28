@@ -6,6 +6,7 @@ import {
   durationOf,
   matches,
   metaLines,
+  restFact,
   restNote,
   rirLabel,
   routineView,
@@ -133,5 +134,15 @@ describe('esfuerzo en RIR', () => {
     expect(rirLabel('RPE8')).toBe('RIR 2')
     expect(rirLabel('8.5')).toBe('RIR 1.5')
     expect(rirLabel('N/A')).toBe('N/A')
+  })
+})
+
+describe('días de descanso en todas las rutinas', () => {
+  it('cuenta los del archivo y, si no hay, lo dice sin inventar', () => {
+    expect(restFact('x', { sessions: 4, rests: 2, rotating: false })).toBe('2 días por semana')
+    expect(restFact('x', { sessions: 1, rests: 1, rotating: false })).toBe('1 día por semana')
+    expect(restFact('x', { sessions: 8, rests: 4, rotating: true })).toBe('4 de cada 12 días')
+    expect(restFact('x', { sessions: 4, rests: 0, rotating: false })).toBe('La rutina no los indica')
+    expect(restFact('muta-ppl-6d', { sessions: 6, rests: 0, rotating: true })).toContain('ciclo de 8 días')
   })
 })

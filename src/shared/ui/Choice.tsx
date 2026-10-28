@@ -1,4 +1,5 @@
 import type { ComponentChildren } from 'preact'
+import { CheckIcon } from './icons.tsx'
 import styles from './Choice.module.css'
 
 export type ChoiceOption<T> = { value: T; label: string; detail?: string; icon?: ComponentChildren }
@@ -13,12 +14,13 @@ type Props<T> = {
   onChange: (value: T) => void
 }
 
-type Look = 'card' | 'pill' | 'circle' | 'chip'
+type Look = 'card' | 'pill' | 'circle' | 'chip' | 'list'
 const LIST: Record<Look, string> = {
   card: styles.cards,
   pill: styles.pills,
   circle: styles.days,
   chip: styles.chips,
+  list: styles.list,
 }
 
 function Group<T extends string | number>(props: Props<T> & { look: Look }) {
@@ -31,7 +33,7 @@ function Group<T extends string | number>(props: Props<T> & { look: Look }) {
           return (
             <label
               key={String(option.value)}
-              class={`${styles.item} ${styles[props.look]} ${selected ? styles.selected : ''}`}
+              class={`${styles.item} ${styles[props.look === 'list' ? 'row' : props.look]} ${selected ? styles.selected : ''}`}
             >
               <input
                 class={styles.radio}
@@ -50,6 +52,16 @@ function Group<T extends string | number>(props: Props<T> & { look: Look }) {
                   </span>
                   <span class={styles.dot} aria-hidden="true" />
                 </>
+              ) : props.look === 'list' ? (
+                <>
+                  <span class={styles.rowText}>
+                    {option.label}
+                    {option.detail && <span class={styles.rowDetail}> · {option.detail}</span>}
+                  </span>
+                  <span class={styles.check} aria-hidden="true">
+                    {selected && <CheckIcon />}
+                  </span>
+                </>
               ) : (
                 option.label
               )}
@@ -64,6 +76,11 @@ function Group<T extends string | number>(props: Props<T> & { look: Look }) {
 /** Tarjetas con icono, título, detalle y círculo de selección (una opción). */
 export function ChoiceCards<T extends string>(props: Props<T>) {
   return <Group {...props} look="card" />
+}
+
+/** Lista compacta de una línea por opción, sin números; la elegida lleva una marca. */
+export function ChoiceList<T extends string>(props: Props<T>) {
+  return <Group {...props} look="list" />
 }
 
 /** Pastillas en fila; la elegida en negro. */
