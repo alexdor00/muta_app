@@ -45,22 +45,37 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.getByText('4', { exact: true }).click()
   await page.getByRole('button', { name: 'Siguiente' }).click()
 
-  // Elige tu rutina: intermedio y 4 días → recomienda Cuerpo completo A/B
+  // Elige tu rutina (en la CI solo están las 2 rutinas de MUTA)
   await expect(page).toHaveURL('/entreno/rutinas')
-  const recomendadas = page.getByRole('region', { name: 'Recomendadas para ti' })
-  await expect(page.getByText('Para 4 días por semana · nivel intermedio')).toBeVisible()
+  await expect(page.getByText('4 días por semana · nivel intermedio · definición')).toBeVisible()
+  const paraTi = page.getByRole('region', { name: 'Para ti' })
+  await expect(paraTi.getByRole('button')).toContainText('Cuerpo completo A/B')
   await capture(page, 'elegir-rutina')
-  // Una tarjeta por tipo de entrenamiento. Perder grasa = definición: primero el volumen de
-  // mantenimiento (Esencial); Hipertrofia (con Cuerpo completo A/B) sigue entre las recomendadas.
-  await expect(recomendadas.getByRole('button').first()).toContainText('Esencial 45 min')
-  await expect(recomendadas.getByRole('button').first()).toContainText('volumen de mantenimiento')
-  await recomendadas.getByRole('button', { name: /Hipertrofia/ }).click()
-  await expect(page).toHaveURL('/entreno/rutinas/hipertrofia?seccion=para-ti')
-  await capture(page, 'familia-rutina')
+
+  // Tipo de entrenamiento: cabecera con foto, número de rutinas, filtros y lista
   await page
-    .getByRole('region', { name: 'Para ti' })
-    .getByRole('button', { name: /Cuerpo completo A\/B/ })
+    .getByRole('region', { name: 'Tipos de entrenamiento' })
+    .getByRole('button', { name: /Hipertrofia/ })
     .click()
+  await expect(page).toHaveURL('/entreno/rutinas/hipertrofia')
+  await expect(page.getByRole('heading', { name: 'Hipertrofia', level: 1 })).toBeVisible()
+  await expect(page.getByText('2 rutinas')).toBeVisible()
+  await capture(page, 'categoria')
+  await page.getByRole('button', { name: 'Filtros' }).first().click()
+  await page.getByText('3 días', { exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Ver 1 rutina' })).toBeVisible()
+  await capture(page, 'filtros')
+  await page.getByRole('button', { name: 'Ver 1 rutina' }).click()
+  await page.getByRole('link', { name: /Cuerpo completo A\/B/ }).click()
+
+  // Detalle: «Adaptar a mí» con lo del perfil (intermedio, definición → mantener)
+  await expect(page).toHaveURL('/entreno/programa/muta-cuerpo-completo-4d')
+  await page.getByRole('button', { name: 'Adaptar a mí' }).click()
+  await expect(page.getByRole('radio', { name: 'Intermedio' })).toBeChecked()
+  await expect(page.getByRole('radio', { name: 'Mantener músculo' })).toBeChecked()
+  await expect(page.getByRole('list', { name: 'Cambios por músculo' })).toBeVisible()
+  await capture(page, 'rutina-adaptada')
+  await page.getByRole('button', { name: 'Empezar mi versión' }).click()
   await expect(page).toHaveURL('/entreno')
   const profile = await page.evaluate(
     () =>
@@ -83,7 +98,10 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
         }
       }),
   )
-  expect(plan).toMatchObject({ programId: 'muta-cuerpo-completo-4d' })
+  expect(plan).toMatchObject({
+    programId: 'muta-cuerpo-completo-4d',
+    adaptation: { level: 'intermediate', goal: 'maintain' },
+  })
 
   // Con perfil, la app ya no abre en la bienvenida
   await page.goto('/')

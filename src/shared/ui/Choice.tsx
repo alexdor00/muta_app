@@ -13,8 +13,13 @@ type Props<T> = {
   onChange: (value: T) => void
 }
 
-type Look = 'card' | 'pill' | 'circle'
-const LIST: Record<Look, string> = { card: styles.cards, pill: styles.pills, circle: styles.days }
+type Look = 'card' | 'pill' | 'circle' | 'chip'
+const LIST: Record<Look, string> = {
+  card: styles.cards,
+  pill: styles.pills,
+  circle: styles.days,
+  chip: styles.chips,
+}
 
 function Group<T extends string | number>(props: Props<T> & { look: Look }) {
   return (
@@ -69,4 +74,9 @@ export function ChoicePills<T extends string>(props: Props<T>) {
 /** Círculos con número; el elegido en negro. Misma altura que las pastillas. */
 export function ChoiceCircles(props: Props<number>) {
   return <Group {...props} look="circle" />
+}
+
+/** Etiquetas que se ajustan al texto y saltan de línea (filtros). Misma altura que las pastillas. */
+export function ChoiceChips<T extends string>(props: Props<T>) {
+  return <Group {...props} look="chip" />
 }

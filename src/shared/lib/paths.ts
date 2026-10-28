@@ -9,9 +9,10 @@ export const paths = {
   routine: '/entreno/rutina',
   /** Elegir rutina (tras la bienvenida, o para cambiarla). */
   chooseRoutine: '/entreno/rutinas',
-  /** Versiones de un tipo de rutina; seccion = desde dónde se entró (para-ti, cinco-dias, otras). */
-  routineFamily: (family: string, seccion?: string) =>
-    `/entreno/rutinas/${family}${seccion ? `?seccion=${seccion}` : ''}`,
+  /** Rutinas de un tipo de entrenamiento («guardadas» = las marcadas). */
+  routineCategory: (category: string) => `/entreno/rutinas/${category}`,
+  /** Detalle de una rutina, con «Adaptar a mí» y «Empezar esta rutina». */
+  routineDetail: (id: string) => `/entreno/programa/${id}`,
   sessionStart: (sessionId: string) => `/entreno/sesion/${sessionId}/inicio`,
   session: (sessionId: string) => `/entreno/sesion/${sessionId}`,
   summary: (sessionId: string) => `/entreno/sesion/${sessionId}/resumen`,
@@ -24,7 +25,8 @@ export const paths = {
 // Patrones para el router (mismas rutas, con parámetros).
 export const patterns = {
   onboarding: '/bienvenida/:step',
-  routineFamily: '/entreno/rutinas/:family',
+  routineCategory: '/entreno/rutinas/:category',
+  routineDetail: '/entreno/programa/:id',
   sessionStart: '/entreno/sesion/:sessionId/inicio',
   session: '/entreno/sesion/:sessionId',
   summary: '/entreno/sesion/:sessionId/resumen',

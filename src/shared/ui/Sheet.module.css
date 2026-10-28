@@ -1,0 +1,66 @@
+/* Hoja que sube desde abajo, sobre un fondo oscurecido. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--scrim-sheet);
+  animation: fade var(--duration-sheet) var(--ease) both;
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--app-max-width);
+  max-height: var(--sheet-max);
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--bg);
+  animation: rise var(--duration-sheet) var(--ease) both;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: var(--control) 1fr var(--control);
+  align-items: center;
+  padding: var(--space-2) var(--space-2) 0;
+}
+
+.title {
+  font: var(--text-headline);
+  text-align: center;
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) var(--gutter) var(--space-6);
+}
+
+.footer {
+  padding: var(--space-3) var(--gutter) calc(var(--space-6) + var(--safe-bottom));
+  border-top: var(--hairline) solid var(--separator);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes rise {
+    from {
+      opacity: 0;
+    }
+  }
+}

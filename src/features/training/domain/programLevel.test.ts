@@ -130,3 +130,16 @@ describe('adaptar a un nivel', () => {
     expect(programLevel(out, 2).sets).toEqual(programLevel(fit, 2).sets)
   })
 })
+
+describe('adaptar para mantener', () => {
+  it('lleva cada músculo al rango «mantener» (los de énfasis se quedan en «desarrollar»)', () => {
+    const p = program([
+      [ex('Bench Press', 4, 'heavy'), ex('Incline DB Press', 4), ex('Lat Pulldown', 4)],
+      [ex('Machine Chest Press', 3), ex('Seated Cable Row', 4), ex('Leg Press', 4)],
+    ])
+    const out = adaptToLevel(p, 'intermediate', 2, 'maintain')
+    const sets = programLevel(out, 2).sets
+    expect(sets.dorsal!).toBeLessThanOrEqual(4) // mantener dorsal 2–4
+    expect(sets.cuadriceps!).toBeLessThanOrEqual(6) // mantener cuádriceps 4–6
+  })
+})

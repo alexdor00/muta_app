@@ -13,7 +13,9 @@ export default defineConfig({
     locale: 'es-ES',
   },
   webServer: {
+    // Sin las rutinas privadas, igual que en la CI (no están en el repositorio)
     command: 'npm run build && npx vite preview --port 4174 --strictPort',
+    env: { VITE_NO_LOCAL_PROGRAMS: '1' },
     url: 'http://localhost:4174',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

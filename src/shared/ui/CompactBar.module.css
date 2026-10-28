@@ -1,0 +1,37 @@
+/* Barra compacta que aparece al bajar: volver, título centrado y una acción. */
+
+.bar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: var(--control) 1fr var(--control);
+  align-items: center;
+  width: 100%;
+  max-width: var(--app-max-width);
+  height: calc(var(--bar-height) + var(--safe-top));
+  padding: var(--safe-top) var(--space-2) 0;
+  border-bottom: var(--hairline) solid var(--separator);
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(var(--rise) * -1));
+  transition:
+    opacity var(--duration-tap) var(--ease),
+    transform var(--duration-tap) var(--ease);
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.title {
+  overflow: hidden;
+  font: var(--text-headline);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -28,6 +28,11 @@
   --photo-card-scrim: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 55%) 100%);
   --photo-card-height: 192px; /* tarjeta de rutina: proporción de la captura de referencia */
   --avatar: 40px;
+  --hero-height: 58dvh; /* cabecera con foto de una categoría o rutina */
+  --thumb: 100px; /* miniatura cuadrada de una fila de lista */
+  --bar-height: 52px; /* barra compacta superior */
+  --sheet-max: 88dvh; /* alto máximo de una hoja */
+  --scrim-sheet: rgb(0 0 0 / 40%); /* fondo oscurecido detrás de una hoja */
   --photo-scrim: linear-gradient(180deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 35%) 45%, rgb(0 0 0 / 85%) 100%);
 
   /* Tipografía: fuente del sistema (SF Pro en iPhone, Roboto en Android). Tamaños en rem. */

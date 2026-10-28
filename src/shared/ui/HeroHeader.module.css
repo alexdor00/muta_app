@@ -1,0 +1,71 @@
+/* Cabecera grande con foto: botón redondo para volver, título y descripción en blanco abajo. */
+
+.hero {
+  position: relative;
+  height: var(--hero-height);
+  overflow: hidden;
+  color: var(--on-photo);
+}
+
+.t1 {
+  background: var(--tone-1);
+}
+
+.t2 {
+  background: var(--tone-2);
+}
+
+.t3 {
+  background: var(--tone-3);
+}
+
+.t4 {
+  background: var(--tone-4);
+}
+
+.t5 {
+  background: var(--tone-5);
+}
+
+.t6 {
+  background: var(--tone-6);
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--photo-scrim);
+}
+
+.back {
+  position: absolute;
+  top: calc(var(--space-6) + var(--safe-top));
+  left: var(--gutter);
+}
+
+.text {
+  position: absolute;
+  right: var(--gutter);
+  bottom: var(--space-8);
+  left: var(--gutter);
+}
+
+.title {
+  font: var(--text-large-title);
+  font-weight: var(--weight-regular);
+  text-wrap: balance;
+}
+
+.description {
+  margin-top: var(--space-3);
+  font: var(--text-body);
+  text-wrap: pretty;
+}

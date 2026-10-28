@@ -1,24 +1,30 @@
 import { getDb, runTx } from '../../../shared/data/db.ts'
-import type { Level } from '../domain/catalog.ts'
-import cuerpoCompleto from '../../../shared/content/programs/muta-cuerpo-completo-4d.json'
-import ppl from '../../../shared/content/programs/muta-ppl-6d.json'
-
-/** Programas propios de MUTA: van en el código y se copian a la base de datos al elegirlos. */
-const BUILT_IN: Record<string, unknown> = { [cuerpoCompleto.id]: cuerpoCompleto, [ppl.id]: ppl }
+import { CATALOG, sourceOf } from '../domain/catalog.ts'
+import type { Adaptation } from '../domain/routineView.ts'
+import { BUILT_IN } from './routineDetail.ts'
 
 /**
- * Guarda la rutina elegida como plan actual. Con adaptTo, el plan se usa adaptado a ese nivel
- * músculo a músculo (domain/adaptVolume.ts); el programa original no se toca.
+ * Guarda la rutina elegida como plan actual, con su variante y, si se pidió, la adaptación
+ * («Adaptar a mí»: nivel y objetivo). El programa original no se toca; se adapta al usarlo.
  */
 export async function chooseRoutine(
   programId: string,
-  adaptTo: Level | null = null,
+  adaptation: Adaptation | null = null,
   now = new Date(),
 ): Promise<void> {
+  const entry = CATALOG.find((e) => e.id === programId)
+  const source = entry ? sourceOf(entry) : programId
   const db = await getDb()
   await runTx(db, ['programs', 'plans'], async (tx) => {
-    const builtIn = BUILT_IN[programId]
+    const builtIn = BUILT_IN[source]
     if (builtIn) await tx.objectStore('programs').put(builtIn)
-    await tx.objectStore('plans').put({ id: 'current', programId, adaptTo, chosenAt: now.toISOString() })
+    await tx.objectStore('plans').put({
+      id: 'current',
+      programId,
+      source,
+      variant: entry?.variant ?? null,
+      adaptation,
+      chosenAt: now.toISOString(),
+    })
   })
 }

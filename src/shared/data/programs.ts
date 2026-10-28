@@ -43,7 +43,10 @@ const meta = import.meta.glob<{ rev: number }>('/private/programs/_meta.json', {
 })
 const LOCAL_REV = Object.values(meta)[0]?.rev ?? 0
 
-export const LOCAL_PROGRAM_COUNT = Object.keys(files).length
+// Con VITE_NO_LOCAL_PROGRAMS (recorridos de prueba) no se cargan: igual que en la CI.
+const enabled = !import.meta.env.VITE_NO_LOCAL_PROGRAMS
+
+export const LOCAL_PROGRAM_COUNT = enabled ? Object.keys(files).length : 0
 
 /**
  * Guarda en la base de datos los programas que todavía no estén, o todos si cambió la revisión.
@@ -53,7 +56,7 @@ export async function seedPrograms(db: Db): Promise<number> {
   const stored = (await db.get('meta', 'programsRev')) as { value: number } | undefined
   const outdated = (stored?.value ?? 0) !== LOCAL_REV
   const have = new Set(outdated ? [] : await db.getAllKeys('programs'))
-  const missing = Object.entries(files).filter(
+  const missing = (enabled ? Object.entries(files) : []).filter(
     ([path]) => !have.has(path.split('/').at(-1)!.replace('.json', '')),
   )
   if (outdated) await db.put('meta', { key: 'programsRev', value: LOCAL_REV })

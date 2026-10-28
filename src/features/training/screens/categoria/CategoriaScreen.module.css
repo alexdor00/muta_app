@@ -1,0 +1,53 @@
+/* Lista de un tipo de entrenamiento: número de rutinas y filtros bajo la cabecera, y las filas. */
+
+.page {
+  padding-bottom: var(--space-10);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--gutter) var(--space-2);
+}
+
+.count {
+  font: var(--text-body);
+  color: var(--label-2);
+}
+
+.list {
+  margin: 0;
+  padding: 0 var(--gutter);
+  list-style: none;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--gutter);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.message {
+  padding: calc(var(--space-6) + var(--safe-top)) var(--gutter);
+  font: var(--text-subhead);
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.filters fieldset + fieldset {
+  margin-top: 0;
+}
+
+.sheetActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}

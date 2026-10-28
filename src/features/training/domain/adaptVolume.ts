@@ -51,7 +51,10 @@ function setSets(day: { exercises: AdaptExercise[] }, target: AdaptExercise, n: 
   }
 }
 
-function adaptWeek(week: Week, level: Level, daysPerWeek: number): Week {
+/** Para qué son las series: ganar músculo (rango «desarrollar») o mantenerlo (rango «mantener»). */
+export type SetsGoal = 'develop' | 'maintain'
+
+function adaptWeek(week: Week, level: Level, daysPerWeek: number, goal: SetsGoal): Week {
   const copy: Week = structuredClone(week)
   const weekly = weeklySets(copy, daysPerWeek)
   const fit = levelFromSets(weekly)
@@ -59,15 +62,25 @@ function adaptWeek(week: Week, level: Level, daysPerWeek: number): Week {
   const days = sessions(copy)
 
   for (const { muscle, priority } of fit.perMuscle) {
-    const range = rangeFor(muscle, level, priority[level] ? 'priority' : 'develop')
+    // Mantener: rango «mantener» salvo los músculos de énfasis de la rutina, que siguen en
+    // «desarrollar» (lo que hace especial a la rutina no se pierde). Ganar: «desarrollar» o
+    // «prioridad» para los de énfasis.
+    const range =
+      goal === 'maintain'
+        ? rangeFor(muscle, level, priority[level] ? 'develop' : 'maintain')
+        : rangeFor(muscle, level, priority[level] ? 'priority' : 'develop')
     // Cambio en series del ciclo (la semana del archivo puede tener más sesiones que días reales)
     let current = weekly[muscle]!
     const step = factor
+    // Mismo criterio que al contar (weeklySets): de un grupo de progresión solo cuenta su primera fila.
+    const counts = (day: { exercises: AdaptExercise[] }, e: AdaptExercise) =>
+      !e.group || day.exercises.find((x) => x.group === e.group) === e
     const candidates = () =>
       days.flatMap((day) =>
         day.exercises
-          .filter((e) => muscleOf(e) === muscle && Number.isFinite(setsOf(e)) && setsOf(e) > 0)
-          .filter((e, i, all) => !e.group || all.findIndex((x) => x.group === e.group) === i)
+          .filter(
+            (e) => counts(day, e) && muscleOf(e) === muscle && Number.isFinite(setsOf(e)) && setsOf(e) > 0,
+          )
           .map((e) => ({ day, e })),
       )
     const sessionSets = (day: { exercises: AdaptExercise[] }) =>
@@ -155,12 +168,13 @@ export function adaptToLevel<P extends { blocks: Block[] }>(
   program: P,
   level: Level,
   daysPerWeek: number,
+  goal: SetsGoal = 'develop',
 ): P {
   return {
     ...program,
     blocks: program.blocks.map((block) => ({
       ...block,
-      weeks: block.weeks.map((w) => adaptWeek(w, level, daysPerWeek)),
+      weeks: block.weeks.map((w) => adaptWeek(w, level, daysPerWeek, goal)),
     })),
   }
 }

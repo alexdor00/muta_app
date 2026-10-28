@@ -1,0 +1,30 @@
+/* Botón redondo con icono: blanco sobre foto, o sin fondo en una barra. */
+
+.button {
+  display: grid;
+  place-items: center;
+  width: var(--control);
+  height: var(--control);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--on-photo);
+  color: var(--on-photo-label);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.button:active {
+  transform: scale(var(--press-scale));
+}
+
+.plain {
+  background: transparent;
+  color: var(--label);
+}
+
+.button svg {
+  width: var(--icon);
+  height: var(--icon);
+}

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'preact/hooks'
 import { Button } from '../../shared/ui/Button.tsx'
-import { ChoiceCards, ChoiceCircles, ChoicePills } from '../../shared/ui/Choice.tsx'
+import { ChoiceCards, ChoiceChips, ChoiceCircles, ChoicePills } from '../../shared/ui/Choice.tsx'
+import { BookmarkIcon, SlidersIcon } from '../../shared/ui/icons.tsx'
+import { ListRow } from '../../shared/ui/ListRow.tsx'
+import { PillButton } from '../../shared/ui/PillButton.tsx'
+import { RoundButton } from '../../shared/ui/RoundButton.tsx'
 import { PhotoCard } from '../../shared/ui/PhotoCard.tsx'
 import { ScreenHeader } from '../../shared/ui/ScreenHeader.tsx'
 import styles from './DevUiScreen.module.css'
@@ -40,6 +44,7 @@ export function DevUiScreen() {
   const [level, setLevel] = useState('beginner')
   const [days, setDays] = useState(3)
   const [goal, setGoal] = useState('a')
+  const [chip, setChip] = useState('Todos')
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -120,6 +125,44 @@ export function DevUiScreen() {
           {([1, 2, 3, 4, 5, 6] as const).map((tone) => (
             <PhotoCard key={tone} title={`Tono ${tone}`} subtitle="Sin foto: degradado" tone={tone} />
           ))}
+        </div>
+      </section>
+
+      <section data-testid="list">
+        <h2 class={styles.h2}>Lista</h2>
+        <div class={styles.stack}>
+          <div class={styles.photo}>
+            <RoundButton label="Volver">‹</RoundButton>
+          </div>
+          <PillButton icon={<SlidersIcon />} onClick={() => {}}>
+            Filtros
+          </PillButton>
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+            <ListRow
+              title="Fila de lista"
+              lines={['Volumen medio · Cuerpo completo · Gimnasio', '4 días · ~60 min · 10 semanas']}
+              eyebrow="Para tus días"
+              href="/dev/ui"
+              thumbBig="4"
+              thumbSmall="días"
+              trailing={
+                <RoundButton label="Guardar" variant="plain">
+                  <BookmarkIcon />
+                </RoundButton>
+              }
+            />
+          </ul>
+          <ChoiceChips
+            name="dev-chips"
+            legend="Etiquetas"
+            showLegend
+            value={chip}
+            onChange={setChip}
+            options={['Todos', 'Cuerpo completo', 'Torso y pierna', 'Empuje, tirón y pierna'].map((v) => ({
+              value: v,
+              label: v,
+            }))}
+          />
         </div>
       </section>
 
