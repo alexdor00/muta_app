@@ -24,6 +24,11 @@ import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
 import { openRoutine, setPriorities, setWeakPoints } from '../../use-cases/routineDetail.ts'
 import styles from './RutinaScreen.module.css'
 
+const restLabel = (cycle: { sessions: number; rests: number; rotating: boolean }) =>
+  cycle.rotating
+    ? `${cycle.rests} de cada ${cycle.sessions + cycle.rests} días`
+    : `${cycle.rests} ${cycle.rests === 1 ? 'día' : 'días'} por semana`
+
 const STATUS = { added: 'Añadido', removed: 'Quitado', changed: 'Ajustado', same: null } as const
 const NO_PRIORITY: PriorityChoice = { priorities: [], optionals: {} }
 
@@ -167,6 +172,7 @@ export function RutinaScreen(props: { id: string }) {
           : 'Se repite sin fecha de fin',
     ],
     ['Reparto', info.splitLabel],
+    ...(info.cycle.rests > 0 ? ([['Descanso', restLabel(info.cycle)]] as [string, string][]) : []),
     ['Volumen', `${info.volume[0].toUpperCase()}${info.volume.slice(1)}`],
     ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
     ...(about?.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),
@@ -264,7 +270,7 @@ export function RutinaScreen(props: { id: string }) {
                             {STATUS[e.status] && <span class={styles.tag}>{STATUS[e.status]}</span>}
                           </span>
                           <span class={styles.exMeta}>
-                            {[e.prescription, e.effort, e.rest].filter(Boolean).join(' · ')}
+                            {[e.prescription, e.effort].filter(Boolean).join(' · ')}
                             {e.before && <span class={styles.before}> (antes: {e.before})</span>}
                           </span>
                         </>

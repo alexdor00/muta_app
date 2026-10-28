@@ -173,12 +173,21 @@ export function phasesView(program: Program): PhaseView[] {
   }))
 }
 
-/** «Obligatorio: 1-2 días de descanso» → «Descanso · 1–2 días»; «Optional…» → «Descanso opcional». */
+/**
+ * Lo que dice el archivo, en lenguaje claro: «Obligatorio: 1-2 días de descanso» → «Descanso obligatorio · 1–2 días»;
+ * «Sugerido: …» → «Descanso sugerido»; «Optional…» → «Descanso opcional».
+ */
 export function restNote(note?: string): string {
   if (!note) return 'Descanso'
-  if (/optional|opcional/i.test(note)) return 'Descanso opcional'
+  const kind = /optional|opcional/i.test(note)
+    ? ' opcional'
+    : /obligatorio/i.test(note)
+      ? ' obligatorio'
+      : /sugerido/i.test(note)
+        ? ' sugerido'
+        : ''
   const range = note.match(/(\d)\s*-\s*(\d)/)
-  return range ? `Descanso · ${range[1]}–${range[2]} días` : 'Descanso'
+  return `Descanso${kind}${range ? ` · ${range[1]}–${range[2]} días` : ''}`
 }
 
 export type VolumeChange = { muscle: string; before: number; after: number }

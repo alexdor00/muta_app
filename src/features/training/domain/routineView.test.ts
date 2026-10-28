@@ -75,7 +75,10 @@ describe('filtros', () => {
 
 describe('detalle', () => {
   it('descansos en lenguaje claro', () => {
-    expect(restNote('Obligatorio: 1-2 días de descanso')).toBe('Descanso · 1–2 días')
+    expect(restNote('Obligatorio: 1-2 días de descanso')).toBe('Descanso obligatorio · 1–2 días')
+    expect(restNote('Sugerido: 2-3 días de descanso')).toBe('Descanso sugerido · 2–3 días')
+    expect(restNote('Sugerido: días de descanso')).toBe('Descanso sugerido')
+    expect(restNote('días de descanso')).toBe('Descanso')
     expect(restNote('Optional días de descanso')).toBe('Descanso opcional')
   })
 
@@ -115,7 +118,10 @@ describe('detalle', () => {
     expect(adapted.changes[0]).toMatchObject({ muscle: 'Pecho', before: 12 })
     const session = adapted.phases[0].weeks[0].days[0]
     expect(session.type === 'session' && session.exercises.some((e) => e.status === 'changed')).toBe(true)
-    expect(adapted.phases[0].weeks[0].days[1]).toEqual({ type: 'rest', note: 'Descanso · 1–2 días' })
+    expect(adapted.phases[0].weeks[0].days[1]).toEqual({
+      type: 'rest',
+      note: 'Descanso · 1–2 días',
+    })
   })
 })
 
