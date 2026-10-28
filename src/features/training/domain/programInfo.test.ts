@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { categorize } from './categories.ts'
 import {
   equipmentOf,
-  infoOf,
   restMinutes,
   selectVariant,
   sessionMinutes,
@@ -87,82 +85,25 @@ describe('hechos de una rutina', () => {
 })
 
 describe('tipos de entrenamiento', () => {
-  const gymHyp = program(
-    {
-      name: 'Cuerpo completo #1',
-      exercises: [ex('Barbell Bench Press', 3), ex('Lat Pulldown', 3), ex('Leg Press', 3)],
-    },
-    {
-      name: 'Cuerpo completo #2',
-      exercises: [ex('Incline DB Press', 3), ex('Seated Cable Row', 3), ex('Hack Squat', 3)],
-    },
-  )
-
-  it('hipertrofia: gimnasio, sin porcentajes ni especialización', () => {
-    expect(categorize(infoOf(gymHyp, 2))).toEqual(['hipertrofia'])
-  })
-
-  it('fuerza: al menos un 12 % de las series por %1RM', () => {
-    const strong = program({
-      name: 'Cuerpo completo #1',
-      exercises: [ex('Back Squat', 4, { percent1RM: '75 %' }), ex('Lat Pulldown', 3), ex('Leg Press', 3)],
-    })
-    expect(categorize(infoOf(strong, 3))).toContain('fuerza')
-  })
-
-  it('la intención del original manda sobre la medida del %1RM', () => {
-    const strong = program({
-      name: 'Cuerpo completo #1',
-      exercises: [ex('Back Squat', 4, { percent1RM: '75 %' }), ex('Lat Pulldown', 3), ex('Leg Press', 3)],
-    })
-    expect(categorize(infoOf(strong, 3), { intent: 'hypertrophy' })).toEqual(['hipertrofia'])
-    const diluted = program({
-      name: 'Cuerpo completo #1',
-      exercises: [ex('Lat Pulldown', 4), ex('Leg Press', 3)],
-    })
-    expect(categorize(infoOf(diluted, 3), { intent: 'strength' })).toEqual(['fuerza'])
-  })
-
-  it('glúteo: también si lo es su etapa del programa', () => {
-    const p = program({ name: 'Torso #1', exercises: [ex('Lat Pulldown', 3), ex('Leg Press', 3)] })
-    expect(categorize(infoOf(p, 3), { gluteStage: true })).toEqual(['gluteo'])
-  })
-
-  it('minimalista: ≤ 2 series por ejercicio y ≤ 50 min', () => {
-    const minimal = program({
-      name: 'Cuerpo completo',
-      exercises: [ex('Hack Squat', 2), ex('Barbell Bench Press', 1)],
-    })
-    expect(categorize(infoOf(minimal, 2))).toEqual(['minimalista'])
-  })
-
-  it('en casa y primeros pasos (curada)', () => {
-    const home = program({ name: 'Sesión 1', exercises: [ex('Push-Up', 3), ex('Bodyweight Squat', 3)] })
-    expect(categorize(infoOf(home, 3), { foundation: true })).toEqual(['casa', 'primeros-pasos'])
-  })
-
-  it('glúteo y pierna: el glúteo es músculo prioritario', () => {
-    const glute = program(
-      {
-        name: 'Pierna #1',
-        exercises: [
-          ex('Barbell Hip Thrust', 4),
-          ex('Cable Glute Kickback', 4),
-          ex('Machine Hip Abduction', 4),
-        ],
-      },
-      { name: 'Pierna #2', exercises: [ex('Barbell Hip Thrust', 4), ex('Cable Pull-Through', 4)] },
-      { name: 'Torso #1', exercises: [ex('Lat Pulldown', 3), ex('Machine Chest Press', 3)] },
-    )
-    expect(categorize(infoOf(glute, 3))).toContain('gluteo')
+  it('cada rutina está en la familia de su programa original, y todas las familias tienen rutinas', async () => {
+    const { CATALOG } = await import('./catalog.ts')
+    const { CATEGORIES } = await import('./categories.ts')
+    const ids = new Set(CATEGORIES.map((c) => c.id))
+    expect(CATALOG.every((e) => ids.has(e.family))).toBe(true)
+    expect(CATEGORIES.every((c) => CATALOG.some((e) => e.family === c.id))).toBe(true)
+    // Las variantes de un mismo archivo van juntas
+    const bySource = new Map<string, Set<string>>()
+    for (const e of CATALOG)
+      bySource.set(e.source ?? e.id, (bySource.get(e.source ?? e.id) ?? new Set()).add(e.family))
+    expect([...bySource.values()].every((s) => s.size === 1)).toBe(true)
   })
 })
 
-describe('rutinas que no se adaptan', () => {
-  it('las minimalistas se usan tal cual', async () => {
+describe('rutinas que el coach no ajusta', () => {
+  it('las esenciales se usan tal cual', async () => {
     const { isAdaptable } = await import('./categories.ts')
-    expect(isAdaptable(['minimalista'])).toBe(false)
-    expect(isAdaptable(['hipertrofia'])).toBe(true)
-    expect(isAdaptable(['fuerza', 'gluteo'])).toBe(true)
+    expect(isAdaptable(['esencial'])).toBe(false)
+    expect(isAdaptable(['culturismo'])).toBe(true)
+    expect(isAdaptable(['fuerza'])).toBe(true)
   })
 })

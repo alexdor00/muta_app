@@ -4,8 +4,8 @@ import fs from 'node:fs'
 import { adaptToLevel, type SetsGoal } from '../src/features/training/domain/adaptVolume.ts'
 import { CATALOG, sourceOf, type Level } from '../src/features/training/domain/catalog.ts'
 import { MUSCLES, rangeFor } from '../src/features/training/domain/muscles.ts'
-import { categorize, isAdaptable } from '../src/features/training/domain/categories.ts'
-import { emphasisOf, infoOf, selectVariant } from '../src/features/training/domain/programInfo.ts'
+import { isAdaptable } from '../src/features/training/domain/categories.ts'
+import { emphasisOf, selectVariant } from '../src/features/training/domain/programInfo.ts'
 import { muscleOf } from '../src/features/training/domain/muscleOf.ts'
 import {
   levelFromSets,
@@ -26,9 +26,7 @@ for (const entry of CATALOG) {
   const program = selectVariant(JSON.parse(fs.readFileSync(file, 'utf8')), entry.variant)
   const days = Math.max(...entry.days)
   // Rutinas especiales (minimalistas): no se adaptan
-  if (
-    !isAdaptable(categorize(infoOf(program, days), { foundation: entry.foundation, intent: entry.intent }))
-  ) {
+  if (!isAdaptable([entry.family])) {
     console.log(`${entry.id}: especial, no se adapta`)
     continue
   }

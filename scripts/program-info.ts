@@ -1,8 +1,7 @@
 // Mide cada rutina del catálogo (con su variante) y guarda hechos y tipos en
 // src/shared/content/program-info.json. Uso: node scripts/program-info.ts
 import fs from 'node:fs'
-import { CATALOG, sourceOf, type CatalogEntry } from '../src/features/training/domain/catalog.ts'
-import { categorize } from '../src/features/training/domain/categories.ts'
+import { CATALOG, sourceOf } from '../src/features/training/domain/catalog.ts'
 import { MUSCLES } from '../src/features/training/domain/muscles.ts'
 import { infoOf, selectVariant, type ProgramInfo } from '../src/features/training/domain/programInfo.ts'
 
@@ -17,20 +16,12 @@ for (const entry of CATALOG) {
   measured.set(entry.id, infoOf(program, Math.max(...entry.days)))
 }
 
-// Etapa de un programa: mismo archivo y mismos bloques (p. ej. torso-pierna y cuerpo completo de la
-// etapa 2 de En casa). Si el glúteo es prioridad en una, lo es en toda la etapa.
-const stage = (e: CatalogEntry) => `${sourceOf(e)}|${e.variant?.blocks?.join(',') ?? '*'}`
-const gluteStages = new Set(CATALOG.filter((e) => measured.get(e.id)?.emphasis.includes('gluteo')).map(stage))
-
 const out: Record<string, unknown> = {}
 for (const entry of CATALOG) {
   const info = measured.get(entry.id)
   if (!info) continue
-  const categories = categorize(info, {
-    foundation: entry.foundation,
-    intent: entry.intent,
-    gluteStage: gluteStages.has(stage(entry)),
-  })
+  // La categoría es la familia del programa original (catalog.ts)
+  const categories = [entry.family]
   out[entry.id] = { ...info, categories }
   const cyc = info.cycle.rotating
     ? `rota ${info.cycle.sessions} ses.`

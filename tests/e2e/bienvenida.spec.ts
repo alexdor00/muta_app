@@ -55,10 +55,10 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   // Tipo de entrenamiento: cabecera con foto, número de rutinas, filtros y lista
   await page
     .getByRole('region', { name: 'Tipos de entrenamiento' })
-    .getByRole('button', { name: /Hipertrofia/ })
+    .getByRole('button', { name: /^MUTA/ })
     .click()
-  await expect(page).toHaveURL('/entreno/rutinas/hipertrofia')
-  await expect(page.getByRole('heading', { name: 'Hipertrofia', level: 1 })).toBeVisible()
+  await expect(page).toHaveURL('/entreno/rutinas/muta')
+  await expect(page.getByRole('heading', { name: 'MUTA', level: 1 })).toBeVisible()
   await expect(page.getByText('2 rutinas')).toBeVisible()
   await capture(page, 'categoria')
   await page.getByRole('button', { name: 'Filtros' }).first().click()

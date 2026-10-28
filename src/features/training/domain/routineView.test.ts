@@ -3,7 +3,7 @@ import type { CatalogEntry } from './catalog.ts'
 import type { ProgramInfo } from './programInfo.ts'
 import { activeFilters, durationOf, matches, metaLines, restNote, routineView } from './routineView.ts'
 
-const entry: CatalogEntry = { id: 'x', title: 'X', days: [4], tone: 1, origin: 'muta' }
+const entry: CatalogEntry = { id: 'x', title: 'X', days: [4], tone: 1, origin: 'muta', family: 'muta' }
 const info = (over: Partial<ProgramInfo> = {}): ProgramInfo => ({
   sets: {},
   volume: 'medio',

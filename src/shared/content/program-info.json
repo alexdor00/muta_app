@@ -33,7 +33,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["hipertrofia"]
+    "categories": ["muta"]
   },
   "muta-ppl-6d": {
     "sets": {
@@ -69,7 +69,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["hipertrofia"]
+    "categories": ["muta"]
   },
   "esencial-45min-2d": {
     "sets": {
@@ -101,7 +101,7 @@
       "rotating": false,
       "restNotes": ["Sugerido: 2-3 días de descanso"]
     },
-    "categories": ["minimalista"]
+    "categories": ["esencial"]
   },
   "esencial-45min-3d": {
     "sets": {
@@ -134,7 +134,7 @@
       "rotating": false,
       "restNotes": ["Sugerido: 1-2 días de descanso"]
     },
-    "categories": ["minimalista"]
+    "categories": ["esencial"]
   },
   "esencial-45min-4d": {
     "sets": {
@@ -167,7 +167,7 @@
       "rotating": false,
       "restNotes": ["Sugerido: 1-2 días de descanso"]
     },
-    "categories": ["minimalista"]
+    "categories": ["esencial"]
   },
   "esencial-45min-5d": {
     "sets": {
@@ -201,7 +201,7 @@
       "rotating": false,
       "restNotes": ["Sugerido: días de descanso"]
     },
-    "categories": ["minimalista"]
+    "categories": ["esencial"]
   },
   "hipertrofia-cuerpo-completo-5d-f1": {
     "sets": {
@@ -237,7 +237,7 @@
       "rotating": false,
       "restNotes": ["Obligatorio: días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["culturismo"]
   },
   "hipertrofia-torso-pierna-f1": {
     "sets": {
@@ -272,7 +272,7 @@
       "rotating": false,
       "restNotes": ["Optional días de descanso", "Obligatorio: días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["culturismo"]
   },
   "hipertrofia-ppl-6d-f1": {
     "sets": {
@@ -308,7 +308,7 @@
       "rotating": true,
       "restNotes": ["Optional días de descanso", "Obligatorio: días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["culturismo"]
   },
   "hipertrofia-cuerpo-completo-5d-f2": {
     "sets": {
@@ -344,7 +344,7 @@
       "rotating": false,
       "restNotes": ["días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["culturismo"]
   },
   "hipertrofia-torso-pierna-f2": {
     "sets": {
@@ -379,7 +379,7 @@
       "rotating": false,
       "restNotes": ["días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["culturismo"]
   },
   "hipertrofia-ppl-6d-f2": {
     "sets": {
@@ -415,7 +415,7 @@
       "rotating": true,
       "restNotes": ["días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["culturismo"]
   },
   "frecuencia-alta-cuerpo-completo-4d": {
     "sets": {
@@ -450,7 +450,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["hipertrofia"]
+    "categories": ["frecuencia-alta"]
   },
   "frecuencia-alta-cuerpo-completo-5d": {
     "sets": {
@@ -485,7 +485,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["hipertrofia"]
+    "categories": ["frecuencia-alta"]
   },
   "fuerza-hipertrofia-1-6d": {
     "sets": {
@@ -521,7 +521,7 @@
       "rotating": false,
       "restNotes": ["Sugerido: días de descanso"]
     },
-    "categories": ["fuerza"]
+    "categories": ["fuerza-hipertrofia"]
   },
   "fuerza-hipertrofia-2-4d": {
     "sets": {
@@ -555,7 +555,7 @@
       "rotating": false,
       "restNotes": ["días de descanso (1-2 DAYS OFF DEPENDING ON YOUR SCHEDULE)"]
     },
-    "categories": ["fuerza"]
+    "categories": ["fuerza-hipertrofia"]
   },
   "fuerza-hipertrofia-2-6d": {
     "sets": {
@@ -590,7 +590,7 @@
       "rotating": false,
       "restNotes": ["días de descanso"]
     },
-    "categories": ["fuerza"]
+    "categories": ["fuerza-hipertrofia"]
   },
   "fuerza-hipertrofia-3-5d": {
     "sets": {
@@ -624,7 +624,7 @@
       "rotating": false,
       "restNotes": ["días de descanso"]
     },
-    "categories": ["fuerza"]
+    "categories": ["fuerza-hipertrofia"]
   },
   "especializacion-sentadilla": {
     "sets": {
@@ -663,7 +663,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["fuerza", "gluteo"]
+    "categories": ["fuerza"]
   },
   "especializacion-banca": {
     "sets": {
@@ -736,7 +736,7 @@
       "rotating": false,
       "restNotes": ["Obligatorio: 1-2 días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["ppl"]
   },
   "ppl-completo-5d": {
     "sets": {
@@ -775,7 +775,7 @@
       "rotating": false,
       "restNotes": ["Optional días de descanso", "Obligatorio: 1-2 días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["ppl"]
   },
   "ppl-completo-6d": {
     "sets": {
@@ -814,7 +814,7 @@
       "rotating": false,
       "restNotes": ["Obligatorio: días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["ppl"]
   },
   "ppl-5d-editado": {
     "sets": {
@@ -849,7 +849,7 @@
       "rotating": false,
       "restNotes": ["Obligatorio: 1-2 días de descanso"]
     },
-    "categories": ["hipertrofia"]
+    "categories": ["ppl"]
   },
   "base-3d": {
     "sets": {
@@ -883,7 +883,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["primeros-pasos", "gluteo"]
+    "categories": ["mujer"]
   },
   "base-4d": {
     "sets": {
@@ -917,7 +917,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["primeros-pasos", "gluteo"]
+    "categories": ["mujer"]
   },
   "base-5d": {
     "sets": {
@@ -951,7 +951,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["primeros-pasos", "gluteo"]
+    "categories": ["mujer"]
   },
   "casa-peso-corporal": {
     "sets": {
@@ -979,7 +979,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["casa", "primeros-pasos"]
+    "categories": ["mujer"]
   },
   "casa-mancuernas": {
     "sets": {
@@ -1012,7 +1012,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["casa"]
+    "categories": ["mujer"]
   },
   "casa-torso-pierna-1": {
     "sets": {
@@ -1046,7 +1046,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["casa", "gluteo"]
+    "categories": ["mujer"]
   },
   "casa-cuerpo-completo-1": {
     "sets": {
@@ -1080,7 +1080,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["casa", "gluteo"]
+    "categories": ["mujer"]
   },
   "casa-torso-pierna-2": {
     "sets": {
@@ -1115,7 +1115,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["casa", "gluteo"]
+    "categories": ["mujer"]
   },
   "casa-cuerpo-completo-2": {
     "sets": {
@@ -1149,7 +1149,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["casa", "gluteo"]
+    "categories": ["mujer"]
   },
   "gluteos": {
     "sets": {
@@ -1181,7 +1181,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["gluteo"]
+    "categories": ["mujer"]
   },
   "mujer-especializacion": {
     "sets": {
@@ -1216,7 +1216,7 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["gluteo"]
+    "categories": ["mujer"]
   },
   "mujer-optimizacion": {
     "sets": {
@@ -1250,6 +1250,6 @@
       "rotating": false,
       "restNotes": []
     },
-    "categories": ["fuerza", "gluteo"]
+    "categories": ["mujer"]
   }
 }

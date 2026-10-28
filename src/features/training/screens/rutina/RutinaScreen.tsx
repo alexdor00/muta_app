@@ -37,7 +37,7 @@ export function RutinaScreen(props: { id: string }) {
 
   const { item, phases } = state
   const { entry, info } = item
-  const back = paths.routineCategory(item.categories[0] ?? 'hipertrofia')
+  const back = paths.routineCategory(item.categories[0] ?? 'muta')
   const currentPhase = phases[Math.min(phase, phases.length - 1)]
   const currentWeek = currentPhase.weeks[Math.min(week, currentPhase.weeks.length - 1)]
 
