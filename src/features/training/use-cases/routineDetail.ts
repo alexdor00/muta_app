@@ -2,7 +2,18 @@ import { getDb } from '../../../shared/data/db.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import cuerpoCompleto from '../../../shared/content/programs/muta-cuerpo-completo-4d.json'
 import ppl from '../../../shared/content/programs/muta-ppl-6d.json'
-import { CATALOG, sourceOf } from '../domain/catalog.ts'
+import { CATALOG, sourceOf, type Level } from '../domain/catalog.ts'
+import {
+  applyPriorities,
+  hasPriorities,
+  isIncluded,
+  MAX_PRIORITIES,
+  musclesOf,
+  optionalsOf,
+  prioritySummary,
+  reasonOf,
+  type PriorityChoice,
+} from '../domain/priorities.ts'
 import { selectVariant, type ProgramData } from '../domain/programInfo.ts'
 import { metaLines, phasesView } from '../domain/routineView.ts'
 import {
@@ -15,36 +26,68 @@ import {
   type WeakNeeds,
   type WeakTable,
 } from '../domain/weakPoints.ts'
-import { routineDetail, routines, type RoutineItem, type WeakView } from '../state/routines.ts'
+import {
+  routineDetail,
+  routines,
+  type PriorityView,
+  type RoutineItem,
+  type WeakView,
+} from '../state/routines.ts'
 import { INFO, loadRoutines } from './loadRoutines.ts'
 
 /** Programas propios de MUTA: van en el código. */
 export const BUILT_IN: Record<string, unknown> = { [cuerpoCompleto.id]: cuerpoCompleto, [ppl.id]: ppl }
 
 type Program = ProgramData & { weakPoints?: WeakTable }
-let open: { item: RoutineItem; program: Program; table: WeakTable | null; needs: WeakNeeds } | null = null
+let open: {
+  item: RoutineItem
+  program: Program
+  table: WeakTable | null
+  needs: WeakNeeds
+  level: Level
+  canPrioritize: boolean
+} | null = null
+let weakChoice: WeakChoice | null = null
+let priorityChoice: PriorityChoice | null = null
 
-function show(choice: WeakChoice | null) {
+/** Calcula lo que se ve con las elecciones de ahora: prioridades primero (quitan opcionales), luego el punto débil. */
+function show() {
   if (!open) return
-  const { item, program, table, needs } = open
+  const { item, program, table, needs, level, canPrioritize } = open
   const weak: WeakView | null = table
     ? {
         table,
-        choice,
+        choice: weakChoice,
         needs,
         required: table.mode === 'pick' || !needs.e1Optional,
-        complete: isComplete(table, choice, needs),
-        summary: weakSummary(table, choice),
+        complete: isComplete(table, weakChoice, needs),
+        summary: weakSummary(table, weakChoice),
       }
     : null
-  const shown = table ? applyWeakPoints(program as never, table, choice) : program
-  routineDetail.value = { status: 'ready', item, phases: phasesView(shown as never), weak }
+  const priorities: PriorityView | null = canPrioritize
+    ? {
+        muscles: musclesOf(program as never),
+        optionals: optionalsOf(program as never).map((o) => ({
+          ...o,
+          included: isIncluded(o, priorityChoice, level),
+          reason: reasonOf(o.muscle),
+        })),
+        choice: priorityChoice,
+        max: MAX_PRIORITIES,
+        summary: prioritySummary(priorityChoice),
+      }
+    : null
+  let shown: Program = canPrioritize ? applyPriorities(program as never, priorityChoice, level) : program
+  if (table) shown = applyWeakPoints(shown as never, table, weakChoice) as Program
+  routineDetail.value = { status: 'ready', item, phases: phasesView(shown as never), weak, priorities }
 }
 
 /** Abre una rutina: carga su programa (propio o local) y la enseña tal cual está diseñada. */
 export async function openRoutine(id: string): Promise<void> {
   routineDetail.value = { status: 'loading' }
   open = null
+  weakChoice = null
+  priorityChoice = null
   try {
     if (routines.value.status !== 'ready') await loadRoutines()
     const state = routines.value
@@ -75,12 +118,17 @@ export async function openRoutine(id: string): Promise<void> {
       program,
       table: hasWeakPoints(program) ? program.weakPoints! : null,
       needs: weakNeeds(program),
+      level: state.profile?.level ?? 'intermediate',
+      canPrioritize: hasPriorities(program as never),
     }
     // Si ya empezaste esta rutina, vuelve lo que elegiste
-    const plan = await db.get('plans', 'current')
-    const saved =
-      plan?.programId === id ? ((plan as { weakPoints?: WeakChoice | null }).weakPoints ?? null) : null
-    show(saved)
+    const plan = (await db.get('plans', 'current')) as
+      { programId?: string; weakPoints?: WeakChoice | null; priorities?: PriorityChoice | null } | undefined
+    if (plan?.programId === id) {
+      weakChoice = plan.weakPoints ?? null
+      priorityChoice = plan.priorities ?? null
+    }
+    show()
   } catch (error) {
     logError(error, 'abrir rutina')
     routineDetail.value = { status: 'missing' }
@@ -89,5 +137,12 @@ export async function openRoutine(id: string): Promise<void> {
 
 /** Guarda lo que eliges en el selector de punto débil y recalcula lo que ves. */
 export function setWeakPoints(choice: WeakChoice | null): void {
-  show(choice)
+  weakChoice = choice
+  show()
+}
+
+/** Guarda tus prioridades y los opcionales que decides a mano, y recalcula lo que ves. */
+export function setPriorities(choice: PriorityChoice | null): void {
+  priorityChoice = choice
+  show()
 }

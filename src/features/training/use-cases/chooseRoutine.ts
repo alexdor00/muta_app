@@ -1,6 +1,6 @@
 import { getDb, runTx } from '../../../shared/data/db.ts'
 import { CATALOG, sourceOf } from '../domain/catalog.ts'
-import type { Adaptation } from '../domain/routineView.ts'
+import type { PriorityChoice } from '../domain/priorities.ts'
 import type { WeakChoice } from '../domain/weakPoints.ts'
 import { BUILT_IN } from './routineDetail.ts'
 
@@ -10,8 +10,7 @@ import { BUILT_IN } from './routineDetail.ts'
  */
 export async function chooseRoutine(
   programId: string,
-  adaptation: Adaptation | null = null,
-  weakPoints: WeakChoice | null = null,
+  choices: { weakPoints?: WeakChoice | null; priorities?: PriorityChoice | null } = {},
   now = new Date(),
 ): Promise<void> {
   const entry = CATALOG.find((e) => e.id === programId)
@@ -25,8 +24,9 @@ export async function chooseRoutine(
       programId,
       source,
       variant: entry?.variant ?? null,
-      adaptation,
-      weakPoints,
+      adaptation: null,
+      weakPoints: choices.weakPoints ?? null,
+      priorities: choices.priorities ?? null,
       chosenAt: now.toISOString(),
     })
   })

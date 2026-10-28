@@ -3,6 +3,7 @@ import type { CatalogEntry, Level, Phase } from '../domain/catalog.ts'
 import type { Category, CategoryId } from '../domain/categories.ts'
 import type { ProgramInfo } from '../domain/programInfo.ts'
 import type { Adaptation, PhaseView } from '../domain/routineView.ts'
+import type { OptionalExercise, PriorityChoice } from '../domain/priorities.ts'
 import type { WeakChoice, WeakNeeds, WeakTable } from '../domain/weakPoints.ts'
 
 /** Una rutina lista para enseñar. */
@@ -45,7 +46,17 @@ export type DetailState =
       /** La rutina tal cual: el volumen solo lo ajustará el coach según cómo respondas. */
       phases: PhaseView[]
       weak: WeakView | null
+      priorities: PriorityView | null
     }
+
+/** Prioridades de una rutina de MUTA: músculos, ejercicios opcionales y lo elegido. */
+export type PriorityView = {
+  muscles: string[]
+  optionals: (OptionalExercise & { included: boolean; reason: string | null })[]
+  choice: PriorityChoice | null
+  max: number
+  summary: string[]
+}
 
 /** Punto débil de una rutina: la tabla, lo elegido y si falta algo obligatorio. */
 export type WeakView = {
@@ -65,6 +76,8 @@ export const routineDetail = signal<DetailState>({ status: 'loading' })
 export { CATEGORIES } from '../domain/categories.ts'
 export { aboutOf, type About } from '../domain/about.ts'
 export type { WeakChoice, WeakNeeds, WeakTable } from '../domain/weakPoints.ts'
+export type { PriorityChoice } from '../domain/priorities.ts'
+export { MAX_PRIORITIES } from '../domain/priorities.ts'
 export type { Adaptation, Category, CategoryId, CatalogEntry, Level, PhaseView }
 export { activeFilters, matches, type Filters } from '../domain/routineView.ts'
 export { SPLIT_LABEL, type Split, type VolumeTier } from '../domain/programInfo.ts'

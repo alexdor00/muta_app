@@ -11,10 +11,11 @@ import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { RoutineAbout } from '../../components/RoutineAbout.tsx'
+import { PriorityPicker } from '../../components/PriorityPicker.tsx'
 import { WeakPointPicker } from '../../components/WeakPointPicker.tsx'
 import { aboutOf, CATEGORIES, routineDetail } from '../../state/routines.ts'
 import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
-import { openRoutine, setWeakPoints } from '../../use-cases/routineDetail.ts'
+import { openRoutine, setPriorities, setWeakPoints } from '../../use-cases/routineDetail.ts'
 import styles from './RutinaScreen.module.css'
 
 const STATUS = { added: 'Añadido', removed: 'Quitado', changed: 'Ajustado', same: null } as const
@@ -29,6 +30,7 @@ export function RutinaScreen(props: { id: string }) {
   const [week, setWeek] = useState(0)
   const infoSheet = useSheet('info')
   const weakSheet = useSheet('punto-debil')
+  const priorSheet = useSheet('prioridades')
   useEffect(() => void openRoutine(props.id), [props.id])
   const state = routineDetail.value
 
@@ -43,7 +45,7 @@ export function RutinaScreen(props: { id: string }) {
     )
   }
 
-  const { item, phases, weak } = state
+  const { item, phases, weak, priorities } = state
   const { entry, info } = item
   const back = paths.routineCategory(item.categories[0] ?? 'muta')
   const about = aboutOf(entry)
@@ -56,7 +58,10 @@ export function RutinaScreen(props: { id: string }) {
   async function start() {
     if (pending) return weakSheet.show()
     try {
-      await chooseRoutine(entry.id, null, weak?.choice ?? null)
+      await chooseRoutine(entry.id, {
+        weakPoints: weak?.choice ?? null,
+        priorities: priorities?.choice ?? null,
+      })
       route(paths.training)
     } catch (error) {
       logError(error, 'empezar rutina')
@@ -161,6 +166,45 @@ export function RutinaScreen(props: { id: string }) {
             choice={weak.choice}
             e1Optional={weak.needs.e1Optional}
             onChange={setWeakPoints}
+          />
+        </Sheet>
+      )}
+
+      {priorities && (
+        <section class={styles.weak} aria-label="Prioridades">
+          <div class={styles.weakHead}>
+            <h2 class={styles.h2}>Tus prioridades</h2>
+            <span class={styles.tag}>Opcional</span>
+          </div>
+          {priorities.summary.length ? (
+            <ul class={styles.summary}>
+              {priorities.summary.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : (
+            <p class={styles.text}>
+              Elige hasta {priorities.max} músculos que quieras mejorar más y qué ejercicios opcionales
+              quieres hacer. Sin elegir, sigo las reglas de tu nivel.
+            </p>
+          )}
+          <Button variant="secondary" onClick={priorSheet.show}>
+            {priorities.choice ? 'Cambiar mis prioridades' : 'Elegir mis prioridades'}
+          </Button>
+        </section>
+      )}
+      {priorSheet.open && priorities && (
+        <Sheet
+          title="Tus prioridades"
+          onClose={priorSheet.close}
+          footer={<Button onClick={priorSheet.close}>Listo</Button>}
+        >
+          <PriorityPicker
+            muscles={priorities.muscles}
+            optionals={priorities.optionals}
+            choice={priorities.choice}
+            max={priorities.max}
+            onChange={setPriorities}
           />
         </Sheet>
       )}
