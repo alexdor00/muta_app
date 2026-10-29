@@ -16,6 +16,8 @@ import {
   aboutOf,
   CATEGORIES,
   restFact,
+  weeksDiffer,
+  withSuggestedRests,
   routineDetail,
   type PriorityChoice,
   type Slot,
@@ -176,6 +178,83 @@ export function RutinaScreen(props: { id: string }) {
     ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
     ...(about?.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),
   ]
+  type Days = typeof currentWeek.days
+  const renderDays = (days: Days, wk: number) => (
+    <ol class={styles.days}>
+      {days.map((day, i) =>
+        day.type === 'rest' ? (
+          <li key={`d${i}`} class={styles.rest}>
+            {day.note}
+          </li>
+        ) : (
+          <li key={`s${i}`} class={styles.session}>
+            <details open={day.exercises.some((e) => e.slot)}>
+              <summary class={styles.summary}>
+                <span class={styles.sessionName}>{day.name}</span>
+                <span class={styles.sessionMeta}>
+                  {day.exercises.filter((e) => e.status !== 'removed').length} ejercicios · ~{day.minutes} min
+                </span>
+              </summary>
+              <ul class={styles.exercises}>
+                {day.exercises.map((e, j) => {
+                  const id = `${phase}-${wk}-${i}-${j}`
+                  const panel = e.slot ? panelFor(e.slot, id) : null
+                  const body = (
+                    <>
+                      <span class={styles.exName}>
+                        {e.name}
+                        {STATUS[e.status] && <span class={styles.tag}>{STATUS[e.status]}</span>}
+                      </span>
+                      <span class={styles.exMeta}>
+                        {[e.prescription, e.effort].filter(Boolean).join(' · ')}
+                        {e.before && <span class={styles.before}> (antes: {e.before})</span>}
+                      </span>
+                    </>
+                  )
+                  if (!panel && !e.tip) {
+                    return (
+                      <li
+                        key={j}
+                        class={`${styles.exercise} ${e.status === 'removed' ? styles.removed : ''}`}
+                      >
+                        {body}
+                      </li>
+                    )
+                  }
+                  return (
+                    <li
+                      key={j}
+                      class={`${styles.exercise} ${styles.slotItem} ${e.status === 'removed' ? styles.removed : ''} ${open === id ? styles.open : ''}`}
+                    >
+                      <button
+                        type="button"
+                        class={styles.slotRow}
+                        aria-expanded={open === id}
+                        onClick={() => toggle(id)}
+                      >
+                        <span class={styles.slotText}>{body}</span>
+                        <span class={styles.chevron}>
+                          <ChevronDownIcon />
+                        </span>
+                      </button>
+                      {open === id && (
+                        <div class={styles.slotPanel}>
+                          {panel && <SlotPanel {...panel} />}
+                          {e.tip && <p class={styles.tipText}>{e.tip}</p>}
+                        </div>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </details>
+          </li>
+        ),
+      )}
+    </ol>
+  )
+  const differ = currentPhase.weeks.length > 1 && weeksDiffer(currentPhase.weeks)
+
   return (
     <div class={styles.page}>
       <CompactBar title={entry.title} backHref={back} watch={hero} />
@@ -230,7 +309,7 @@ export function RutinaScreen(props: { id: string }) {
             }}
           />
         )}
-        {currentPhase.weeks.length > 1 && (
+        {currentPhase.weeks.length > 1 && !differ && (
           <div class={styles.weeks}>
             <ChoiceChips
               name="semana"
@@ -242,79 +321,18 @@ export function RutinaScreen(props: { id: string }) {
           </div>
         )}
 
-        <ol class={styles.days}>
-          {currentWeek.days.map((day, i) =>
-            day.type === 'rest' ? (
-              <li key={`d${i}`} class={styles.rest}>
-                {day.note}
-              </li>
-            ) : (
-              <li key={`s${i}`} class={styles.session}>
-                <details open={day.exercises.some((e) => e.slot)}>
-                  <summary class={styles.summary}>
-                    <span class={styles.sessionName}>{day.name}</span>
-                    <span class={styles.sessionMeta}>
-                      {day.exercises.filter((e) => e.status !== 'removed').length} ejercicios · ~{day.minutes}{' '}
-                      min
-                    </span>
-                  </summary>
-                  <ul class={styles.exercises}>
-                    {day.exercises.map((e, j) => {
-                      const id = `${phase}-${week}-${i}-${j}`
-                      const panel = e.slot ? panelFor(e.slot, id) : null
-                      const body = (
-                        <>
-                          <span class={styles.exName}>
-                            {e.name}
-                            {STATUS[e.status] && <span class={styles.tag}>{STATUS[e.status]}</span>}
-                          </span>
-                          <span class={styles.exMeta}>
-                            {[e.prescription, e.effort].filter(Boolean).join(' · ')}
-                            {e.before && <span class={styles.before}> (antes: {e.before})</span>}
-                          </span>
-                        </>
-                      )
-                      if (!panel && !e.tip) {
-                        return (
-                          <li
-                            key={j}
-                            class={`${styles.exercise} ${e.status === 'removed' ? styles.removed : ''}`}
-                          >
-                            {body}
-                          </li>
-                        )
-                      }
-                      return (
-                        <li
-                          key={j}
-                          class={`${styles.exercise} ${styles.slotItem} ${e.status === 'removed' ? styles.removed : ''} ${open === id ? styles.open : ''}`}
-                        >
-                          <button
-                            type="button"
-                            class={styles.slotRow}
-                            aria-expanded={open === id}
-                            onClick={() => toggle(id)}
-                          >
-                            <span class={styles.slotText}>{body}</span>
-                            <span class={styles.chevron}>
-                              <ChevronDownIcon />
-                            </span>
-                          </button>
-                          {open === id && (
-                            <div class={styles.slotPanel}>
-                              {panel && <SlotPanel {...panel} />}
-                              {e.tip && <p class={styles.tipText}>{e.tip}</p>}
-                            </div>
-                          )}
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </details>
-              </li>
-            ),
-          )}
-        </ol>
+        {differ ? (
+          <div class={styles.weekList}>
+            {currentPhase.weeks.map((w, wi) => (
+              <details key={w.week} class={styles.week} open={wi === 0}>
+                <summary class={styles.weekTitle}>Semana {w.week}</summary>
+                {renderDays(withSuggestedRests(w.days, entry.id), wi)}
+              </details>
+            ))}
+          </div>
+        ) : (
+          renderDays(withSuggestedRests(currentWeek.days, entry.id), week)
+        )}
       </section>
 
       <div class={styles.footer}>

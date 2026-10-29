@@ -7,6 +7,8 @@ import {
   matches,
   metaLines,
   restFact,
+  weeksDiffer,
+  withSuggestedRests,
   restNote,
   rirLabel,
   routineView,
@@ -144,11 +146,43 @@ describe('días de descanso en todas las rutinas', () => {
     expect(restFact('x', { sessions: 8, rests: 4, rotating: true })).toBe('4 de cada 12 días')
     expect(restFact('x', { sessions: 4, rests: 0, rotating: false })).toBe('La rutina no los indica')
     expect(restFact('x', { sessions: 4, rests: 0, rotating: false }, null, ['Torso', 'Pierna'])).toBe(
-      'Sugerido (la rutina no los indica): Torso, Pierna y descanso',
+      'Sugerido: la rutina no los indica',
     )
     expect(restFact('x', { sessions: 4, rests: 0, rotating: false }, 'Día 7: descanso')).toBe(
       'Día 7: descanso',
     )
     expect(restFact('muta-ppl-6d', { sessions: 6, rests: 0, rotating: true })).toContain('ciclo de 8 días')
+  })
+})
+
+describe('filas de descanso y semanas plegables', () => {
+  const ses = (name: string) => ({ type: 'session' as const, name, minutes: 50, exercises: [] })
+  const rest = { type: 'rest' as const, note: 'Descanso sugerido' }
+  it('sin descansos en el archivo, sugiere uno al acabar el ciclo', () => {
+    expect(withSuggestedRests([ses('Torso'), ses('Pierna')], 'x')).toEqual([
+      ses('Torso'),
+      ses('Pierna'),
+      rest,
+    ])
+    const own = [ses('Torso'), { type: 'rest' as const, note: 'Descanso · 1–2 días' }]
+    expect(withSuggestedRests(own, 'x')).toBe(own)
+  })
+
+  it('MUTA cuerpo completo: tras B1 y tras B2', () => {
+    const days = ['A1', 'B1', 'A2', 'B2'].map(ses)
+    expect(withSuggestedRests(days, 'muta-cuerpo-completo-4d').map((d) => d.type)).toEqual([
+      'session',
+      'session',
+      'rest',
+      'session',
+      'session',
+      'rest',
+    ])
+  })
+
+  it('las semanas son distintas si cambia algo de sus días', () => {
+    const w = (n: number, name: string) => ({ week: n, days: [ses(name)] })
+    expect(weeksDiffer([w(1, 'A'), w(2, 'A')])).toBe(false)
+    expect(weeksDiffer([w(1, 'A'), w(2, 'B')])).toBe(true)
   })
 })

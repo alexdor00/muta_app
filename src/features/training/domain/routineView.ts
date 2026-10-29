@@ -229,10 +229,31 @@ export function restFact(
       : `${cycle.rests} ${cycle.rests === 1 ? 'día' : 'días'} por semana`
   }
   if (id === 'muta-ppl-6d') return 'Con ciclo de 8 días: 2 descansos (tras pierna A y tras pierna B)'
-  // Costumbre: al acabar el ciclo completo (torso, pierna…; empuje, tirón, pierna…), un día de descanso
-  const joined = sessions.join(', ')
-  const order = joined.length <= 70 ? joined : `${sessions.length} sesiones`
-  return sessions.length
-    ? `Sugerido (la rutina no los indica): ${order} y descanso`
-    : 'La rutina no los indica'
+  // Costumbre: al acabar el ciclo completo, un día de descanso; las filas de la lista dicen dónde
+  return sessions.length ? 'Sugerido: la rutina no los indica' : 'La rutina no los indica'
+}
+
+const REST_AFTER: Record<string, string[]> = {
+  // El documento de conocimiento da el ejemplo «A1, B1, descanso, A2, B2, descanso»
+  'muta-cuerpo-completo-4d': ['B1', 'B2'],
+}
+
+/**
+ * Si la semana no trae días de descanso, se enseña el descanso sugerido: al acabar el ciclo completo (torso y
+ * pierna, empuje-tirón-pierna…), o donde indique `REST_AFTER`. Si el archivo los trae, se dejan tal cual.
+ */
+export function withSuggestedRests(days: DayView[], id: string): DayView[] {
+  if (days.some((d) => d.type === 'rest')) return days
+  const rest: DayView = { type: 'rest', note: 'Descanso sugerido' }
+  const after = REST_AFTER[id]
+  if (!after) return days.some((d) => d.type === 'session') ? [...days, rest] : days
+  return days.flatMap((d) =>
+    d.type === 'session' && after.some((a) => d.name.startsWith(a)) ? [d, rest] : [d],
+  )
+}
+
+/** ¿Las semanas de una fase son distintas entre sí (ejercicios, series…)? */
+export function weeksDiffer(weeks: WeekView[]): boolean {
+  const key = (w: WeekView) => JSON.stringify(w.days)
+  return weeks.some((w) => key(w) !== key(weeks[0]))
 }

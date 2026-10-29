@@ -206,3 +206,21 @@
   font: var(--text-footnote);
   color: var(--label-2);
 }
+
+/* Semanas distintas: cada una se pliega */
+.weekList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.week {
+  padding: var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.weekTitle {
+  padding: var(--space-3) 0;
+  font: var(--text-headline);
+  cursor: pointer;
+}
