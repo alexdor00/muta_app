@@ -1,9 +1,8 @@
-# Comprobaciones en cada push y pull request (decisión 9).
+# Comprobaciones en cada push (en cualquier rama) y pull request (decisión 9).
 name: CI
 
 on:
   push:
-    branches: [main]
   pull_request:
 
 jobs:
