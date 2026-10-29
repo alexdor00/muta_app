@@ -4,7 +4,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- Cerrar la rama `refactor/una-fuente-de-verdad`: pasar la CI, unirla a `main` y decidir la protección de la rama principal.
+- Proteger la rama `main` en GitHub (Settings → Branches → exigir que la CI pase). La hace el dueño del repositorio.
 
 ## Hecho
 
