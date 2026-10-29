@@ -1,4 +1,5 @@
 import { aboutOf } from './about.ts'
+import type { Exercise, ProgramData as Program } from './program.ts'
 import type { Slot } from './slots.ts'
 import { adaptToLevel, type SetsGoal } from './adaptVolume.ts'
 import type { CatalogEntry, Level } from './catalog.ts'
@@ -67,27 +68,6 @@ export const activeFilters = (f: Filters) => Object.values(f).filter((v) => v !=
 
 export type Adaptation = { level: Level; goal: SetsGoal }
 
-type Exercise = {
-  name: string
-  sets: number | string | null
-  reps: string | null
-  rpe: string | null
-  percent1RM: string | null
-  rest: string | null
-  kind?: 'heavy' | 'compound' | 'isolation'
-  group?: string | null
-  original?: { sets: number | string | null; rpe: string | null }
-  added?: boolean
-  removed?: boolean
-  muscle?: string
-  originalName?: string
-  slot?: Slot
-  tip?: string
-}
-type Day = { name: string; exercises: Exercise[] } | { rest: true; note?: string }
-type Week = { week: number; days: Day[] }
-type Program = { blocks: { title: string | null; weeks: Week[] }[] }
-
 export type ExerciseView = {
   name: string
   /** «3 × 8-10». */
@@ -137,7 +117,7 @@ function exerciseView(e: Exercise): ExerciseView {
     name: e.name,
     prescription: `${e.sets ?? '–'} × ${e.reps ?? '–'}`,
     effort,
-    rest: e.rest,
+    rest: e.rest ?? null,
     status: status === 'changed' && !before ? 'same' : status,
     before,
     slot: e.slot ?? null,
@@ -151,7 +131,7 @@ const visible = (exercises: Exercise[]) =>
 
 export function phasesView(program: Program): PhaseView[] {
   return program.blocks.map((block) => ({
-    title: block.title,
+    title: block.title ?? null,
     weeks: block.weeks.map((week) => ({
       week: week.week,
       days: week.days.map((d): DayView =>
@@ -162,9 +142,7 @@ export function phasesView(program: Program): PhaseView[] {
               name: d.name,
               minutes:
                 Math.round(
-                  sessionMinutes(
-                    d.exercises.filter((e) => !(e.slot?.kind === 'optional' && e.slot.off)) as never,
-                  ) / 5,
+                  sessionMinutes(d.exercises.filter((e) => !(e.slot?.kind === 'optional' && e.slot.off))) / 5,
                 ) * 5,
               exercises: visible(d.exercises).map(exerciseView),
             },
@@ -194,10 +172,10 @@ export type VolumeChange = { muscle: string; before: number; after: number }
 
 /** Series semanales por músculo antes y después de adaptar (semana representativa). */
 export function volumeChanges(original: Program, adapted: Program, daysPerWeek: number): VolumeChange[] {
-  const rep = representativeWeek(original as never)
-  const index = original.blocks[0].weeks.indexOf(rep as never)
-  const before = weeklySets(rep as never, daysPerWeek)
-  const after = weeklySets(adapted.blocks[0].weeks[index] as never, daysPerWeek)
+  const rep = representativeWeek(original)
+  const index = original.blocks[0].weeks.indexOf(rep)
+  const before = weeklySets(rep, daysPerWeek)
+  const after = weeklySets(adapted.blocks[0].weeks[index], daysPerWeek)
   return (Object.keys({ ...before, ...after }) as MuscleId[])
     .map((m) => ({ muscle: MUSCLES[m].label, before: before[m] ?? 0, after: after[m] ?? 0 }))
     .filter((c) => c.before !== c.after)
@@ -206,7 +184,7 @@ export function volumeChanges(original: Program, adapted: Program, daysPerWeek: 
 /** La rutina para enseñar: original, o adaptada a un nivel y objetivo («Adaptar a mí»). */
 export function routineView(program: Program, daysPerWeek: number, adaptation: Adaptation | null) {
   if (!adaptation) return { phases: phasesView(program), changes: [] as VolumeChange[] }
-  const adapted = adaptToLevel(program as never, adaptation.level, daysPerWeek, adaptation.goal) as Program
+  const adapted = adaptToLevel(program, adaptation.level, daysPerWeek, adaptation.goal) as Program
   return { phases: phasesView(adapted), changes: volumeChanges(program, adapted, daysPerWeek) }
 }
 

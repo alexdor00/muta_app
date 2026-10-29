@@ -27,7 +27,7 @@ import { toggleSaved } from '../../use-cases/toggleSaved.ts'
 import styles from './CategoriaScreen.module.css'
 
 const SAVED = {
-  id: 'guardadas',
+  id: 'guardadas' as const,
   title: 'Guardadas',
   description: 'Las rutinas que has marcado para verlas luego.',
   tone: 1 as const,
@@ -99,7 +99,7 @@ export function CategoriaScreen(props: { category: string }) {
       ? []
       : category.id === SAVED.id
         ? state.items.filter((i) => state.saved.has(i.entry.id))
-        : state.items.filter((i) => i.categories.includes(category.id as never))
+        : state.items.filter((i) => i.categories.includes(category.id))
   const shown = inCategory.filter((i) => matches(i, filters))
   const active = activeFilters(filters)
   const set = (key: keyof Filters, value: string) =>

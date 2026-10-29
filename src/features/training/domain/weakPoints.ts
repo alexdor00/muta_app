@@ -1,3 +1,4 @@
+import type { Day, Exercise, ProgramData } from './program.ts'
 import type { Slot } from './slots.ts'
 
 // Puntos débiles: algunas rutinas dejan huecos para que elijas un ejercicio según el músculo que más
@@ -23,22 +24,13 @@ export type WeakTable =
   /** `min` y `max` son la recomendación del programa, no un límite. */
   | { mode: 'pick'; min: number; max: number; muscles: WeakMuscle[] }
 
+/** Un programa con su tabla de puntos débiles. */
+type Program = ProgramData & { weakPoints?: WeakTable }
+
 export type WeakChoice =
   | { mode: 'table'; muscle: string; e1: string | null; e2: string | null }
   /** Un músculo y su ejercicio por día con hueco (clave: nombre del día, p. ej. «Torso 1»). */
   | { mode: 'pick'; slots: Record<string, { muscle: string; option: string } | null> }
-
-type Exercise = {
-  name: string
-  originalName?: string
-  notes?: string | null
-  substitutions?: string[]
-  slot?: Slot
-  [key: string]: unknown
-}
-type Day = { name: string; exercises: Exercise[] } | { rest: true }
-type Week = { week: number; days: Day[] }
-type Program = { blocks: { title: string | null; weeks: Week[] }[]; weakPoints?: WeakTable }
 
 const TABLE_ROW = /^Weak Point Exercise ([12])\b/i
 const PICK_ROW = /^(UPPER|LOWER) BODY WEAK POINT\b/i

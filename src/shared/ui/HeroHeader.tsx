@@ -1,4 +1,4 @@
-import type { ComponentChildren } from 'preact'
+import type { ComponentChildren, RefObject } from 'preact'
 import { ChevronLeftIcon } from './icons.tsx'
 import { RoundButton } from './RoundButton.tsx'
 import styles from './HeroHeader.module.css'
@@ -11,7 +11,7 @@ type Props = {
   tone?: 1 | 2 | 3 | 4 | 5 | 6
   backHref: string
   /** Se pasa para saber cuándo deja de verse (barra compacta). */
-  heroRef?: { current: HTMLElement | null }
+  heroRef?: RefObject<HTMLElement | null>
   /** Botón redondo arriba a la derecha (p. ej. la «!» de información). */
   action?: ComponentChildren
 }
@@ -19,7 +19,7 @@ type Props = {
 /** Cabecera de una categoría o una rutina: foto a todo el ancho y el título encima. */
 export function HeroHeader({ title, description, photo, tone = 1, backHref, heroRef, action }: Props) {
   return (
-    <header class={`${styles.hero} ${styles[`t${tone}`]}`} ref={heroRef as never}>
+    <header class={`${styles.hero} ${styles[`t${tone}`]}`} ref={heroRef}>
       {photo && <img class={styles.photo} src={photo} alt="" />}
       <div class={styles.scrim} />
       <div class={styles.back}>

@@ -1,13 +1,9 @@
 import type { PriorityChoice } from './priorities.ts'
-import type { Slot } from './slots.ts'
+import type { Day, Exercise, ProgramData as Program } from './program.ts'
 
 // Ejercicios «opcionales» de las rutinas que los marcan en su documento original («(optional)»): el cuello
 // de Fuerza e hipertrofia, la plancha… Salen en la rutina como una fila que se hace o se quita. Por defecto
 // se hacen, tal como están en la rutina. (Los de MUTA siguen sus propias reglas: priorities.ts.)
-
-type Exercise = { name: string; originalName?: string; slot?: Slot; [key: string]: unknown }
-type Day = { name: string; exercises: Exercise[] } | { rest: true }
-type Program = { blocks: { weeks: { days: unknown[] }[] }[] }
 
 const MARK = /\boptional\b/i
 /** Los huecos de punto débil también dicen «(optional)», pero se eligen con su propio selector. */

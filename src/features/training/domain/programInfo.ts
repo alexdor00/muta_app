@@ -1,23 +1,8 @@
+import type { Exercise, ProgramData, Week } from './program.ts'
 import { BIG, MUSCLES, type MuscleId } from './muscles.ts'
 import { levelFromSets, representativeWeek, weeklySets, type SetsByMuscle } from './programLevel.ts'
 
 // Hechos medibles de una rutina. La clasificación (categories.ts) sale de aquí, no de opiniones.
-
-type Exercise = {
-  name: string
-  originalName?: string
-  muscle?: string
-  group?: string | null
-  kind?: 'heavy' | 'compound' | 'isolation'
-  sets: number | string | null
-  warmupSets?: string | number | null
-  rest?: string | null
-  percent1RM?: string | null
-}
-type Day = { name: string; exercises: Exercise[] } | { rest: true; note?: string }
-type Week = { week: number; days: Day[] }
-type Block = { title: string | null; weeks: Week[] }
-export type ProgramData = { blocks: Block[] }
 
 /** Variante de un archivo con varias rutinas dentro (bloques y sesiones que le tocan). */
 export type Variant = { blocks?: number[]; sessions?: string }
@@ -83,7 +68,7 @@ export function sessionMinutes(exercises: Exercise[]): number {
 
 /** Duración media de las sesiones de la semana representativa, redondeada a 5 minutos. */
 export function programMinutes(program: ProgramData): number {
-  const sessions = sessionsOf(representativeWeek(program as never) as Week)
+  const sessions = sessionsOf(representativeWeek(program) as Week)
   if (!sessions.length) return 0
   const avg = sessions.reduce((n, s) => n + sessionMinutes(s.exercises), 0) / sessions.length
   return Math.round(avg / 5) * 5
@@ -149,10 +134,10 @@ function sessionType(name: string): 'fb' | 'push' | 'pull' | 'upper' | 'lower' |
 
 /** Reparto según las sesiones de la semana representativa, con su nombre en lenguaje claro. */
 export function splitOf(program: ProgramData): { split: Split; label: string } {
-  const types = new Set(
-    sessionsOf(representativeWeek(program as never) as Week).map((s) => sessionType(s.name)),
+  const types = new Set<string>(
+    sessionsOf(representativeWeek(program) as Week).map((s) => sessionType(s.name)),
   )
-  const has = (...t: string[]) => t.some((x) => types.has(x as never))
+  const has = (...t: string[]) => t.some((x) => types.has(x))
   const ppl = has('push', 'pull')
   if (ppl && has('upper')) return { split: 'hibrido', label: 'Empuje, tirón y pierna + torso y pierna' }
   if (ppl && has('fb')) return { split: 'hibrido', label: 'Empuje, tirón y pierna + cuerpo completo' }
@@ -243,7 +228,7 @@ export type ProgramInfo = {
 
 /** Todos los hechos de una rutina (ya con su variante aplicada). */
 export function infoOf(program: ProgramData, daysPerWeek: number): ProgramInfo {
-  const sets = weeklySets(representativeWeek(program as never), daysPerWeek)
+  const sets = weeklySets(representativeWeek(program), daysPerWeek)
   const emphasis = emphasisOf(sets)
   const { tier, ratio } = volumeTier(sets, emphasis)
   const { split, label } = splitOf(program)

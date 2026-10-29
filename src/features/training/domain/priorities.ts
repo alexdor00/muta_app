@@ -1,6 +1,6 @@
 import type { Level } from './catalog.ts'
 import { sessionMinutes } from './programInfo.ts'
-import type { Slot } from './slots.ts'
+import type { Day, Exercise, ProgramData as Program } from './program.ts'
 
 // Prioridades de las rutinas de MUTA: tienen ejercicios opcionales (huecos «opc») que dependen de lo
 // que quieras mejorar (docs/conocimiento, reglas del generador):
@@ -28,19 +28,6 @@ export type PriorityChoice = {
 }
 
 export type OptionalExercise = { key: string; name: string; muscle: string; days: string[] }
-
-type Exercise = {
-  name: string
-  muscle?: string
-  optional?: boolean
-  sets?: number | string | null
-  original?: { sets: number | string | null; rpe: string | null }
-  rpe?: string | null
-  slot?: Slot
-  [key: string]: unknown
-}
-type Day = { name: string; exercises: Exercise[] } | { rest: true }
-type Program = { blocks: { weeks: { days: Day[] }[] }[] }
 
 const rows = (program: Program) =>
   program.blocks.flatMap((b) =>
@@ -111,7 +98,7 @@ function fitDay(
 ): Exercise[] {
   let list = exercises
   let guard = 100
-  while (sessionMinutes(list.filter((e) => !isOff(e)) as never) > limit && guard--) {
+  while (sessionMinutes(list.filter((e) => !isOff(e))) > limit && guard--) {
     const lastOptional = list.findLastIndex(
       (e) => e.optional && !isOff(e) && !protectedMuscles.has(String(e.muscle)) && !manual.has(keyOf(e)),
     )

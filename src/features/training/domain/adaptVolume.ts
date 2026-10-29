@@ -1,4 +1,5 @@
 import type { Level } from './catalog.ts'
+import { isSession, type Block, type Exercise as AdaptExercise, type Session, type Week } from './program.ts'
 import { muscleOf } from './muscleOf.ts'
 import { rangeFor, type MuscleId } from './muscles.ts'
 import { emphasisOf } from './programInfo.ts'
@@ -18,33 +19,12 @@ export const MAX_SETS_ISOLATION = 5
 export const MAX_SETS_MUSCLE_SESSION = 11
 export const NEW_EXERCISE_SETS = 2
 
-export type AdaptExercise = {
-  name: string
-  originalName?: string
-  muscle?: string
-  group?: string | null
-  kind?: 'heavy' | 'compound' | 'isolation'
-  sets: number | string | null
-  rpe: string | null
-  percent1RM: string | null
-  original?: { sets: number | string | null; rpe: string | null }
-  /** Ejercicio añadido por la adaptación (no estaba en la rutina). */
-  added?: boolean
-  /** Ejercicio quitado por la adaptación (0 series; se enseña tachado). */
-  removed?: boolean
-}
-type Day = { exercises: AdaptExercise[] } | { rest: true }
-type Week = { week: number; days: Day[] }
-type Block = { title?: string | null; weeks: Week[] }
-
 const setsOf = (e: AdaptExercise) =>
   typeof e.sets === 'number' ? e.sets : Number.parseInt(String(e.sets ?? ''), 10)
-const totalSets = (day: { exercises: AdaptExercise[] }) =>
-  day.exercises.reduce((n, e) => n + (setsOf(e) || 0), 0)
-const sessions = (week: Week) =>
-  week.days.filter((d): d is { exercises: AdaptExercise[] } => 'exercises' in d)
+const totalSets = (day: Session) => day.exercises.reduce((n, e) => n + (setsOf(e) || 0), 0)
+const sessions = (week: Week) => week.days.filter(isSession)
 
-function setSets(day: { exercises: AdaptExercise[] }, target: AdaptExercise, n: number) {
+function setSets(day: Session, target: AdaptExercise, n: number) {
   // En programas por progresión, todas las filas del mismo grupo cambian a la vez.
   const rows = target.group ? day.exercises.filter((e) => e.group === target.group) : [target]
   for (const e of rows) {
@@ -78,7 +58,7 @@ function adaptWeek(week: Week, level: Level, daysPerWeek: number, goal: SetsGoal
     let current = weekly[muscle]!
     const step = factor
     // Mismo criterio que al contar (weeklySets): de un grupo de progresión solo cuenta su primera fila.
-    const counts = (day: { exercises: AdaptExercise[] }, e: AdaptExercise) =>
+    const counts = (day: Session, e: AdaptExercise) =>
       !e.group || day.exercises.find((x) => x.group === e.group) === e
     const candidates = () =>
       days.flatMap((day) =>
@@ -94,7 +74,7 @@ function adaptWeek(week: Week, level: Level, daysPerWeek: number, goal: SetsGoal
           )
           .map((e) => ({ day, e })),
       )
-    const sessionSets = (day: { exercises: AdaptExercise[] }) =>
+    const sessionSets = (day: Session) =>
       day.exercises
         .filter(
           (e) => muscleOf(e) === muscle && (!e.group || day.exercises.find((x) => x.group === e.group) === e),
@@ -146,7 +126,7 @@ function adaptWeek(week: Week, level: Level, daysPerWeek: number, goal: SetsGoal
         .filter((day) => sessionSets(day) + NEW_EXERCISE_SETS <= MAX_SETS_MUSCLE_SESSION)
         .sort((a, b) => sessionSets(a) - sessionSets(b) || totalSets(a) - totalSets(b))[0]
       if (!target) break
-      const subs = (model as { substitutions?: string[] }).substitutions ?? []
+      const subs = model.substitutions ?? []
       target.exercises.push({
         ...structuredClone(model),
         name: subs[0] ?? model.name,
@@ -154,7 +134,7 @@ function adaptWeek(week: Week, level: Level, daysPerWeek: number, goal: SetsGoal
         sets: NEW_EXERCISE_SETS,
         original: { sets: 0, rpe: null },
         added: true,
-      } as AdaptExercise)
+      })
       current += NEW_EXERCISE_SETS * step
     }
   }
@@ -186,7 +166,7 @@ export function adaptToLevel<P extends { blocks: Block[] }>(
     blocks: program.blocks.map((block) => {
       // El ajuste se calcula en la semana representativa de cada fase y se aplica igual a todas
       // sus semanas: así se conservan las olas de volumen (introducción, descarga, sobrecarga).
-      const rep = representativeWeek({ blocks: [block] } as never) as Week
+      const rep = representativeWeek({ blocks: [block] })
       const adaptedRep = adaptWeek(rep, level, daysPerWeek, goal)
       return { ...block, weeks: block.weeks.map((w) => applyLike(w, rep, adaptedRep)) }
     }),
@@ -199,8 +179,7 @@ function applyLike(week: Week, model: Week, adapted: Week): Week {
   out.days.forEach((day, d) => {
     const before = model.days[d]
     const after = adapted.days[d]
-    if (!('exercises' in day) || !before || !after || !('exercises' in before) || !('exercises' in after))
-      return
+    if (!isSession(day) || !before || !after || !isSession(before) || !isSession(after)) return
     before.exercises.forEach((orig, i) => {
       const next = after.exercises[i]
       const target = day.exercises[i]

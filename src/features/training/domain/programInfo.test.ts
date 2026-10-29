@@ -6,8 +6,8 @@ import {
   sessionMinutes,
   splitOf,
   volumeTier,
-  type ProgramData,
 } from './programInfo.ts'
+import type { ProgramData } from './program.ts'
 
 const ex = (originalName: string, sets: number, extra: Record<string, unknown> = {}) => ({
   name: originalName,

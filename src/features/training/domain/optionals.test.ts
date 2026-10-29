@@ -7,6 +7,7 @@ const program = {
     {
       weeks: [
         {
+          week: 1,
           days: [
             {
               name: 'Día 1',

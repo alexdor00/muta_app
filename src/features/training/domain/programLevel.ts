@@ -1,4 +1,5 @@
 import type { Level } from './catalog.ts'
+import type { ProgramData as Program, Week } from './program.ts'
 import { muscleOf } from './muscleOf.ts'
 import { MUSCLE_IDS, rangeFor, type MuscleId } from './muscles.ts'
 
@@ -6,17 +7,6 @@ import { MUSCLE_IDS, rangeFor, type MuscleId } from './muscles.ts'
 // comparadas con los rangos «desarrollar» de cada nivel (docs/conocimiento).
 
 export type SetsByMuscle = Partial<Record<MuscleId, number>>
-
-type Exercise = {
-  name: string
-  originalName?: string
-  muscle?: string
-  group?: string | null
-  sets: number | string | null
-}
-type Day = { exercises: Exercise[] } | { rest: true }
-type Week = { week: number; days: Day[] }
-type Program = { blocks: { weeks: Week[] }[] }
 
 const sessionsOf = (week: Week) => week.days.filter((d) => 'exercises' in d && d.exercises.length).length
 

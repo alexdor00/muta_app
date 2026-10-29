@@ -13,7 +13,7 @@ const ex = (originalName: string, sets: number, kind: 'heavy' | 'compound' | 'is
   percent1RM: null as string | null,
 })
 const program = (days: ReturnType<typeof ex>[][]) => ({
-  blocks: [{ weeks: [{ week: 1, days: days.map((exercises) => ({ exercises })) }] }],
+  blocks: [{ weeks: [{ week: 1, days: days.map((exercises, i) => ({ name: `Día ${i + 1}`, exercises })) }] }],
 })
 
 describe('músculo de cada ejercicio', () => {
@@ -53,8 +53,8 @@ describe('nivel por series', () => {
     const week = {
       week: 1,
       days: [
-        { exercises: [ex('Bench Press', 3), ex('Incline DB Press', 3)] },
-        { exercises: [ex('Bench Press', 3)] },
+        { name: 'Día 1', exercises: [ex('Bench Press', 3), ex('Incline DB Press', 3)] },
+        { name: 'Día 2', exercises: [ex('Bench Press', 3)] },
       ],
     }
     expect(weeklySets(week, 2)).toEqual({ pecho: 9 })
@@ -66,6 +66,7 @@ describe('nivel por series', () => {
       week: 1,
       days: [
         {
+          name: 'Día 1',
           exercises: [
             { ...ex('Braced Lunge', 2), group: 'LUNGE' },
             { ...ex('Bodyweight Lunge', 2), group: 'LUNGE' },
@@ -167,6 +168,7 @@ describe('rutinas especiales', () => {
       week: n,
       days: [
         {
+          name: 'Día 1',
           exercises: [
             ex('Bench Press', sets),
             ex('Incline DB Press', sets),

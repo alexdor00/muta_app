@@ -34,6 +34,7 @@ const program = {
     {
       weeks: [
         {
+          week: 1,
           days: [
             {
               name: 'Empuje A',
@@ -122,7 +123,7 @@ describe('prioridades de MUTA', () => {
 
 describe('regla de tiempo (75 min por defecto)', () => {
   const day = (...exercises: ReturnType<typeof ex>[]) => ({
-    blocks: [{ weeks: [{ days: [{ name: 'Día', exercises }] }] }],
+    blocks: [{ weeks: [{ week: 1, days: [{ name: 'Día', exercises }] }] }],
   })
   const list = (p: ReturnType<typeof day>) =>
     p.blocks[0].weeks[0].days.flatMap((d) => ('exercises' in d ? d.exercises : []))
@@ -204,6 +205,7 @@ describe('los opcionales quitados no desaparecen', () => {
         {
           weeks: [
             {
+              week: 1,
               days: [
                 {
                   name: 'Día',
@@ -232,6 +234,7 @@ describe('los opcionales quitados no desaparecen', () => {
         {
           weeks: [
             {
+              week: 1,
               days: [
                 {
                   name: 'Día',

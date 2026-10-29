@@ -16,7 +16,8 @@ import {
   type PriorityChoice,
 } from '../domain/priorities.ts'
 import { applyMarkedOptionals } from '../domain/optionals.ts'
-import { selectVariant, type ProgramData } from '../domain/programInfo.ts'
+import type { ProgramData } from '../domain/program.ts'
+import { selectVariant } from '../domain/programInfo.ts'
 import { metaLines, phasesView } from '../domain/routineView.ts'
 import { applyWeakPoints, hasWeakPoints, type WeakChoice, type WeakTable } from '../domain/weakPoints.ts'
 import {
@@ -47,14 +48,12 @@ function show() {
   if (!open) return
   const { item, program, table, level, canPrioritize } = open
   const weak: WeakView | null = table ? { table, choice: weakChoice } : null
-  const afterPriorities: Program = canPrioritize
-    ? applyPriorities(program as never, priorityChoice, level)
-    : program
-  const trimmed = canPrioritize ? trimmedKeys(afterPriorities as never) : new Set<string>()
+  const afterPriorities: Program = canPrioritize ? applyPriorities(program, priorityChoice, level) : program
+  const trimmed = canPrioritize ? trimmedKeys(afterPriorities) : new Set<string>()
   const priorities: PriorityView | null = canPrioritize
     ? {
-        muscles: musclesOf(program as never),
-        optionals: optionalsOf(program as never).map((o) => {
+        muscles: musclesOf(program),
+        optionals: optionalsOf(program).map((o) => {
           const included = isIncluded(o, priorityChoice, level)
           return { ...o, included, trimmed: trimmed.has(o.key), reason: reasonOf(o.muscle) }
         }),
@@ -64,12 +63,12 @@ function show() {
       }
     : null
   let shown: Program = afterPriorities
-  if (table) shown = applyWeakPoints(shown as never, table, weakChoice) as Program
-  if (!canPrioritize) shown = applyMarkedOptionals(shown as never, priorityChoice) as Program
+  if (table) shown = applyWeakPoints(shown, table, weakChoice) as Program
+  if (!canPrioritize) shown = applyMarkedOptionals(shown, priorityChoice) as Program
   routineDetail.value = {
     status: 'ready',
     item,
-    phases: phasesView(shown as never),
+    phases: phasesView(shown),
     weak,
     priorities,
     choice: priorityChoice,
@@ -113,7 +112,7 @@ export async function openRoutine(id: string): Promise<void> {
       program,
       table: hasWeakPoints(program) ? program.weakPoints! : null,
       level: state.profile?.level ?? 'intermediate',
-      canPrioritize: hasPriorities(program as never),
+      canPrioritize: hasPriorities(program),
     }
     // Si ya empezaste esta rutina, vuelve lo que elegiste
     const plan = (await db.get('plans', 'current')) as
