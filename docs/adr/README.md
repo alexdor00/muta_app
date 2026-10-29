@@ -13,3 +13,4 @@ Si una cambia, se escribe una nota nueva que la sustituye; la vieja no se borra.
 8. [Diseño](0008-diseno.md)
 9. [Calidad](0009-calidad.md)
 10. [Actualizaciones](0010-actualizaciones.md)
+11. [Opciones dentro de la rutina, descansos y una sola fuente](0011-opciones-dentro-de-la-rutina.md)
