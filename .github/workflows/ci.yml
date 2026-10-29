@@ -38,8 +38,17 @@ jobs:
       - name: Construir
         run: npm run build
 
+      - name: Tamaño de la app
+        run: npm run size
+
+      - name: Guardas del proyecto (tipos únicos, documentación, datos privados)
+        run: npm run guardas
+
       - name: Navegador para los recorridos
         run: npx playwright install --with-deps chromium
 
       - name: Recorridos en un móvil simulado
         run: npm run e2e
+
+      - name: Rendimiento y accesibilidad (Lighthouse)
+        run: npm run lighthouse

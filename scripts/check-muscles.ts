@@ -6,7 +6,7 @@ const dirs = ['private/programs', 'src/shared/content/programs']
 const unknown = new Map<string, number>()
 let total = 0
 for (const dir of dirs) {
-  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.json') && !f.startsWith('_'))) {
+  for (const f of fs.readdirSync(dir).filter((name) => name.endsWith('.json') && !name.startsWith('_'))) {
     const p = JSON.parse(fs.readFileSync(`${dir}/${f}`, 'utf8'))
     for (const b of p.blocks)
       for (const w of b.weeks)

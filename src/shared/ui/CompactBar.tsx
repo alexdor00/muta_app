@@ -29,7 +29,7 @@ export function CompactBar({ title, backHref, action, watch }: Props) {
   }, [watch])
 
   return (
-    <div class={`${styles.bar} ${visible ? styles.visible : ''}`} aria-hidden={!visible}>
+    <div class={`${styles.bar} ${visible ? styles.visible : ''}`} aria-hidden={!visible} inert={!visible}>
       <RoundButton label="Volver" href={backHref} variant="plain">
         <ChevronLeftIcon />
       </RoundButton>

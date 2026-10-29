@@ -39,7 +39,15 @@ export default tseslint.config(
     files: ['**/*.{ts,tsx}'],
     languageOptions: { globals: globals.browser },
     plugins: { 'react-hooks': reactHooks },
-    rules: reactHooks.configs.recommended.rules,
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      // Nada se sobrescribe: ni variables que tapan a otras, ni declaraciones repetidas, ni imports duplicados
+      '@typescript-eslint/no-shadow': 'error',
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': 'error',
+      'no-duplicate-imports': 'error',
+      'no-param-reassign': ['error', { props: false }],
+    },
   },
   {
     files: ['src/**/*.{ts,tsx}'],

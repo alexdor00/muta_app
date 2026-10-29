@@ -14,9 +14,12 @@
     "e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm run test && npm run build",
+    "check": "npm run format:check && npm run lint && npm run lint:css && npm run typecheck && npm run test && npm run build && npm run size && npm run guardas",
     "lint:css": "stylelint \"src/**/*.css\"",
-    "galeria": "node scripts/galeria.cjs"
+    "galeria": "node scripts/galeria.cjs",
+    "size": "size-limit",
+    "lighthouse": "lhci autorun",
+    "guardas": "node scripts/guardas.cjs"
   },
   "dependencies": {
     "@preact/signals": "^2.11.4",
@@ -25,9 +28,12 @@
     "preact-iso": "^2.12.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.64.1",
     "@preact/preset-vite": "^2.10.6",
+    "@size-limit/file": "^14.3.0",
     "@types/node": "^24.19.2",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
@@ -36,11 +42,20 @@
     "fake-indexeddb": "^6.2.6",
     "globals": "^17.13.0",
     "prettier": "^3.9.10",
+    "size-limit": "^14.3.0",
     "stylelint": "^17.16.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.5",
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.5"
-  }
+  },
+  "size-limit": [
+    {
+      "name": "JavaScript al abrir (entrada)",
+      "path": "dist/assets/index-*.js",
+      "gzip": true,
+      "limit": "50 kB"
+    }
+  ]
 }

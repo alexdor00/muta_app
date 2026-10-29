@@ -224,3 +224,9 @@
   font: var(--text-headline);
   cursor: pointer;
 }
+
+/* Sobre el gris más oscuro de la fila, el gris secundario no llega al contraste mínimo: texto principal */
+.slotRow .exMeta,
+.slotItem.removed .exName {
+  color: var(--label);
+}
