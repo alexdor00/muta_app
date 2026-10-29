@@ -1,0 +1,11 @@
+# Siempre saltos de línea LF en el repositorio y en el equipo (Prettier también escribe LF)
+* text=auto eol=lf
+
+# Binarios: no tocar
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff2 binary
+*.docx binary
