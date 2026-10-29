@@ -168,16 +168,30 @@ describe('filas de descanso y semanas plegables', () => {
     expect(withSuggestedRests(own, 'x')).toBe(own)
   })
 
-  it('MUTA cuerpo completo: tras B1 y tras B2', () => {
-    const days = ['A1', 'B1', 'A2', 'B2'].map(ses)
-    expect(withSuggestedRests(days, 'muta-cuerpo-completo-4d').map((d) => d.type)).toEqual([
-      'session',
-      'session',
-      'rest',
-      'session',
-      'session',
-      'rest',
+  it('cada rutina con sus descansos en su sitio y con su tipo', () => {
+    const six = ['Empuje A', 'Tirón A', 'Pierna A', 'Empuje B', 'Tirón B', 'Pierna B'].map(ses)
+    const out = withSuggestedRests(six, 'muta-ppl-6d')
+    expect(out.map((d) => (d.type === 'rest' ? d.note : d.name))).toEqual([
+      'Empuje A',
+      'Tirón A',
+      'Pierna A',
+      'Descanso obligatorio',
+      'Empuje B',
+      'Tirón B',
+      'Pierna B',
+      'Descanso obligatorio',
     ])
+    const jn = withSuggestedRests(six, 'ppl-tecnica')
+    expect(jn.filter((d) => d.type === 'rest').map((d) => d.type === 'rest' && d.note)).toEqual([
+      'Descanso opcional',
+      'Descanso obligatorio',
+    ])
+    // Solo el bloque 1 de la especialización de mujer lo dice; el 2 queda con el sugerido final
+    expect(withSuggestedRests(six, 'mujer-especializacion', 0).at(-1)).toEqual({
+      type: 'rest',
+      note: 'Descanso obligatorio',
+    })
+    expect(withSuggestedRests(six, 'mujer-especializacion', 1).at(-1)).toEqual(rest)
   })
 
   it('las semanas son distintas si cambia algo de sus días', () => {

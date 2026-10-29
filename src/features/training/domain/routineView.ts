@@ -233,23 +233,60 @@ export function restFact(
   return sessions.length ? 'Sugerido: la rutina no los indica' : 'La rutina no los indica'
 }
 
-const REST_AFTER: Record<string, string[]> = {
-  // El documento de conocimiento da el ejemplo «A1, B1, descanso, A2, B2, descanso»
-  'muta-cuerpo-completo-4d': ['B1', 'B2'],
+type RestRule = { after: number; note: string; phase?: number }
+const FIXED = 'Descanso obligatorio'
+const OPTIONAL = 'Descanso opcional'
+const SUGGESTED = 'Descanso sugerido'
+
+/**
+ * Dónde caen los descansos de las rutinas cuyos archivos no los traen, según lo que dicen sus documentos
+ * (`after` = tras la sesión número N de la semana). El resto, al acabar el ciclo completo.
+ */
+const REST_RULES: Record<string, RestRule[]> = {
+  // Documento de conocimiento: ciclo de 8 días «EA, TA, PA, descanso, EB, TB, PB, descanso»
+  'muta-ppl-6d': [
+    { after: 3, note: FIXED },
+    { after: 6, note: FIXED },
+  ],
+  // Documento de conocimiento: ejemplo «A1, B1, descanso, A2, B2, descanso»
+  'muta-cuerpo-completo-4d': [
+    { after: 2, note: SUGGESTED },
+    { after: 4, note: SUGGESTED },
+  ],
+  // Preguntas frecuentes del original: «un descanso tras el día 2 y otros tras el día 4» / «entre el 2 y el 3 y tras el 5»
+  'frecuencia-alta-cuerpo-completo-4d': [
+    { after: 2, note: SUGGESTED },
+    { after: 4, note: SUGGESTED },
+  ],
+  'frecuencia-alta-cuerpo-completo-5d': [
+    { after: 2, note: SUGGESTED },
+    { after: 5, note: SUGGESTED },
+  ],
+  // Original: «Día 7: descanso» y «descanso opcional entre el día 4 y el 5»
+  'ppl-tecnica': [
+    { after: 4, note: OPTIONAL },
+    { after: 6, note: FIXED },
+  ],
+  // Original: bloque 1, seis días seguidos y «Día 7: descanso»
+  'mujer-especializacion': [{ after: 6, note: FIXED, phase: 0 }],
 }
 
 /**
- * Si la semana no trae días de descanso, se enseña el descanso sugerido: al acabar el ciclo completo (torso y
- * pierna, empuje-tirón-pierna…), o donde indique `REST_AFTER`. Si el archivo los trae, se dejan tal cual.
+ * Si la semana no trae días de descanso, se enseñan donde dice su documento (`REST_RULES`) o, si no dice nada,
+ * al acabar el ciclo completo (torso y pierna, empuje-tirón-pierna…). Si el archivo los trae, se dejan tal cual.
  */
-export function withSuggestedRests(days: DayView[], id: string): DayView[] {
+export function withSuggestedRests(days: DayView[], id: string, phase = 0): DayView[] {
   if (days.some((d) => d.type === 'rest')) return days
-  const rest: DayView = { type: 'rest', note: 'Descanso sugerido' }
-  const after = REST_AFTER[id]
-  if (!after) return days.some((d) => d.type === 'session') ? [...days, rest] : days
-  return days.flatMap((d) =>
-    d.type === 'session' && after.some((a) => d.name.startsWith(a)) ? [d, rest] : [d],
-  )
+  const rules = (REST_RULES[id] ?? []).filter((r) => r.phase === undefined || r.phase === phase)
+  const rest = (note: string): DayView => ({ type: 'rest', note })
+  if (!rules.length) return days.some((d) => d.type === 'session') ? [...days, rest(SUGGESTED)] : days
+  let session = 0
+  return days.flatMap((d) => {
+    if (d.type !== 'session') return [d]
+    session += 1
+    const here = rules.filter((r) => r.after === session)
+    return [d, ...here.map((r) => rest(r.note))]
+  })
 }
 
 /** ¿Las semanas de una fase son distintas entre sí (ejercicios, series…)? */

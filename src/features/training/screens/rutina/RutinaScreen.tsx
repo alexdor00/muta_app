@@ -326,12 +326,12 @@ export function RutinaScreen(props: { id: string }) {
             {currentPhase.weeks.map((w, wi) => (
               <details key={w.week} class={styles.week} open={wi === 0}>
                 <summary class={styles.weekTitle}>Semana {w.week}</summary>
-                {renderDays(withSuggestedRests(w.days, entry.id), wi)}
+                {renderDays(withSuggestedRests(w.days, entry.id, phase), wi)}
               </details>
             ))}
           </div>
         ) : (
-          renderDays(withSuggestedRests(currentWeek.days, entry.id), week)
+          renderDays(withSuggestedRests(currentWeek.days, entry.id, phase), week)
         )}
       </section>
 
