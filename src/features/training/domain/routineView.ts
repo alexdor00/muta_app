@@ -174,18 +174,18 @@ export function phasesView(program: Program): PhaseView[] {
 }
 
 /**
- * Lo que dice el archivo, en lenguaje claro: «Obligatorio: 1-2 días de descanso» → «Descanso obligatorio · 1–2 días»;
+ * Lo que dice el archivo, en lenguaje claro (sin tipo, el descanso es obligatorio): «Obligatorio: 1-2 días de descanso» → «Descanso obligatorio · 1–2 días»;
  * «Sugerido: …» → «Descanso sugerido»; «Optional…» → «Descanso opcional».
  */
 export function restNote(note?: string): string {
-  if (!note) return 'Descanso'
+  if (!note) return 'Descanso obligatorio'
   const kind = /optional|opcional/i.test(note)
     ? ' opcional'
     : /obligatorio/i.test(note)
       ? ' obligatorio'
       : /sugerido/i.test(note)
         ? ' sugerido'
-        : ''
+        : ' obligatorio'
   const range = note.match(/(\d)\s*-\s*(\d)/)
   return `Descanso${kind}${range ? ` · ${range[1]}–${range[2]} días` : ''}`
 }
@@ -229,8 +229,8 @@ export function restFact(
       : `${cycle.rests} ${cycle.rests === 1 ? 'día' : 'días'} por semana`
   }
   if (id === 'muta-ppl-6d') return 'Con ciclo de 8 días: 2 descansos (tras pierna A y tras pierna B)'
-  // Costumbre: al acabar el ciclo completo, un día de descanso; las filas de la lista dicen dónde
-  return sessions.length ? 'Sugerido: la rutina no los indica' : 'La rutina no los indica'
+  // Si no dicen nada: descanso obligatorio tras una vuelta completa al cuerpo; las filas de la lista dicen dónde
+  return sessions.length ? 'Tras cada vuelta completa (la rutina no los indica)' : 'La rutina no los indica'
 }
 
 type RestRule = { after: number; note: string; phase?: number }
@@ -250,8 +250,8 @@ const REST_RULES: Record<string, RestRule[]> = {
   ],
   // Documento de conocimiento: ejemplo «A1, B1, descanso, A2, B2, descanso»
   'muta-cuerpo-completo-4d': [
-    { after: 2, note: SUGGESTED },
-    { after: 4, note: SUGGESTED },
+    { after: 2, note: FIXED },
+    { after: 4, note: FIXED },
   ],
   // Preguntas frecuentes del original: «un descanso tras el día 2 y otros tras el día 4» / «entre el 2 y el 3 y tras el 5»
   'frecuencia-alta-cuerpo-completo-4d': [
@@ -273,13 +273,13 @@ const REST_RULES: Record<string, RestRule[]> = {
 
 /**
  * Si la semana no trae días de descanso, se enseñan donde dice su documento (`REST_RULES`) o, si no dice nada,
- * al acabar el ciclo completo (torso y pierna, empuje-tirón-pierna…). Si el archivo los trae, se dejan tal cual.
+ * al acabar la vuelta completa al cuerpo (torso y pierna, empuje-tirón-pierna…), como descanso obligatorio. Si el archivo los trae, se dejan tal cual.
  */
 export function withSuggestedRests(days: DayView[], id: string, phase = 0): DayView[] {
   if (days.some((d) => d.type === 'rest')) return days
   const rules = (REST_RULES[id] ?? []).filter((r) => r.phase === undefined || r.phase === phase)
   const rest = (note: string): DayView => ({ type: 'rest', note })
-  if (!rules.length) return days.some((d) => d.type === 'session') ? [...days, rest(SUGGESTED)] : days
+  if (!rules.length) return days.some((d) => d.type === 'session') ? [...days, rest(FIXED)] : days
   let session = 0
   return days.flatMap((d) => {
     if (d.type !== 'session') return [d]

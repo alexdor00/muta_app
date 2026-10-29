@@ -81,7 +81,8 @@ describe('detalle', () => {
     expect(restNote('Obligatorio: 1-2 días de descanso')).toBe('Descanso obligatorio · 1–2 días')
     expect(restNote('Sugerido: 2-3 días de descanso')).toBe('Descanso sugerido · 2–3 días')
     expect(restNote('Sugerido: días de descanso')).toBe('Descanso sugerido')
-    expect(restNote('días de descanso')).toBe('Descanso')
+    expect(restNote('días de descanso')).toBe('Descanso obligatorio')
+    expect(restNote()).toBe('Descanso obligatorio')
     expect(restNote('Optional días de descanso')).toBe('Descanso opcional')
   })
 
@@ -123,7 +124,7 @@ describe('detalle', () => {
     expect(session.type === 'session' && session.exercises.some((e) => e.status === 'changed')).toBe(true)
     expect(adapted.phases[0].weeks[0].days[1]).toEqual({
       type: 'rest',
-      note: 'Descanso · 1–2 días',
+      note: 'Descanso obligatorio · 1–2 días',
     })
   })
 })
@@ -146,7 +147,7 @@ describe('días de descanso en todas las rutinas', () => {
     expect(restFact('x', { sessions: 8, rests: 4, rotating: true })).toBe('4 de cada 12 días')
     expect(restFact('x', { sessions: 4, rests: 0, rotating: false })).toBe('La rutina no los indica')
     expect(restFact('x', { sessions: 4, rests: 0, rotating: false }, null, ['Torso', 'Pierna'])).toBe(
-      'Sugerido: la rutina no los indica',
+      'Tras cada vuelta completa (la rutina no los indica)',
     )
     expect(restFact('x', { sessions: 4, rests: 0, rotating: false }, 'Día 7: descanso')).toBe(
       'Día 7: descanso',
@@ -157,7 +158,7 @@ describe('días de descanso en todas las rutinas', () => {
 
 describe('filas de descanso y semanas plegables', () => {
   const ses = (name: string) => ({ type: 'session' as const, name, minutes: 50, exercises: [] })
-  const rest = { type: 'rest' as const, note: 'Descanso sugerido' }
+  const rest = { type: 'rest' as const, note: 'Descanso obligatorio' }
   it('sin descansos en el archivo, sugiere uno al acabar el ciclo', () => {
     expect(withSuggestedRests([ses('Torso'), ses('Pierna')], 'x')).toEqual([
       ses('Torso'),
