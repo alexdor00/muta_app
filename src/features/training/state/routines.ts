@@ -49,8 +49,8 @@ export type DetailState =
       priorities: PriorityView | null
       /** Lo que has decidido de los opcionales y las prioridades. */
       choice: PriorityChoice | null
-      /** Lo que dice el documento original sobre los días de descanso. */
-      rest: string | null
+      /** Los datos clave bajo el título («Días», «Duración», «Descanso»…). */
+      facts: [string, string][]
     }
 
 /** Prioridades de una rutina de MUTA: músculos, ejercicios opcionales y lo elegido. */
@@ -79,12 +79,5 @@ export type { Slot } from '../domain/slots.ts'
 export type { PriorityChoice } from '../domain/priorities.ts'
 export { DEFAULT_MINUTES, MAX_PRIORITIES } from '../domain/priorities.ts'
 export type { Adaptation, Category, CategoryId, CatalogEntry, Level, PhaseView }
-export {
-  activeFilters,
-  matches,
-  restFact,
-  weeksDiffer,
-  withSuggestedRests,
-  type Filters,
-} from '../domain/routineView.ts'
+export { activeFilters, matches, type Filters } from '../domain/routineView.ts'
 export { SPLIT_LABEL, type Split, type VolumeTier } from '../domain/programInfo.ts'

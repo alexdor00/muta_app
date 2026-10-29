@@ -44,7 +44,16 @@ export type Day = Session | RestDay
 export type Week = { week: number; days: Day[] }
 export type Block = { title?: string | null; weeks: Week[] }
 
+/** Un descanso que el archivo no trae: cae tras la sesión número `after` de la semana (de la fase `phase`, si se dice). */
+export type RestRule = { after: number; note: string; phase?: number }
+
 /** Un programa: sus bloques con semanas y días. */
-export type ProgramData = { blocks: Block[] }
+export type ProgramData = {
+  blocks: Block[]
+  /** Dónde caen los descansos cuando el archivo no los trae (los dice el documento de la rutina). */
+  restRules?: RestRule[]
+  /** Lo que dice el documento sobre los días de descanso, con sus palabras. */
+  restInfo?: string
+}
 
 export const isSession = (day: Day): day is Session => 'exercises' in day

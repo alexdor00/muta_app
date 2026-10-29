@@ -2,6 +2,7 @@ import { getDb } from '../../../shared/data/db.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import cuerpoCompleto from '../../../shared/content/programs/muta-cuerpo-completo-4d.json'
 import ppl from '../../../shared/content/programs/muta-ppl-6d.json'
+import { aboutOf } from '../domain/about.ts'
 import { CATALOG, sourceOf, type Level } from '../domain/catalog.ts'
 import {
   applyPriorities,
@@ -18,7 +19,7 @@ import {
 import { applyMarkedOptionals } from '../domain/optionals.ts'
 import type { ProgramData } from '../domain/program.ts'
 import { selectVariant } from '../domain/programInfo.ts'
-import { metaLines, phasesView } from '../domain/routineView.ts'
+import { applyRestRules, factsOf, metaLines, phasesView } from '../domain/routineView.ts'
 import { applyWeakPoints, hasWeakPoints, type WeakChoice, type WeakTable } from '../domain/weakPoints.ts'
 import {
   routineDetail,
@@ -32,7 +33,7 @@ import { INFO, loadRoutines } from './loadRoutines.ts'
 /** Programas propios de MUTA: van en el código. */
 export const BUILT_IN: Record<string, unknown> = { [cuerpoCompleto.id]: cuerpoCompleto, [ppl.id]: ppl }
 
-type Program = ProgramData & { weakPoints?: WeakTable; restInfo?: string }
+type Program = ProgramData & { weakPoints?: WeakTable }
 let open: {
   item: RoutineItem
   program: Program
@@ -65,14 +66,21 @@ function show() {
   let shown: Program = afterPriorities
   if (table) shown = applyWeakPoints(shown, table, weakChoice) as Program
   if (!canPrioritize) shown = applyMarkedOptionals(shown, priorityChoice) as Program
+  const phases = applyRestRules(phasesView(shown), program.restRules)
   routineDetail.value = {
     status: 'ready',
     item,
-    phases: phasesView(shown),
+    phases,
+    facts: factsOf({
+      days: item.entry.days,
+      info: item.info,
+      rest: program.restInfo ?? null,
+      sessions: (phases[0]?.weeks[0]?.days ?? []).flatMap((d) => (d.type === 'session' ? [d.name] : [])),
+      basics: !!aboutOf(item.entry)?.basics,
+    }),
     weak,
     priorities,
     choice: priorityChoice,
-    rest: program.restInfo ?? null,
   }
 }
 

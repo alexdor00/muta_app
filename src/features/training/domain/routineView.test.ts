@@ -6,9 +6,12 @@ import {
   durationOf,
   matches,
   metaLines,
+  applyRestRules,
+  phasesView,
   restFact,
   weeksDiffer,
-  withSuggestedRests,
+  type DayView,
+  type PhaseView,
   restNote,
   rirLabel,
   routineView,
@@ -142,37 +145,48 @@ describe('esfuerzo en RIR', () => {
 
 describe('días de descanso en todas las rutinas', () => {
   it('cuenta los del archivo y, si no hay, lo dice sin inventar', () => {
-    expect(restFact('x', { sessions: 4, rests: 2, rotating: false })).toBe('2 días por semana')
-    expect(restFact('x', { sessions: 1, rests: 1, rotating: false })).toBe('1 día por semana')
-    expect(restFact('x', { sessions: 8, rests: 4, rotating: true })).toBe('4 de cada 12 días')
-    expect(restFact('x', { sessions: 4, rests: 0, rotating: false })).toBe('La rutina no los indica')
-    expect(restFact('x', { sessions: 4, rests: 0, rotating: false }, null, ['Torso', 'Pierna'])).toBe(
+    expect(restFact({ sessions: 4, rests: 2, rotating: false })).toBe('2 días por semana')
+    expect(restFact({ sessions: 1, rests: 1, rotating: false })).toBe('1 día por semana')
+    expect(restFact({ sessions: 8, rests: 4, rotating: true })).toBe('4 de cada 12 días')
+    expect(restFact({ sessions: 4, rests: 0, rotating: false })).toBe('La rutina no los indica')
+    expect(restFact({ sessions: 4, rests: 0, rotating: false }, null, ['Torso', 'Pierna'])).toBe(
       'Tras cada vuelta completa (la rutina no los indica)',
     )
-    expect(restFact('x', { sessions: 4, rests: 0, rotating: false }, 'Día 7: descanso')).toBe(
-      'Día 7: descanso',
-    )
-    expect(restFact('muta-ppl-6d', { sessions: 6, rests: 0, rotating: true })).toContain('ciclo de 8 días')
+    expect(restFact({ sessions: 4, rests: 0, rotating: false }, 'Día 7: descanso')).toBe('Día 7: descanso')
   })
 })
 
 describe('filas de descanso y semanas plegables', () => {
   const ses = (name: string) => ({ type: 'session' as const, name, minutes: 50, exercises: [] })
-  const rest = { type: 'rest' as const, note: 'Descanso obligatorio' }
-  it('sin descansos en el archivo, sugiere uno al acabar el ciclo', () => {
-    expect(withSuggestedRests([ses('Torso'), ses('Pierna')], 'x')).toEqual([
-      ses('Torso'),
-      ses('Pierna'),
-      rest,
-    ])
-    const own = [ses('Torso'), { type: 'rest' as const, note: 'Descanso · 1–2 días' }]
-    expect(withSuggestedRests(own, 'x')).toBe(own)
+  const fixed = { type: 'rest' as const, note: 'Descanso obligatorio' }
+  const phase = (days: DayView[], weeks = 1): PhaseView => ({
+    title: null,
+    differ: false,
+    weeks: Array.from({ length: weeks }, (_, i) => ({ week: i + 1, days })),
+  })
+  const names = (p: PhaseView) => p.weeks[0].days.map((d) => (d.type === 'rest' ? d.note : d.name))
+
+  it('sin reglas ni descansos en el archivo, uno obligatorio al acabar la vuelta completa', () => {
+    const [out] = applyRestRules([phase([ses('Torso'), ses('Pierna')])])
+    expect(out.weeks[0].days).toEqual([ses('Torso'), ses('Pierna'), fixed])
   })
 
-  it('cada rutina con sus descansos en su sitio y con su tipo', () => {
+  it('si el archivo trae descansos, se dejan tal cual', () => {
+    const own = [ses('Torso'), { type: 'rest' as const, note: 'Descanso · 1–2 días' }]
+    const [out] = applyRestRules([phase(own)], [{ after: 1, note: 'Descanso sugerido' }])
+    expect(out.weeks[0].days).toBe(own)
+  })
+
+  it('las reglas del programa los ponen en su sitio y con su tipo', () => {
     const six = ['Empuje A', 'Tirón A', 'Pierna A', 'Empuje B', 'Tirón B', 'Pierna B'].map(ses)
-    const out = withSuggestedRests(six, 'muta-ppl-6d')
-    expect(out.map((d) => (d.type === 'rest' ? d.note : d.name))).toEqual([
+    const [out] = applyRestRules(
+      [phase(six)],
+      [
+        { after: 3, note: 'Descanso obligatorio' },
+        { after: 6, note: 'Descanso opcional' },
+      ],
+    )
+    expect(names(out)).toEqual([
       'Empuje A',
       'Tirón A',
       'Pierna A',
@@ -180,24 +194,33 @@ describe('filas de descanso y semanas plegables', () => {
       'Empuje B',
       'Tirón B',
       'Pierna B',
-      'Descanso obligatorio',
-    ])
-    const jn = withSuggestedRests(six, 'ppl-tecnica')
-    expect(jn.filter((d) => d.type === 'rest').map((d) => d.type === 'rest' && d.note)).toEqual([
       'Descanso opcional',
-      'Descanso obligatorio',
     ])
-    // Solo el bloque 1 de la especialización de mujer lo dice; el 2 queda con el sugerido final
-    expect(withSuggestedRests(six, 'mujer-especializacion', 0).at(-1)).toEqual({
-      type: 'rest',
-      note: 'Descanso obligatorio',
-    })
-    expect(withSuggestedRests(six, 'mujer-especializacion', 1).at(-1)).toEqual(rest)
+  })
+
+  it('una regla con fase solo vale en esa fase', () => {
+    const rules = [{ after: 1, note: 'Descanso sugerido', phase: 0 }]
+    const [first, second] = applyRestRules([phase([ses('A'), ses('B')]), phase([ses('A'), ses('B')])], rules)
+    expect(names(first)).toEqual(['A', 'Descanso sugerido', 'B'])
+    expect(names(second)).toEqual(['A', 'B', 'Descanso obligatorio'])
   })
 
   it('las semanas son distintas si cambia algo de sus días', () => {
     const w = (n: number, name: string) => ({ week: n, days: [ses(name)] })
     expect(weeksDiffer([w(1, 'A'), w(2, 'A')])).toBe(false)
     expect(weeksDiffer([w(1, 'A'), w(2, 'B')])).toBe(true)
+  })
+
+  it('phasesView marca las fases cuyas semanas difieren', () => {
+    const exercise = (sets: number) => ({ name: 'Press', sets })
+    const week = (n: number, sets: number) => ({
+      week: n,
+      days: [{ name: 'Día', exercises: [exercise(sets)] }],
+    })
+    const [same, other] = phasesView({
+      blocks: [{ weeks: [week(1, 3), week(2, 3)] }, { weeks: [week(1, 3), week(2, 4)] }],
+    })
+    expect(same.differ).toBe(false)
+    expect(other.differ).toBe(true)
   })
 })

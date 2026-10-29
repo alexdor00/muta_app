@@ -1,5 +1,5 @@
 import { aboutOf } from './about.ts'
-import type { Exercise, ProgramData as Program } from './program.ts'
+import type { Exercise, ProgramData as Program, RestRule } from './program.ts'
 import type { Slot } from './slots.ts'
 import { adaptToLevel, type SetsGoal } from './adaptVolume.ts'
 import type { CatalogEntry, Level } from './catalog.ts'
@@ -87,7 +87,8 @@ export type DayView =
   | { type: 'session'; name: string; minutes: number; exercises: ExerciseView[] }
   | { type: 'rest'; note: string }
 export type WeekView = { week: number; days: DayView[] }
-export type PhaseView = { title: string | null; weeks: WeekView[] }
+/** `differ`: las semanas de la fase son distintas entre sí (se enseñan plegables). */
+export type PhaseView = { title: string | null; weeks: WeekView[]; differ: boolean }
 
 /**
  * El esfuerzo se enseña en RIR (repeticiones en reserva = 10 − RPE). Los programas guardan el RPE
@@ -130,9 +131,8 @@ const visible = (exercises: Exercise[]) =>
   exercises.filter((e, i) => !e.group || exercises.findIndex((x) => x.group === e.group) === i)
 
 export function phasesView(program: Program): PhaseView[] {
-  return program.blocks.map((block) => ({
-    title: block.title ?? null,
-    weeks: block.weeks.map((week) => ({
+  return program.blocks.map((block) => {
+    const weeks = block.weeks.map((week) => ({
       week: week.week,
       days: week.days.map((d): DayView =>
         'rest' in d
@@ -147,8 +147,9 @@ export function phasesView(program: Program): PhaseView[] {
               exercises: visible(d.exercises).map(exerciseView),
             },
       ),
-    })),
-  }))
+    }))
+    return { title: block.title ?? null, weeks, differ: weeksDiffer(weeks) }
+  })
 }
 
 /**
@@ -193,7 +194,6 @@ export function routineView(program: Program, daysPerWeek: number, adaptation: A
  * dice. Solo «Empuje, tirón y pierna» de MUTA tiene el ciclo de 8 días que describe el documento de conocimiento.
  */
 export function restFact(
-  id: string,
   cycle: { sessions: number; rests: number; rotating: boolean },
   /** Lo que dice el documento original, si lo dice. */
   original?: string | null,
@@ -206,69 +206,84 @@ export function restFact(
       ? `${cycle.rests} de cada ${cycle.sessions + cycle.rests} días`
       : `${cycle.rests} ${cycle.rests === 1 ? 'día' : 'días'} por semana`
   }
-  if (id === 'muta-ppl-6d') return 'Con ciclo de 8 días: 2 descansos (tras pierna A y tras pierna B)'
   // Si no dicen nada: descanso obligatorio tras una vuelta completa al cuerpo; las filas de la lista dicen dónde
   return sessions.length ? 'Tras cada vuelta completa (la rutina no los indica)' : 'La rutina no los indica'
 }
 
-type RestRule = { after: number; note: string; phase?: number }
 const FIXED = 'Descanso obligatorio'
-const OPTIONAL = 'Descanso opcional'
-const SUGGESTED = 'Descanso sugerido'
 
 /**
- * Dónde caen los descansos de las rutinas cuyos archivos no los traen, según lo que dicen sus documentos
- * (`after` = tras la sesión número N de la semana). El resto, al acabar el ciclo completo.
+ * Si la semana no trae días de descanso, se ponen donde dice la rutina (`rules`) o, si no dice nada, al acabar la
+ * vuelta completa al cuerpo (torso y pierna, empuje-tirón-pierna…), como descanso obligatorio.
+ * Si el archivo los trae, se dejan tal cual.
  */
-const REST_RULES: Record<string, RestRule[]> = {
-  // Documento de conocimiento: ciclo de 8 días «EA, TA, PA, descanso, EB, TB, PB, descanso»
-  'muta-ppl-6d': [
-    { after: 3, note: FIXED },
-    { after: 6, note: FIXED },
-  ],
-  // Documento de conocimiento: ejemplo «A1, B1, descanso, A2, B2, descanso»
-  'muta-cuerpo-completo-4d': [
-    { after: 2, note: FIXED },
-    { after: 4, note: FIXED },
-  ],
-  // Preguntas frecuentes del original: «un descanso tras el día 2 y otros tras el día 4» / «entre el 2 y el 3 y tras el 5»
-  'frecuencia-alta-cuerpo-completo-4d': [
-    { after: 2, note: SUGGESTED },
-    { after: 4, note: SUGGESTED },
-  ],
-  'frecuencia-alta-cuerpo-completo-5d': [
-    { after: 2, note: SUGGESTED },
-    { after: 5, note: SUGGESTED },
-  ],
-  // Original: «Día 7: descanso» y «descanso opcional entre el día 4 y el 5»
-  'ppl-tecnica': [
-    { after: 4, note: OPTIONAL },
-    { after: 6, note: FIXED },
-  ],
-  // Original: bloque 1, seis días seguidos y «Día 7: descanso»
-  'mujer-especializacion': [{ after: 6, note: FIXED, phase: 0 }],
-}
-
-/**
- * Si la semana no trae días de descanso, se enseñan donde dice su documento (`REST_RULES`) o, si no dice nada,
- * al acabar la vuelta completa al cuerpo (torso y pierna, empuje-tirón-pierna…), como descanso obligatorio. Si el archivo los trae, se dejan tal cual.
- */
-export function withSuggestedRests(days: DayView[], id: string, phase = 0): DayView[] {
+function withRests(days: DayView[], rules: RestRule[], phase: number): DayView[] {
   if (days.some((d) => d.type === 'rest')) return days
-  const rules = (REST_RULES[id] ?? []).filter((r) => r.phase === undefined || r.phase === phase)
+  const mine = rules.filter((r) => r.phase === undefined || r.phase === phase)
   const rest = (note: string): DayView => ({ type: 'rest', note })
-  if (!rules.length) return days.some((d) => d.type === 'session') ? [...days, rest(FIXED)] : days
+  if (!mine.length) return days.some((d) => d.type === 'session') ? [...days, rest(FIXED)] : days
   let session = 0
   return days.flatMap((d) => {
     if (d.type !== 'session') return [d]
     session += 1
-    const here = rules.filter((r) => r.after === session)
-    return [d, ...here.map((r) => rest(r.note))]
+    return [d, ...mine.filter((r) => r.after === session).map((r) => rest(r.note))]
   })
+}
+
+/** Las fases con sus filas de descanso puestas. */
+export function applyRestRules(phases: PhaseView[], rules: RestRule[] = []): PhaseView[] {
+  return phases.map((p, i) => ({
+    ...p,
+    weeks: p.weeks.map((w) => ({ ...w, days: withRests(w.days, rules, i) })),
+  }))
 }
 
 /** ¿Las semanas de una fase son distintas entre sí (ejercicios, series…)? */
 export function weeksDiffer(weeks: WeekView[]): boolean {
   const key = (w: WeekView) => JSON.stringify(w.days)
   return weeks.some((w) => key(w) !== key(weeks[0]))
+}
+
+/** Los datos clave de una rutina (los que van bajo el título). */
+export function factsOf(args: {
+  days: number[]
+  info: {
+    cycle: { sessions: number; rests: number; rotating: boolean }
+    minutes: number
+    phases: unknown[]
+    weeks: number
+    splitLabel: string
+    volume: string
+    equipment: 'gym' | 'home'
+  }
+  /** Lo que dice el documento sobre los días de descanso. */
+  rest: string | null
+  /** Las sesiones de la primera semana, en orden. */
+  sessions: string[]
+  basics: boolean
+}): [string, string][] {
+  const { days, info } = args
+  const span = days.join('–')
+  return [
+    [
+      'Días',
+      info.cycle.rotating
+        ? `${span} por semana · rota en ${info.cycle.sessions} sesiones`
+        : `${span} por semana`,
+    ],
+    ['Duración', `~${info.minutes} min por sesión`],
+    [
+      'Programa',
+      info.phases.length
+        ? `${info.phases.length} fases · ${info.weeks} semanas`
+        : info.weeks
+          ? `${info.weeks} semanas`
+          : 'Se repite sin fecha de fin',
+    ],
+    ['Reparto', info.splitLabel],
+    ['Descanso', restFact(info.cycle, args.rest, args.sessions)],
+    ['Volumen', `${info.volume[0].toUpperCase()}${info.volume.slice(1)}`],
+    ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
+    ...(args.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),
+  ]
 }

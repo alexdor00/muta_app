@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
-import { logError } from '../../../../shared/lib/logger.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
@@ -11,24 +10,14 @@ import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { RoutineAbout } from '../../components/RoutineAbout.tsx'
-import { SlotPanel, type SlotPanelProps } from '../../components/SlotPanel.tsx'
-import {
-  aboutOf,
-  CATEGORIES,
-  restFact,
-  weeksDiffer,
-  withSuggestedRests,
-  routineDetail,
-  type PriorityChoice,
-  type Slot,
-  type WeakChoice,
-} from '../../state/routines.ts'
-import { chooseRoutine } from '../../use-cases/chooseRoutine.ts'
-import { openRoutine, setPriorities, setWeakPoints } from '../../use-cases/routineDetail.ts'
+import { SlotPanel } from '../../components/SlotPanel.tsx'
+import { aboutOf, CATEGORIES, routineDetail } from '../../state/routines.ts'
+import { openRoutine } from '../../use-cases/routineDetail.ts'
+import { slotPanel } from '../../use-cases/slotPanel.ts'
+import { startOpenRoutine } from '../../use-cases/startRoutine.ts'
 import styles from './RutinaScreen.module.css'
 
 const STATUS = { added: 'Añadido', removed: null, changed: 'Ajustado', same: null } as const
-const NO_PRIORITY: PriorityChoice = { priorities: [], optionals: {} }
 
 /**
  * Detalle de una rutina: datos clave, estructura por fases, semanas y días, y «Empezar esta rutina».
@@ -57,8 +46,8 @@ export function RutinaScreen(props: { id: string }) {
     )
   }
 
-  const { item, phases, weak, priorities, choice, rest } = state
-  const { entry, info } = item
+  const { item, phases, facts } = state
+  const { entry } = item
   const back = paths.routineCategory(item.categories[0] ?? 'muta')
   const about = aboutOf(entry)
   const currentPhase = phases[Math.min(phase, phases.length - 1)]
@@ -66,118 +55,13 @@ export function RutinaScreen(props: { id: string }) {
   const toggle = (id: string) => setOpen((now) => (now === id ? null : id))
 
   async function begin() {
-    try {
-      await chooseRoutine(entry.id, {
-        weakPoints: weak?.choice ?? null,
-        priorities: choice,
-      })
-      route(paths.training)
-    } catch (error) {
-      logError(error, 'empezar rutina')
-    }
+    if (await startOpenRoutine()) route(paths.training)
   }
 
-  // ── Lo que se despliega bajo cada fila que se puede cambiar
-  const prior = choice ?? NO_PRIORITY
-  const setPrior = (change: Partial<PriorityChoice>) => setPriorities({ ...prior, ...change })
   const anySlot = currentWeek.days.some(
     (d) => d.type === 'session' && d.exercises.some((e) => e.slot || e.tip),
   )
 
-  function panelFor(slot: Slot, id: string): SlotPanelProps | null {
-    if (slot.kind === 'optional') {
-      const o = priorities?.optionals.find((x) => x.key === slot.key)
-      return {
-        id,
-        kind: 'optional',
-        muscle: o?.muscle ?? '',
-        reason: o?.reason ?? null,
-        why: slot.why,
-        off: slot.off,
-        minutes: priorities?.minutes ?? null,
-        onSet: (include) => setPrior({ optionals: { ...prior.optionals, [slot.key]: include } }),
-        original: o?.name ?? '',
-        options: slot.options,
-        value: slot.chosen,
-        onPick: (name) => {
-          const rest = Object.fromEntries(
-            Object.entries(prior.alternatives ?? {}).filter(([key]) => key !== slot.key),
-          )
-          setPrior({ alternatives: name ? { ...rest, [slot.key]: name } : rest })
-        },
-      }
-    }
-    if (slot.kind === 'weak' && weak) {
-      const now = weak.choice?.mode === 'table' ? weak.choice : null
-      const put = (change: Partial<{ e1: string | null; e2: string | null }>) =>
-        setWeakPoints({
-          mode: 'table',
-          muscle: now?.muscle ?? '',
-          e1: now?.e1 ?? null,
-          e2: now?.e2 ?? null,
-          ...change,
-        })
-      return {
-        id,
-        kind: 'weak',
-        which: slot.which,
-        muscles: weak.table.muscles,
-        muscle: now?.muscle ?? null,
-        value: slot.which === 1 ? (now?.e1 ?? null) : (now?.e2 ?? null),
-        onMuscle: (muscle) => setWeakPoints({ mode: 'table', muscle, e1: null, e2: null }),
-        onOption: (en) => put(slot.which === 1 ? { e1: en } : { e2: en }),
-      }
-    }
-    if (slot.kind === 'pick' && weak) {
-      const slots = weak.choice?.mode === 'pick' ? weak.choice.slots : {}
-      const mine = slots[slot.day] ?? null
-      const set = (value: { muscle: string; option: string } | null): WeakChoice => ({
-        mode: 'pick',
-        slots: { ...slots, [slot.day]: value },
-      })
-      const recommended =
-        weak.table.mode === 'pick'
-          ? `El programa recomienda ${weak.table.min} o ${weak.table.max} músculos, siempre los mismos.`
-          : ''
-      return {
-        id,
-        kind: 'pick',
-        recommendation: recommended,
-        muscles: weak.table.muscles,
-        muscle: mine?.muscle ?? null,
-        value: mine?.option || null,
-        onMuscle: (muscle) => setWeakPoints(set({ muscle, option: '' })),
-        onOption: (en) => setWeakPoints(set(en && mine ? { muscle: mine.muscle, option: en } : null)),
-      }
-    }
-    return null
-  }
-
-  const sessionNames = (phases[0]?.weeks[0]?.days ?? []).flatMap((d) =>
-    d.type === 'session' ? [d.name] : [],
-  )
-  const facts: [string, string][] = [
-    [
-      'Días',
-      info.cycle.rotating
-        ? `${entry.days.join('–')} por semana · rota en ${info.cycle.sessions} sesiones`
-        : `${entry.days.join('–')} por semana`,
-    ],
-    ['Duración', `~${info.minutes} min por sesión`],
-    [
-      'Programa',
-      info.phases.length
-        ? `${info.phases.length} fases · ${info.weeks} semanas`
-        : info.weeks
-          ? `${info.weeks} semanas`
-          : 'Se repite sin fecha de fin',
-    ],
-    ['Reparto', info.splitLabel],
-    ['Descanso', restFact(entry.id, info.cycle, rest, sessionNames)],
-    ['Volumen', `${info.volume[0].toUpperCase()}${info.volume.slice(1)}`],
-    ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
-    ...(about?.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),
-  ]
   type Days = typeof currentWeek.days
   const renderDays = (days: Days, wk: number) => (
     <ol class={styles.days}>
@@ -198,7 +82,7 @@ export function RutinaScreen(props: { id: string }) {
               <ul class={styles.exercises}>
                 {day.exercises.map((e, j) => {
                   const id = `${phase}-${wk}-${i}-${j}`
-                  const panel = e.slot ? panelFor(e.slot, id) : null
+                  const panel = e.slot ? slotPanel(e.slot) : null
                   const body = (
                     <>
                       <span class={styles.exName}>
@@ -239,7 +123,7 @@ export function RutinaScreen(props: { id: string }) {
                       </button>
                       {open === id && (
                         <div class={styles.slotPanel}>
-                          {panel && <SlotPanel {...panel} />}
+                          {panel && <SlotPanel id={id} {...panel} />}
                           {e.tip && <p class={styles.tipText}>{e.tip}</p>}
                         </div>
                       )}
@@ -253,7 +137,7 @@ export function RutinaScreen(props: { id: string }) {
       )}
     </ol>
   )
-  const differ = currentPhase.weeks.length > 1 && weeksDiffer(currentPhase.weeks)
+  const differ = currentPhase.weeks.length > 1 && currentPhase.differ
 
   return (
     <div class={styles.page}>
@@ -326,12 +210,12 @@ export function RutinaScreen(props: { id: string }) {
             {currentPhase.weeks.map((w, wi) => (
               <details key={w.week} class={styles.week} open={wi === 0}>
                 <summary class={styles.weekTitle}>Semana {w.week}</summary>
-                {renderDays(withSuggestedRests(w.days, entry.id, phase), wi)}
+                {renderDays(w.days, wi)}
               </details>
             ))}
           </div>
         ) : (
-          renderDays(withSuggestedRests(currentWeek.days, entry.id, phase), week)
+          renderDays(currentWeek.days, week)
         )}
       </section>
 

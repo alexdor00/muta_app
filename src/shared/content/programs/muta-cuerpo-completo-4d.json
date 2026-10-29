@@ -585,5 +585,16 @@
         }
       ]
     }
-  ]
+  ],
+  "restRules": [
+    {
+      "after": 2,
+      "note": "Descanso obligatorio"
+    },
+    {
+      "after": 4,
+      "note": "Descanso obligatorio"
+    }
+  ],
+  "restInfo": "Un descanso tras B1 y otro tras B2 (ejemplo del documento de conocimiento)"
 }

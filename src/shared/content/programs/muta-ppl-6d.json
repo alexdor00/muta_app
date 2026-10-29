@@ -761,5 +761,16 @@
         }
       ]
     }
-  ]
+  ],
+  "restRules": [
+    {
+      "after": 3,
+      "note": "Descanso obligatorio"
+    },
+    {
+      "after": 6,
+      "note": "Descanso obligatorio"
+    }
+  ],
+  "restInfo": "Con ciclo de 8 días: 2 descansos (tras pierna A y tras pierna B)"
 }
