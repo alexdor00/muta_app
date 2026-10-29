@@ -39,9 +39,15 @@ Los e2e se construyen sin las rutinas privadas (`VITE_NO_LOCAL_PROGRAMS=1`), igu
 ## Documentación de detalle
 
 - [Arquitectura y flujo de datos](docs/arquitectura.md)
+- [Diseño: resumen del documento de rediseño](docs/rediseno.md): pantallas pendientes, sistema de diseño, checklist
+- [Datos de las rutinas](docs/datos.md): cómo se verifican y cómo se añade una rutina sin inventar
 - [Decisiones técnicas](docs/decisiones.md) y [notas ADR](docs/adr/README.md)
 - [Reglas y conocimiento de entrenamiento](docs/conocimiento/README.md) · [Diseños](docs/diseno/)
 - [Tareas](TAREAS.md): qué está hecho, qué toca ahora y qué falta
+
+## Al empezar una sesión (también tras /clear)
+
+Leer este archivo, `TAREAS.md` y el `CLAUDE.md` del módulo; resumir en cinco líneas qué hay hecho, la tarea actual y las dudas abiertas, y esperar.
 
 ## Reglas globales
 

@@ -49,7 +49,14 @@ for (const file of src) {
 }
 
 // 6. Documentación: existe, el CLAUDE.md raíz cabe en 120 líneas y los enlaces llevan a algún sitio
-for (const doc of ['CLAUDE.md', 'TAREAS.md', 'docs/arquitectura.md', 'docs/decisiones.md']) {
+for (const doc of [
+  'CLAUDE.md',
+  'TAREAS.md',
+  'docs/arquitectura.md',
+  'docs/decisiones.md',
+  'docs/rediseno.md',
+  'docs/datos.md',
+]) {
   if (!fs.existsSync(path.join(ROOT, doc))) fail(`falta ${doc}`)
 }
 const rootDoc = read('CLAUDE.md')

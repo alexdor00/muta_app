@@ -16,6 +16,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   grupo muscular, indicaciones del documento, descansos en todas las rutinas, semanas plegables.
 - Un solo sitio para los tipos de un programa; pantalla sin lógica; reglas de descanso en JSON; pruebas por módulo
   (112 tests); `.gitattributes`; axe, size-limit y Lighthouse CI; documentación para trabajar con poco contexto.
+- Documentación autosuficiente tras /clear: `docs/rediseno.md` (resumen del PDF de rediseño) y `docs/datos.md` (verificación y alta de rutinas).
 - Rama `refactor/una-fuente-de-verdad` unida a `main` con la CI en verde (2026-10-29).
 
 ## Pendiente (por prioridad)

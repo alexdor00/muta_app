@@ -34,3 +34,5 @@ resumen, ficha del ejercicio) existen como «pendientes» hasta tener diseño ap
 - El contenido va en los JSON del programa (`restRules`, `restInfo`, `tip`, `weakPoints`), no en el código.
 - Nada obligatorio: lo opcional, a elección del usuario; lo que viene del documento, con sus palabras.
 - Cada función de `domain/` lleva su prueba; un archivo que solo declara tipos no la necesita.
+
+Para pantallas nuevas: [docs/rediseno.md](../../../docs/rediseno.md). Para datos de rutinas: [docs/datos.md](../../../docs/datos.md).
