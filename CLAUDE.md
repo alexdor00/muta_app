@@ -76,4 +76,5 @@ Leer este archivo, `TAREAS.md` y el `CLAUDE.md` del módulo; resumir en cinco l�
 - Mantener este archivo **por debajo de 120 líneas**: si crece, el detalle pasa a `docs/`.
 - No duplicar información entre archivos: enlazarla.
 - Si no está claro dónde va algo, preguntar antes de escribirlo.
-- `npm run guardas` comprueba lo mecánico (existencia de los CLAUDE.md, límite de líneas, enlaces).
+- `npm run guardas` comprueba lo mecánico: existencia de los CLAUDE.md, límite de líneas, enlaces y que un cambio que toque un
+  módulo actualice su `CLAUDE.md` o `TAREAS.md` (comparando con `main`).

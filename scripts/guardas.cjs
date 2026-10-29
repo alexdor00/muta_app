@@ -88,6 +88,47 @@ for (const area of fs.readdirSync(path.join(ROOT, 'src/features'))) {
   else if (!rootDoc.includes(doc)) fail(`CLAUDE.md raíz no enlaza ${doc}`)
 }
 
+// 8. Documentación al día: si un cambio (respecto a main) toca el código de un módulo, debe tocar también su
+// CLAUDE.md o TAREAS.md. Solo se comprueba si hay una rama de referencia (en la CI y en ramas locales).
+const MODULES = [
+  ...fs.readdirSync(path.join(ROOT, 'src/features')).map((a) => ({
+    dir: `src/features/${a}/`,
+    doc: `src/features/${a}/CLAUDE.md`,
+  })),
+  { dir: 'src/shared/', doc: 'src/shared/CLAUDE.md' },
+  { dir: 'src/app/', doc: 'src/app/CLAUDE.md' },
+  { dir: 'tests/e2e/', doc: 'tests/e2e/CLAUDE.md' },
+]
+function changedFiles() {
+  for (const base of ['origin/main', 'main']) {
+    try {
+      const mergeBase = execFileSync('git', ['merge-base', base, 'HEAD'], {
+        cwd: ROOT,
+        encoding: 'utf8',
+      }).trim()
+      const out = execFileSync('git', ['diff', '--name-only', mergeBase, 'HEAD'], {
+        cwd: ROOT,
+        encoding: 'utf8',
+      })
+      return out.split('\n').filter(Boolean)
+    } catch {
+      // probar con la siguiente referencia
+    }
+  }
+  return null
+}
+const changed = changedFiles()
+if (changed && !changed.includes('TAREAS.md')) {
+  for (const m of MODULES) {
+    const touched = changed.some(
+      (f) => f.startsWith(m.dir) && !/\.(test\.ts|module\.css)$/.test(f) && f !== m.doc,
+    )
+    if (touched && !changed.includes(m.doc)) {
+      fail(`el cambio toca ${m.dir} pero no ${m.doc} ni TAREAS.md: actualizar la documentación`)
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`Guardas: ${errors.length} problema(s)\n` + errors.map((e) => `  ✖ ${e}`).join('\n'))
   process.exit(1)
