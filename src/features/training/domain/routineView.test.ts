@@ -143,6 +143,12 @@ describe('días de descanso en todas las rutinas', () => {
     expect(restFact('x', { sessions: 1, rests: 1, rotating: false })).toBe('1 día por semana')
     expect(restFact('x', { sessions: 8, rests: 4, rotating: true })).toBe('4 de cada 12 días')
     expect(restFact('x', { sessions: 4, rests: 0, rotating: false })).toBe('La rutina no los indica')
+    expect(restFact('x', { sessions: 4, rests: 0, rotating: false }, null, ['Torso', 'Pierna'])).toBe(
+      'Sugerido (la rutina no los indica): Torso, Pierna y descanso',
+    )
+    expect(restFact('x', { sessions: 4, rests: 0, rotating: false }, 'Día 7: descanso')).toBe(
+      'Día 7: descanso',
+    )
     expect(restFact('muta-ppl-6d', { sessions: 6, rests: 0, rotating: true })).toContain('ciclo de 8 días')
   })
 })

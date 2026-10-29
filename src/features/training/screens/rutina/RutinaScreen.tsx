@@ -55,7 +55,7 @@ export function RutinaScreen(props: { id: string }) {
     )
   }
 
-  const { item, phases, weak, priorities } = state
+  const { item, phases, weak, priorities, choice, rest } = state
   const { entry, info } = item
   const back = paths.routineCategory(item.categories[0] ?? 'muta')
   const about = aboutOf(entry)
@@ -67,7 +67,7 @@ export function RutinaScreen(props: { id: string }) {
     try {
       await chooseRoutine(entry.id, {
         weakPoints: weak?.choice ?? null,
-        priorities: priorities?.choice ?? null,
+        priorities: choice,
       })
       route(paths.training)
     } catch (error) {
@@ -76,15 +76,15 @@ export function RutinaScreen(props: { id: string }) {
   }
 
   // ── Lo que se despliega bajo cada fila que se puede cambiar
-  const prior = priorities?.choice ?? NO_PRIORITY
+  const prior = choice ?? NO_PRIORITY
   const setPrior = (change: Partial<PriorityChoice>) => setPriorities({ ...prior, ...change })
   const anySlot = currentWeek.days.some(
     (d) => d.type === 'session' && d.exercises.some((e) => e.slot || e.tip),
   )
 
   function panelFor(slot: Slot, id: string): SlotPanelProps | null {
-    if (slot.kind === 'optional' && priorities) {
-      const o = priorities.optionals.find((x) => x.key === slot.key)
+    if (slot.kind === 'optional') {
+      const o = priorities?.optionals.find((x) => x.key === slot.key)
       return {
         id,
         kind: 'optional',
@@ -92,7 +92,7 @@ export function RutinaScreen(props: { id: string }) {
         reason: o?.reason ?? null,
         why: slot.why,
         off: slot.off,
-        minutes: priorities.minutes,
+        minutes: priorities?.minutes ?? null,
         onSet: (include) => setPrior({ optionals: { ...prior.optionals, [slot.key]: include } }),
         original: o?.name ?? '',
         options: slot.options,
@@ -151,6 +151,9 @@ export function RutinaScreen(props: { id: string }) {
     return null
   }
 
+  const sessionNames = (phases[0]?.weeks[0]?.days ?? []).flatMap((d) =>
+    d.type === 'session' ? [d.name] : [],
+  )
   const facts: [string, string][] = [
     [
       'Días',
@@ -168,7 +171,7 @@ export function RutinaScreen(props: { id: string }) {
           : 'Se repite sin fecha de fin',
     ],
     ['Reparto', info.splitLabel],
-    ['Descanso', restFact(entry.id, info.cycle)],
+    ['Descanso', restFact(entry.id, info.cycle, rest, sessionNames)],
     ['Volumen', `${info.volume[0].toUpperCase()}${info.volume.slice(1)}`],
     ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
     ...(about?.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),

@@ -15,6 +15,7 @@ import {
   trimmedKeys,
   type PriorityChoice,
 } from '../domain/priorities.ts'
+import { applyMarkedOptionals } from '../domain/optionals.ts'
 import { selectVariant, type ProgramData } from '../domain/programInfo.ts'
 import { metaLines, phasesView } from '../domain/routineView.ts'
 import { applyWeakPoints, hasWeakPoints, type WeakChoice, type WeakTable } from '../domain/weakPoints.ts'
@@ -30,7 +31,7 @@ import { INFO, loadRoutines } from './loadRoutines.ts'
 /** Programas propios de MUTA: van en el código. */
 export const BUILT_IN: Record<string, unknown> = { [cuerpoCompleto.id]: cuerpoCompleto, [ppl.id]: ppl }
 
-type Program = ProgramData & { weakPoints?: WeakTable }
+type Program = ProgramData & { weakPoints?: WeakTable; restInfo?: string }
 let open: {
   item: RoutineItem
   program: Program
@@ -64,12 +65,15 @@ function show() {
     : null
   let shown: Program = afterPriorities
   if (table) shown = applyWeakPoints(shown as never, table, weakChoice) as Program
+  if (!canPrioritize) shown = applyMarkedOptionals(shown as never, priorityChoice) as Program
   routineDetail.value = {
     status: 'ready',
     item,
     phases: phasesView(shown as never),
     weak,
     priorities,
+    choice: priorityChoice,
+    rest: program.restInfo ?? null,
   }
 }
 

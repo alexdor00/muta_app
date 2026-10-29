@@ -214,12 +214,25 @@ export function routineView(program: Program, daysPerWeek: number, adaptation: A
  * El dato «Descanso» de una rutina, para todas. Si el archivo trae días de descanso, se cuentan; si no, lo
  * dice. Solo «Empuje, tirón y pierna» de MUTA tiene el ciclo de 8 días que describe el documento de conocimiento.
  */
-export function restFact(id: string, cycle: { sessions: number; rests: number; rotating: boolean }): string {
+export function restFact(
+  id: string,
+  cycle: { sessions: number; rests: number; rotating: boolean },
+  /** Lo que dice el documento original, si lo dice. */
+  original?: string | null,
+  /** Las sesiones de la primera semana, en orden. */
+  sessions: string[] = [],
+): string {
+  if (original) return original
   if (cycle.rests > 0) {
     return cycle.rotating
       ? `${cycle.rests} de cada ${cycle.sessions + cycle.rests} días`
       : `${cycle.rests} ${cycle.rests === 1 ? 'día' : 'días'} por semana`
   }
   if (id === 'muta-ppl-6d') return 'Con ciclo de 8 días: 2 descansos (tras pierna A y tras pierna B)'
-  return 'La rutina no los indica'
+  // Costumbre: al acabar el ciclo completo (torso, pierna…; empuje, tirón, pierna…), un día de descanso
+  const joined = sessions.join(', ')
+  const order = joined.length <= 70 ? joined : `${sessions.length} sesiones`
+  return sessions.length
+    ? `Sugerido (la rutina no los indica): ${order} y descanso`
+    : 'La rutina no los indica'
 }

@@ -137,7 +137,9 @@ export function SlotPanel(props: SlotPanelProps) {
           : props.reason
     return (
       <div class={styles.panel}>
-        <p class={styles.hint}>Ejercicio opcional de {props.muscle.toLowerCase()}. Tú decides si lo haces.</p>
+        <p class={styles.hint}>
+          Ejercicio opcional{props.muscle ? ` de ${props.muscle.toLowerCase()}` : ''}. Tú decides si lo haces.
+        </p>
         <ChoicePills
           name={`${props.id}-opcional`}
           legend="¿Lo haces?"

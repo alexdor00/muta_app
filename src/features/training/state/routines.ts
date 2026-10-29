@@ -47,6 +47,10 @@ export type DetailState =
       phases: PhaseView[]
       weak: WeakView | null
       priorities: PriorityView | null
+      /** Lo que has decidido de los opcionales y las prioridades. */
+      choice: PriorityChoice | null
+      /** Lo que dice el documento original sobre los días de descanso. */
+      rest: string | null
     }
 
 /** Prioridades de una rutina de MUTA: músculos, ejercicios opcionales y lo elegido. */
