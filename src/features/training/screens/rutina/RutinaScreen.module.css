@@ -31,12 +31,6 @@
   font: var(--text-title-2);
 }
 
-.text {
-  margin-top: var(--space-2);
-  font: var(--text-subhead);
-  color: var(--label-2);
-}
-
 .structure {
   display: flex;
   flex-direction: column;

@@ -33,21 +33,3 @@
   background: var(--surface);
   font: var(--text-footnote);
 }
-
-.more {
-  padding: 0 var(--gutter);
-}
-
-.back {
-  padding: calc(var(--space-3) + var(--safe-top)) var(--gutter) 0;
-  font: var(--text-body);
-}
-
-.back a {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.back + header {
-  padding-top: 0;
-}
