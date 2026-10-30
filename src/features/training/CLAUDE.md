@@ -36,10 +36,16 @@ resumen, ficha del ejercicio) existen como «pendientes» hasta tener diseño ap
   prioridades → puntos débiles → opcionales marcados → descansos. Orden fijo; cada paso recibe y devuelve `ProgramData`.
 - Las elecciones se guardan en IndexedDB `plans/current` (`chooseRoutine`). El programa original no se toca.
 - El contenido va en los JSON del programa (`restRules`, `restInfo`, `tip`, `weakPoints`), no en el código.
-- **Todos los tipos se recorren por frecuencia** (`DayPicker`): se elige los días por semana y salen las rutinas de esos días, en filas
-  con su «!» y guardar, también si es una sola. Mujer (12 rutinas) tiene antes categorías con tarjeta y «!» (`/entreno/rutinas/mujer`,
+- **Todos los grupos se recorren por frecuencia** (`DayPicker`): se elige los días por semana y salen las rutinas de esos días, en filas
+  con su «!» y guardar, también si es una sola. Hipertrofia y Mujer tienen antes categorías con tarjeta (`/entreno/rutinas/mujer`,
   `/mujer/base`…) y «Ver todas» (`/mujer/todas`). Los filtros están en todos los niveles; los días van en círculos y hay equipamiento.
-  Los nombres de las categorías de Mujer y su «!» son texto propuesto (resumen de los documentos, más corto); el resto sale del catálogo.
+- **La «!» de cada tarjeta ayuda a elegir** (qué es, para quién, por cuál empezar) y sale de los documentos de los programas, resumida:
+  nada que el documento no diga. Los nombres y frases de las categorías de Mujer son texto propuesto; el resto sale del catálogo.
+- **Las partes de una serie llevan la fase en el nombre** (`Fuerza e hipertrofia · fase 1`, `Hipertrofia · fase 2 · …`); las fases de
+  dentro de una rutina se explican en su «!». Los nombres y los grupos se verifican contra el documento original (decisión 2026-10-30).
+- **Descansos:** primero lo que dice el documento (días en el archivo y `restRules`); solo si no dice nada, `restCycles.ts` los pone donde
+  se completa la vuelta al cuerpo. Un descanso que el documento solo permite no se guarda como obligatorio ([docs/datos.md](../../../docs/datos.md)).
+- **La pantalla de una rutina abre todo plegado** (ni la semana 1 ni las sesiones con opciones salen desplegadas).
 - La fila es corta (`compactMeta`): volumen como etiqueta y una línea con minutos, fases y semanas. El reparto y el lugar van en el detalle.
 - Nada obligatorio: lo opcional, a elección del usuario; lo que viene del documento, con sus palabras.
 - Cada función de `domain/` lleva su prueba; un archivo que solo declara tipos no la necesita.

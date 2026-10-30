@@ -4,9 +4,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- Revisar en el móvil (`npm run dev`) la rama `pantalla/estilo-blanco-negro` y unirla a `main`: grupos, selector de días,
-  «!» de cada tarjeta y descansos. Aún no se ha visto a mano en un móvil real.
-- Revisar «En casa · principiante · peso corporal»: sale como «Gimnasio» (afecta al filtro de equipamiento).
+- **Unir la rama `pantalla/estilo-blanco-negro` a `main`** (PR en GitHub, con la CI en verde): revisarla antes en un móvil real con
+  `npm run dev` (grupos, selector de días, «!» de cada tarjeta, descansos). Hasta ahora solo se ha visto en el navegador simulado.
+- Después, **arreglar la galería de capturas** (`npm run galeria`): espera el texto «Recomendadas para ti», que ya no existe en la app.
 - Proteger la rama `main` en GitHub (Settings → Branches → exigir que la CI pase, job `check`). La hace el dueño del repositorio.
 
 ## Hecho
@@ -29,6 +29,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   - Partes de una serie con la fase en el nombre (Fuerza e hipertrofia · fase 1–3, Hipertrofia · fase 1–2); En casa por nivel.
   - Descanso obligatorio donde se completa la vuelta al cuerpo (`restCycles.ts`) solo si el documento no dice nada.
   - Textos de descanso más cortos y datos corregidos (revisión 14 de las rutinas locales).
+  - Limpieza de lo que no tenía función (informe y generador de diseño obsoletos, estilos sin uso), con una sola fuente para el
+    rango de días y la cuenta de rutinas. Verificado: `npm run check` (145 tests) y e2e (6 de 6).
 
 ## Pendiente (por prioridad)
 

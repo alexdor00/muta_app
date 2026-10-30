@@ -31,7 +31,7 @@ JSON del programa ── shared/content (MUTA) o private/programs → IndexedDB 
         applyWeakPoints      (huecos de punto débil)                      domain/weakPoints.ts
         applyMarkedOptionals ("(optional)" de los originales)             domain/optionals.ts
         phasesView           (filas listas para pintar)                   domain/routineView.ts
-        applyRestRules       (filas de descanso)                          domain/routineView.ts
+        applyRestRules       (descansos: archivo → reglas → patrones)     domain/routineView.ts · restCycles.ts
         factsOf              (datos clave)                                domain/routineView.ts
         │
         ▼  state/routines.ts · señal `routineDetail`
