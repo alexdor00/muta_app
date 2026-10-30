@@ -121,13 +121,13 @@ test('galería de pantallas', async ({ browser }) => {
       )
       await page
         .getByRole('region', { name: 'Recomendadas para ti' })
-        .getByRole('button', { name: /^MUTA/ })
+        .getByRole('button', { name: /^Hipertrofia/ })
         .click()
-      await expect(page).toHaveURL(/\/entreno\/rutinas\/muta/)
+      await expect(page).toHaveURL(/\/entreno\/rutinas\/hipertrofia/)
       await shot(
         page,
         '10b-familia-muta',
-        'Tipo de rutina · MUTA',
+        'Tipo de rutina · Hipertrofia',
         'Al tocar una familia: arriba «Para ti» (las versiones que encajan con tus días y nivel) y debajo «Más de este tipo». Se puede elegir cualquiera.',
       )
     }

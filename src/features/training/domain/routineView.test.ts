@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type { CatalogEntry } from './catalog.ts'
+import type { MuscleId } from './muscles.ts'
 import type { ProgramInfo } from './programInfo.ts'
 import {
   activeFilters,
+  compactMeta,
+  countLabel,
+  daysLabel,
+  daysRange,
   durationOf,
+  factsOf,
   matches,
   metaLines,
   applyRestRules,
@@ -35,6 +41,47 @@ const info = (over: Partial<ProgramInfo> = {}): ProgramInfo => ({
   ...over,
 })
 
+describe('rango de días y cuenta de rutinas', () => {
+  it('los días se escriben igual en el cuadrado de la fila y en el texto', () => {
+    expect(daysRange([4])).toBe('4')
+    expect(daysRange([5, 6])).toBe('5–6')
+    expect(daysLabel([4])).toBe('4 días')
+    expect(daysLabel([3, 4])).toBe('3–4 días')
+  })
+
+  it('una rutina en singular y el resto en plural', () => {
+    expect(countLabel(1)).toBe('1 rutina')
+    expect(countLabel(12)).toBe('12 rutinas')
+    expect(countLabel(0)).toBe('0 rutinas')
+  })
+})
+
+describe('datos clave', () => {
+  it('sin fin no hay línea «Programa»; sin dato de descanso, no hay línea «Descanso»', () => {
+    const facts = factsOf({ days: [4], info: info({ weeks: 0 }), rest: null, basics: false })
+    expect(facts.map(([name]) => name)).toEqual(['Días', 'Duración', 'Reparto', 'Volumen', 'Lugar'])
+  })
+
+  it('con el texto del documento sobre los descansos, sale tal cual', () => {
+    const facts = factsOf({ days: [4], info: info(), rest: 'Tras B1 y tras B2', basics: false })
+    expect(facts).toContainEqual(['Descanso', 'Tras B1 y tras B2'])
+  })
+})
+
+describe('fila corta', () => {
+  it('etiqueta de volumen y una línea con minutos, fases y semanas; sin días, reparto ni lugar', () => {
+    expect(compactMeta(info())).toEqual({ chip: 'Volumen medio', line: '~60 min · 10 semanas' })
+    expect(compactMeta(info({ volume: 'bajo', phases: ['A', 'B'], weeks: 8 }))).toEqual({
+      chip: 'Volumen bajo',
+      line: '~60 min · 2 fases · 8 semanas',
+    })
+    expect(compactMeta(info({ weeks: 0 })).line).toBe('~60 min')
+    expect(compactMeta(info({ cycle: { sessions: 8, rests: 4, rotating: true, restNotes: [] } })).line).toBe(
+      'rota en 8 sesiones · ~60 min · 10 semanas',
+    )
+  })
+})
+
 describe('datos de la fila', () => {
   it('volumen, reparto y material; días, duración y semanas', () => {
     expect(metaLines(entry, info())).toEqual([
@@ -49,7 +96,7 @@ describe('datos de la fila', () => {
       info({ cycle: { sessions: 8, rests: 4, rotating: true, restNotes: [] } }),
     )
     expect(rot).toBe('rota en 8 sesiones · ~60 min · 10 semanas')
-    expect(metaLines(entry, info({ weeks: 0 }))[1]).toBe('4 días · ~60 min · Sin fecha de fin')
+    expect(metaLines(entry, info({ weeks: 0 }))[1]).toBe('4 días · ~60 min')
     expect(metaLines(entry, info({ phases: ['A', 'B', 'C'], weeks: 13 }))[1]).toBe(
       '4 días · ~60 min · 3 fases · 13 semanas',
     )
@@ -148,16 +195,19 @@ describe('días de descanso en todas las rutinas', () => {
     expect(restFact({ sessions: 4, rests: 2, rotating: false })).toBe('2 días por semana')
     expect(restFact({ sessions: 1, rests: 1, rotating: false })).toBe('1 día por semana')
     expect(restFact({ sessions: 8, rests: 4, rotating: true })).toBe('4 de cada 12 días')
-    expect(restFact({ sessions: 4, rests: 0, rotating: false })).toBe('La rutina no los indica')
-    expect(restFact({ sessions: 4, rests: 0, rotating: false }, null, ['Torso', 'Pierna'])).toBe(
-      'Tras cada vuelta completa (la rutina no los indica)',
-    )
+    expect(restFact({ sessions: 4, rests: 0, rotating: false })).toBeNull()
     expect(restFact({ sessions: 4, rests: 0, rotating: false }, 'Día 7: descanso')).toBe('Día 7: descanso')
   })
 })
 
 describe('filas de descanso y semanas plegables', () => {
-  const ses = (name: string) => ({ type: 'session' as const, name, minutes: 50, exercises: [] })
+  const ses = (name: string, muscles: MuscleId[] = []) => ({
+    type: 'session' as const,
+    name,
+    minutes: 50,
+    exercises: [],
+    muscles,
+  })
   const fixed = { type: 'rest' as const, note: 'Descanso obligatorio' }
   const phase = (days: DayView[], weeks = 1): PhaseView => ({
     title: null,
@@ -166,9 +216,43 @@ describe('filas de descanso y semanas plegables', () => {
   })
   const names = (p: PhaseView) => p.weeks[0].days.map((d) => (d.type === 'rest' ? d.note : d.name))
 
-  it('sin reglas ni descansos en el archivo, uno obligatorio al acabar la vuelta completa', () => {
+  it('sin reglas ni descansos en el archivo ni músculos reconocidos, uno obligatorio al final', () => {
     const [out] = applyRestRules([phase([ses('Torso'), ses('Pierna')])])
     expect(out.weeks[0].days).toEqual([ses('Torso'), ses('Pierna'), fixed])
+  })
+
+  it('sin reglas, el descanso va donde se completa la vuelta al cuerpo, no solo al final', () => {
+    const torso: MuscleId[] = ['pecho', 'dorsal']
+    const pierna: MuscleId[] = ['cuadriceps', 'gluteo']
+    const week = [
+      ses('Pierna A', pierna),
+      ses('Torso A', torso),
+      ses('Pierna B', pierna),
+      ses('Torso B', torso),
+    ]
+    const [out] = applyRestRules([phase(week)])
+    expect(names(out)).toEqual([
+      'Pierna A',
+      'Torso A',
+      'Descanso obligatorio',
+      'Pierna B',
+      'Torso B',
+      'Descanso obligatorio',
+    ])
+  })
+
+  it('con la pierna partida, el descanso va tras la segunda parte de la pierna', () => {
+    const week = [
+      ses('Cuádriceps', ['cuadriceps']),
+      ses('Torso', ['pecho', 'dorsal']),
+      ses('Femoral y glúteo', ['femoral', 'gluteo']),
+    ]
+    expect(names(applyRestRules([phase(week)])[0])).toEqual([
+      'Cuádriceps',
+      'Torso',
+      'Femoral y glúteo',
+      'Descanso obligatorio',
+    ])
   })
 
   it('si el archivo trae descansos, se dejan tal cual', () => {
@@ -178,7 +262,7 @@ describe('filas de descanso y semanas plegables', () => {
   })
 
   it('las reglas del programa los ponen en su sitio y con su tipo', () => {
-    const six = ['Empuje A', 'Tirón A', 'Pierna A', 'Empuje B', 'Tirón B', 'Pierna B'].map(ses)
+    const six = ['Empuje A', 'Tirón A', 'Pierna A', 'Empuje B', 'Tirón B', 'Pierna B'].map((n) => ses(n))
     const [out] = applyRestRules(
       [phase(six)],
       [

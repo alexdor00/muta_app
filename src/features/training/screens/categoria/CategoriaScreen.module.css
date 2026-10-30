@@ -22,6 +22,18 @@
   list-style: none;
 }
 
+/* Categorías de un tipo con secciones (Mujer) y el botón «Ver todas» */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-inside);
+  padding: var(--space-2) var(--gutter) 0;
+}
+
+.all {
+  padding: var(--space-4) var(--gutter) 0;
+}
+
 .empty {
   display: flex;
   flex-direction: column;

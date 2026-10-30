@@ -78,6 +78,16 @@
   opacity: 0.85;
 }
 
+.wrap {
+  position: relative;
+}
+
+.action {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+}
+
 .badge {
   position: absolute;
   top: var(--space-3);

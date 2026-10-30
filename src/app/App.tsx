@@ -125,6 +125,7 @@ function Layout() {
             <Route path={paths.routine} component={TuRutina} />
             <Route path={paths.chooseRoutine} component={ElegirRutina} />
             <Route path={patterns.routineCategory} component={Categoria} />
+            <Route path={patterns.routineSection} component={Categoria} />
             <Route path={patterns.routineDetail} component={Rutina} />
             <Route path={patterns.sessionStart} component={SesionInicio} />
             <Route path={patterns.summary} component={Resumen} />

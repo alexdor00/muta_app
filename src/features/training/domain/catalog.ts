@@ -1,4 +1,4 @@
-import type { CategoryId } from './categories.ts'
+import type { FamilyId } from './categories.ts'
 import type { ProgramInfo, Variant, VolumeTier } from './programInfo.ts'
 
 // Catálogo de rutinas: datos de hecho de cada una (título, días, origen, variante).
@@ -21,7 +21,7 @@ export type CatalogEntry = {
   source?: string
   variant?: Variant
   /** Familia: la carpeta del programa original (o MUTA). */
-  family: CategoryId
+  family: FamilyId
 }
 
 const local = (e: Omit<CatalogEntry, 'origin'>): CatalogEntry => ({ ...e, origin: 'local' })
@@ -53,42 +53,42 @@ export const CATALOG: CatalogEntry[] = [
   local({
     id: 'hipertrofia-cuerpo-completo-5d-f1',
     family: 'culturismo',
-    title: 'Hipertrofia F1 · cuerpo completo',
+    title: 'Hipertrofia · fase 1 · cuerpo completo',
     days: [5],
     tone: 4,
   }),
   local({
     id: 'hipertrofia-torso-pierna-f1',
     family: 'culturismo',
-    title: 'Hipertrofia F1 · torso y pierna',
+    title: 'Hipertrofia · fase 1 · torso y pierna',
     days: [5],
     tone: 4,
   }),
   local({
     id: 'hipertrofia-ppl-6d-f1',
     family: 'culturismo',
-    title: 'Hipertrofia F1 · empuje, tirón y pierna',
+    title: 'Hipertrofia · fase 1 · empuje, tirón y pierna',
     days: [6],
     tone: 4,
   }),
   local({
     id: 'hipertrofia-cuerpo-completo-5d-f2',
     family: 'culturismo',
-    title: 'Hipertrofia F2 · cuerpo completo',
+    title: 'Hipertrofia · fase 2 · cuerpo completo',
     days: [5],
     tone: 4,
   }),
   local({
     id: 'hipertrofia-torso-pierna-f2',
     family: 'culturismo',
-    title: 'Hipertrofia F2 · torso y pierna',
+    title: 'Hipertrofia · fase 2 · torso y pierna',
     days: [5],
     tone: 4,
   }),
   local({
     id: 'hipertrofia-ppl-6d-f2',
     family: 'culturismo',
-    title: 'Hipertrofia F2 · empuje, tirón y pierna',
+    title: 'Hipertrofia · fase 2 · empuje, tirón y pierna',
     days: [6],
     tone: 4,
   }),
@@ -111,28 +111,28 @@ export const CATALOG: CatalogEntry[] = [
   local({
     id: 'fuerza-hipertrofia-1-6d',
     family: 'fuerza-hipertrofia',
-    title: 'Fuerza e hipertrofia 1',
+    title: 'Fuerza e hipertrofia · fase 1',
     days: [5, 6],
     tone: 6,
   }),
   local({
     id: 'fuerza-hipertrofia-2-4d',
     family: 'fuerza-hipertrofia',
-    title: 'Fuerza e hipertrofia 2 · 4 días',
+    title: 'Fuerza e hipertrofia · fase 2 · 4 días',
     days: [4],
     tone: 6,
   }),
   local({
     id: 'fuerza-hipertrofia-2-6d',
     family: 'fuerza-hipertrofia',
-    title: 'Fuerza e hipertrofia 2 · 5–6 días',
+    title: 'Fuerza e hipertrofia · fase 2',
     days: [5, 6],
     tone: 6,
   }),
   local({
     id: 'fuerza-hipertrofia-3-5d',
     family: 'fuerza-hipertrofia',
-    title: 'Fuerza e hipertrofia 3',
+    title: 'Fuerza e hipertrofia · fase 3',
     days: [5],
     tone: 6,
   }),
@@ -208,11 +208,11 @@ export const CATALOG: CatalogEntry[] = [
     source: 'mujer-base',
     variant: { blocks: [4, 5] },
   }),
-  // En casa: seis rutinas en un archivo (dos etapas de progresión)
+  // En casa: seis programas de un archivo, por nivel (principiante ×2, intermedio ×2, avanzado ×2)
   local({
     id: 'casa-peso-corporal',
     family: 'mujer',
-    title: 'En casa · peso corporal',
+    title: 'En casa · principiante · peso corporal',
     days: [3],
     tone: 2,
     source: 'mujer-casa',
@@ -221,7 +221,7 @@ export const CATALOG: CatalogEntry[] = [
   local({
     id: 'casa-mancuernas',
     family: 'mujer',
-    title: 'En casa · con mancuernas',
+    title: 'En casa · principiante · con mancuernas',
     days: [3],
     tone: 2,
     source: 'mujer-casa',
@@ -230,7 +230,7 @@ export const CATALOG: CatalogEntry[] = [
   local({
     id: 'casa-torso-pierna-1',
     family: 'mujer',
-    title: 'En casa · torso y pierna, etapa 1',
+    title: 'En casa · intermedio · torso y pierna',
     days: [4],
     tone: 2,
     source: 'mujer-casa',
@@ -239,7 +239,7 @@ export const CATALOG: CatalogEntry[] = [
   local({
     id: 'casa-cuerpo-completo-1',
     family: 'mujer',
-    title: 'En casa · cuerpo completo, etapa 1',
+    title: 'En casa · intermedio · cuerpo completo',
     days: [4],
     tone: 2,
     source: 'mujer-casa',
@@ -248,7 +248,7 @@ export const CATALOG: CatalogEntry[] = [
   local({
     id: 'casa-torso-pierna-2',
     family: 'mujer',
-    title: 'En casa · torso y pierna, etapa 2',
+    title: 'En casa · avanzado · torso y pierna',
     days: [4],
     tone: 2,
     source: 'mujer-casa',
@@ -257,7 +257,7 @@ export const CATALOG: CatalogEntry[] = [
   local({
     id: 'casa-cuerpo-completo-2',
     family: 'mujer',
-    title: 'En casa · cuerpo completo, etapa 2',
+    title: 'En casa · avanzado · cuerpo completo',
     days: [4],
     tone: 2,
     source: 'mujer-casa',
@@ -265,8 +265,20 @@ export const CATALOG: CatalogEntry[] = [
   }),
   // Especialización
   local({ id: 'gluteos', family: 'mujer', title: 'Glúteo', days: [5], tone: 3 }),
-  local({ id: 'mujer-especializacion', family: 'mujer', title: 'Tren inferior', days: [6], tone: 3 }),
-  local({ id: 'mujer-optimizacion', family: 'mujer', title: 'Optimización', days: [5], tone: 3 }),
+  local({
+    id: 'mujer-especializacion',
+    family: 'mujer',
+    title: 'Desarrollo completo · foco en glúteo',
+    days: [6],
+    tone: 3,
+  }),
+  local({
+    id: 'mujer-optimizacion',
+    family: 'mujer',
+    title: 'Físico equilibrado',
+    days: [5],
+    tone: 3,
+  }),
 ]
 
 /** Archivo del que sale la rutina. */

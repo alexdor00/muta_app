@@ -79,5 +79,21 @@ export type { Slot } from '../domain/slots.ts'
 export type { PriorityChoice } from '../domain/priorities.ts'
 export { DEFAULT_MINUTES, MAX_PRIORITIES } from '../domain/priorities.ts'
 export type { Adaptation, Category, CategoryId, CatalogEntry, Level, PhaseView }
-export { activeFilters, matches, type Filters } from '../domain/routineView.ts'
+export {
+  activeFilters,
+  compactMeta,
+  countLabel,
+  daysRange,
+  matches,
+  type Filters,
+} from '../domain/routineView.ts'
 export { SPLIT_LABEL, type Split, type VolumeTier } from '../domain/programInfo.ts'
+export {
+  ALL_SECTION,
+  daysOf,
+  inSection,
+  pickDays,
+  sectionAbout,
+  sectionsOf,
+  type Section,
+} from '../domain/sections.ts'

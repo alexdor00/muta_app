@@ -11,6 +11,8 @@ export const paths = {
   chooseRoutine: '/entreno/rutinas',
   /** Rutinas de un tipo de entrenamiento («guardadas» = las marcadas). */
   routineCategory: (category: string) => `/entreno/rutinas/${category}`,
+  /** Una sección de un tipo («mujer» → «base»), o «todas» para la lista completa. */
+  routineSection: (category: string, section: string) => `/entreno/rutinas/${category}/${section}`,
   /** Detalle de una rutina, con «Adaptar a mí» y «Empezar esta rutina». */
   routineDetail: (id: string) => `/entreno/programa/${id}`,
   sessionStart: (sessionId: string) => `/entreno/sesion/${sessionId}/inicio`,
@@ -26,6 +28,7 @@ export const paths = {
 export const patterns = {
   onboarding: '/bienvenida/:step',
   routineCategory: '/entreno/rutinas/:category',
+  routineSection: '/entreno/rutinas/:category/:section',
   routineDetail: '/entreno/programa/:id',
   sessionStart: '/entreno/sesion/:sessionId/inicio',
   session: '/entreno/sesion/:sessionId',

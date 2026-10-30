@@ -3,7 +3,9 @@ import type { Exercise, ProgramData as Program, RestRule } from './program.ts'
 import type { Slot } from './slots.ts'
 import { adaptToLevel, type SetsGoal } from './adaptVolume.ts'
 import type { CatalogEntry, Level } from './catalog.ts'
+import { muscleOf } from './muscleOf.ts'
 import { MUSCLES, type MuscleId } from './muscles.ts'
+import { restPositions } from './restCycles.ts'
 import { sessionMinutes, type ProgramInfo, type Split, type VolumeTier } from './programInfo.ts'
 import { representativeWeek, weeklySets } from './programLevel.ts'
 
@@ -15,21 +17,45 @@ const VOLUME_LABEL: Record<VolumeTier, string> = {
   alto: 'Volumen alto',
 }
 
-export const daysLabel = (days: number[]) =>
-  days.length > 1 ? `${Math.min(...days)}–${Math.max(...days)} días` : `${days[0]} días`
+/** «4» o «5–6». */
+export const daysRange = (days: number[]) =>
+  days.length > 1 ? `${Math.min(...days)}–${Math.max(...days)}` : String(days[0])
 
-/** Las dos líneas grises de una fila (como «Avanzado · Fuerza · Equipo completo» y «45 min»). */
-export function metaLines(entry: CatalogEntry, info: ProgramInfo): [string, string] {
-  const place = info.equipment === 'home' ? 'En casa' : 'Gimnasio'
-  const length = info.phases.length
+/** «4 días» o «5–6 días». */
+export const daysLabel = (days: number[]) => `${daysRange(days)} días`
+
+/** «1 rutina», «12 rutinas». */
+export const countLabel = (n: number) => `${n} ${n === 1 ? 'rutina' : 'rutinas'}`
+
+const placeOf = (info: { equipment: 'gym' | 'home' }) => (info.equipment === 'home' ? 'En casa' : 'Gimnasio')
+
+/** «2 fases · 8 semanas»; vacío si la rutina no tiene fin (se repite): no se dice nada. */
+const lengthOf = (info: { phases: unknown[]; weeks: number }) =>
+  info.phases.length
     ? `${info.phases.length} fases · ${info.weeks} semanas`
     : info.weeks
       ? `${info.weeks} semanas`
-      : 'Sin fecha de fin'
+      : ''
+
+/**
+ * Versión corta de una fila: una etiqueta (el volumen) y una línea con lo que cuesta (minutos, fases y semanas).
+ * Sin los días (ya salen en el cuadrado, salvo si la rutina rota), ni el reparto ni el lugar (los dicen el título y
+ * el detalle de la rutina).
+ */
+export function compactMeta(info: ProgramInfo): { chip: string; line: string } {
+  const rhythm = info.cycle.rotating ? `rota en ${info.cycle.sessions} sesiones` : ''
+  const line = [rhythm, `~${info.minutes} min`, lengthOf(info)].filter(Boolean).join(' · ')
+  return { chip: VOLUME_LABEL[info.volume], line }
+}
+
+/** Las dos líneas grises de una fila (como «Avanzado · Fuerza · Equipo completo» y «45 min»). */
+export function metaLines(entry: CatalogEntry, info: ProgramInfo): [string, string] {
+  const place = placeOf(info)
+  const length = lengthOf(info)
   const rhythm = info.cycle.rotating ? `rota en ${info.cycle.sessions} sesiones` : daysLabel(entry.days)
   return [
     `${VOLUME_LABEL[info.volume]} · ${info.splitLabel} · ${place}`,
-    `${rhythm} · ~${info.minutes} min · ${length}`,
+    [rhythm, `~${info.minutes} min`, length].filter(Boolean).join(' · '),
   ]
 }
 
@@ -44,6 +70,7 @@ export type Filters = {
   cycle?: 'semanal' | 'rota'
   /** «si»: solo las que buscan mejorar los básicos. */
   basics?: 'si'
+  equipment?: 'gym' | 'home'
 }
 
 /** Corta ≤ 45 min · media 50–65 · larga ≥ 70. */
@@ -59,6 +86,7 @@ export function matches(item: { entry: CatalogEntry; info: ProgramInfo }, f: Fil
   if (f.volume && info.volume !== f.volume) return false
   if (f.cycle && (f.cycle === 'rota') !== info.cycle.rotating) return false
   if (f.basics && !aboutOf(entry)?.basics) return false
+  if (f.equipment && info.equipment !== f.equipment) return false
   return true
 }
 
@@ -84,7 +112,14 @@ export type ExerciseView = {
   tip: string | null
 }
 export type DayView =
-  | { type: 'session'; name: string; minutes: number; exercises: ExerciseView[] }
+  | {
+      type: 'session'
+      name: string
+      minutes: number
+      exercises: ExerciseView[]
+      /** Los músculos que trabaja (sin los ejercicios quitados): de aquí sale dónde va el descanso. */
+      muscles: MuscleId[]
+    }
   | { type: 'rest'; note: string }
 export type WeekView = { week: number; days: DayView[] }
 /** `differ`: las semanas de la fase son distintas entre sí (se enseñan plegables). */
@@ -126,6 +161,12 @@ function exerciseView(e: Exercise): ExerciseView {
   }
 }
 
+/** Los músculos de una sesión, sin repetir y sin lo que está quitado o apagado. */
+function musclesOfSession(exercises: Exercise[]): MuscleId[] {
+  const worked = exercises.filter((e) => !e.removed && !(e.slot?.kind === 'optional' && e.slot.off))
+  return [...new Set(worked.flatMap((e) => muscleOf(e) ?? []))]
+}
+
 /** Una fila por grupo de progresión: el primer nivel, con el resto como alternativas. */
 const visible = (exercises: Exercise[]) =>
   exercises.filter((e, i) => !e.group || exercises.findIndex((x) => x.group === e.group) === i)
@@ -145,6 +186,7 @@ export function phasesView(program: Program): PhaseView[] {
                   sessionMinutes(d.exercises.filter((e) => !(e.slot?.kind === 'optional' && e.slot.off))) / 5,
                 ) * 5,
               exercises: visible(d.exercises).map(exerciseView),
+              muscles: musclesOfSession(d.exercises),
             },
       ),
     }))
@@ -190,38 +232,39 @@ export function routineView(program: Program, daysPerWeek: number, adaptation: A
 }
 
 /**
- * El dato «Descanso» de una rutina, para todas. Si el archivo trae días de descanso, se cuentan; si no, lo
- * dice. Solo «Empuje, tirón y pierna» de MUTA tiene el ciclo de 8 días que describe el documento de conocimiento.
+ * El dato «Descanso» de una rutina. Si el documento lo dice, tal cual; si el archivo trae días de descanso, se
+ * cuentan; si no, no hay dato (null): los descansos obligatorios ya salen en la lista de días de la rutina.
+ * Solo «Empuje, tirón y pierna» de MUTA tiene el ciclo de 8 días que describe el documento de conocimiento.
  */
 export function restFact(
   cycle: { sessions: number; rests: number; rotating: boolean },
   /** Lo que dice el documento original, si lo dice. */
   original?: string | null,
-  /** Las sesiones de la primera semana, en orden. */
-  sessions: string[] = [],
-): string {
+): string | null {
   if (original) return original
   if (cycle.rests > 0) {
     return cycle.rotating
       ? `${cycle.rests} de cada ${cycle.sessions + cycle.rests} días`
       : `${cycle.rests} ${cycle.rests === 1 ? 'día' : 'días'} por semana`
   }
-  // Si no dicen nada: descanso obligatorio tras una vuelta completa al cuerpo; las filas de la lista dicen dónde
-  return sessions.length ? 'Tras cada vuelta completa (la rutina no los indica)' : 'La rutina no los indica'
+  return null
 }
 
 const FIXED = 'Descanso obligatorio'
 
 /**
- * Si la semana no trae días de descanso, se ponen donde dice la rutina (`rules`) o, si no dice nada, al acabar la
- * vuelta completa al cuerpo (torso y pierna, empuje-tirón-pierna…), como descanso obligatorio.
+ * Si la semana no trae días de descanso, se ponen donde dice la rutina (`rules`) o, si no dice nada, donde se completa
+ * la vuelta al cuerpo según lo que trabaja cada sesión (`restCycles.ts`), como descanso obligatorio.
  * Si el archivo los trae, se dejan tal cual.
  */
 function withRests(days: DayView[], rules: RestRule[], phase: number): DayView[] {
   if (days.some((d) => d.type === 'rest')) return days
   const mine = rules.filter((r) => r.phase === undefined || r.phase === phase)
   const rest = (note: string): DayView => ({ type: 'rest', note })
-  if (!mine.length) return days.some((d) => d.type === 'session') ? [...days, rest(FIXED)] : days
+  if (!mine.length) {
+    const after = new Set(restPositions(days.map((d) => (d.type === 'session' ? d.muscles : []))))
+    return days.flatMap((d, i) => (after.has(i + 1) ? [d, rest(FIXED)] : [d]))
+  }
   let session = 0
   return days.flatMap((d) => {
     if (d.type !== 'session') return [d]
@@ -258,13 +301,13 @@ export function factsOf(args: {
   }
   /** Lo que dice el documento sobre los días de descanso. */
   rest: string | null
-  /** Las sesiones de la primera semana, en orden. */
-  sessions: string[]
   basics: boolean
 }): [string, string][] {
   const { days, info } = args
   const span = days.join('–')
-  return [
+  const rest = restFact(info.cycle, args.rest)
+  const length = lengthOf(info)
+  const facts: [string, string][] = [
     [
       'Días',
       info.cycle.rotating
@@ -272,18 +315,12 @@ export function factsOf(args: {
         : `${span} por semana`,
     ],
     ['Duración', `~${info.minutes} min por sesión`],
-    [
-      'Programa',
-      info.phases.length
-        ? `${info.phases.length} fases · ${info.weeks} semanas`
-        : info.weeks
-          ? `${info.weeks} semanas`
-          : 'Se repite sin fecha de fin',
-    ],
-    ['Reparto', info.splitLabel],
-    ['Descanso', restFact(info.cycle, args.rest, args.sessions)],
-    ['Volumen', `${info.volume[0].toUpperCase()}${info.volume.slice(1)}`],
-    ['Lugar', info.equipment === 'home' ? 'En casa' : 'Gimnasio'],
-    ...(args.basics ? ([['Fuerza', 'Mejora los básicos']] as [string, string][]) : []),
   ]
+  // Lo que el programa no dice (no tiene fin, no habla de descansos) no sale
+  if (length) facts.push(['Programa', length])
+  facts.push(['Reparto', info.splitLabel])
+  if (rest) facts.push(['Descanso', rest])
+  facts.push(['Volumen', `${info.volume[0].toUpperCase()}${info.volume.slice(1)}`], ['Lugar', placeOf(info)])
+  if (args.basics) facts.push(['Fuerza', 'Mejora los básicos'])
+  return facts
 }

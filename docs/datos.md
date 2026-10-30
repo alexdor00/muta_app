@@ -26,10 +26,14 @@ Un hueco de punto débil se reconoce por su nombre original (`Weak Point Exercis
 - **PDF (11 programas):** se cuenta cada fila del PDF por su posición y se alinea con lo guardado (`anchors.mjs`, `align2.cjs`, `pdfnames.mjs`, `verify-pdf-indep.mjs`).
   Se corrigieron filas que faltaban (+28 Tren inferior, +8 Optimización, +6 Glúteo), nombres cortados, esfuerzos simplificados y niveles mal agrupados.
 - **Formato por campo:** `lint-datos.cjs` revisa que cada campo tenga lo esperado (un descanso que es una nota, un nombre con «DAY 4»… es contaminación al extraer).
+- **Al corregir un dato de una rutina local, subir `rev` en `private/programs/_meta.json`** (con una nota de qué cambió). La app guarda una copia de cada rutina en el navegador y solo la vuelve a cargar cuando cambia la revisión; sin subirla, cada navegador sigue con el dato viejo.
 - **Normalización** (sin cambiar valores): `scripts/normalize-programs.cjs private/programs`.
+- **Nombres en la app.** Los documentos originales y estas notas llaman «Tren inferior» y «Optimización» a dos programas de Mujer;
+  en la app se llaman «Desarrollo completo · foco en glúteo» y «Físico equilibrado» (`catalog.ts`, ids `mujer-especializacion` y `mujer-optimizacion`).
 
 ## Excepciones conocidas (y por qué)
 
+- Descansos de «Desarrollo completo · foco en glúteo» (`mujer-especializacion`): el documento solo dice que el bloque 1 **se puede** hacer seguido (seis días de entreno y el día 7 de descanso). Se guarda como nota (`restInfo`), no como regla; los descansos salen de la detección por patrones (`restCycles.ts`). Regla general: un descanso que el documento solo permite no se guarda como obligatorio.
 - Series de la semana 2 de «En casa» (avanzada, torso 2): no vienen en el PDF; se deducen de las semanas 1 y 3, que coinciden.
 - Erratas del documento corregidas: «REP10», «RP8», «PRE8» (= RPE), «2-3mn» (= 2-3 min). Una celda de Optimización dice «RPE» sin número y se deja.
 - Test de sentadilla (semana 10): el PDF solo dice «NOTES»; «1 repetición, RPE 9-9.5» sale de sus preguntas frecuentes y queda marcado como rellenado.

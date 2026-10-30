@@ -7,14 +7,14 @@ type Props = {
   children: ComponentChildren
   href?: string
   onClick?: () => void
-  /** onPhoto: círculo blanco sobre una foto · plain: solo el icono (barras). */
-  variant?: 'onPhoto' | 'plain'
+  /** onPhoto: círculo blanco sobre una foto · plain: solo el icono (barras) · ghost: solo el icono, en blanco, sobre una foto. */
+  variant?: 'onPhoto' | 'plain' | 'ghost'
   pressed?: boolean
 }
 
 /** Botón redondo de icono (volver, filtros, guardar). */
 export function RoundButton({ label, children, href, onClick, variant = 'onPhoto', pressed }: Props) {
-  const className = `${styles.button} ${variant === 'plain' ? styles.plain : ''}`
+  const className = `${styles.button} ${variant === 'plain' ? styles.plain : ''} ${variant === 'ghost' ? styles.ghost : ''}`
   if (href) {
     return (
       <a class={className} href={href} aria-label={label} onClick={onClick}>

@@ -5,6 +5,8 @@ type Props = {
   title: string
   /** Líneas grises bajo el título («Volumen medio · Cuerpo completo», «4 días · ~55 min»). */
   lines: string[]
+  /** Etiquetas en píldora bajo el título, antes de las líneas («Volumen bajo»). */
+  chips?: string[]
   /** Texto pequeño en color sobre el título («Para ti»). */
   eyebrow?: string
   href: string
@@ -21,6 +23,7 @@ type Props = {
 export function ListRow({
   title,
   lines,
+  chips,
   eyebrow,
   href,
   photo,
@@ -45,6 +48,15 @@ export function ListRow({
         <span class={styles.body}>
           {eyebrow && <span class={styles.eyebrow}>{eyebrow}</span>}
           <span class={styles.title}>{title}</span>
+          {chips && chips.length > 0 && (
+            <span class={styles.chips}>
+              {chips.map((chip) => (
+                <span key={chip} class={styles.chip}>
+                  {chip}
+                </span>
+              ))}
+            </span>
+          )}
           {lines.map((line) => (
             <span key={line} class={styles.line}>
               {line}

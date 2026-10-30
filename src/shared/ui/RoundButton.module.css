@@ -24,6 +24,14 @@
   color: var(--label);
 }
 
+/* Sobre una foto, sin círculo: solo el icono en blanco (la zona de toque sigue siendo de 44 px) */
+.ghost {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  background: transparent;
+  color: var(--on-photo);
+}
+
 .button svg {
   width: var(--icon);
   height: var(--icon);

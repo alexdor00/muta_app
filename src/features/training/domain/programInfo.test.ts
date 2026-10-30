@@ -87,10 +87,10 @@ describe('hechos de una rutina', () => {
 describe('tipos de entrenamiento', () => {
   it('cada rutina está en la familia de su programa original, y todas las familias tienen rutinas', async () => {
     const { CATALOG } = await import('./catalog.ts')
-    const { CATEGORIES } = await import('./categories.ts')
-    const ids = new Set(CATEGORIES.map((c) => c.id))
-    expect(CATALOG.every((e) => ids.has(e.family))).toBe(true)
-    expect(CATEGORIES.every((c) => CATALOG.some((e) => e.family === c.id))).toBe(true)
+    const { CATEGORY_OF_FAMILY } = await import('./categories.ts')
+    const families = Object.keys(CATEGORY_OF_FAMILY)
+    expect(CATALOG.every((e) => families.includes(e.family))).toBe(true)
+    expect(families.every((family) => CATALOG.some((e) => e.family === family))).toBe(true)
     // Las variantes de un mismo archivo van juntas
     const bySource = new Map<string, Set<string>>()
     for (const e of CATALOG)

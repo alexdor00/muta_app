@@ -72,7 +72,7 @@ export function RutinaScreen(props: { id: string }) {
           </li>
         ) : (
           <li key={`s${i}`} class={styles.session}>
-            <details open={day.exercises.some((e) => e.slot)}>
+            <details>
               <summary class={styles.summary}>
                 <span class={styles.sessionName}>{day.name}</span>
                 <span class={styles.sessionMeta}>
@@ -208,7 +208,7 @@ export function RutinaScreen(props: { id: string }) {
         {differ ? (
           <div class={styles.weekList}>
             {currentPhase.weeks.map((w, wi) => (
-              <details key={w.week} class={styles.week} open={wi === 0}>
+              <details key={w.week} class={styles.week}>
                 <summary class={styles.weekTitle}>Semana {w.week}</summary>
                 {renderDays(w.days, wi)}
               </details>

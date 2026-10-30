@@ -33,6 +33,7 @@ const COLORS = [
   '--label-2',
   '--separator',
   '--accent',
+  '--on-accent',
   '--good',
   '--warning',
   '--critical',

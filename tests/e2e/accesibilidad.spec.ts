@@ -39,7 +39,13 @@ test('elegir rutina y detalle de una rutina de MUTA', async ({ page }) => {
   await page.goto('/entreno/programa/muta-cuerpo-completo-4d')
   await expect(page.getByRole('button', { name: 'Empezar esta rutina' })).toBeVisible()
   await sinFallos(page)
-  // con un ejercicio desplegado
+  // con una sesión y un ejercicio desplegados
+  // Las sesiones salen cerradas: se abre la que lleva el ejercicio
+  await page
+    .locator('details:not(:has(details))', { has: page.getByText(/Press militar en máquina/) })
+    .first()
+    .locator('summary')
+    .click()
   await page
     .getByRole('button', { name: /Press militar en máquina/ })
     .first()

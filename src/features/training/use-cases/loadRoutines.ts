@@ -3,7 +3,7 @@ import { logError } from '../../../shared/lib/logger.ts'
 import programInfo from '../../../shared/content/program-info.json'
 import { phaseOf, type Goal } from '../../profile/index.ts'
 import { CATALOG, recommend, sourceOf, type Level } from '../domain/catalog.ts'
-import { CATEGORIES, type CategoryId } from '../domain/categories.ts'
+import { CATEGORIES, categoryOf, type FamilyId } from '../domain/categories.ts'
 import type { ProgramInfo } from '../domain/programInfo.ts'
 import { metaLines } from '../domain/routineView.ts'
 import { routines, type RoutineItem } from '../state/routines.ts'
@@ -12,7 +12,7 @@ const LEVELS: Level[] = ['beginner', 'intermediate', 'advanced']
 const GOALS: Goal[] = ['gain_muscle', 'lose_fat', 'feel_better']
 
 /** Hechos y tipos medidos de cada rutina (scripts/program-info.ts). */
-export const INFO = programInfo as unknown as Record<string, ProgramInfo & { categories: CategoryId[] }>
+export const INFO = programInfo as unknown as Record<string, ProgramInfo & { categories: FamilyId[] }>
 
 export const SAVED_PREFIX = 'guardada:'
 
@@ -52,7 +52,7 @@ export async function loadRoutines(): Promise<void> {
           ? {
               entry,
               info,
-              categories: info.categories,
+              categories: [categoryOf(entry.family)],
               recommended,
               allowed,
               lines: metaLines(entry, info),

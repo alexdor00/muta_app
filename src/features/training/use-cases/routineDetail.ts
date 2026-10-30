@@ -4,6 +4,7 @@ import cuerpoCompleto from '../../../shared/content/programs/muta-cuerpo-complet
 import ppl from '../../../shared/content/programs/muta-ppl-6d.json'
 import { aboutOf } from '../domain/about.ts'
 import { CATALOG, sourceOf, type Level } from '../domain/catalog.ts'
+import { categoryOf } from '../domain/categories.ts'
 import {
   applyPriorities,
   hasPriorities,
@@ -75,7 +76,6 @@ function show() {
       days: item.entry.days,
       info: item.info,
       rest: program.restInfo ?? null,
-      sessions: (phases[0]?.weeks[0]?.days ?? []).flatMap((d) => (d.type === 'session' ? [d.name] : [])),
       basics: !!aboutOf(item.entry)?.basics,
     }),
     weak,
@@ -109,7 +109,7 @@ export async function openRoutine(id: string): Promise<void> {
     const item = state.items.find((i) => i.entry.id === id) ?? {
       entry,
       info,
-      categories: info.categories,
+      categories: [categoryOf(entry.family)],
       recommended: false,
       allowed: false,
       lines: metaLines(entry, info),

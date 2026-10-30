@@ -11,7 +11,8 @@
   --label: #111113;
   --label-2: #6e6e73;
   --separator: #e3e3e6;
-  --accent: #ff5a12;
+  --accent: #111113; /* sin color: el énfasis es negro en claro y blanco en oscuro */
+  --on-accent: #ffffff; /* texto o icono sobre un fondo --accent */
   --good: #34c759;
   --warning: #ff9f0a;
   --critical: #ff3b30;
@@ -118,7 +119,8 @@
     --label: #f2f2f7;
     --label-2: #98989f;
     --separator: #38383a;
-    --accent: #ff6a2a;
+    --accent: #f2f2f7;
+    --on-accent: #000000;
     --good: #30d158;
     --warning: #ffd60a;
     --critical: #ff453a;
@@ -132,7 +134,8 @@
   --label: #f2f2f7;
   --label-2: #98989f;
   --separator: #38383a;
-  --accent: #ff6a2a;
+  --accent: #f2f2f7;
+  --on-accent: #000000;
   --good: #30d158;
   --warning: #ffd60a;
   --critical: #ff453a;

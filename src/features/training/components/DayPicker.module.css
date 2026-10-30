@@ -1,0 +1,75 @@
+/* Selector de frecuencia: botones grandes en una fila; el elegido, en negro (blanco en oscuro). */
+
+.picker {
+  padding: var(--space-5) var(--gutter) var(--space-2);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-1);
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.title {
+  padding: 0;
+  font: var(--text-title-2);
+}
+
+.hint {
+  margin: var(--space-1) 0 var(--space-4);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.options {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.option {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--row);
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    background var(--duration-tap) var(--ease),
+    color var(--duration-tap) var(--ease);
+}
+
+.option:has(.radio:focus-visible) {
+  outline: var(--focus-ring) solid var(--accent);
+  outline-offset: var(--focus-ring);
+}
+
+.radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.number {
+  font: var(--text-title-1);
+}
+
+.unit {
+  font: var(--text-footnote);
+}
+
+.selected {
+  background: var(--accent);
+  color: var(--on-accent);
+}

@@ -9,7 +9,7 @@ import {
   type Level,
   type Phase,
 } from '../src/features/training/domain/catalog.ts'
-import { CATEGORIES } from '../src/features/training/domain/categories.ts'
+import { CATEGORIES, categoryOf } from '../src/features/training/domain/categories.ts'
 
 const dir = process.argv[2]
 if (!dir) throw new Error('Falta la carpeta con las capturas')
@@ -39,8 +39,9 @@ const FOLDER: Record<string, string> = {
   'torso-pierna': 'UpperLower Program',
 }
 const categoryRows = CATEGORIES.map((c) => {
-  const n = CATALOG.filter((e) => e.family === c.id).length
-  return `<tr><th>${esc(c.title)}</th><td>${esc(FOLDER[c.id])}</td><td class="num">${n}</td><td>${esc(c.description)}</td></tr>`
+  const entries = CATALOG.filter((e) => categoryOf(e.family) === c.id)
+  const folders = [...new Set(entries.map((e) => FOLDER[e.family]))].join(' · ')
+  return `<tr><th>${esc(c.title)}</th><td>${esc(folders)}</td><td class="num">${entries.length}</td><td>${esc(c.description)}</td></tr>`
 }).join('')
 
 const available = new Set(CATALOG.map(sourceOf))

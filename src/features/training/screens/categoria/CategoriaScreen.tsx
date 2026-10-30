@@ -1,30 +1,51 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
+import { useLocation } from 'preact-iso'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
+import { ChoiceChips, ChoiceCircles } from '../../../../shared/ui/Choice.tsx'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
 import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
 import { BookmarkIcon, InfoIcon, SlidersIcon } from '../../../../shared/ui/icons.tsx'
 import { ListRow } from '../../../../shared/ui/ListRow.tsx'
+import { PhotoCard } from '../../../../shared/ui/PhotoCard.tsx'
 import { PillButton } from '../../../../shared/ui/PillButton.tsx'
 import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
+import { DayPicker } from '../../components/DayPicker.tsx'
 import { RoutineAbout } from '../../components/RoutineAbout.tsx'
 import {
+  ALL_SECTION,
   aboutOf,
   activeFilters,
   CATEGORIES,
+  compactMeta,
+  countLabel,
+  daysOf,
+  daysRange,
+  inSection,
   matches,
+  pickDays,
   routines,
-  SPLIT_LABEL,
+  sectionAbout,
+  sectionsOf,
   type Filters,
+  type About,
   type RoutineItem,
-  type Split,
 } from '../../state/routines.ts'
 import { loadRoutines } from '../../use-cases/loadRoutines.ts'
 import { toggleSaved } from '../../use-cases/toggleSaved.ts'
 import styles from './CategoriaScreen.module.css'
+import {
+  ALL,
+  BASICS_OPTIONS,
+  CYCLE_OPTIONS,
+  DAY_OPTIONS,
+  DURATION_OPTIONS,
+  EQUIPMENT_OPTIONS,
+  SPLIT_OPTIONS,
+  VOLUME_OPTIONS,
+} from './filterOptions.ts'
 
 const SAVED = {
   id: 'guardadas' as const,
@@ -33,58 +54,39 @@ const SAVED = {
   tone: 1 as const,
 }
 
-const ALL = 'todos'
-type Option = { value: string; label: string }
-const DAY_OPTIONS: Option[] = [
-  { value: ALL, label: 'Todos' },
-  ...[2, 3, 4, 5, 6].map((d) => ({ value: String(d), label: `${d} días` })),
-]
-const SPLIT_OPTIONS: Option[] = [
-  { value: ALL, label: 'Todos' },
-  ...(Object.keys(SPLIT_LABEL) as Split[]).map((s) => ({ value: s, label: SPLIT_LABEL[s] })),
-]
-const DURATION_OPTIONS: Option[] = [
-  { value: ALL, label: 'Todas' },
-  { value: 'corta', label: 'Hasta 45 min' },
-  { value: 'media', label: '50–65 min' },
-  { value: 'larga', label: '70 min o más' },
-]
-const VOLUME_OPTIONS: Option[] = [
-  { value: ALL, label: 'Todos' },
-  { value: 'bajo', label: 'Bajo' },
-  { value: 'medio', label: 'Medio' },
-  { value: 'alto', label: 'Alto' },
-]
-const BASICS_OPTIONS: Option[] = [
-  { value: ALL, label: 'Todas' },
-  { value: 'si', label: 'Mejoran los básicos' },
-]
-const CYCLE_OPTIONS: Option[] = [
-  { value: ALL, label: 'Todos' },
-  { value: 'semanal', label: 'Semanal' },
-  { value: 'rota', label: 'Rota (no semanal)' },
-]
-
-const thumbDays = (days: number[]) =>
-  days.length > 1 ? `${Math.min(...days)}–${Math.max(...days)}` : String(days[0])
-
 /**
  * Rutinas de un tipo de entrenamiento (o las guardadas): cabecera con foto, número de rutinas,
  * filtros y lista. Arriba las de tus días. Al bajar aparece una barra compacta.
+ * Cada tipo se recorre por frecuencia: se elige los días por semana y salen las rutinas de esos días. Mujer e
+ * Hipertrofia, que tienen muchas, se dividen antes en categorías con tarjeta y «Ver todas» lleva a la lista
+ * completa. Los filtros están en todos los niveles. La «!» de una tarjeta o de una fila abre su explicación.
  */
-export function CategoriaScreen(props: { category: string }) {
+export function CategoriaScreen(props: { category: string; section?: string }) {
+  const { route } = useLocation()
   const hero = useRef<HTMLElement>(null)
   const filtersSheet = useSheet('filtros')
   const infoSheet = useSheet('info')
-  const [info, setInfo] = useState<RoutineItem | null>(null)
+  /** La «!» abierta: la de una rutina o la de una categoría. */
+  const [info, setInfo] = useState<{ title: string; about: About } | null>(null)
   const [filters, setFilters] = useState<Filters>({})
+  const [pickedDays, setPickedDays] = useState<number | undefined>()
   useEffect(() => {
     if (routines.value.status !== 'ready') void loadRoutines()
   }, [])
+  // Al cambiar de categoría o de sección (misma pantalla) se parte de cero
+  useEffect(() => {
+    setFilters({})
+    setPickedDays(undefined)
+  }, [props.category, props.section])
 
   const state = routines.value
   const category = props.category === SAVED.id ? SAVED : CATEGORIES.find((c) => c.id === props.category)
-  if (!category) {
+  const sections = sectionsOf(props.category)
+  const all = props.section === ALL_SECTION
+  const chosen = sections.find((s) => s.id === props.section)
+  // Un tipo con una sola sección (todos menos Mujer) no tiene tarjetas: se entra directo en ella
+  const section = chosen ?? (!props.section && sections.length === 1 ? sections[0] : undefined)
+  if (!category || (props.section && !all && !chosen)) {
     return (
       <div class={styles.page}>
         <p class={styles.message}>
@@ -100,8 +102,17 @@ export function CategoriaScreen(props: { category: string }) {
       : category.id === SAVED.id
         ? state.items.filter((i) => state.saved.has(i.entry.id))
         : state.items.filter((i) => i.categories.includes(category.id))
-  const shown = inCategory.filter((i) => matches(i, filters))
   const active = activeFilters(filters)
+  const matching = (section ? inSection(section, inCategory) : inCategory).filter((i) => matches(i, filters))
+  // «cards»: las categorías del tipo · «section»: una categoría · «list»: la lista plana
+  const view = section ? 'section' : sections.length > 0 && !all && active === 0 ? 'cards' : 'list'
+
+  const profileDays = state.status === 'ready' ? state.profile?.daysPerWeek : undefined
+  const days = section?.byDays ? daysOf(matching) : []
+  const day = days.length > 0 ? pickDays(days, pickedDays ?? profileDays) : undefined
+  const results = day === undefined ? matching : matching.filter((i) => i.entry.days.includes(day))
+
+  const count = view === 'cards' ? inCategory.length : matching.length
   const set = (key: keyof Filters, value: string) =>
     setFilters((f) => ({ ...f, [key]: value === ALL ? undefined : key === 'days' ? Number(value) : value }))
   const value = (key: keyof Filters) => (filters[key] === undefined ? ALL : String(filters[key]))
@@ -112,93 +123,155 @@ export function CategoriaScreen(props: { category: string }) {
     </RoundButton>
   )
 
+  const row = (item: RoutineItem) => {
+    const saved = state.status === 'ready' && state.saved.has(item.entry.id)
+    const current = state.status === 'ready' && state.currentId === item.entry.id
+    const about = aboutOf(item.entry)
+    const basics = !!about?.basics
+    // Fila corta: el volumen como etiqueta y una línea con lo que cuesta
+    const compact = compactMeta(item.info)
+    return (
+      <ListRow
+        key={item.entry.id}
+        title={item.entry.title}
+        chips={[compact.chip, ...(basics ? ['Mejora los básicos'] : [])]}
+        lines={[compact.line]}
+        eyebrow={current ? 'Tu rutina' : item.recommended ? 'Para tus días' : undefined}
+        href={paths.routineDetail(item.entry.id)}
+        tone={item.entry.tone}
+        thumbBig={daysRange(item.entry.days)}
+        thumbSmall="días"
+        trailing={
+          <span class={styles.actions}>
+            {about && (
+              <RoundButton
+                label={`De qué trata ${item.entry.title}`}
+                variant="plain"
+                onClick={() => {
+                  setInfo({ title: item.entry.title, about })
+                  infoSheet.show()
+                }}
+              >
+                <InfoIcon />
+              </RoundButton>
+            )}
+            <RoundButton
+              label={saved ? 'Quitar de guardadas' : 'Guardar'}
+              variant="plain"
+              pressed={saved}
+              onClick={() => void toggleSaved(item.entry.id)}
+            >
+              <BookmarkIcon filled={saved} />
+            </RoundButton>
+          </span>
+        }
+      />
+    )
+  }
+
+  const empty = (
+    <div class={styles.empty}>
+      <p>
+        {active
+          ? 'Ninguna rutina con estos filtros.'
+          : category.id === SAVED.id
+            ? 'Aún no has guardado ninguna rutina.'
+            : 'No hay rutinas de este tipo.'}
+      </p>
+      {active > 0 && (
+        <Button variant="secondary" onClick={() => setFilters({})}>
+          Quitar filtros
+        </Button>
+      )}
+    </div>
+  )
+
+  // Dentro de una categoría de Mujer (o de «Ver todas») se vuelve al tipo; en el resto, a «Elige tu rutina»
+  const back = props.section ? paths.routineCategory(category.id) : paths.chooseRoutine
+  const nested = props.section && section ? section : undefined
+  const title = nested ? nested.title : category.title
+
   return (
     <div class={styles.page}>
-      <CompactBar title={category.title} backHref={paths.chooseRoutine} action={filterButton} watch={hero} />
+      <CompactBar title={title} backHref={back} action={filterButton} watch={hero} />
       <HeroHeader
-        title={category.title}
-        description={category.description}
-        tone={category.tone}
-        backHref={paths.chooseRoutine}
+        title={title}
+        description={nested?.description ?? category.description}
+        tone={nested ? nested.tone : category.tone}
+        backHref={back}
         heroRef={hero}
       />
 
       <div class={styles.toolbar}>
-        <p class={styles.count}>
-          {state.status === 'loading'
-            ? 'Cargando…'
-            : `${shown.length} ${shown.length === 1 ? 'rutina' : 'rutinas'}`}
-        </p>
+        <p class={styles.count}>{state.status === 'loading' ? 'Cargando…' : countLabel(count)}</p>
         <PillButton icon={<SlidersIcon />} count={active} onClick={filtersSheet.show}>
           Filtros
         </PillButton>
       </div>
 
-      {shown.length > 0 ? (
-        <ul class={styles.list}>
-          {shown.map((item) => {
-            const saved = state.status === 'ready' && state.saved.has(item.entry.id)
-            const current = state.status === 'ready' && state.currentId === item.entry.id
-            return (
-              <ListRow
-                key={item.entry.id}
-                title={item.entry.title}
-                lines={aboutOf(item.entry)?.basics ? [...item.lines, 'Mejora los básicos'] : item.lines}
-                eyebrow={current ? 'Tu rutina' : item.recommended ? 'Para tus días' : undefined}
-                href={paths.routineDetail(item.entry.id)}
-                tone={item.entry.tone}
-                thumbBig={thumbDays(item.entry.days)}
-                thumbSmall="días"
-                trailing={
-                  <span class={styles.actions}>
-                    {aboutOf(item.entry) && (
-                      <RoundButton
-                        label={`De qué trata ${item.entry.title}`}
-                        variant="plain"
-                        onClick={() => {
-                          setInfo(item)
-                          infoSheet.show()
-                        }}
-                      >
-                        <InfoIcon />
-                      </RoundButton>
-                    )}
-                    <RoundButton
-                      label={saved ? 'Quitar de guardadas' : 'Guardar'}
-                      variant="plain"
-                      pressed={saved}
-                      onClick={() => void toggleSaved(item.entry.id)}
-                    >
-                      <BookmarkIcon filled={saved} />
-                    </RoundButton>
-                  </span>
-                }
-              />
-            )
-          })}
-        </ul>
-      ) : (
-        state.status === 'ready' && (
-          <div class={styles.empty}>
-            <p>
-              {active
-                ? 'Ninguna rutina con estos filtros.'
-                : category.id === SAVED.id
-                  ? 'Aún no has guardado ninguna rutina.'
-                  : 'No hay rutinas de este tipo.'}
-            </p>
-            {active > 0 && (
-              <Button variant="secondary" onClick={() => setFilters({})}>
-                Quitar filtros
-              </Button>
-            )}
+      {view === 'cards' && state.status === 'ready' && (
+        <>
+          <div class={styles.cards}>
+            {sections.map((s) => {
+              const inside = inSection(s, inCategory)
+              const n = inside.length
+              const about = sectionAbout(s, inside)
+              return (
+                n > 0 && (
+                  <PhotoCard
+                    key={s.id}
+                    title={s.title}
+                    subtitle={[s.description, countLabel(n)].filter(Boolean).join(' · ')}
+                    tone={s.tone}
+                    onClick={() => route(paths.routineSection(category.id, s.id))}
+                    action={
+                      about && (
+                        <RoundButton
+                          label={`De qué trata ${s.title}`}
+                          variant="ghost"
+                          onClick={() => {
+                            setInfo({ title: s.title, about })
+                            infoSheet.show()
+                          }}
+                        >
+                          <InfoIcon />
+                        </RoundButton>
+                      )
+                    }
+                  />
+                )
+              )
+            })}
           </div>
-        )
+          <div class={styles.all}>
+            <Button variant="secondary" href={paths.routineSection(category.id, ALL_SECTION)}>
+              {`Ver todas las rutinas (${inCategory.length})`}
+            </Button>
+          </div>
+        </>
       )}
 
-      {infoSheet.open && info && aboutOf(info.entry) && (
-        <Sheet title={info.entry.title} onClose={infoSheet.close}>
-          <RoutineAbout about={aboutOf(info.entry)!} />
+      {view === 'section' && day !== undefined && days.length > 1 && (
+        <DayPicker
+          eyebrow={nested ? `${category.title} / ${nested.title}` : category.title}
+          title="Elige tu frecuencia"
+          hint="Programas según tus días disponibles."
+          days={days}
+          value={day}
+          onChange={setPickedDays}
+        />
+      )}
+
+      {view !== 'cards' &&
+        (results.length === 0 ? (
+          state.status === 'ready' && empty
+        ) : (
+          <ul class={styles.list}>{results.map(row)}</ul>
+        ))}
+
+      {infoSheet.open && info && (
+        <Sheet title={info.title} onClose={infoSheet.close}>
+          <RoutineAbout about={info.about} />
         </Sheet>
       )}
       {filtersSheet.open && (
@@ -207,9 +280,7 @@ export function CategoriaScreen(props: { category: string }) {
           onClose={filtersSheet.close}
           footer={
             <div class={styles.sheetActions}>
-              <Button
-                onClick={filtersSheet.close}
-              >{`Ver ${shown.length} ${shown.length === 1 ? 'rutina' : 'rutinas'}`}</Button>
+              <Button onClick={filtersSheet.close}>{`Ver ${countLabel(count)}`}</Button>
               {active > 0 && (
                 <Button variant="secondary" onClick={() => setFilters({})}>
                   Quitar filtros
@@ -219,14 +290,35 @@ export function CategoriaScreen(props: { category: string }) {
           }
         >
           <div class={styles.filters}>
-            <ChoiceChips
-              name="f-dias"
-              legend="Días por semana"
-              showLegend
-              options={DAY_OPTIONS}
-              value={value('days')}
-              onChange={(v) => set('days', v)}
-            />
+            {sections.length > 0 ? (
+              <ChoiceCircles
+                name="f-dias"
+                legend="Días por semana"
+                showLegend
+                options={daysOf(inCategory).map((d) => ({ value: d, label: String(d) }))}
+                value={filters.days ?? 0}
+                onChange={(d) => setFilters((f) => ({ ...f, days: d }))}
+              />
+            ) : (
+              <ChoiceChips
+                name="f-dias"
+                legend="Días por semana"
+                showLegend
+                options={DAY_OPTIONS}
+                value={value('days')}
+                onChange={(v) => set('days', v)}
+              />
+            )}
+            {sections.length > 0 && (
+              <ChoiceChips
+                name="f-equipamiento"
+                legend="Equipamiento"
+                showLegend
+                options={EQUIPMENT_OPTIONS}
+                value={value('equipment')}
+                onChange={(v) => set('equipment', v)}
+              />
+            )}
             <ChoiceChips
               name="f-reparto"
               legend="Reparto"

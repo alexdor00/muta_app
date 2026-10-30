@@ -49,20 +49,22 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await expect(page).toHaveURL('/entreno/rutinas')
   await expect(page.getByText('4 días por semana · nivel intermedio · definición')).toBeVisible()
   const paraTi = page.getByRole('region', { name: 'Para ti' })
-  await expect(paraTi.getByRole('button')).toContainText('Cuerpo completo A/B')
+  // La tarjeta lleva además su «!»: el primer botón es la tarjeta
+  await expect(paraTi.getByRole('button').first()).toContainText('Cuerpo completo A/B')
   await capture(page, 'elegir-rutina')
 
   // Tipo de entrenamiento: cabecera con foto, número de rutinas, filtros y lista
   await page
     .getByRole('region', { name: 'Tipos de entrenamiento' })
-    .getByRole('button', { name: /^MUTA/ })
+    .getByRole('button', { name: /^Hipertrofia/ })
     .click()
-  await expect(page).toHaveURL('/entreno/rutinas/muta')
-  await expect(page.getByRole('heading', { name: 'MUTA', level: 1 })).toBeVisible()
-  await expect(page.getByText('2 rutinas')).toBeVisible()
+  await expect(page).toHaveURL('/entreno/rutinas/hipertrofia')
+  await expect(page.getByRole('heading', { name: 'Hipertrofia', level: 1 })).toBeVisible()
+  await expect(page.getByText('2 rutinas', { exact: true })).toBeVisible()
   await capture(page, 'categoria')
   await page.getByRole('button', { name: 'Filtros' }).first().click()
-  await page.getByText('3 días', { exact: true }).click()
+  // Los días del filtro son círculos con el número (en la pantalla de detrás está el selector de frecuencia)
+  await page.getByRole('dialog', { name: 'Filtros' }).getByText('3', { exact: true }).click()
   await expect(page.getByRole('button', { name: 'Ver 1 rutina' })).toBeVisible()
   await capture(page, 'filtros')
   await page.getByRole('button', { name: 'Ver 1 rutina' }).click()
@@ -80,6 +82,12 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
 
   // Los ejercicios opcionales salen en la propia rutina (fondo gris) y se deciden al pulsarlos.
   // Regla de MUTA: el hombro anterior solo entra si es prioridad, así que sale «Quitado».
+  // Las sesiones salen cerradas: se abre la que lleva el ejercicio
+  await page
+    .locator('details:not(:has(details))', { has: page.getByText(/Press militar en máquina/) })
+    .first()
+    .locator('summary')
+    .click()
   await page
     .getByRole('button', { name: /Press militar en máquina/ })
     .first()

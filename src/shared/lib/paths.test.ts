@@ -38,3 +38,10 @@ describe('tabOf', () => {
     expect(tabOf(paths.profile)).toBe(null)
   })
 })
+
+describe('secciones de un tipo', () => {
+  it('la ruta de una sección cuelga del tipo y marca la pestaña Entreno', () => {
+    expect(paths.routineSection('mujer', 'base')).toBe('/entreno/rutinas/mujer/base')
+    expect(tabOf(paths.routineSection('mujer', 'todas'))).toBe('training')
+  })
+})

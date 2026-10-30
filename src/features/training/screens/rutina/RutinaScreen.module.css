@@ -125,7 +125,7 @@
   padding: 0 var(--space-2);
   border-radius: var(--radius-pill);
   background: var(--accent);
-  color: var(--on-photo);
+  color: var(--on-accent);
   font: var(--text-caption);
 }
 

@@ -1,11 +1,14 @@
-import { useEffect } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { BookmarkIcon } from '../../../../shared/ui/icons.tsx'
+import { BookmarkIcon, InfoIcon } from '../../../../shared/ui/icons.tsx'
 import { PhotoCard } from '../../../../shared/ui/PhotoCard.tsx'
 import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { ScreenHeader } from '../../../../shared/ui/ScreenHeader.tsx'
-import { routines } from '../../state/routines.ts'
+import { Sheet } from '../../../../shared/ui/Sheet.tsx'
+import { useSheet } from '../../../../shared/ui/useSheet.ts'
+import { RoutineAbout } from '../../components/RoutineAbout.tsx'
+import { aboutOf, countLabel, routines, type About } from '../../state/routines.ts'
 import { loadRoutines } from '../../use-cases/loadRoutines.ts'
 import styles from './ElegirRutinaScreen.module.css'
 
@@ -20,6 +23,22 @@ export function ElegirRutinaScreen() {
   const { route } = useLocation()
   useEffect(() => void loadRoutines(), [])
   const state = routines.value
+  const infoSheet = useSheet('info')
+  /** La «!» abierta: la de un grupo o la de la rutina recomendada. */
+  const [info, setInfo] = useState<{ title: string; about: About } | null>(null)
+  const infoButton = (title: string, about: About | null) =>
+    about && (
+      <RoundButton
+        label={`De qué trata ${title}`}
+        variant="ghost"
+        onClick={() => {
+          setInfo({ title, about })
+          infoSheet.show()
+        }}
+      >
+        <InfoIcon />
+      </RoundButton>
+    )
 
   const header = (intro?: string) => (
     <ScreenHeader
@@ -71,6 +90,7 @@ export function ElegirRutinaScreen() {
               tone={state.featured.entry.tone}
               badge={state.featured.entry.id === state.currentId ? 'Tu rutina' : 'Recomendada'}
               onClick={() => route(paths.routineDetail(state.featured!.entry.id))}
+              action={infoButton(state.featured.entry.title, aboutOf(state.featured.entry))}
             />
           </div>
         </section>
@@ -83,13 +103,20 @@ export function ElegirRutinaScreen() {
             <PhotoCard
               key={category.id}
               title={category.title}
-              subtitle={`${count} ${count === 1 ? 'rutina' : 'rutinas'}${forYou ? ` · ${forYou} de tus días` : ''}`}
+              subtitle={`${countLabel(count)}${forYou ? ` · ${forYou} de tus días` : ''}`}
               tone={category.tone}
               onClick={() => route(paths.routineCategory(category.id))}
+              action={infoButton(category.title, category.about)}
             />
           ))}
         </div>
       </section>
+
+      {infoSheet.open && info && (
+        <Sheet title={info.title} onClose={infoSheet.close}>
+          <RoutineAbout about={info.about} />
+        </Sheet>
+      )}
     </div>
   )
 }

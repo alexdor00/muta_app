@@ -43,6 +43,7 @@ const PROGRAMS = {
       'Hipertrofia pura, primera fase. Todo gira en torno a la tensión en el músculo: técnica estricta, bajada controlada de 2–4 segundos y llegar al máximo estiramiento.',
     forWho: 'Intermedio-avanzado que quiere ganar músculo, sin objetivos de fuerza máxima.',
     how: [
+      'Fase 1 de 2: la fase 2 continúa con ejercicios, rangos y técnicas nuevas.',
       'Dos bloques de 5 semanas, «construcción» y «novedad»; el segundo cambia ejercicios, rangos y técnicas para dar un estímulo nuevo.',
       'La semana 5 es de semidescarga y separa los dos bloques: algo menos de volumen y sin llegar al fallo.',
       'Las primeras series son algo más suaves y la última se lleva al fallo o casi (RIR 0–1); las técnicas de intensidad, solo en la última.',
@@ -53,6 +54,7 @@ const PROGRAMS = {
     summary: 'Hipertrofia pura, segunda fase: continúa la primera con ejercicios, rangos y técnicas nuevas.',
     forWho: 'Intermedio-avanzado; encaja muy bien después de la fase 1.',
     how: [
+      'Fase 2 de 2: continúa la fase 1 y encaja muy bien después de ella.',
       'Semana 1 de introducción (RIR 1–3), bloque «escalada» de 4 semanas, semana 6 de semidescarga y bloque «a fondo» de 4 semanas.',
       'Después de la primera semana, casi todas las series van a RIR 0–1 y la última suele ir al fallo.',
       'Día de punto débil y brazos para priorizar lo que más te cueste.',
@@ -65,6 +67,8 @@ const PROGRAMS = {
     forWho:
       'Intermedio-avanzado (unos 2–5 años entrenando en serio) estancado en tamaño o fuerza: tanta frecuencia es un estímulo nuevo.',
     how: [
+      'Dos bloques de 4 semanas: el 1 empieza suave para acostumbrarte a tanta frecuencia; el 2 añade fuerza y habilidad, subiendo a un básico muy exigente y haciendo después series más ligeras de otro compuesto.',
+      'Al final puedes hacer una semana de descarga y otra de test de máximos.',
       'El objetivo principal es ganar músculo; los básicos van por porcentaje de tu máximo para que la fuerza también suba.',
       'Practicas cada levantamiento muchas veces por semana, así que la técnica mejora rápido.',
       'Si no estás acostumbrado a tanta frecuencia, baja las cargas o añade un día de descanso al principio.',
@@ -77,6 +81,8 @@ const PROGRAMS = {
       'Fuerza e hipertrofia a partes iguales: subir sentadilla, banca y peso muerto mientras ganas músculo de forma proporcionada. Es la base de la serie.',
     forWho: 'Intermedio-avanzado (unos 2–5 años entrenando en serio).',
     how: [
+      'Fase 1 de 3 del sistema Powerbuilding: la base, con igual foco en fuerza y tamaño. Después vienen la fase 2 y la 3.',
+      'Va bien después de Frecuencia alta, aunque puedes hacerla antes o sin ella.',
       'Periodización avanzada y métodos de progresión poco habituales, útiles para romper estancamientos.',
       'Semanas de cuerpo completo alternas, así que cada músculo se entrena con frecuencia alta.',
       'La recuperación manda: técnica impecable y, si al principio cuesta, baja cargas o descansa un día más.',
@@ -89,6 +95,8 @@ const PROGRAMS = {
       'Fuerza e hipertrofia, segunda entrega de la serie: construye tolerancia al volumen con más peso en la hipertrofia.',
     forWho: 'Intermedio-avanzado que quiere seguir ganando músculo sin dejar de mejorar los tres básicos.',
     how: [
+      'Fase 2 de 3: viene después de la 1 y es la de acumulación. Con menos de 2 años entrenando, el autor recomienda pasar antes por Torso y pierna o Frecuencia alta, y por la fase 1.',
+      'Hay dos versiones, de 4 y de 5–6 días: es la misma fase, elige según tus días.',
       'Más variedad de ejercicios y rangos de repeticiones más altos, además del trabajo de fuerza.',
       'Los básicos siguen por porcentaje de tu máximo; los accesorios, por esfuerzo (RIR).',
       'Prepara la tercera entrega, centrada en la fuerza máxima.',
@@ -101,6 +109,8 @@ const PROGRAMS = {
       'Fuerza e hipertrofia, tercera entrega de la serie: convierte el trabajo acumulado en fuerza máxima en sentadilla, banca y peso muerto.',
     forWho: 'Intermedio-avanzado que ya tiene una buena base de volumen y técnica.',
     how: [
+      'Fase 3 de 3, la del pico: pensada para hacerse después de la 1 y la 2. Si solo buscas fuerza máxima, puedes hacerla sin ellas.',
+      'Son 8 semanas de carga, 1 de descarga y 1 de test de máximos.',
       'Más intensidad y menos volumen en los básicos, con un pico de fuerza al final.',
       'Se mantiene el trabajo de hipertrofia para no perder músculo.',
       'Los básicos van por porcentaje de tu máximo: conviene conocerlo o estimarlo antes de empezar.',
@@ -166,7 +176,8 @@ const PROGRAMS = {
     ],
   },
   esencial: {
-    summary: 'Lo imprescindible para ganar músculo en sesiones de unos 45 minutos, de 2 a 5 días por semana.',
+    summary:
+      'Rutina minimalista para quien tiene poco tiempo: lo imprescindible para ganar músculo en sesiones de unos 45 minutos, de 2 a 5 días por semana.',
     forWho:
       'Cualquier nivel con poco tiempo. Si prefieres más volumen y sesiones de 60–90 minutos, mejor otra rutina.',
     how: [
@@ -203,9 +214,11 @@ const PROGRAMS = {
     forWho:
       'Intermedias-avanzadas con al menos un año de entrenamiento constante y la técnica de los ejercicios básicos dominada.',
     how: [
-      'Mucho tren inferior, con el volumen justo de torso.',
-      'Técnicas avanzadas como tensión constante y excéntrica acentuada.',
-      'Los básicos van por porcentaje de tu máximo.',
+      'Bloque 1 (semanas 1–4), acumulación de volumen: la introducción, con menos volumen y más descansos de lo habitual.',
+      'Bloque 2 (semanas 5–8), técnicas avanzadas: el más duro y sin descarga; incluye tensión constante y excéntrica acentuada.',
+      'Bloque 3 (semanas 9–10): una semana de descarga corta y otra de esfuerzo máximo para batir récords.',
+      'Mucho tren inferior, con el volumen justo de torso; los básicos van por porcentaje de tu máximo.',
+      'Al acabar puedes repetirla con tus nuevos máximos, o hacer «Desarrollo completo · foco en glúteo» si no la has hecho.',
     ],
   },
   'mujer-base': {
@@ -270,8 +283,8 @@ const RULES: [RegExp, ProgramKey, string?][] = [
     'Versión principiante: solo peso corporal, 3 días de cuerpo completo.',
   ],
   [/^casa-mancuernas$/, 'mujer-casa', 'Versión principiante: peso corporal y mancuernas, 3 días.'],
-  [/^casa-.*-1$/, 'mujer-casa', 'Versión intermedia (etapa 1), 4 días.'],
-  [/^casa-.*-2$/, 'mujer-casa', 'Versión avanzada (etapa 2), 4 días.'],
+  [/^casa-.*-1$/, 'mujer-casa', 'Versión intermedia, 4 días.'],
+  [/^casa-.*-2$/, 'mujer-casa', 'Versión avanzada, 4 días.'],
   [
     /^vuelta-ppl$/,
     'vuelta',

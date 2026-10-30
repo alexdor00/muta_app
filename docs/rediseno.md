@@ -15,8 +15,9 @@ respuesta inmediata (imagen, sonido, vibración) · pensada para el gimnasio (ac
 ## Sistema de diseño (todo sale de `tokens.css`)
 
 - **Color** (claro/oscuro): `--bg` #FFF/#000 · `--surface` #F4F4F5/#1C1C1E · `--surface-2` #E9E9EB/#2C2C2E · `--label` #111113/#F2F2F7 ·
-  `--label-2` #6E6E73/#98989F · `--separator` #E3E3E6/#38383A · `--accent` #FF5A12/#FF6A2A (solo lo que está en marcha: serie, descanso, check;
-  si hay más de dos cosas en naranja, sobra alguna) · estados `--good/--warning/--critical`.
+  `--label-2` #6E6E73/#98989F · `--separator` #E3E3E6/#38383A · `--accent` #111113/#F2F2F7 con `--on-accent` #FFF/#000 · estados
+  `--good/--warning/--critical`. **Sin naranja** (decisión 2026-10-29): el documento original usaba #FF5A12/#FF6A2A como acento; donde este
+  resumen diga «naranja» (descanso, check…), se usa el acento neutro: blanco y negro, y el énfasis por tamaño, peso y contraste.
 - **Tipografía** (fuente del sistema, cifras de ancho fijo): título grande 34/41 · título 1 28/34 · título 2 22/28 · titular 17/22 · cuerpo 17/22 ·
   subtítulo 15/20 · nota 13/18 · leyenda 12/16 · cifra grande 48/52.
 - **Espacio**: rejilla de 4 · margen lateral 20 · entre bloques 24, dentro 12 · radios 8 chip, 12 control, 20 tarjeta, 28 hoja, 999 píldora ·
