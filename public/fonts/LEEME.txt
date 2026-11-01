@@ -1,0 +1,4 @@
+barlow-condensed-900i.woff2 — Barlow Condensed Black Italic.
+Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow).
+Licencia: SIL Open Font License 1.1 (https://openfontlicense.org/open-font-license-official-text/).
+Se usa solo en las siglas y títulos de las tarjetas de sesión (Tu plan).

@@ -1,0 +1,34 @@
+/* Barra de pestañas: fija abajo, con icono y nombre; la pestaña activa en negro (blanco en oscuro). */
+
+.bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding-bottom: var(--safe-bottom);
+  border-top: var(--hairline) solid var(--separator);
+  background: var(--bg);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: calc(var(--tab-bar-height) - var(--hairline));
+  padding: var(--space-2) 0;
+  color: var(--label-2);
+  font: var(--text-caption);
+  text-decoration: none;
+}
+
+.tab svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.tab[aria-current='page'] {
+  color: var(--label);
+}

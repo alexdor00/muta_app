@@ -14,13 +14,14 @@ type Props<T> = {
   onChange: (value: T) => void
 }
 
-type Look = 'card' | 'pill' | 'circle' | 'chip' | 'list'
+type Look = 'card' | 'pill' | 'circle' | 'chip' | 'list' | 'segment'
 const LIST: Record<Look, string> = {
   card: styles.cards,
   pill: styles.pills,
   circle: styles.days,
   chip: styles.chips,
   list: styles.list,
+  segment: styles.segments,
 }
 
 function Group<T extends string | number>(props: Props<T> & { look: Look }) {
@@ -96,4 +97,9 @@ export function ChoiceCircles(props: Props<number>) {
 /** Etiquetas que se ajustan al texto y saltan de línea (filtros). Misma altura que las pastillas. */
 export function ChoiceChips<T extends string>(props: Props<T>) {
   return <Group {...props} look="chip" />
+}
+
+/** Control segmentado (Hoy · Semana): una pista gris con la opción elegida en negro. */
+export function ChoiceSegmented<T extends string>(props: Props<T>) {
+  return <Group {...props} look="segment" />
 }

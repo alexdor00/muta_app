@@ -1,0 +1,119 @@
+/* «Tu semana»: progreso y un círculo por día. */
+
+.card {
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.eyebrow {
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.count {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.count strong {
+  font: var(--text-title-2);
+  font-style: italic;
+  font-weight: var(--weight-bold);
+  color: var(--label);
+}
+
+.bar {
+  display: block;
+  width: 100%;
+  height: var(--space-2);
+  margin-top: var(--space-3);
+  appearance: none;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.bar::-webkit-progress-bar {
+  background: var(--surface-2);
+}
+
+.bar::-webkit-progress-value {
+  border-radius: var(--radius-pill);
+  background: var(--label);
+}
+
+.bar::-moz-progress-bar {
+  border-radius: var(--radius-pill);
+  background: var(--label);
+}
+
+.days {
+  display: flex;
+  justify-content: space-between;
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.letter,
+.note {
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+.note {
+  min-height: var(--space-4);
+  font-style: italic;
+  font-weight: var(--weight-bold);
+  color: var(--label);
+}
+
+.circle {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  font: var(--text-footnote);
+  font-style: italic;
+  font-weight: var(--weight-bold);
+}
+
+.circle svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.hecho .circle {
+  border-color: var(--label);
+  background: var(--label);
+  color: var(--bg);
+}
+
+.hoy .circle {
+  border-color: var(--label);
+}
+
+.descanso .circle {
+  border-style: dashed;
+  background: transparent;
+  color: var(--label-2);
+}

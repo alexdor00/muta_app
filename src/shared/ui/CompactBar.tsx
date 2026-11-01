@@ -6,7 +6,8 @@ import styles from './CompactBar.module.css'
 
 type Props = {
   title: string
-  backHref: string
+  /** A dónde vuelve; sin él no hay botón de volver (pantalla principal de una pestaña). */
+  backHref?: string
   /** Acción de la derecha (icono). */
   action?: ComponentChildren
   /** Cabecera grande: la barra aparece cuando deja de verse. */
@@ -30,9 +31,13 @@ export function CompactBar({ title, backHref, action, watch }: Props) {
 
   return (
     <div class={`${styles.bar} ${visible ? styles.visible : ''}`} aria-hidden={!visible} inert={!visible}>
-      <RoundButton label="Volver" href={backHref} variant="plain">
-        <ChevronLeftIcon />
-      </RoundButton>
+      {backHref ? (
+        <RoundButton label="Volver" href={backHref} variant="plain">
+          <ChevronLeftIcon />
+        </RoundButton>
+      ) : (
+        <span />
+      )}
       <p class={styles.title}>{title}</p>
       <span>{action}</span>
     </div>

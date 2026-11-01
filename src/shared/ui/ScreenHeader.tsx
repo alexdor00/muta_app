@@ -10,6 +10,8 @@ type Props = {
   avatarHref: string
   /** Botón o enlace de la derecha (icono). */
   action?: ComponentChildren
+  /** El título (más pequeño, en negrita) y el avatar en la misma fila, el avatar a la derecha (Entrenamiento). */
+  inline?: boolean
 }
 
 function PersonIcon() {
@@ -22,13 +24,24 @@ function PersonIcon() {
 }
 
 /** Cabecera de una pantalla principal de pestaña: avatar, acción y título grande. */
-export function ScreenHeader({ title, intro, initials, avatarHref, action }: Props) {
+export function ScreenHeader({ title, intro, initials, avatarHref, action, inline }: Props) {
+  const avatar = (
+    <a class={styles.avatar} href={avatarHref} aria-label="Perfil">
+      {initials || <PersonIcon />}
+    </a>
+  )
+  if (inline) {
+    return (
+      <header class={`${styles.header} ${styles.inline}`}>
+        <h1 class={styles.inlineTitle}>{title}</h1>
+        {avatar}
+      </header>
+    )
+  }
   return (
     <header class={styles.header}>
       <div class={styles.bar}>
-        <a class={styles.avatar} href={avatarHref} aria-label="Perfil">
-          {initials || <PersonIcon />}
-        </a>
+        {avatar}
         {action && <span class={styles.action}>{action}</span>}
       </div>
       <h1 class={styles.title}>{title}</h1>

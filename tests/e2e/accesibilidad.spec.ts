@@ -20,6 +20,19 @@ test('bienvenida', async ({ page }) => {
   await sinFallos(page)
 })
 
+test('tu plan, con un músculo tocado y con la hoja Tu rutina abierta', async ({ page }) => {
+  await page.goto('/entreno')
+  await page
+    .getByRole('button', { name: /^Bíceps/ })
+    .locator('path')
+    .first()
+    .click()
+  await sinFallos(page)
+  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await expect(page.getByRole('dialog', { name: 'Tu rutina' })).toBeVisible()
+  await sinFallos(page)
+})
+
 test('piezas de diseño en claro y oscuro', async ({ page }) => {
   for (const scheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme: scheme })

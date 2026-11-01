@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'preact/hooks'
 import { Button } from '../../shared/ui/Button.tsx'
-import { ChoiceCards, ChoiceChips, ChoiceCircles, ChoicePills } from '../../shared/ui/Choice.tsx'
+import {
+  ChoiceCards,
+  ChoiceChips,
+  ChoiceCircles,
+  ChoicePills,
+  ChoiceSegmented,
+} from '../../shared/ui/Choice.tsx'
 import { BookmarkIcon, SlidersIcon } from '../../shared/ui/icons.tsx'
 import { ListRow } from '../../shared/ui/ListRow.tsx'
 import { PillButton } from '../../shared/ui/PillButton.tsx'
@@ -46,6 +52,7 @@ export function DevUiScreen() {
   const [level, setLevel] = useState('beginner')
   const [days, setDays] = useState(3)
   const [goal, setGoal] = useState('a')
+  const [period, setPeriod] = useState('hoy')
   const [chip, setChip] = useState('Todos')
   const [muscle, setMuscle] = useState(['hombros'])
   const [muscles, setMuscles] = useState(['pecho', 'gemelos'])
@@ -244,6 +251,17 @@ export function DevUiScreen() {
           options={[
             { value: 'a', label: 'Opción elegida', detail: 'Con detalle debajo', icon: '★' },
             { value: 'b', label: 'Otra opción', detail: 'Con detalle debajo', icon: '•' },
+          ]}
+        />
+        <ChoiceSegmented
+          name="dev-periodo"
+          legend="Segmentado"
+          showLegend
+          value={period}
+          onChange={setPeriod}
+          options={[
+            { value: 'hoy', label: 'Hoy' },
+            { value: 'semana', label: 'Semana' },
           ]}
         />
       </section>

@@ -1,7 +1,7 @@
 /* Detalle de una rutina: datos, «Adaptar a mí», estructura y botón fijo abajo. */
 
 .page {
-  padding-bottom: calc(var(--control-lg) + var(--space-10) + var(--safe-bottom));
+  padding-bottom: calc(var(--control-lg) + var(--space-10) + var(--tab-bar-height) + var(--safe-bottom));
 }
 
 .message {
@@ -130,12 +130,12 @@
 
 .footer {
   position: fixed;
-  bottom: 0;
+  bottom: calc(var(--tab-bar-height) + var(--safe-bottom)); /* encima de la barra de pestañas */
   left: 50%;
   z-index: 5;
   width: 100%;
   max-width: var(--app-max-width);
-  padding: var(--space-3) var(--gutter) calc(var(--space-4) + var(--safe-bottom));
+  padding: var(--space-3) var(--gutter);
   background: var(--bg);
   transform: translateX(-50%);
 }

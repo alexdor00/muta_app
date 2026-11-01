@@ -47,6 +47,9 @@ resumen, ficha del ejercicio) existen como «pendientes» hasta tener diseño ap
   se completa la vuelta al cuerpo. Un descanso que el documento solo permite no se guarda como obligatorio ([docs/datos.md](../../../docs/datos.md)).
 - **La pantalla de una rutina abre todo plegado** (ni la semana 1 ni las sesiones con opciones salen desplegadas).
 - La fila es corta (`compactMeta`): volumen como etiqueta y una línea con minutos, fases y semanas. El reparto y el lugar van en el detalle.
+- **Tu plan** (`screens/tu-plan`, con la tarjeta `MusclesCard` y la hoja `TuRutinaSheet`; no hay pantalla Músculos aparte) es solo maqueta: leen `state/muestra/datos.ts`
+  (datos de prueba escritos a mano, **se borran enteros** cuando haya datos reales). Las filas de la hoja «Tu rutina» solo se ven, sin acción. Las tarjetas de sesión son de colores (estilo del prototipo anterior), de unos 270 de alto; la cabecera lleva el título y el perfil a la derecha y, al bajar, queda una barra fija con «Entrenamiento» (`CompactBar`); tocar un músculo saca encima una burbuja con sus series (tocar fuera la cierra); «Empezar» va con la sesión visible del carrusel.
+  `MuscleFigure` es el dibujo del cuerpo; sus contornos (`bodyParts.ts`, generado, no se edita a mano) salen de `react-native-body-highlighter` (MIT, hombre, frente y espalda, con su licencia en la cabecera del archivo); en negro los músculos con la mitad o más de las series del que más, en gris medio los demás trabajados; las piezas de `components/` reciben todo por parámetros.
 - Nada obligatorio: lo opcional, a elección del usuario; lo que viene del documento, con sus palabras.
 - Cada función de `domain/` lleva su prueba; un archivo que solo declara tipos no la necesita.
 

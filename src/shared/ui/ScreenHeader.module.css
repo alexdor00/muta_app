@@ -50,3 +50,15 @@
   font: var(--text-subhead);
   color: var(--label-2);
 }
+
+/* Título y avatar en una fila (Entrenamiento): título en negrita, del tamaño del diseño */
+.inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.inlineTitle {
+  font: var(--text-title-tab);
+}

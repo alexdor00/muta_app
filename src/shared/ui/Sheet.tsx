@@ -10,10 +10,12 @@ type Props = {
   children: ComponentChildren
   /** Botones fijos abajo (p. ej. «Ver 12 rutinas»). */
   footer?: ComponentChildren
+  /** Título grande a la izquierda (Tu rutina) en vez de centrado. */
+  large?: boolean
 }
 
 /** Hoja que sube desde abajo. Se cierra con la X, tocando fuera o con Escape. */
-export function Sheet({ title, onClose, children, footer }: Props) {
+export function Sheet({ title, onClose, children, footer, large }: Props) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => event.key === 'Escape' && onClose()
     document.addEventListener('keydown', onKey)
@@ -23,8 +25,8 @@ export function Sheet({ title, onClose, children, footer }: Props) {
   return (
     <div class={styles.backdrop} onClick={(event) => event.target === event.currentTarget && onClose()}>
       <section class={styles.sheet} role="dialog" aria-modal="true" aria-label={title}>
-        <header class={styles.header}>
-          <span />
+        <header class={`${styles.header} ${large ? styles.large : ''}`}>
+          {!large && <span />}
           <h2 class={styles.title}>{title}</h2>
           <RoundButton label="Cerrar" variant="plain" onClick={onClose}>
             <CloseIcon />

@@ -34,6 +34,16 @@
   text-align: center;
 }
 
+.large {
+  grid-template-columns: 1fr var(--control);
+  padding: var(--space-4) var(--space-2) 0 var(--gutter);
+}
+
+.large .title {
+  font: var(--text-title-1);
+  text-align: left;
+}
+
 .body {
   flex: 1;
   overflow-y: auto;

@@ -1,0 +1,85 @@
+/* Tarjeta de una sesión de Tu plan: de color, letra estrecha en cursiva (estilo del prototipo anterior). */
+
+.card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: calc(var(--photo-card-height) * 1.4); /* 269 */
+  overflow: hidden;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-card);
+  color: var(--c-fg);
+  text-decoration: none;
+}
+
+.tone1,
+.tone3 {
+  --c-fg: var(--on-session-dark);
+  --c-soft: var(--on-session-dark-soft);
+  --c-line: var(--on-session-dark-line);
+}
+
+.tone2,
+.tone4 {
+  --c-fg: var(--on-session-light);
+  --c-soft: var(--on-session-light-soft);
+  --c-line: var(--on-session-light-line);
+}
+
+.tone1 {
+  background: var(--session-1);
+}
+
+.tone2 {
+  background: var(--session-2);
+  text-shadow: var(--session-text-shadow);
+}
+
+.tone3 {
+  background: var(--session-3);
+}
+
+.tone4 {
+  background: var(--session-4);
+}
+
+/* La sigla enorme de fondo, solo el contorno (en las rayas no se ve, se quita) */
+.ghost {
+  position: absolute;
+  top: calc(var(--space-2) * -1);
+  right: calc(var(--space-2) * -1);
+  z-index: -1;
+  font: var(--text-session-ghost);
+  color: transparent;
+  -webkit-text-stroke: var(--border) var(--c-line);
+  pointer-events: none;
+}
+
+.tone2 .ghost {
+  display: none;
+}
+
+.estado {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-5);
+  font: var(--text-footnote);
+  color: var(--c-soft);
+}
+
+.sigla {
+  font: var(--text-session-sigla);
+}
+
+.name {
+  font: var(--text-session-title);
+  text-transform: uppercase;
+}
+
+.detail {
+  margin-top: var(--space-1);
+  font: var(--text-footnote);
+  color: var(--c-soft);
+}

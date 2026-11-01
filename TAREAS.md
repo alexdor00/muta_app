@@ -4,6 +4,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
+- **Rama `pantalla/tu-plan`** (sale de `pantalla/estilo-blanco-negro`, sin unir): Tu plan según el nuevo diseño con datos de prueba
+  (`state/muestra/`): tarjetas de sesión de colores, Tu semana, Músculos con el cuerpo grande (tocar un músculo enseña sus series) y la
+  hoja «Tu rutina». Verificado: `npm run check` (145 tests) y e2e (11 de 11). Falta: revisarlo en el móvil, y después la lógica real.
+
 - **Unir la rama `pantalla/estilo-blanco-negro` a `main`** (PR en GitHub, con la CI en verde): revisarla antes en un móvil real con
   `npm run dev` (grupos, selector de días, «!» de cada tarjeta, descansos). Hasta ahora solo se ha visto en el navegador simulado.
 - Después, **arreglar la galería de capturas** (`npm run galeria`): espera el texto «Recomendadas para ti», que ya no existe en la app.
@@ -46,6 +50,5 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Dudas abiertas
 
-- ¿Descanso «sugerido» u «obligatorio» en las rutinas de «Esencial» cuyo original dice «sugerido»? Ahora se respeta lo que dice el original.
 - ¿Tercer descanso al final en «Cuerpo completo A/B» (el documento de conocimiento da un ejemplo con descanso doble)?
 - ¿Se publica la app (hosting) antes o después de las pantallas de sesión?

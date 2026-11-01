@@ -1,0 +1,63 @@
+/* Dibujo del cuerpo como en el diseño: cuerpo en gris muy claro con líneas suaves y contorno marcado;
+   los músculos más trabajados en negro y los menos, en gris medio. */
+
+.figure {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.outline {
+  pointer-events: none;
+  fill: color-mix(in srgb, var(--label) 9%, var(--bg));
+  stroke: color-mix(in srgb, var(--label) 55%, var(--bg));
+  stroke-width: calc(var(--hairline) * 2.5);
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.muscle,
+.some,
+.on,
+.hair {
+  stroke: color-mix(in srgb, var(--label) 22%, var(--bg));
+  stroke-width: var(--hairline);
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.muscle {
+  fill: color-mix(in srgb, var(--label) 9%, var(--bg));
+}
+
+.hair {
+  fill: color-mix(in srgb, var(--label) 22%, var(--bg));
+}
+
+.some {
+  fill: color-mix(in srgb, var(--label) 48%, var(--bg));
+  stroke: color-mix(in srgb, var(--label) 30%, var(--bg));
+}
+
+.on {
+  fill: var(--label);
+  stroke: var(--label);
+}
+
+/* Tocar un músculo: se marca con un borde grueso (y el negro se aclara para que se vea) */
+.part {
+  cursor: pointer;
+  outline: none;
+}
+
+.selected path,
+.part:focus-visible path {
+  stroke: var(--label);
+  stroke-width: calc(var(--hairline) * 3);
+}
+
+.selected .on,
+.part:focus-visible .on {
+  fill: color-mix(in srgb, var(--label) 70%, var(--bg));
+}

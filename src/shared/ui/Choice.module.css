@@ -93,6 +93,31 @@
   color: var(--bg);
 }
 
+/* Control segmentado */
+.segments {
+  display: flex;
+  padding: calc(var(--space-1) / 2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.segment {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  height: calc(var(--control-sm) - var(--space-1));
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  font: var(--text-footnote);
+  color: var(--label);
+}
+
+.segment.selected {
+  background: var(--label);
+  color: var(--bg);
+  font-weight: var(--weight-semibold);
+}
+
 /* Tarjetas */
 .cards {
   display: flex;
