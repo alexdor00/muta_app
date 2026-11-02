@@ -1,0 +1,135 @@
+/* «Progreso de la sesión», como en el prototipo anterior: número grande, cambio y fecha; gráfica con eje y área;
+   Tonelaje · Repeticiones · Duración debajo. */
+
+.card {
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+/* Cada dato en una línea; si no caben los tres, la fecha baja */
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-3);
+  white-space: nowrap;
+}
+
+.value {
+  font: var(--text-session-value);
+}
+
+.change {
+  flex: 1;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.date {
+  margin-left: auto;
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+/* Eje a la izquierda, la gráfica y las fechas debajo */
+.chart {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.axis {
+  position: relative;
+  min-width: var(--space-4);
+  font: var(--text-chart-axis);
+  color: var(--label-2);
+  text-align: right;
+}
+
+.axis span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.plot {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--separator);
+  stroke-width: var(--hairline);
+  vector-effect: non-scaling-stroke;
+}
+
+.shadeTop {
+  stop-color: var(--label);
+  stop-opacity: 0.18;
+}
+
+.shadeBottom {
+  stop-color: var(--label);
+  stop-opacity: 0.02;
+}
+
+/* Al cambiar de medida la línea se dibuja y el área aparece */
+.line {
+  fill: none;
+  stroke: var(--label);
+  stroke-width: var(--border);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  vector-effect: non-scaling-stroke;
+  animation: draw var(--duration-draw) var(--ease) forwards;
+}
+
+.area {
+  animation: fade var(--duration-draw) var(--ease) both;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.dot {
+  fill: var(--label);
+}
+
+.dates {
+  display: flex;
+  grid-column: 2;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+  font: var(--text-chart-axis);
+  color: var(--label-2);
+}
+
+/* Un solo entreno: su punto va a la derecha y su fecha también */
+.single {
+  justify-content: flex-end;
+}
+
+.empty {
+  margin-top: var(--space-5);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.metrics {
+  display: flex;
+  margin-top: var(--space-4);
+}

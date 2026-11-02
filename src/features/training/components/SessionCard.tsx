@@ -1,5 +1,6 @@
 import { paths } from '../../../shared/lib/paths.ts'
 import styles from './SessionCard.module.css'
+import tones from './sessionTone.module.css'
 
 type Props = {
   sigla: string
@@ -11,10 +12,13 @@ type Props = {
   tono: 1 | 2 | 3 | 4
 }
 
-/** Tarjeta cuadrada y de color de una sesión, con la sigla de fondo; se abre al tocarla. */
+/** Tarjeta de color de una sesión, con la sigla de fondo; al tocarla se abre Ver sesión. */
 export function SessionCard({ sigla, nombre, detalle, estado, tono }: Props) {
   return (
-    <a class={`${styles.card} ${styles[`tone${tono}`]}`} href={paths.routine}>
+    <a
+      class={`${styles.card} ${tones[`tone${tono}`]} ${tono === 2 ? styles.noGhost : ''}`}
+      href={paths.sessionView(sigla.toLowerCase())}
+    >
       <span class={styles.ghost} aria-hidden="true">
         {sigla}
       </span>

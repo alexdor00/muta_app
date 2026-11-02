@@ -4,20 +4,22 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
 import { DotsIcon, PlayIcon } from '../../../../shared/ui/icons.tsx'
 import { ScreenHeader } from '../../../../shared/ui/ScreenHeader.tsx'
+import { carouselStep, useDragScroll } from '../../../../shared/ui/useDragScroll.ts'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { MusclesCard } from '../../components/MusclesCard.tsx'
 import { SessionCard } from '../../components/SessionCard.tsx'
 import { TuRutinaSheet } from '../../components/TuRutinaSheet.tsx'
 import { WeekCard } from '../../components/WeekCard.tsx'
-import { actividadMuestra, MUESTRA, type Periodo } from '../../state/muestra/datos.ts'
+import { actividadMuestra, detalleSesion, MUESTRA, tonoDe, type Periodo } from '../../state/muestra/datos.ts'
 import { MUSCLES } from '../../state/routines.ts'
 import styles from './TuPlanScreen.module.css'
 
 const ESTADO = { hecho: 'Hecha', hoy: 'Hoy', pendiente: 'Pendiente', descanso: 'Descanso' } as const
 /** Cada sesión con su color fijo (por su orden en la rutina) y cómo va esta semana. */
-const TARJETAS = MUESTRA.sesiones.map((s, i) => ({
+const TARJETAS = MUESTRA.sesiones.map((s) => ({
   ...s,
-  tono: ((i % 4) + 1) as 1 | 2 | 3 | 4,
+  tono: tonoDe(s.sigla),
+  detalle: detalleSesion(s),
   estado: ESTADO[MUESTRA.semana.find((d) => d.sigla === s.sigla)?.estado ?? 'pendiente'],
 }))
 
@@ -42,6 +44,8 @@ export function TuPlanScreen() {
   // «Empezar» va con la sesión que se ve en el carrusel
   const elegida = sesiones[visible]?.sigla ?? hoy
   const actividad = actividadMuestra(periodo)
+  // Con el dedo se desliza; con el ratón, se arrastra
+  const carrusel = useDragScroll<HTMLDivElement>()
   return (
     <>
       <CompactBar title="Entrenamiento" watch={cabecera} />
@@ -49,25 +53,20 @@ export function TuPlanScreen() {
         <ScreenHeader title="Entrenamiento" avatarHref={paths.profile} inline />
       </div>
       <div
+        ref={carrusel}
         class={styles.cards}
         role="group"
         aria-label="Sesiones de tu rutina"
-        onScroll={(event) => {
-          const el = event.currentTarget
-          const [first, second] = [el.children[0], el.children[1]]
-          const paso =
-            first instanceof HTMLElement && second instanceof HTMLElement
-              ? second.offsetLeft - first.offsetLeft
-              : el.clientWidth
-          setVisible(Math.round(el.scrollLeft / (paso || 1)))
-        }}
+        onScroll={(event) =>
+          setVisible(Math.round(event.currentTarget.scrollLeft / carouselStep(event.currentTarget)))
+        }
       >
         {sesiones.map((s) => (
           <div key={s.sigla} class={styles.card}>
             <SessionCard
               sigla={s.sigla}
               nombre={s.nombre}
-              detalle={`${s.ejercicios} ejercicios · ${s.series} series · ${s.minutos} min`}
+              detalle={s.detalle}
               estado={s.estado}
               tono={s.tono}
             />

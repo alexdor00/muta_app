@@ -1,0 +1,62 @@
+/* Cabecera de Ver sesión: el color de la sesión arriba (como su tarjeta) y el texto abajo; el contenido sube por encima. */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: var(--session-hero-height);
+  padding: var(--safe-top) var(--gutter) calc(var(--radius-card) + var(--space-6));
+  color: var(--c-fg);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--bar-height);
+}
+
+.back {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  margin-left: calc(var(--space-3) * -1);
+  color: inherit;
+}
+
+.back svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.barTitle {
+  font: var(--text-headline);
+  font-weight: var(--weight-bold);
+}
+
+.sigla {
+  display: block;
+  font: var(--text-session-hero);
+}
+
+.name {
+  display: block;
+  margin-top: var(--space-1);
+  font: var(--text-title-2);
+  font-weight: var(--weight-bold);
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font: var(--text-subhead);
+  color: var(--c-soft);
+}
+
+.detail svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}

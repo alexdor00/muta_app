@@ -35,6 +35,9 @@ const TuPlan = screen(() =>
 const TuRutina = screen(() =>
   import('../features/training/screens/tu-rutina/TuRutinaScreen.tsx').then((m) => m.TuRutinaScreen),
 )
+const VerSesion = screen(() =>
+  import('../features/training/screens/ver-sesion/VerSesionScreen.tsx').then((m) => m.VerSesionScreen),
+)
 const SesionInicio = screen(() =>
   import('../features/training/screens/sesion-inicio/SesionInicioScreen.tsx').then(
     (m) => m.SesionInicioScreen,
@@ -123,6 +126,7 @@ function Layout() {
             <Route path={paths.today} component={Hoy} />
             <Route path={paths.training} component={TuPlan} />
             <Route path={paths.routine} component={TuRutina} />
+            <Route path={patterns.sessionView} component={VerSesion} />
             <Route path={paths.chooseRoutine} component={ElegirRutina} />
             <Route path={patterns.routineCategory} component={Categoria} />
             <Route path={patterns.routineSection} component={Categoria} />

@@ -13,6 +13,24 @@ test('el carrusel cambia la sesión de «Empezar»', async ({ page }) => {
   await expect(empezar).toHaveAttribute('href', /\/entreno\/sesion\/[ab]\d\/inicio$/)
 })
 
+test.describe('con ratón (ordenador)', () => {
+  test.use({ hasTouch: false, isMobile: false })
+
+  test('arrastrar la tarjeta pasa a la siguiente sin abrirla', async ({ page }) => {
+    await page.goto('/entreno')
+    const empezar = page.getByRole('link', { name: /^Empezar/ })
+    await expect(empezar).toHaveText('Empezar B1')
+    const caja = (await page.getByRole('group', { name: 'Sesiones de tu rutina' }).boundingBox())!
+    const y = caja.y + caja.height / 2
+    await page.mouse.move(caja.x + caja.width * 0.8, y)
+    await page.mouse.down()
+    await page.mouse.move(caja.x + caja.width * 0.3, y, { steps: 8 })
+    await page.mouse.up()
+    await expect(empezar).toHaveText('Empezar A2')
+    await expect(page).toHaveURL('/entreno')
+  })
+})
+
 test('«···» abre la hoja Tu rutina y se cierra', async ({ page }) => {
   await page.goto('/entreno')
   await page.getByRole('button', { name: 'Tu rutina' }).click()

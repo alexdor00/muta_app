@@ -51,6 +51,7 @@
   --photo-card-height: 192px; /* tarjeta de rutina: proporción de la captura de referencia */
   --avatar: 40px;
   --hero-height: 58dvh; /* cabecera con foto de una categoría o rutina */
+  --session-hero-height: 44dvh; /* cabecera de color de Ver sesión (proporción del diseño) */
   --thumb: 100px; /* miniatura cuadrada de una fila de lista */
   --bar-height: 52px; /* barra compacta superior */
   --tab-bar-height: 60px; /* barra de pestañas (sin la zona segura de abajo); lo fijo abajo va encima */
@@ -73,7 +74,10 @@
   --font-condensed: 'Barlow Condensed', 'Futura Condensed ExtraBold', 'Arial Narrow', sans-serif;
   --text-session-sigla: italic 900 1.125rem / 1.2 var(--font-condensed); /* 18: sigla de la tarjeta de sesión (como en el diseño) */
   --text-session-title: italic 900 1.375rem / 1.1 var(--font-condensed); /* 22 */
+  --text-session-hero: italic 900 2.5rem / 1 var(--font-condensed); /* 40: sigla grande de Ver sesión */
   --text-session-label: italic 900 1.375rem / 1 var(--font-condensed); /* 22: nombre en la burbuja de un músculo */
+  --text-session-value: italic 900 1.875rem / 1 var(--font-condensed); /* 30: tonelaje de la gráfica de Ver sesión */
+  --text-chart-axis: 500 0.8125rem / 1 var(--font); /* 13: números y fechas de los ejes de una gráfica */
   --text-session-ghost: italic 900 11.875rem / 0.8 var(--font-condensed); /* 190: sigla de fondo, solo contorno */
   --text-brand: 800 4rem / 1 var(--font); /* 64: solo el logotipo MUTA de la bienvenida */
 
@@ -128,6 +132,7 @@
   --duration-tap: 150ms;
   --duration-sheet: 250ms;
   --duration-screen: 350ms;
+  --duration-draw: 900ms; /* la línea de una gráfica dibujándose */
   --rise: 8px; /* desplazamiento al aparecer */
   --press-scale: 0.98; /* encogimiento al pulsar */
 
@@ -180,5 +185,6 @@
     --duration-tap: 0ms;
     --duration-sheet: 150ms;
     --duration-screen: 150ms;
+    --duration-draw: 0ms;
   }
 }

@@ -1,0 +1,86 @@
+/* Lista de ejercicios de Ver sesión: filas con nombre, series y flecha; desplegada, «Última vez» en píldoras. */
+
+.title {
+  font: var(--text-headline);
+}
+
+.list {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item + .item {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(var(--space-1) / 2);
+}
+
+.name {
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+.detail {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.chevron {
+  display: grid;
+  color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.chevron svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.open {
+  transform: rotate(90deg);
+}
+
+.last {
+  padding-bottom: var(--space-4);
+}
+
+.lastTitle {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.sets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sets li {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: var(--text-subhead);
+}

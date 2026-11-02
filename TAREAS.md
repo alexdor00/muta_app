@@ -4,9 +4,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- **Rama `pantalla/tu-plan`** (sale de `pantalla/estilo-blanco-negro`, sin unir): Tu plan según el nuevo diseño con datos de prueba
-  (`state/muestra/`): tarjetas de sesión de colores, Tu semana, Músculos con el cuerpo grande (tocar un músculo enseña sus series) y la
-  hoja «Tu rutina». Verificado: `npm run check` (145 tests) y e2e (11 de 11). Falta: revisarlo en el móvil, y después la lógica real.
+- **Siguiente pantalla del rediseño**: la sesión (lo que abre «Empezar B1»). Falta el diseño aprobado del usuario.
 
 - **Unir la rama `pantalla/estilo-blanco-negro` a `main`** (PR en GitHub, con la CI en verde): revisarla antes en un móvil real con
   `npm run dev` (grupos, selector de días, «!» de cada tarjeta, descansos). Hasta ahora solo se ha visto en el navegador simulado.
@@ -15,6 +13,11 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- Rama `pantalla/tu-plan` (commit 3e6659b, sin unir): Tu plan con el nuevo diseño y datos de prueba; e2e 11 de 11.
+- Rama `pantalla/ver-sesion` (2026-11-02, sale de `pantalla/tu-plan`, sin unir): Ver sesión con datos de prueba: cabecera con el
+  color de la sesión, gráfica del prototipo anterior con Tonelaje · Repeticiones · Duración, ejercicios sin foto que se despliegan con
+  la última vez, «Empezar» fijo. El carrusel de Tu plan se arrastra con ratón. 152 tests, e2e 17 de 17. Falta verlo en el móvil y
+  la lógica real.
 - Estructura por áreas con fronteras comprobadas por el linter, CI, 10 ADR y sistema de diseño (`tokens.css`).
 - Bienvenida (A01–A04) y perfil guardado.
 - Rutinas contrastadas con los documentos originales (ejercicios, orden, series, repeticiones).

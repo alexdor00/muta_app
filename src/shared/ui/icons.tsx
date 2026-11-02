@@ -191,3 +191,11 @@ export function TouchIcon() {
     </svg>
   )
 }
+
+export function ArrowLeftIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M20 12H5M11 5l-7 7 7 7" />
+    </svg>
+  )
+}

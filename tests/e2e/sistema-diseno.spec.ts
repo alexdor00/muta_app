@@ -15,6 +15,8 @@ const height = async (page: Page, selector: ReturnType<Page['locator']>) =>
   (await selector.boundingBox())!.height
 
 test('las piezas de /dev/ui miden lo que dicen los tokens', async ({ page }) => {
+  // Mide muchas piezas: sola tarda ~23 s y, con el resto de pruebas en paralelo, pasaba de los 30 s por defecto
+  test.setTimeout(60_000)
   await page.goto('/dev/ui')
   const choices = page.getByTestId('choices')
   await expect(choices).toBeVisible()

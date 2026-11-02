@@ -87,6 +87,7 @@ export {
   matches,
   type Filters,
 } from '../domain/routineView.ts'
+export { effortLabel } from '../domain/effort.ts'
 export { MUSCLES, type MuscleId } from '../domain/muscles.ts'
 export { SPLIT_LABEL, type Split, type VolumeTier } from '../domain/programInfo.ts'
 export {

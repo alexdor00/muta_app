@@ -2,13 +2,13 @@
 
 Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared/` **nunca** importa de un área.
 
-| Carpeta     | Qué es                                                                                            | Puede usar        |
-| ----------- | ------------------------------------------------------------------------------------------------- | ----------------- |
-| `ui/`       | `tokens.css`, `base.css` y componentes (Button, Choice, Sheet, ListRow, Tiles…)                   | `ui`, `lib`       |
-| `data/`     | IndexedDB: `db.ts`, `schema.ts` (almacenes), `migrations/`, copia de seguridad, programas locales | `data`, `lib`     |
-| `content/`  | JSON versionado: programas de MUTA, consejos, `program-info.json`                                 | `content`, `lib`  |
-| `platform/` | Vibración, avisos, wake lock, archivos (versión web)                                              | `platform`, `lib` |
-| `lib/`      | Utilidades puras: rutas (`paths.ts`), registro de errores                                         | `lib`             |
+| Carpeta     | Qué es                                                                                               | Puede usar        |
+| ----------- | ---------------------------------------------------------------------------------------------------- | ----------------- |
+| `ui/`       | `tokens.css`, `base.css` y componentes (Button, Choice, Sheet, ListRow, Tiles…)                      | `ui`, `lib`       |
+| `data/`     | IndexedDB: `db.ts`, `schema.ts` (almacenes), `migrations/`, copia de seguridad, programas locales    | `data`, `lib`     |
+| `content/`  | JSON versionado: programas de MUTA, consejos, `program-info.json`                                    | `content`, `lib`  |
+| `platform/` | Vibración, avisos, wake lock, archivos (versión web)                                                 | `platform`, `lib` |
+| `lib/`      | Utilidades puras: rutas (`paths.ts`), números y fechas en español (`format.ts`), registro de errores | `lib`             |
 
 ## Convenciones
 

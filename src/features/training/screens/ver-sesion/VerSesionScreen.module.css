@@ -1,0 +1,39 @@
+/* Ver sesión: cabecera de color, el contenido en blanco subiendo por encima y «Empezar» fijo abajo. */
+
+.page {
+  padding-bottom: calc(var(--control-lg) + var(--space-8) + var(--safe-bottom));
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-block);
+  margin-top: calc(var(--radius-card) * -1);
+  padding: var(--space-5) var(--gutter) 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--bg);
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  z-index: 5;
+  width: 100%;
+  max-width: var(--app-max-width);
+  padding: var(--space-3) var(--gutter) calc(var(--space-4) + var(--safe-bottom));
+  background: var(--bg);
+  transform: translateX(-50%);
+}
+
+.startLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.startLabel svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}

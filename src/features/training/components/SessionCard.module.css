@@ -14,38 +14,7 @@
   text-decoration: none;
 }
 
-.tone1,
-.tone3 {
-  --c-fg: var(--on-session-dark);
-  --c-soft: var(--on-session-dark-soft);
-  --c-line: var(--on-session-dark-line);
-}
-
-.tone2,
-.tone4 {
-  --c-fg: var(--on-session-light);
-  --c-soft: var(--on-session-light-soft);
-  --c-line: var(--on-session-light-line);
-}
-
-.tone1 {
-  background: var(--session-1);
-}
-
-.tone2 {
-  background: var(--session-2);
-  text-shadow: var(--session-text-shadow);
-}
-
-.tone3 {
-  background: var(--session-3);
-}
-
-.tone4 {
-  background: var(--session-4);
-}
-
-/* La sigla enorme de fondo, solo el contorno (en las rayas no se ve, se quita) */
+/* La sigla enorme de fondo, solo el contorno (en las rayas no se ve, se quita). El color sale de sessionTone. */
 .ghost {
   position: absolute;
   top: calc(var(--space-2) * -1);
@@ -57,7 +26,7 @@
   pointer-events: none;
 }
 
-.tone2 .ghost {
+.noGhost .ghost {
   display: none;
 }
 

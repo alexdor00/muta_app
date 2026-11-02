@@ -7,6 +7,8 @@ export const paths = {
   today: '/hoy',
   training: '/entreno',
   routine: '/entreno/rutina',
+  /** Ver una sesión de tu rutina (B1): progreso, ejercicios y «Empezar». */
+  sessionView: (sessionId: string) => `/entreno/rutina/${sessionId}`,
   /** Elegir rutina (tras la bienvenida, o para cambiarla). */
   chooseRoutine: '/entreno/rutinas',
   /** Rutinas de un tipo de entrenamiento («guardadas» = las marcadas). */
@@ -30,6 +32,7 @@ export const patterns = {
   routineCategory: '/entreno/rutinas/:category',
   routineSection: '/entreno/rutinas/:category/:section',
   routineDetail: '/entreno/programa/:id',
+  sessionView: '/entreno/rutina/:sessionId',
   sessionStart: '/entreno/sesion/:sessionId/inicio',
   session: '/entreno/sesion/:sessionId',
   summary: '/entreno/sesion/:sessionId/resumen',
@@ -52,10 +55,11 @@ export function tabOf(path: string): Tab | null {
 }
 
 /**
- * Pantalla completa, sin barra de pestañas: la bienvenida y entrenar (sesión en curso y resumen),
- * para no salir por error. La sesión antes de empezar (inicio) sí lleva pestañas.
+ * Pantalla completa, sin barra de pestañas: la bienvenida, ver una sesión (lleva «Empezar» fijo abajo) y entrenar
+ * (sesión en curso y resumen), para no salir por error. La sesión antes de empezar (inicio) sí lleva pestañas.
  */
 export function isFullScreen(path: string): boolean {
   if (path === paths.welcome || path.startsWith(`${paths.welcome}/`)) return true
+  if (path.startsWith(`${paths.routine}/`)) return true
   return /^\/entreno\/sesion\/[^/]+(\/resumen)?\/?$/.test(path)
 }

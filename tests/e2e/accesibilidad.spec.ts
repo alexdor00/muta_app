@@ -33,6 +33,17 @@ test('tu plan, con un músculo tocado y con la hoja Tu rutina abierta', async ({
   await sinFallos(page)
 })
 
+test('ver sesión, con un ejercicio desplegado', async ({ page }) => {
+  await page.goto('/entreno/rutina/b1')
+  await page.getByRole('button', { name: /Peso muerto rumano/ }).click()
+  await expect(page.getByText('Última vez')).toBeVisible()
+  await sinFallos(page)
+  // La cabecera naranja (texto oscuro) también
+  await page.goto('/entreno/rutina/a2')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await sinFallos(page)
+})
+
 test('piezas de diseño en claro y oscuro', async ({ page }) => {
   for (const scheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme: scheme })
@@ -43,6 +54,8 @@ test('piezas de diseño en claro y oscuro', async ({ page }) => {
 })
 
 test('elegir rutina y detalle de una rutina de MUTA', async ({ page }) => {
+  // Tres pasadas de axe en páginas largas: sola tarda ~16 s y, con el resto en paralelo, rozaba los 30 s por defecto
+  test.setTimeout(60_000)
   await page.goto('/bienvenida')
   await page.getByRole('link', { name: 'Comenzar' }).click()
   await page.getByRole('link', { name: 'Siguiente' }).click()
