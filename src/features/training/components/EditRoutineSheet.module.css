@@ -1,0 +1,107 @@
+/* Editar rutina (A11): lista numerada de la sesión, mantener pulsado para moverla, añadir y volver a la rutina. */
+
+.list {
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+/* La fila que se está moviendo */
+.lifted {
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+}
+
+.number {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--badge);
+  height: var(--badge);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(var(--space-1) / 2);
+  min-width: 0;
+}
+
+.name {
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+.detail,
+.note {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.note {
+  font: var(--text-footnote);
+}
+
+.chevron {
+  display: grid;
+  color: var(--label-2);
+}
+
+.chevron svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.hint {
+  margin: var(--space-4) 0;
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.add {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.add svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.restore {
+  display: block;
+  width: 100%;
+  min-height: var(--tap-min);
+  margin-top: var(--space-3);
+  border: 0;
+  background: none;
+  font: var(--text-subhead);
+  color: var(--label-2);
+  cursor: pointer;
+}

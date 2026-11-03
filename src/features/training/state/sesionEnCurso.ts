@@ -108,7 +108,7 @@ export function nuevaSesion(sesion: SesionPlan, inicio: number): SesionEnCurso {
     ejercicios: sesion.ejercicios.map((e, i) => ({
       series: Array.from({ length: e.series }, () => ({ ...SERIE_VACIA })),
       calentamiento: (plan[i] ?? []).map(() => false),
-      nota: '',
+      nota: e.nota ?? '',
       cambiadoPor: null,
     })),
   }

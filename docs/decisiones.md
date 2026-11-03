@@ -126,3 +126,10 @@ Como son de terceros, van en una biblioteca local (`private/biblioteca`, fuera d
 abrir su ficha («Cómo hacerlo · Del documento de …»), cambiar ejercicio y proponer equivalentes. Las explicaciones se tradujeron
 a mano (no con un traductor automático) y se ponen en cada ejercicio de las rutinas; en la ficha pequeña de Ver sesión manda
 la explicación del documento de esa rutina sobre la clave de la biblioteca.
+
+## 2026-11-03 · Editar rutina: por sesión, para todas las semanas, y la escritura del plan en cola
+
+Editar rutina (A11–A13) guarda lo que cambias en cada sesión aparte de la rutina (`plans/current.ediciones`, por sigla) y vale para
+todas las semanas, como «Cambiar ejercicio · En mi plan». El descanso y el ejercicio cambiado por otro siguen siendo de todo el plan.
+Al probarlo salió un error: dos cambios casi a la vez (la pauta y el descanso) leían y escribían el plan por separado y el segundo
+pisaba al primero. Ahora todas las escrituras del plan van en cola y cada una guarda el estado completo más reciente.

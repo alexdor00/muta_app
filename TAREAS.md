@@ -17,9 +17,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   [docs/datos.md](docs/datos.md). Faltan Women's Specialization y Comeback Bridge.
 - **Explicaciones y biblioteca local**: las 1.140 explicaciones de los documentos traducidas (9.901 ejercicios las enseñan) y
   208 ejercicios originales de las rutinas en la biblioteca local, con su explicación («Cómo hacerlo · Del documento de …»).
-- **Editar rutina (A11–A14)**: aprobada (2026-11-03) con el PNG `Desktop/MUTA-A11-editar-rutina-funcionalidades.png`: **la tarea actual**.
-- **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; Editar rutina (A11, con «Añadir un
-  ejercicio» de la ficha del músculo); editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
+- **Editar rutina (A11–A13)** hecha: reordenar, añadir, editar la pauta, copiar, quitar, cambiar por otro y volver a la rutina
+  original, para todas las semanas (e2e 72 de 72). Falta: superserie y «cada serie distinta» (A14), que piden cambiar la sesión y el
+  motor, y «Añadir un ejercicio» desde la ficha del músculo. Verlo en el móvil real.
+- **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
   el material); el consejo de prioridades; la imagen para compartir (hoy, texto);
   ficha para los 235 nombres de las rutinas que no tienen pareja en la biblioteca (`private/informes/ejercicios-sin-ficha.txt`):
   hay que añadirlos a la biblioteca con datos verificados. Las cuatro filas «Pronto» de la hoja «Tu rutina».

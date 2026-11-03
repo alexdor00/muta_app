@@ -1,0 +1,12 @@
+/* Volver a la rutina original: texto y dos botones. */
+
+.lead {
+  margin-bottom: var(--space-4);
+  font: var(--text-body);
+  color: var(--label-2);
+}
+
+.pair {
+  display: grid;
+  gap: var(--space-2);
+}

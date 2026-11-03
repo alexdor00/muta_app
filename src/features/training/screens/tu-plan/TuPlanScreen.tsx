@@ -11,6 +11,7 @@ import { SessionCard } from '../../components/SessionCard.tsx'
 import { TuRutinaSheet } from '../../components/TuRutinaSheet.tsx'
 import { WeekCard } from '../../components/WeekCard.tsx'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
+import { EditarRutinaHoja } from '../editar-rutina/EditarRutinaHoja.tsx'
 import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { localDate } from '../../../../shared/lib/format.ts'
 import {
@@ -43,6 +44,7 @@ export function TuPlanScreen() {
 function TuPlan({ siguiente }: { siguiente: number }) {
   const sheet = useSheet('rutina')
   const biblioteca = useSheet('biblioteca')
+  const editar = useSheet('editar')
   // Al bajar, la cabecera grande se va y arriba queda una barra con el título (como en las listas de rutinas)
   const cabecera = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(0)
@@ -144,8 +146,15 @@ function TuPlan({ siguiente }: { siguiente: number }) {
           }}
         />
       </div>
-      {sheet.open && <TuRutinaSheet onClose={sheet.close} onBiblioteca={biblioteca.showInstead} />}
+      {sheet.open && (
+        <TuRutinaSheet
+          onClose={sheet.close}
+          onBiblioteca={biblioteca.showInstead}
+          onEditar={editar.showInstead}
+        />
+      )}
       {biblioteca.open && <BibliotecaHoja onClose={biblioteca.close} />}
+      {editar.open && <EditarRutinaHoja onClose={editar.close} />}
       {ficha && <MusculoHoja musculo={ficha} onClose={() => setFicha(null)} />}
     </>
   )

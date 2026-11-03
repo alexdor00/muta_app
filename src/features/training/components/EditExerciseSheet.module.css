@@ -1,0 +1,233 @@
+/* Editar ejercicio (A12–A13): pauta en tarjetas grises, descanso y salto en píldoras, más opciones plegadas. */
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4) 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.back svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: var(--text-footnote);
+}
+
+.summary {
+  margin: var(--space-4) 0;
+  font: var(--text-body);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  font: var(--text-body);
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.pair {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.pair small,
+.block small,
+.hint {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.block {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.counter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+}
+
+.counter b {
+  min-width: 2ch;
+  font: var(--text-headline);
+  text-align: center;
+}
+
+.counter button {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--label);
+  cursor: pointer;
+}
+
+.counter button:disabled {
+  color: var(--label-2);
+  cursor: default;
+}
+
+.counter svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.option {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-subhead);
+  cursor: pointer;
+}
+
+.option[aria-pressed='true'] {
+  background: var(--label);
+  color: var(--bg);
+}
+
+.more {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.more summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--control);
+  font: var(--text-body);
+  list-style: none;
+  cursor: pointer;
+}
+
+.more summary::-webkit-details-marker {
+  display: none;
+}
+
+.more summary svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+}
+
+.more[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.more .option {
+  background: var(--surface);
+}
+
+.more .option[aria-pressed='true'] {
+  background: var(--label);
+}
+
+.label {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.note {
+  min-height: calc(var(--control) * 1.5);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-body);
+  resize: vertical;
+}
+
+.actions {
+  display: grid;
+  margin-top: var(--space-3);
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control);
+  border: 0;
+  border-top: var(--hairline) solid var(--separator);
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.action:disabled {
+  color: var(--label-2);
+  cursor: default;
+}
+
+.action svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.danger {
+  color: var(--critical-label);
+}

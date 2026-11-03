@@ -162,3 +162,18 @@ test('elegir rutina y detalle de una rutina de MUTA', async ({ page }) => {
     .click()
   await sinFallos(page)
 })
+
+test('Editar rutina y Editar ejercicio (con más opciones abiertas)', async ({ page }) => {
+  await page.goto('/entreno')
+  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page
+    .getByRole('dialog', { name: 'Tu rutina' })
+    .getByRole('button', { name: /Editar rutina/ })
+    .click()
+  await expect(page.getByRole('dialog', { name: 'Editar rutina' })).toBeVisible()
+  await sinFallos(page)
+  await page.getByRole('button', { name: /^1 Peso muerto rumano/ }).click()
+  const ej = page.getByRole('dialog', { name: 'Peso muerto rumano' })
+  await ej.getByText('Más opciones').click()
+  await sinFallos(page)
+})

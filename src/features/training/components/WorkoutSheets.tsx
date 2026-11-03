@@ -231,7 +231,8 @@ export function SessionTimeSheet(props: {
   )
 }
 
-const DESCANSOS = [30, 45, 60, 75, 90, 120, 150, 180, 240, 300] as const
+/** Los descansos que se pueden elegir (también en Editar ejercicio). */
+export const DESCANSOS = [30, 45, 60, 75, 90, 120, 150, 180, 240, 300] as const
 
 /** Descanso del ejercicio (C18): se guarda para ese ejercicio en todas las sesiones. */
 export function RestChoiceSheet(props: {

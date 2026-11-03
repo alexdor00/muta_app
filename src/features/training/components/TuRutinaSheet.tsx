@@ -6,16 +6,18 @@ import {
   CameraIcon,
   ChatIcon,
   ChevronRightIcon,
+  PencilIcon,
   SparkIcon,
   SwapIcon,
 } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import styles from './TuRutinaSheet.module.css'
 
-type Accion = 'biblioteca'
+type Accion = 'biblioteca' | 'editar'
 
 /** Sin `accion` ni `href`, la fila aún no existe: se ve apagada con «Pronto» y no se puede tocar. */
 const ROWS: { label: string; Icon: () => JSX.Element; accion?: Accion; href?: string }[] = [
+  { label: 'Editar rutina', Icon: PencilIcon, accion: 'editar' },
   { label: 'Cambiar de rutina', Icon: SwapIcon, href: paths.chooseRoutine },
   { label: 'Biblioteca de ejercicios', Icon: BookIcon, accion: 'biblioteca' },
   { label: 'Añadir foto a la sesión', Icon: CameraIcon },
@@ -24,9 +26,17 @@ const ROWS: { label: string; Icon: () => JSX.Element; accion?: Accion; href?: st
   { label: 'Mis consejos', Icon: ChatIcon },
 ]
 
-/** Hoja «Tu rutina»: las opciones de la rutina. Cambiar de rutina y la biblioteca funcionan; el resto, «Pronto». */
-export function TuRutinaSheet({ onClose, onBiblioteca }: { onClose: () => void; onBiblioteca: () => void }) {
-  const acciones: Record<Accion, () => void> = { biblioteca: onBiblioteca }
+/** Hoja «Tu rutina»: las opciones de la rutina. Editar, cambiar de rutina y la biblioteca funcionan; el resto, «Pronto». */
+export function TuRutinaSheet({
+  onClose,
+  onBiblioteca,
+  onEditar,
+}: {
+  onClose: () => void
+  onBiblioteca: () => void
+  onEditar: () => void
+}) {
+  const acciones: Record<Accion, () => void> = { biblioteca: onBiblioteca, editar: onEditar }
   return (
     <Sheet title="Tu rutina" onClose={onClose} large>
       <ul class={styles.list}>

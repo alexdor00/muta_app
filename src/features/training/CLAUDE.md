@@ -70,6 +70,11 @@ resumen, ficha del ejercicio) existen como «pendientes» hasta tener diseño ap
 - **Cambiar ejercicio** (`SwapSheet`): «Solo hoy» o «En mi plan». Primero «Hacen lo mismo» (`domain/equivalence.ts`: mismo músculo y zona
   de énfasis, con el porqué), luego los del programa y la biblioteca. En el plan, `cambiarEnPlan` guarda `plans/current.cambios` y
   `sesionesDeSemana` monta el nuevo con la pauta de la rutina (`enLugarDe`; Ver sesión lo dice y se puede volver).
+- **Editar rutina** (A11–A13, `screens/editar-rutina/EditarRutinaHoja.tsx` con `EditRoutineSheet` y `EditExerciseSheet`, desde «Tu rutina»):
+  por sesión, reordenar (mantener pulsado o «Subir/Bajar un puesto»), añadir de la biblioteca, editar series, repeticiones, «al terminar
+  la serie», descanso, salto y nota, copiar a otra sesión, quitar, cambiar por otro (`SwapSheet soloPlan`) y volver a la rutina
+  original. Se guarda en `plans/current.ediciones` por sigla (`domain/routineEdit.ts · aplicarEdicion`, para todas las semanas); el
+  descanso, en `descansosElegidos`, y el cambio de ejercicio, en `cambios`. Todo el plan se escribe en cola con el estado completo.
 - Nada obligatorio: lo opcional, a elección del usuario; lo que viene del documento, con sus palabras.
 - Cada función de `domain/` lleva su prueba; un archivo que solo declara tipos no la necesita.
 

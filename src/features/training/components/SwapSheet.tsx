@@ -41,18 +41,22 @@ export function SwapSheet(props: {
   onElegir: (nombre: string, alcance: Alcance) => void
   /** «Elegir cualquier ejercicio»: la biblioteca, filtrada por su músculo (sesion-en-vivo.js · v7-swap-any). */
   onBiblioteca: (alcance: Alcance) => void
+  /** Desde Editar rutina: siempre en tu plan, sin elegir. */
+  soloPlan?: boolean
   onClose: () => void
 }) {
-  const [alcance, setAlcance] = useState<Alcance>('hoy')
+  const [alcance, setAlcance] = useState<Alcance>(props.soloPlan ? 'plan' : 'hoy')
   return (
     <Sheet title="Cambiar ejercicio" onClose={props.onClose} large>
-      <ChoiceSegmented
-        name="alcance-cambio"
-        legend="Dónde se cambia"
-        options={ALCANCES}
-        value={alcance}
-        onChange={setAlcance}
-      />
+      {!props.soloPlan && (
+        <ChoiceSegmented
+          name="alcance-cambio"
+          legend="Dónde se cambia"
+          options={ALCANCES}
+          value={alcance}
+          onChange={setAlcance}
+        />
+      )}
       <p class={styles.lead}>
         {alcance === 'hoy'
           ? 'Solo cambia en esta sesión; tu plan sigue igual.'

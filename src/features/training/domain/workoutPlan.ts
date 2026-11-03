@@ -40,6 +40,10 @@ export type EjercicioPlan = {
   original?: string
   /** La explicación del documento de la rutina para este ejercicio (traducida), si la trae. */
   explicacion?: string
+  /** Tu nota del ejercicio (Editar rutina). */
+  nota?: string
+  /** Lo añadiste tú en Editar rutina (no está en la rutina). */
+  anadido?: boolean
   /** Si en tu plan lo cambiaste por este: el de la rutina («En lugar de …»). */
   enLugarDe?: string
 }
