@@ -49,14 +49,22 @@ export function searchLibrary(
   list: LibraryExercise[],
   query: string,
   muscle: MuscleId | null,
-  /** Cuántas veces sale cada ejercicio en las rutinas: los más típicos, primero (a igualdad, en el orden de la lista). */
+  /**
+   * Cuántas veces sale cada ejercicio en las rutinas: los más típicos, primero (a igualdad, en el orden de la lista). Los
+   * originales de las rutinas, siempre detrás de los de MUTA: algunos no se entienden sin su documento.
+   */
   usos: Readonly<Record<string, number>> = {},
 ): LibraryExercise[] {
   const q = plainText(query.trim())
   return list
     .filter((e) => (!muscle || e.primary === muscle) && (!q || plainText(e.name).includes(q)))
     .map((e, i) => ({ e, i }))
-    .sort((a, b) => (usos[b.e.id] ?? 0) - (usos[a.e.id] ?? 0) || a.i - b.i)
+    .sort(
+      (a, b) =>
+        Number(Boolean(a.e.deRutina)) - Number(Boolean(b.e.deRutina)) ||
+        (usos[b.e.id] ?? 0) - (usos[a.e.id] ?? 0) ||
+        a.i - b.i,
+    )
     .map(({ e }) => e)
 }
 
