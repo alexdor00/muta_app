@@ -2,7 +2,7 @@ import { expect, test } from './plan.ts'
 
 // Consejos de hoy (C10): en Ver sesión, el aviso de la sesión y la hoja; el orden de hoy; el aviso de orden en la ficha.
 
-// B1 de MUTA: abdomen y curl femoral con bisagra (las laterales en polea no están en la biblioteca: sin su consejo)
+// B1 de MUTA: las laterales en polea, el abdomen y el curl femoral con bisagra
 const ABDOMEN = /Pon el abdomen en un hueco que no compita/
 const CURL = /Tienes curl femoral y bisagra/
 
@@ -11,7 +11,7 @@ test('Ver sesión trae los consejos para esta sesión plegados; al tocarlos se a
   const tarjeta = page.locator('details', { hasText: 'Consejos para esta sesión' })
   await expect(tarjeta.getByText(ABDOMEN)).toBeHidden()
   await tarjeta.getByText('Consejos para esta sesión').click()
-  await expect(tarjeta.getByRole('listitem')).toHaveCount(2)
+  await expect(tarjeta.getByRole('listitem')).toHaveCount(3)
   await expect(tarjeta).toContainText(ABDOMEN)
   await expect(tarjeta).toContainText(CURL)
 })
@@ -20,7 +20,7 @@ test('en la sesión, el aviso abre la hoja; «Invertir hoy» cambia el orden y l
   page,
 }) => {
   await page.goto('/entreno/sesion/b1')
-  await page.getByRole('button', { name: /^2 consejos para esta sesión/ }).click()
+  await page.getByRole('button', { name: /^3 consejos para esta sesión/ }).click()
   const hoja = page.getByRole('dialog', { name: 'Consejos de hoy' })
   await expect(hoja).toContainText('Isquios, glúteo y pecho')
   await expect(hoja).toContainText(ABDOMEN)

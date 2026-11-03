@@ -99,3 +99,12 @@ Tu plan, Ver sesión, la sesión, el resumen y las fichas dejan los datos de pru
 
 Las sesiones sin sigla en su nombre («Torso 1») se llaman S1, S2… por su orden en la semana. La sesión en curso se guarda a
 cada cambio con una copia de sus ejercicios, así el resumen compara con la vez anterior aunque el entreno ya esté guardado.
+
+## 2026-11-03 · Nombres de las rutinas unidos con la biblioteca (alias)
+
+De 754 nombres de ejercicio en las rutinas, solo 61 estaban en la biblioteca. El usuario pidió unir todos los que sean el mismo
+ejercicio. Se revisaron uno a uno (con el nombre original en inglés y, en los dudosos, los documentos originales) y se unieron
+457 en `shared/content/exercise-aliases.json`. Criterio: **mismo movimiento con el mismo material**. Cuentan como el mismo la
+técnica (pausa, excéntrica, 21s, parciales, dropset, lastrado), el ángulo o el recorrido, hacerlo a una mano y el prefijo de
+superserie; **no** el cambio de agarre (supino, inverso), de material (barra, mancuernas, máquina, banda) ni los «a elegir» o
+«X o Y». En pantalla se ve el nombre de la rutina; la ficha, la clave y los datos son los de la biblioteca. Quedan 235 sin pareja.

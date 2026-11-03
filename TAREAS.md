@@ -9,12 +9,14 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   encima, **sin commit**, los **datos reales**: Tu plan, Ver sesión, la sesión, el resumen y las fichas leen la rutina guardada y tus
   entrenos (`workouts`); la sesión que toca va por rotación, lo apuntado se guarda a cada serie y sigue al recargar, y al terminar
   se guarda y pasa a la siguiente (decisión 2026-11-03). Ya no hay `state/muestra/`. Verificado: `npm run check` (243 tests) y e2e 65 de 65.
+  Unidos por alias 457 nombres de las rutinas con la biblioteca: el 76 % de los ejercicios tienen ficha (antes, el 22 %).
   Ver sesión despliega cada ejercicio con su ficha en pequeño y lo sugerido se ve en gris («Sugerido, no lo dice la rutina: …»).
   Falta verlo en un móvil real.
 - **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; Editar rutina (A11, con «Añadir un
   ejercicio» de la ficha del músculo); editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
   el material); el consejo de prioridades; la imagen para compartir (hoy, texto);
-  ficha para los ejercicios que no están en la biblioteca (hoy no tienen). Las cuatro filas «Pronto» de la hoja «Tu rutina».
+  ficha para los 235 nombres de las rutinas que no tienen pareja en la biblioteca (`private/informes/ejercicios-sin-ficha.txt`):
+  hay que añadirlos a la biblioteca con datos verificados. Las cuatro filas «Pronto» de la hoja «Tu rutina».
   Semana de descarga: solo si la rutina la pauta (decisión 2026-11-02).
 
 - **Unir la rama `pantalla/estilo-blanco-negro` a `main`** (PR en GitHub, con la CI en verde): revisarla antes en un móvil real con

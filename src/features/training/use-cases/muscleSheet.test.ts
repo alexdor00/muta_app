@@ -17,7 +17,7 @@ describe('ficha del músculo con el contenido real', () => {
         ejercicios: [
           { nombre: 'Peso muerto rumano', series: 3 },
           { nombre: 'No existe', series: 2 },
-          { nombre: 'Curl predicador', series: 4, musculo: 'biceps' },
+          { nombre: 'Crunch bicicleta', series: 4, musculo: 'core' },
         ],
       },
     ])
@@ -29,7 +29,7 @@ describe('ficha del músculo con el contenido real', () => {
         series: 3,
         contributes: expect.objectContaining({ femoral: 1 }),
       },
-      { id: null, sigla: 'B1', nombre: 'Curl predicador', series: 4, contributes: { biceps: 1 } },
+      { id: null, sigla: 'B1', nombre: 'Crunch bicicleta', series: 4, contributes: { core: 1 } },
     ])
   })
 })

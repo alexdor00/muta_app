@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import aliases from '../../../shared/content/exercise-aliases.json'
 import { libraryProblems } from '../domain/exerciseLibrary.ts'
 import {
   buscarEjercicios,
@@ -25,6 +26,13 @@ describe('biblioteca de ejercicios', () => {
     expect(idPorNombre('Peso muerto rumano')).toBe('peso_muerto_rumano')
     expect(idPorNombre('Otro')).toBeNull()
     expect(porNombre('peso muerto RUMANO')?.id).toBe('peso_muerto_rumano')
+  })
+  it('un nombre de rutina con otro nombre lleva a su ejercicio; cada alias apunta a uno que existe', () => {
+    expect(porNombre('Sentadilla trasera')?.id).toBe('sentadilla')
+    expect(porNombre('Laterales en polea')?.id).toBe('elevaciones_laterales_en_polea')
+    expect(porNombre('Crunch bicicleta')).toBeNull()
+    const ids = new Set(LIBRARY.map((e) => e.id))
+    expect(Object.values(aliases).filter((id) => !ids.has(id))).toEqual([])
   })
   it('busca en el contenido real', () => {
     expect(buscarEjercicios('jalón', null).map((e) => e.name)).toContain('Jalón al pecho')

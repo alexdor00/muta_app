@@ -1,3 +1,4 @@
+import aliases from '../../../shared/content/exercise-aliases.json'
 import exercises from '../../../shared/content/exercises.json'
 import { searchLibrary, type LibraryExercise } from '../domain/exerciseLibrary.ts'
 import type { MuscleId } from '../domain/muscles.ts'
@@ -20,8 +21,17 @@ export function buscarEjercicios(query: string, muscle: MuscleId | null): Librar
   return searchLibrary(LIBRARY, query, muscle)
 }
 
-/** Un ejercicio de la biblioteca por su nombre, sin mirar mayúsculas (los de una rutina), o null. */
+/**
+ * Nombres de las rutinas que son un ejercicio de la biblioteca con otro nombre (técnica, ángulo, una mano, superserie…),
+ * revisados a mano uno a uno (decisión 2026-11-03): nombre → id.
+ */
+const ALIAS = aliases as Record<string, string>
+
+/** Un ejercicio de la biblioteca por su nombre (sin mirar mayúsculas) o por su alias, o null. */
 export function porNombre(nombre: string): LibraryExercise | null {
   const n = nombre.toLowerCase()
-  return LIBRARY.find((e) => e.name.toLowerCase() === n) ?? null
+  const exacto = LIBRARY.find((e) => e.name.toLowerCase() === n)
+  if (exacto) return exacto
+  const id = ALIAS[nombre]
+  return id ? ejercicioDeBiblioteca(id) : null
 }

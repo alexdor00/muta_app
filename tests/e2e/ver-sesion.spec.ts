@@ -51,14 +51,17 @@ test('una sesión que no existe lo dice', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Esta sesión no existe' })).toBeVisible()
 })
 
-test('lo que no dice la rutina sale como sugerido; sin biblioteca, sin enlace a la ficha', async ({
+test('un ejercicio que en la biblioteca se llama de otra forma tiene su ficha y nada sugerido', async ({
   page,
 }) => {
   await page.goto('/entreno/rutina/b1')
+  // «Laterales en polea» (MUTA) es «Elevaciones laterales en polea» de la biblioteca (exercise-aliases.json)
   const fila = page.getByRole('button', { name: /Laterales en polea/ })
-  await expect(fila).toContainText('Sugerido, no lo dice la rutina: salto de 2,5 kg')
-  await expect(page.getByRole('button', { name: /Peso muerto rumano/ })).not.toContainText('Sugerido')
+  await expect(fila).not.toContainText('Sugerido')
   await fila.click()
   await expect(page.getByText('15 kg × 14')).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Ver ficha' })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Ver ficha' })).toHaveAttribute(
+    'href',
+    '/entreno/ejercicio/elevaciones_laterales_en_polea',
+  )
 })

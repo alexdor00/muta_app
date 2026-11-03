@@ -19,6 +19,9 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
 - **content**: archivos JSON que no se editan a mano sin revisar su prueba. Los programas de terceros **no** van aquí: van en `private/`.
 - `exercises.json` es la biblioteca (141 ejercicios): sale del prototipo anterior con `node scripts/exercises-from-prototype.cjs`; no se
   edita a mano, se vuelve a generar. Los 4 de cuello no traen fuente: el prototipo los da como criterio orientativo.
+- `exercise-aliases.json`: nombre de un ejercicio en una rutina → id de la biblioteca, cuando es el mismo ejercicio con otro nombre
+  (técnica, ángulo, recorrido, una mano, superserie). Revisado a mano uno a uno (decisión 2026-11-03); se edita a mano y su
+  prueba comprueba que cada id existe. Lo que no tiene pareja está en `private/informes/ejercicios-sin-ficha.txt`.
 - `tips/pre.json` (los 9 de antes de empezar), `tips/muscles.json` (la clave, los 137 consejos y el reparto de cada músculo) y `tips/session.json` (textos de las reglas de la sesión, por id) salen del prototipo con
   `node scripts/tips-from-prototype.cjs`; tampoco se editan a mano.
 - `programs.ts` guarda los programas locales (`private/programs/*.json`, rev en `_meta.json`: subirla al cambiar un archivo).
