@@ -1,6 +1,12 @@
 import { useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
-import { formatChange, formatClock, formatDayDate, formatDecimal } from '../../../../shared/lib/format.ts'
+import {
+  formatChange,
+  formatClock,
+  formatDayDate,
+  formatDecimal,
+  formatRange,
+} from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChevronLeftIcon, PlayIcon } from '../../../../shared/ui/icons.tsx'
@@ -110,8 +116,11 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
               : []),
             {
               icono: 'reps',
-              texto: `${f.rango[0]}–${f.rango[1]} reps`,
-              etiqueta: `${f.rango[0]} a ${f.rango[1]} repeticiones`,
+              texto: `${formatRange(f.rango)} reps`,
+              etiqueta:
+                f.rango[0] === f.rango[1]
+                  ? `${f.rango[0]} repeticiones`
+                  : `${f.rango[0]} a ${f.rango[1]} repeticiones`,
             },
             {
               icono: 'descanso',
@@ -120,7 +129,7 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
             },
           ]}
         />
-        <FichaClave texto={plainEffort(ex.key)} />
+        {ex.key && <FichaClave texto={plainEffort(ex.key)} fuente={ex.deRutina ? ex.source : null} />}
         <FichaSugerencia
           etiqueta={f.sugerencia.etiqueta}
           valor={f.sugerencia.valor}

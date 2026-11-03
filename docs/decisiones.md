@@ -118,3 +118,11 @@ recto femoral o vastos): mismo músculo principal y misma zona obligatorios; des
 secundarios en común (`domain/equivalence.ts`). La zona sale del nombre, también del original en inglés. «Cambiar ejercicio»
 deja elegir **solo hoy** o **en mi plan**: en el plan se guarda «ejercicio de la rutina → el nuevo» (`plans/current.cambios`)
 y el nuevo conserva la pauta de la rutina (series, repeticiones, esfuerzo y descanso); se puede volver al de la rutina.
+
+## 2026-11-03 · Los ejercicios originales de cada rutina, en la biblioteca con la explicación de su documento
+
+El usuario pidió que los ejercicios originales de cada rutina estén en la biblioteca con las explicaciones de los documentos.
+Como son de terceros, van en una biblioteca local (`private/biblioteca`, fuera de git) que la app une a la de MUTA para buscar,
+abrir su ficha («Cómo hacerlo · Del documento de …»), cambiar ejercicio y proponer equivalentes. Las explicaciones se tradujeron
+a mano (no con un traductor automático) y se ponen en cada ejercicio de las rutinas; en la ficha pequeña de Ver sesión manda
+la explicación del documento de esa rutina sobre la clave de la biblioteca.

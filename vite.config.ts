@@ -36,5 +36,7 @@ export default defineConfig({
   ],
   test: {
     include: ['src/**/*.test.ts'], // los recorridos de tests/e2e los pasa Playwright
+    // Sin las rutinas ni la biblioteca locales (private/): las pruebas dan lo mismo aquí que en la CI
+    env: { VITE_NO_LOCAL_PROGRAMS: '1' },
   },
 })

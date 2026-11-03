@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   formatChange,
+  formatRange,
   localDate,
   formatClock,
   formatDayDate,
@@ -71,5 +72,12 @@ describe('localDate', () => {
   it('la fecha en hora local, no en UTC', () => {
     const tarde = new Date(2026, 10, 3, 23, 30)
     expect(localDate(tarde)).toBe('2026-11-03')
+  })
+})
+
+describe('formatRange', () => {
+  it('con raya, o un solo número si son iguales', () => {
+    expect(formatRange([6, 10])).toBe('6–10')
+    expect(formatRange([15, 15])).toBe('15')
   })
 })

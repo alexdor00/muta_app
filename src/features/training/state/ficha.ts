@@ -67,7 +67,8 @@ export function fichaCorta(e: EjercicioPlan, lib: LibraryExercise | null) {
   return {
     hoy: s.valor,
     etiqueta: s.etiqueta,
-    clave: lib ? plainEffort(lib.key) : null,
+    // La explicación del documento de esta rutina manda; si no la trae, la clave de la biblioteca
+    clave: e.explicacion ? plainEffort(e.explicacion) : lib?.key ? plainEffort(lib.key) : null,
     musculos: musculos.length ? musculos.join(' · ') : null,
     id: lib?.id ?? null,
   }

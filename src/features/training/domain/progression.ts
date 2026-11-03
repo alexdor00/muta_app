@@ -1,6 +1,6 @@
 // Doble progresión con RIR (docs/conocimiento/02-reglas.md · «Doble progresión»; motor.js · suggestFor del prototipo).
 // Sin el caso de descarga: solo se aplica si la rutina la pauta (decisión 2026-11-02) y aún no hay ninguna que lo haga.
-import { formatDecimal } from '../../../shared/lib/format.ts'
+import { formatDecimal, formatRange } from '../../../shared/lib/format.ts'
 import { e1rm } from './e1rm.ts'
 import { effortLabel } from './effort.ts'
 import type { Range } from './muscles.ts'
@@ -41,7 +41,7 @@ export function suggestFor(
   i = 0,
 ): Sugerencia {
   const [a, b] = p.rango
-  const rango = `${a}–${b}`
+  const rango = formatRange([a, b])
   if (!p.ultima?.length) {
     if (p.mejorOtraSesion && p.mejorOtraSesion > 0 && !p.pesoCorporal) {
       const kg = floorTo(p.mejorOtraSesion / (1 + (a + p.rir) / 30), p.salto)

@@ -102,6 +102,13 @@
   color: var(--label-2);
 }
 
+/* De qué documento sale la explicación */
+.source {
+  margin-top: var(--space-2);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
 .suggestion {
   display: flex;
   flex-wrap: wrap;

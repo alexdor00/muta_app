@@ -24,4 +24,7 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
   prueba comprueba que cada id existe. Lo que no tiene pareja está en `private/informes/ejercicios-sin-ficha.txt`.
 - `tips/pre.json` (los 9 de antes de empezar), `tips/muscles.json` (la clave, los 137 consejos y el reparto de cada músculo) y `tips/session.json` (textos de las reglas de la sesión, por id) salen del prototipo con
   `node scripts/tips-from-prototype.cjs`; tampoco se editan a mano.
+- `data/localExercises.ts` carga la biblioteca local (`private/biblioteca/ejercicios.json`: los ejercicios originales de las rutinas con la
+  explicación de su documento; ver [docs/datos.md](../../docs/datos.md)); como las rutinas locales, no se carga con `VITE_NO_LOCAL_PROGRAMS`
+  (e2e, CI y Vitest).
 - `programs.ts` guarda los programas locales (`private/programs/*.json`, rev en `_meta.json`: subirla al cambiar un archivo).

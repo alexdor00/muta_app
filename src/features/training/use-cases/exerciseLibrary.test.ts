@@ -32,6 +32,9 @@ describe('biblioteca de ejercicios', () => {
     expect(porNombre('Sentadilla trasera')?.id).toBe('sentadilla')
     expect(porNombre('Laterales en polea')?.id).toBe('elevaciones_laterales_en_polea')
     expect(porNombre('Crunch bicicleta')).toBeNull()
+    // El prefijo de superserie o de serie top no cambia el ejercicio
+    expect(porNombre('A1: Curl araña')?.id).toBe('curl_arana')
+    expect(porNombre('Serie top: Sentadilla trasera')?.id).toBe('sentadilla')
     const ids = new Set(LIBRARY.map((e) => e.id))
     expect(Object.values(aliases).filter((id) => !ids.has(id))).toEqual([])
   })

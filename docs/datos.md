@@ -65,3 +65,13 @@ excéntrica, top set…), traduce con `translate.cjs` y corrige con `sustitucion
 resto de un corte, no es un ejercicio). Solo rellena donde no hay nada. Rev 15 de `_meta.json`: el 74 % de los ejercicios
 tienen sustituciones del documento. Sin lista en el documento: Women's Foundation, Optimization, Glute Hypertrophy y At-Home;
 pendientes: Women's Specialization (en columnas de la tabla) y Comeback Bridge (la página es una imagen).
+
+## Explicaciones de los documentos y biblioteca local (2026-11-03)
+
+- **Explicaciones.** La columna de notas de cada documento (`notes`, en inglés) está traducida a mano en
+  `private/herramientas/notas/notas-es.tsv` (1.140 distintas; las vacías son trozos rotos del PDF). `notas-aplicar.cjs` las pone en
+  cada ejercicio como `tip` (el original no se toca). Rev 16 de `_meta.json`. El esfuerzo va en RIR («RPE 9» → «a 1 del fallo»).
+- **Biblioteca local.** Los ejercicios originales de las rutinas que no están en la biblioteca de MUTA (ni con alias) los genera
+  `node private/herramientas/biblioteca-local.mts` en `private/biblioteca/ejercicios.json`: músculo con `muscleOf`, material,
+  tipo y patrón por el nombre, la pauta más habitual y la explicación más repetida de su documento, con los programas de los
+  que sale. Quedan fuera los estiramientos y los «a elegir». Volver a generarla al cambiar rutinas, alias o explicaciones.

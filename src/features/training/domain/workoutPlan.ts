@@ -1,7 +1,7 @@
 // Tu plan de verdad: las sesiones de la semana que toca de la rutina guardada, con lo que la sesión necesita de cada
 // ejercicio. Lo que trae la rutina manda; lo que falta sale de la biblioteca y, si tampoco está, se rellena y se marca
 // como sugerido (decisión 2026-11-03).
-import { formatClock, formatDecimal } from '../../../shared/lib/format.ts'
+import { formatClock, formatDecimal, formatRange } from '../../../shared/lib/format.ts'
 import { effortLabel } from './effort.ts'
 import type { LibraryExercise } from './exerciseLibrary.ts'
 import { muscleOf } from './muscleOf.ts'
@@ -38,6 +38,8 @@ export type EjercicioPlan = {
   sugeridos: Sugerido[]
   /** El nombre original (inglés) que trae la rutina, si lo trae: ayuda a saber qué trabaja. */
   original?: string
+  /** La explicación del documento de la rutina para este ejercicio (traducida), si la trae. */
+  explicacion?: string
   /** Si en tu plan lo cambiaste por este: el de la rutina («En lugar de …»). */
   enLugarDe?: string
 }
@@ -100,7 +102,7 @@ export function ejercicioDelPlan(e: Exercise, lib: LibraryExercise | null): Ejer
   return {
     nombre: e.slot?.kind === 'optional' && e.slot.chosen ? e.slot.chosen : e.name,
     series: o(seriesDe(e.sets), undefined, RELLENO.series, 'series'),
-    reps: o(repsDe(e.reps), lib ? `${lib.reps[0]}–${lib.reps[1]}` : undefined, RELLENO.reps, 'reps'),
+    reps: o(repsDe(e.reps), lib ? formatRange(lib.reps) : undefined, RELLENO.reps, 'reps'),
     rir: o(rirDe(e.rpe), lib?.rir, RELLENO.rir, 'rir'),
     ultima: [],
     descanso: o(descansoDe(e.rest), lib?.restSec, Math.round(restMinutes(null, e.kind) * 60), 'descanso'),
@@ -115,6 +117,7 @@ export function ejercicioDelPlan(e: Exercise, lib: LibraryExercise | null): Ejer
     salto: o(null, lib?.stepKg, RELLENO.salto, 'salto'),
     sustitutos: e.substitutions ?? [],
     ...(e.originalName && e.originalName !== e.name ? { original: e.originalName } : {}),
+    ...(e.tip ? { explicacion: e.tip } : {}),
     sugeridos,
   }
 }

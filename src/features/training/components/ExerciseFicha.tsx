@@ -63,11 +63,17 @@ function Fila(props: { icono: JSX.Element; titulo: string; children: JSX.Element
   )
 }
 
-/** «La clave» de la técnica, de la biblioteca. */
-export function FichaClave({ texto }: { texto: string }) {
+/**
+ * «La clave» de la técnica, de la biblioteca; en un ejercicio original de una rutina, «Cómo hacerlo» con la explicación
+ * de su documento y de qué rutinas sale.
+ */
+export function FichaClave({ texto, fuente }: { texto: string; fuente?: string | null }) {
   return (
-    <Fila icono={<InfoIcon />} titulo="La clave">
-      <p class={styles.text}>{texto}</p>
+    <Fila icono={<InfoIcon />} titulo={fuente ? 'Cómo hacerlo' : 'La clave'}>
+      <>
+        <p class={styles.text}>{texto}</p>
+        {fuente && <p class={styles.source}>Del documento de: {fuente}</p>}
+      </>
     </Fila>
   )
 }

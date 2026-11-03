@@ -26,6 +26,11 @@ export type LibraryExercise = {
   /** La clave de la técnica, con su fuente. */
   key: string
   source: string
+  /**
+   * Ejercicio original de una rutina (biblioteca local): `key` es la explicación de su documento y `source`, las
+   * rutinas de las que sale.
+   */
+  deRutina?: boolean
 }
 
 export const EQUIPMENT_LABEL: Record<Equipment, string> = {

@@ -60,3 +60,8 @@ export function formatChange(ratio: number): string {
 export function localDate(at = new Date()): string {
   return new Date(at.getTime() - at.getTimezoneOffset() * 60_000).toISOString().slice(0, 10)
 }
+
+/** Un rango de números: «6–10», o «15» si los dos son iguales. */
+export function formatRange([a, b]: readonly [number, number]): string {
+  return a === b ? String(a) : `${a}–${b}`
+}

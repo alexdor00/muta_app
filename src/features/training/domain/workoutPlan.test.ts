@@ -102,6 +102,11 @@ describe('un ejercicio del plan', () => {
     })
   })
 
+  it('lleva la explicación del documento de la rutina, si la trae', () => {
+    expect(ejercicioDelPlan({ name: 'Press', tip: 'Codos a 45°.' }, null).explicacion).toBe('Codos a 45°.')
+    expect(ejercicioDelPlan({ name: 'Press' }, null).explicacion).toBeUndefined()
+  })
+
   it('sin biblioteca: músculo por el nombre y lo demás sugerido', () => {
     const e = ejercicioDelPlan(
       { name: 'Curl predicador', originalName: 'Preacher curl', kind: 'isolation' },
