@@ -12,7 +12,14 @@ import { selectVariant } from '../domain/programInfo.ts'
 import type { WeakChoice } from '../domain/weakPoints.ts'
 import type { Entreno } from '../domain/workoutHistory.ts'
 import { aplicarEdicion, type EdicionSesion, type Ediciones } from '../domain/routineEdit.ts'
-import { avanzar, dondeVas, INICIO, sesionesDeSemana, type Rotacion } from '../domain/workoutPlan.ts'
+import {
+  avanzar,
+  dondeVas,
+  INICIO,
+  pautaEnPrograma,
+  sesionesDeSemana,
+  type Rotacion,
+} from '../domain/workoutPlan.ts'
 import { descansosDeRutina } from '../domain/restDays.ts'
 import { elecciones, type EleccionMusculo } from '../state/musculos.ts'
 import { entrenos, tuPlan } from '../state/plan.ts'
@@ -112,6 +119,14 @@ async function leer(): Promise<void> {
     logError(error, 'cargar el plan')
     tuPlan.value = { status: 'none' }
   }
+}
+
+/**
+ * Cómo pauta tu rutina un ejercicio de la biblioteca (por su id, con sus otros nombres) en cualquiera de sus semanas, para su
+ * ficha cuando no está en la semana que toca. null si tu rutina no lo lleva.
+ */
+export function pautaEnTuRutina(id: string) {
+  return programa ? pautaEnPrograma(programa, (n) => porNombre(n)?.id === id) : null
 }
 
 /** Una fila guardada sin los campos de la base. */

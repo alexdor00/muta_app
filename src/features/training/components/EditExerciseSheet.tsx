@@ -21,8 +21,8 @@ const QUEDAN = [
   { value: '2', label: 'Quedan 2' },
   { value: '3', label: 'Quedan 3' },
 ]
-/** El rango de repeticiones se mueve entero, de 2 en 2; el descanso, de 15 en 15 s (hasta 5 min). */
-const PASO_REPS = 2
+/** Las repeticiones, mínimo y máximo de 1 en 1 (hasta 50); el descanso, de 15 en 15 s (hasta 5 min). */
+const MAX_REPS = 50
 const PASO_DESCANSO = 15
 const MAX_DESCANSO = 300
 
@@ -60,7 +60,8 @@ function Contador(p: {
 }
 
 /**
- * Editar ejercicio (A12–A13): series, repeticiones y descanso con − / +, y «Al terminar la serie» en una lista plegada.
+ * Editar ejercicio (A12–A13): series y descanso con − / +; repeticiones (mínimo y máximo) y «Al terminar la serie»,
+ * desplegables.
  * Cada toque se guarda solo. Un consejo del entrenador como mucho; «Cambiar por otro» y «Quitar».
  */
 export function EditExerciseSheet(props: {
@@ -77,7 +78,8 @@ export function EditExerciseSheet(props: {
   onClose: () => void
 }) {
   const [p, setP] = useState(props.pauta)
-  const [quedanAbierto, setQuedanAbierto] = useState(false)
+  // Un desplegable abierto cada vez: repeticiones o «Al terminar la serie»
+  const [abierto, setAbierto] = useState<'reps' | 'quedan' | null>(null)
   const cambia = (c: Partial<PautaEdicion>) => {
     const nueva = { ...p, ...c }
     setP(nueva)
@@ -100,13 +102,27 @@ export function EditExerciseSheet(props: {
           puedeMas={p.series < 10}
           onPaso={(paso) => cambia({ series: p.series + paso })}
         />
-        <Contador
-          nombre="Repeticiones"
-          texto={formatRange(p.reps)}
-          puedeMenos={min - PASO_REPS >= 1}
-          puedeMas={max + PASO_REPS <= 50}
-          onPaso={(paso) => cambia({ reps: [min + paso * PASO_REPS, max + paso * PASO_REPS] })}
-        />
+        <Desplegable
+          titulo="Repeticiones"
+          valor={formatRange(p.reps)}
+          abierto={abierto === 'reps'}
+          onAbrir={(a) => setAbierto(a ? 'reps' : null)}
+        >
+          <Contador
+            nombre="Mínimo de reps"
+            texto={String(min)}
+            puedeMenos={min > 1}
+            puedeMas={min < max}
+            onPaso={(paso) => cambia({ reps: [min + paso, max] })}
+          />
+          <Contador
+            nombre="Máximo de reps"
+            texto={String(max)}
+            puedeMenos={max > min}
+            puedeMas={max < MAX_REPS}
+            onPaso={(paso) => cambia({ reps: [min, max + paso] })}
+          />
+        </Desplegable>
         <Contador
           nombre="Descanso"
           texto={formatClock(p.descanso)}
@@ -127,8 +143,8 @@ export function EditExerciseSheet(props: {
         <Desplegable
           titulo="Al terminar la serie"
           valor={quedan.label}
-          abierto={quedanAbierto}
-          onAbrir={setQuedanAbierto}
+          abierto={abierto === 'quedan'}
+          onAbrir={(a) => setAbierto(a ? 'quedan' : null)}
         >
           <small class={styles.hint}>Cuántas repeticiones más podrías hacer</small>
           <ChoiceList

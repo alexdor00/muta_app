@@ -150,3 +150,10 @@ una sesión» (uno o dos días). De serie, los de la rutina (los del archivo, lo
 vuelta al cuerpo); cambiados en Editar rutina, se guardan en el plan para todas las semanas. Hoy toca descanso si la última sesión
 hecha lo lleva detrás y aún no han pasado esos días; no bloquea: se puede entrenar igual. En Ver sesión, el ejercicio desplegado ya
 no repite lo que toca hoy, los músculos ni la clave (están en la ficha completa).
+
+## 2026-11-03 · Repeticiones a mano y de dónde salen las de la ficha
+
+En Editar ejercicio las repeticiones se ponen a mano (mínimo y máximo, de 1 en 1) en un desplegable, en vez de mover el rango
+entero. La ficha del ejercicio usaba la pauta de la biblioteca cuando el ejercicio no estaba en la semana que toca; ahora busca
+antes en toda tu rutina (las repeticiones y el esfuerzo que más se repiten) y dice de dónde salen: de tu plan, de tu rutina o
+típicas de ese ejercicio.

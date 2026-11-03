@@ -31,6 +31,7 @@ import {
   type MuscleId,
 } from '../../state/routines.ts'
 import { ejercicioDeBiblioteca } from '../../use-cases/exerciseLibrary.ts'
+import { pautaEnTuRutina } from '../../use-cases/training.ts'
 import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { usePlan } from '../comun/usePlan.ts'
 import styles from './FichaEjercicioScreen.module.css'
@@ -42,6 +43,13 @@ const METRICAS = [
 type MetricaEjercicio = (typeof METRICAS)[number]['value']
 
 const NOMBRES = Object.fromEntries(MUSCLE_IDS.map((id) => [id, MUSCLES[id].label]))
+
+/** De dónde salen las repeticiones de la ficha. */
+const FUENTE = {
+  plan: 'de tu plan',
+  rutina: 'de tu rutina (en otra semana)',
+  biblioteca: 'típicas de este ejercicio: tu rutina no lo lleva',
+} as const
 
 /**
  * Ficha del ejercicio (diseño aprobado del 2026-11-02, sin foto): nombre y pauta, la clave, el peso que toca hoy con su
@@ -63,7 +71,7 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
       </Pending>
     )
   }
-  const f = fichaDe(ex)
+  const f = fichaDe(ex, pautaEnTuRutina(ex.id))
   const musculos = (min: number, max: number) =>
     (Object.entries(ex.contributes) as [MuscleId, number][])
       .filter(([, c]) => c >= min && c < max)
@@ -117,10 +125,7 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
             {
               icono: 'reps',
               texto: `${formatRange(f.rango)} reps`,
-              etiqueta:
-                f.rango[0] === f.rango[1]
-                  ? `${f.rango[0]} repeticiones`
-                  : `${f.rango[0]} a ${f.rango[1]} repeticiones`,
+              etiqueta: `${f.rango[0] === f.rango[1] ? f.rango[0] : `${f.rango[0]} a ${f.rango[1]}`} repeticiones, ${FUENTE[f.fuente]}`,
             },
             {
               icono: 'descanso',
@@ -128,6 +133,7 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
               etiqueta: `Descanso ${formatClock(descanso)}`,
             },
           ]}
+          nota={`Repeticiones ${FUENTE[f.fuente]}`}
         />
         {ex.key && (
           <FichaClave texto={plainEffort(ex.key)} fuente={ex.deRutina ? ex.source : null} web={ex.keyWeb} />

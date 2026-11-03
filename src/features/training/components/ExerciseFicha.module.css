@@ -197,3 +197,10 @@
   width: var(--icon-sm);
   height: var(--icon-sm);
 }
+
+/* De dónde sale la pauta de la cabecera */
+.headNote {
+  margin: var(--space-3) 0 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+}

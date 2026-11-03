@@ -1,6 +1,7 @@
 // Lo que enseña la ficha de un ejercicio: tu plan y tus entrenos.
 import { formatDecimal } from '../../../shared/lib/format.ts'
 import type { LibraryExercise } from '../domain/exerciseLibrary.ts'
+import type { Range } from '../domain/muscles.ts'
 import { progresoDe } from '../domain/exerciseProgress.ts'
 import { suggestFor, type Sugerencia } from '../domain/progression.ts'
 import { historialDe, ultimaVez } from '../domain/workoutHistory.ts'
@@ -27,14 +28,15 @@ function vistaSugerencia(sugerencia: Sugerencia, antes: SerieHecha | null) {
 
 /**
  * La ficha de un ejercicio de la biblioteca: si está en tu plan, con la pauta de su sesión, lo que toca hoy (lo mismo
- * que propone la sesión: doble progresión desde la última vez) y su historial; si no, con lo de la biblioteca y
- * «Primera vez».
+ * que propone la sesión: doble progresión desde la última vez) y su historial; si no, con lo que pone tu rutina en otras
+ * semanas (`deRutina`) o, si tampoco, lo típico de la biblioteca. `fuente` dice de dónde salen las repeticiones.
  */
-export function fichaDe(ex: LibraryExercise) {
+export function fichaDe(ex: LibraryExercise, deRutina: { reps: Range; rir: number | null } | null = null) {
   const plan = enTuPlan(ex.name)
   const ultima = ultimaVez(entrenos.value, ex.name)
-  const rango = (plan && rangoDe(plan.e.reps)) ?? ex.reps
-  const rir = plan ? plan.e.rir : ex.rir
+  const rango = (plan && rangoDe(plan.e.reps)) ?? deRutina?.reps ?? ex.reps
+  const rir = plan ? plan.e.rir : (deRutina?.rir ?? ex.rir)
+  const fuente: 'plan' | 'rutina' | 'biblioteca' = plan ? 'plan' : deRutina ? 'rutina' : 'biblioteca'
   const pesoCorporal = ex.equipment === 'bodyweight' || Boolean(plan?.e.pesoCorporal)
   const sugerencia = plan
     ? sugerenciaDe(plan.e)
@@ -47,6 +49,7 @@ export function fichaDe(ex: LibraryExercise) {
       })
   return {
     plan,
+    fuente,
     rango,
     rir,
     pesoCorporal,

@@ -7,6 +7,7 @@ import {
   kilosDeHoy,
   nombresDeSesiones,
   notaSugerido,
+  pautaEnPrograma,
   rangoDe,
   descansoDe,
   dondeVas,
@@ -251,5 +252,36 @@ describe('nombresDeSesiones', () => {
       { sigla: 'S3', nombre: 'Torso' },
     ]
     expect(nombresDeSesiones(lista)).toEqual({ S1: 'Torso 1', S2: 'Pierna', S3: 'Torso 2' })
+  })
+})
+
+describe('pautaEnPrograma', () => {
+  const prog = (reps: (string | null)[]): ProgramData => ({
+    blocks: [
+      {
+        weeks: reps.map((r, i) => ({
+          week: i + 1,
+          days: [
+            {
+              name: 'A',
+              exercises: [
+                { name: 'Aperturas', reps: r, rpe: '9' },
+                { name: 'Press', reps: '5' },
+              ],
+            },
+          ],
+        })),
+      },
+    ],
+  })
+  it('las repeticiones y el esfuerzo que más se repiten en todas las semanas', () => {
+    expect(pautaEnPrograma(prog(['8-12', '12-15', '12-15']), (n) => n === 'Aperturas')).toEqual({
+      reps: [12, 15],
+      rir: 1,
+    })
+  })
+  it('null si la rutina no lo lleva o no dice repeticiones', () => {
+    expect(pautaEnPrograma(prog(['8-12']), (n) => n === 'Remo')).toBeNull()
+    expect(pautaEnPrograma(prog([null]), (n) => n === 'Aperturas')).toBeNull()
   })
 })

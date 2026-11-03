@@ -24,6 +24,8 @@ export function FichaCabecera(props: {
   nombre: string
   musculos: string[]
   pauta: { icono: keyof typeof ICONO; texto: string; etiqueta: string }[]
+  /** De dónde sale la pauta («Repeticiones de tu rutina»), en gris debajo. */
+  nota?: string
 }) {
   return (
     <section class={`${styles.card} ${styles.head}`}>
@@ -46,6 +48,7 @@ export function FichaCabecera(props: {
           )
         })}
       </ul>
+      {props.nota && <p class={styles.headNote}>{props.nota}</p>}
     </section>
   )
 }

@@ -17,7 +17,11 @@ export function Desplegable(props: {
     <details
       class={styles.more}
       open={props.abierto}
-      onToggle={(e) => props.onAbrir((e.currentTarget as HTMLDetailsElement).open)}
+      onToggle={(e) => {
+        // Si se cierra porque se abrió otro (lo manda `abierto`), no avisa: el aviso cerraría el otro
+        const open = (e.currentTarget as HTMLDetailsElement).open
+        if (open !== props.abierto) props.onAbrir(open)
+      }}
     >
       <summary>
         <span>{props.titulo}</span>

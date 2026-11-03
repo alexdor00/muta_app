@@ -174,6 +174,6 @@ test('Editar rutina y Editar ejercicio (con «Al terminar la serie» abierto)', 
   await sinFallos(page)
   await page.getByRole('button', { name: /^Peso muerto rumano/ }).click()
   const ej = page.getByRole('dialog', { name: 'Peso muerto rumano' })
-  await ej.locator('summary').click()
+  await ej.locator('summary', { hasText: 'Al terminar la serie' }).click()
   await sinFallos(page)
 })

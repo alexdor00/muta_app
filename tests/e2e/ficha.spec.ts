@@ -12,7 +12,8 @@ test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos
   await expect(page.getByRole('navigation')).toHaveCount(0)
   const pauta = page.getByRole('list', { name: 'Pauta' })
   await expect(pauta.getByLabel('3 series')).toBeVisible()
-  await expect(pauta.getByLabel('6 a 10 repeticiones')).toBeVisible()
+  await expect(pauta.getByLabel('6 a 10 repeticiones, de tu plan')).toBeVisible()
+  await expect(page.getByText('Repeticiones de tu plan')).toBeVisible()
   await expect(pauta.getByLabel('Descanso 3:00')).toBeVisible()
 
   await expect(page.getByRole('region', { name: 'La clave' })).not.toContainText('RIR')
@@ -48,6 +49,8 @@ test('un ejercicio que no está en tu plan: primera vez, sin descanso ni histori
   )
   await expect(page.getByText('Aún no has hecho este ejercicio.')).toBeVisible()
   await expect(page.getByRole('region', { name: 'Descanso' })).toHaveCount(0)
+  // Tu rutina (MUTA cuerpo completo) no lo lleva: las típicas, y lo dice
+  await expect(page.getByText('Repeticiones típicas de este ejercicio: tu rutina no lo lleva')).toBeVisible()
 })
 
 test('desde la biblioteca se abre la ficha y la flecha vuelve', async ({ page }) => {

@@ -54,21 +54,26 @@ test('editar la pauta se guarda sola y se ve en Ver sesión', async ({ page }) =
   await page.getByRole('button', { name: /^Peso muerto rumano/ }).click()
   const ej = page.getByRole('dialog', { name: 'Peso muerto rumano' })
   await ej.getByRole('button', { name: 'Series: más' }).click()
-  await ej.locator('summary').click()
+  // Repeticiones: mínimo y máximo, cada uno de 1 en 1
+  await ej.locator('summary', { hasText: 'Repeticiones' }).click()
+  await ej.getByRole('button', { name: 'Máximo de reps: más' }).click()
+  await ej.getByRole('button', { name: 'Máximo de reps: más' }).click()
+  await expect(ej.locator('summary', { hasText: 'Repeticiones' })).toContainText('6–12')
+  await ej.locator('summary', { hasText: 'Al terminar la serie' }).click()
   await ej.getByText('Queda 1', { exact: true }).click()
   for (let i = 0; i < 4; i++) await ej.getByRole('button', { name: 'Descanso: menos' }).click()
   await expect(ej.getByLabel('Descanso', { exact: true })).toHaveText('2:00')
   await ej.getByRole('button', { name: B1 }).click()
-  await expect(filas(page).first()).toContainText('4 × 6–10 · 2:00')
+  await expect(filas(page).first()).toContainText('4 × 6–12 · 2:00')
   // En Ver sesión (navegando por la app) y, al recargar, sigue guardado
   await page.getByRole('dialog', { name: 'Editar rutina' }).getByRole('button', { name: 'Cerrar' }).click()
   await page.getByRole('link', { name: new RegExp(B1) }).click()
   await expect(page.getByRole('button', { name: /Peso muerto rumano/ })).toContainText(
-    '4 series · 6–10 reps · a 1 del fallo',
+    '4 series · 6–12 reps · a 1 del fallo',
   )
   await page.reload()
   await expect(page.getByRole('button', { name: /Peso muerto rumano/ })).toContainText(
-    '4 series · 6–10 reps · a 1 del fallo',
+    '4 series · 6–12 reps · a 1 del fallo',
   )
 })
 

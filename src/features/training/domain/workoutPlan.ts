@@ -257,3 +257,29 @@ export function notaSugerido(e: EjercicioPlan): string | null {
   })
   return partes.length ? `Sugerido, no lo dice la rutina: ${partes.join(', ')}` : null
 }
+
+/**
+ * Cómo pauta tu rutina un ejercicio en cualquiera de sus semanas (`esEste` dice si un nombre es ese ejercicio): las
+ * repeticiones y el esfuerzo que más se repiten. null si la rutina no lo lleva o no dice repeticiones.
+ */
+export function pautaEnPrograma(
+  program: ProgramData,
+  esEste: (nombre: string) => boolean,
+): { reps: Range; rir: number | null } | null {
+  const reps = new Map<string, number>()
+  const rpe = new Map<string, number>()
+  for (const b of program.blocks)
+    for (const w of b.weeks)
+      for (const d of w.days.filter(isSession))
+        for (const e of d.exercises) {
+          if (!esEste(e.name)) continue
+          const r = repsDe(e.reps)
+          if (r) reps.set(r, (reps.get(r) ?? 0) + 1)
+          if (e.rpe) rpe.set(e.rpe, (rpe.get(e.rpe) ?? 0) + 1)
+        }
+  const masUsado = (m: Map<string, number>) => [...m].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null
+  const rango = rangoDe(masUsado(reps) ?? '')
+  if (!rango) return null
+  const r = masUsado(rpe)
+  return { reps: rango, rir: r ? rirDe(r) : null }
+}
