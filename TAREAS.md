@@ -4,6 +4,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
+- **Propuesta pendiente de aprobar**: `Desktop/MUTA-Entreno-lo-que-falta-minimalista.png` (Tu rutina A06, cada serie distinta y
+  superserie A14, cobertura, mis consejos, rehacer el plan, foto de la sesión, «···» de la ficha y tu material, imagen para
+  compartir; C00 se propone no hacerla aparte).
+
 - **Rama `pantalla/sesion`** (sale de `pantalla/ver-sesion`): commit 712da0d con la sesión en curso, el resumen, la biblioteca
   (A16), las fichas del ejercicio y del músculo (A17–A21), los consejos de hoy (C10) y la hoja «Tu rutina» con «Cambiar de rutina»;
   encima, **sin commit**, los **datos reales**: Tu plan, Ver sesión, la sesión, el resumen y las fichas leen la rutina guardada y tus
@@ -22,9 +26,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   rutina original; el entrenador dice un consejo cada vez (nuevo: tope de ~8–11 series del mismo músculo por sesión). Los 194
   ejercicios de la biblioteca local tienen explicación (25 de una web, con su fuente). Sesión y descansos obligatorios en desplegables:
   los descansos se cambian tras cada sesión y Tu plan dice «Hoy toca descanso». Ver sesión despliega solo la última vez y «Ver ficha». Falta: superserie y «cada serie distinta» (A14), que piden cambiar la sesión y el
-  motor, y «Añadir un ejercicio» desde la ficha del músculo. Verlo en el móvil real.
+  motor («Añadir un ejercicio» desde la ficha del músculo ya está). Verlo en el móvil real.
 - **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
-  el material); el consejo de prioridades; la imagen para compartir (hoy, texto);
+  el material); la imagen para compartir (hoy, texto);
   ficha para los 235 nombres de las rutinas que no tienen pareja en la biblioteca (`private/informes/ejercicios-sin-ficha.txt`):
   hay que añadirlos a la biblioteca con datos verificados. Las cuatro filas «Pronto» de la hoja «Tu rutina».
   Semana de descarga: solo si la rutina la pauta (decisión 2026-11-02).

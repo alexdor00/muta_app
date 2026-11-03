@@ -73,3 +73,27 @@ test('desde Tu plan, «Ver ficha» en la burbuja; en hombros se pasa de uno a ot
   await hoja.getByRole('button', { name: 'Hombro posterior', exact: true }).click()
   await expect(page.getByRole('dialog', { name: 'Hombro posterior' })).toBeVisible()
 })
+
+test('«Añadir un ejercicio» elige uno del músculo y la sesión, y sale en «Dónde lo entrenas»', async ({
+  page,
+}) => {
+  await page.goto('/entreno/ejercicio/peso_muerto_rumano')
+  await page
+    .getByRole('region', { name: 'Músculos que trabaja' })
+    .getByRole('button', { name: 'Femoral' })
+    .click()
+  await page
+    .getByRole('dialog', { name: 'Femoral' })
+    .getByRole('button', { name: 'Añadir un ejercicio' })
+    .click()
+  const bib = page.getByRole('dialog', { name: 'Elegir ejercicio' })
+  await bib.getByRole('searchbox').fill('buenos días')
+  await bib
+    .getByRole('button', { name: /^Buenos días/ })
+    .first()
+    .click()
+  const donde = page.getByRole('dialog', { name: /^¿En qué sesión va Buenos días/ })
+  await donde.getByText('Espalda y cuádriceps', { exact: true }).click()
+  const hoja = page.getByRole('dialog', { name: 'Femoral' })
+  await expect(hoja.getByRole('link', { name: /^Buenos días.* A2/ })).toBeVisible()
+})

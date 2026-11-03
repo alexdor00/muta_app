@@ -33,6 +33,8 @@ type Props<M extends string> = {
   indirectos: Fila[]
   /** Pestaña Consejos (null si el músculo no tiene nada suyo). */
   consejos: { clave: string; tips: ConsejoVisto[]; donde: string | null } | null
+  /** «Añadir un ejercicio» de este músculo a una sesión de tu plan (sin plan, no sale). */
+  onAnadir?: () => void
   onClose: () => void
 }
 
@@ -215,6 +217,12 @@ export function MuscleSheet<M extends string>(p: Props<M>) {
             >
               <Filas filas={p.indirectos} />
             </Plegable>
+          )}
+          {p.onAnadir && (
+            <button type="button" class={styles.add} onClick={p.onAnadir}>
+              <PlusIcon />
+              Añadir un ejercicio
+            </button>
           )}
         </>
       ) : (

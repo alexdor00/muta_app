@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { elecciones } from '../state/musculos.ts'
 import { CONSEJOS_ANTES, consejosDeSesion } from './sessionTips.ts'
 
 describe('consejos de la sesión con el contenido real', () => {
@@ -32,5 +33,17 @@ describe('consejos de la sesión con el contenido real', () => {
       { nombre: 'Curl femoral tumbado', series: 2 },
     ])
     expect(tips.at(-1)?.accion).toEqual({ tipo: 'invertir', a: 1, b: 2 })
+  })
+
+  it('con un músculo en Prioridad (ficha del músculo) que va tarde, el consejo de subirlo', () => {
+    elecciones.value = { pecho: { modo: 'priority', propio: null } }
+    const tips = consejosDeSesion([
+      { nombre: 'Peso muerto rumano', series: 3 },
+      { nombre: 'Sentadilla hack', series: 3 },
+      { nombre: 'Press inclinado con mancuernas', series: 3 },
+    ])
+    elecciones.value = {}
+    expect(tips.map((t) => t.id)).toContain('prioridadTarde')
+    expect(tips.find((t) => t.id === 'prioridadTarde')?.accion).toEqual({ tipo: 'subir', indice: 2 })
   })
 })
