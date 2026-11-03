@@ -52,4 +52,11 @@ describe('biblioteca de ejercicios', () => {
     expect(r.length).toBeGreaterThan(0)
     expect(r.map((x) => x.ex.id)).not.toContain('curl_predicador_scott')
   })
+  it('sin duplicados: ni ids ni nombres repetidos, y ningún alias es el nombre de un ejercicio', () => {
+    const ids = LIBRARY.map((e) => e.id)
+    const nombres = LIBRARY.map((e) => e.name.toLowerCase())
+    expect(ids.length - new Set(ids).size).toBe(0)
+    expect(nombres.length - new Set(nombres).size).toBe(0)
+    expect(Object.keys(aliases).filter((a) => nombres.includes(a.toLowerCase()))).toEqual([])
+  })
 })

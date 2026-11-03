@@ -31,6 +31,8 @@ export type LibraryExercise = {
    * rutinas de las que sale.
    */
   deRutina?: boolean
+  /** Otros nombres con los que sale en las rutinas (la misma técnica con otra intensidad o tipo de serie). */
+  alias?: string[]
 }
 
 export const EQUIPMENT_LABEL: Record<Equipment, string> = {

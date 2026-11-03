@@ -40,7 +40,9 @@ const sinPrefijo = (n: string) =>
 export function porNombre(nombre: string): LibraryExercise | null {
   for (const k of new Set([nombre, sinPrefijo(nombre)])) {
     const n = k.toLowerCase()
-    const exacto = BIBLIOTECA.find((e) => e.name.toLowerCase() === n)
+    const exacto = BIBLIOTECA.find(
+      (e) => e.name.toLowerCase() === n || e.alias?.some((a) => a.toLowerCase() === n),
+    )
     if (exacto) return exacto
     if (ALIAS[k]) return ejercicioDeBiblioteca(ALIAS[k])
   }

@@ -75,3 +75,7 @@ pendientes: Women's Specialization (en columnas de la tabla) y Comeback Bridge (
   `node private/herramientas/biblioteca-local.mts` en `private/biblioteca/ejercicios.json`: músculo con `muscleOf`, material,
   tipo y patrón por el nombre, la pauta más habitual y la explicación más repetida de su documento, con los programas de los
   que sale. Quedan fuera los estiramientos y los «a elegir». Volver a generarla al cambiar rutinas, alias o explicaciones.
+- **Sin duplicados.** Los nombres que solo cambian la técnica, la intensidad o el tipo de serie (pausa, lastrado, excéntrica, myo-reps,
+  serie pesada o de descarga) van en una sola ficha y los demás quedan como `alias`; un paréntesis con «o» es una alternativa y no se
+  quita. El generador no escribe si queda un id, un nombre o un ejercicio repetido, también frente a los de MUTA. Revisado el
+  2026-11-03: 194 ejercicios locales (14 con alias) y los 141 de MUTA sin duplicados.
