@@ -1,0 +1,40 @@
+/* Fila que se despliega: título, lo elegido en gris y una flecha que gira. */
+
+.more summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--row);
+  border-bottom: var(--hairline) solid var(--separator);
+  font: var(--text-body);
+  list-style: none;
+  cursor: pointer;
+}
+
+.more summary::-webkit-details-marker {
+  display: none;
+}
+
+.value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  color: var(--label-2);
+  text-align: right;
+}
+
+.value svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.more[open] .value svg {
+  transform: rotate(180deg);
+}
+
+.body {
+  padding: var(--space-2) 0 var(--space-3);
+}

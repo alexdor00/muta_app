@@ -27,7 +27,9 @@ test('la gráfica enseña la última vez y cambia de medida', async ({ page }) =
   await expect(page.getByRole('img', { name: /^Repeticiones de \d+ entrenos$/ })).toBeVisible()
 })
 
-test('un ejercicio se despliega con su ficha en pequeño y lo que hiciste la última vez', async ({ page }) => {
+test('un ejercicio se despliega con lo que hiciste la última vez y el enlace a su ficha', async ({
+  page,
+}) => {
   await page.goto('/entreno/rutina/b1')
   const fila = page.getByRole('button', { name: /Peso muerto rumano/ })
   await expect(fila).toHaveAttribute('aria-expanded', 'false')
@@ -35,9 +37,9 @@ test('un ejercicio se despliega con su ficha en pequeño y lo que hiciste la úl
   await expect(fila).toHaveAttribute('aria-expanded', 'true')
   await expect(page.getByText('Última vez')).toBeVisible()
   await expect(page.getByText('62,5 × 6')).toBeVisible()
-  // La ficha en pequeño: lo que toca hoy, los músculos, la clave y el enlace a la completa
-  await expect(page.getByText('62,5 kg × 6–10')).toBeVisible()
-  await expect(page.getByText('Femoral · Glúteo · Aductores')).toBeVisible()
+  // Sin lo que toca hoy, los músculos ni la clave (están en la ficha completa)
+  await expect(page.getByText('62,5 kg × 6–10')).toHaveCount(0)
+  await expect(page.getByText('Femoral · Glúteo · Aductores')).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Ver ficha' })).toHaveAttribute(
     'href',
     '/entreno/ejercicio/peso_muerto_rumano',
@@ -59,7 +61,6 @@ test('un ejercicio que en la biblioteca se llama de otra forma tiene su ficha y 
   const fila = page.getByRole('button', { name: /Laterales en polea/ })
   await expect(fila).not.toContainText('Sugerido')
   await fila.click()
-  await expect(page.getByText('15 kg × 14')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Ver ficha' })).toHaveAttribute(
     'href',
     '/entreno/ejercicio/elevaciones_laterales_en_polea',

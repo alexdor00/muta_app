@@ -18,7 +18,6 @@ import {
 } from '../../state/plan.ts'
 import { effortLabel } from '../../state/routines.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
-import { fichaCorta } from '../../state/ficha.ts'
 import { porNombre } from '../../use-cases/exerciseLibrary.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
@@ -53,7 +52,7 @@ export function VerSesionScreen(props: { sessionId: string }) {
   // El cambio frente a la vez anterior, redondeado: si redondea a 0 %, «Igual que la anterior»
   const pct = ultimo && anterior?.valor ? Math.round((ultimo.valor / anterior.valor - 1) * 100) : null
   const ejercicios = sesion.ejercicios.map((e) => {
-    const ficha = fichaCorta(e, porNombre(e.nombre))
+    const lib = porNombre(e.nombre)
     return {
       nombre: e.nombre,
       detalle: `${e.series} series · ${e.reps} reps · ${effortLabel(e.rir)}`,
@@ -61,7 +60,7 @@ export function VerSesionScreen(props: { sessionId: string }) {
         [e.enLugarDe ? 'En lugar de ' + e.enLugarDe + ' (cambiado en tu plan)' : null, notaSugerido(e)]
           .filter(Boolean)
           .join(' · ') || null,
-      ficha: { ...ficha, href: ficha.id ? paths.exercise(ficha.id) : null },
+      href: lib ? paths.exercise(lib.id) : null,
       ultima: e.ultima.map((u) => (u.kg != null ? `${formatDecimal(u.kg)} × ${u.reps}` : `${u.reps} reps`)),
     }
   })

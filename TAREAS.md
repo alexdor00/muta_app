@@ -20,8 +20,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 - **Editar rutina (A11–A13)** hecha y simplificada: sesiones por su nombre, filas «3 × 6–10 · 3:00» con asa para mover, un ejercicio
   con series, repeticiones y descanso que se guardan solos, «Al terminar la serie» en lista, cambiar por otro, quitar y volver a la
   rutina original; el entrenador dice un consejo cada vez (nuevo: tope de ~8–11 series del mismo músculo por sesión). Los 194
-  ejercicios de la biblioteca local tienen explicación (25 de una web, con su fuente). **Duda abierta**: cambiar los descansos
-  obligatorios (ver propuesta). Falta: superserie y «cada serie distinta» (A14), que piden cambiar la sesión y el
+  ejercicios de la biblioteca local tienen explicación (25 de una web, con su fuente). Sesión y descansos obligatorios en desplegables:
+  los descansos se cambian tras cada sesión y Tu plan dice «Hoy toca descanso». Ver sesión despliega solo la última vez y «Ver ficha». Falta: superserie y «cada serie distinta» (A14), que piden cambiar la sesión y el
   motor, y «Añadir un ejercicio» desde la ficha del músculo. Verlo en el móvil real.
 - **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
   el material); el consejo de prioridades; la imagen para compartir (hoy, texto);

@@ -26,8 +26,7 @@
   font: var(--text-body);
 }
 
-.line,
-.more summary {
+.line {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -68,35 +67,14 @@
 }
 
 .counter svg,
-.value svg,
 .links svg {
   width: var(--icon-sm);
   height: var(--icon-sm);
 }
 
-.more summary {
-  list-style: none;
-  cursor: pointer;
-}
-
-.more summary::-webkit-details-marker {
-  display: none;
-}
-
-.value {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  color: var(--label-2);
-}
-
-.more[open] .value svg {
-  transform: rotate(180deg);
-}
-
 .hint {
   display: block;
-  margin: var(--space-3) 0 var(--space-2);
+  margin-bottom: var(--space-2);
   font: var(--text-footnote);
   color: var(--label-2);
 }

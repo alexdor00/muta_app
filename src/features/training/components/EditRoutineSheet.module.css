@@ -1,4 +1,4 @@
-/* Editar rutina (A11): las sesiones por su nombre, la lista con su asa para moverla, un consejo y añadir. */
+/* Editar rutina (A11): sesión y descansos desplegables, la lista con su asa para moverla, un consejo y añadir. */
 
 .list {
   margin: var(--space-3) 0 0;
@@ -124,4 +124,67 @@
   font: var(--text-subhead);
   color: var(--label-2);
   cursor: pointer;
+}
+
+.hint {
+  margin: 0 0 var(--space-2);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* Descansos: una fila por sesión con − n + */
+.rests {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rests li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--row);
+  font: var(--text-subhead);
+}
+
+.rests li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.counter {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.counter b {
+  min-width: 2ch;
+  font: var(--text-headline);
+  text-align: center;
+}
+
+.counter button {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--label);
+  cursor: pointer;
+}
+
+.counter button:disabled {
+  color: var(--label-2);
+  cursor: default;
+}
+
+.counter svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
 }

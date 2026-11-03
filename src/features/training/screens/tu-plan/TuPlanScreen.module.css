@@ -34,6 +34,13 @@
   background: var(--label);
 }
 
+/* Hoy toca un descanso obligatorio */
+.rest {
+  margin: var(--space-4) var(--gutter) 0;
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
 .actions {
   display: flex;
   gap: var(--space-3);

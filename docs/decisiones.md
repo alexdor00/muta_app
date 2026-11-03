@@ -142,3 +142,11 @@ plegada. Las sesiones se nombran por lo que trabajan, no por su sigla. El entren
 Ver sesión, más uno nuevo de docs/conocimiento (no más de ~8–11 series directas del mismo músculo por sesión). Para los 25
 ejercicios de la biblioteca local sin explicación en su documento, el usuario pidió buscarla en internet: se escribió en español a
 partir de webs de técnica y la ficha dice de qué web sale.
+
+## 2026-11-03 · Descansos obligatorios que se pueden cambiar, y Tu plan los respeta
+
+El usuario pidió poder cambiar los descansos obligatorios. El plan sigue yendo por rotación, sin días fijos: un descanso va «tras
+una sesión» (uno o dos días). De serie, los de la rutina (los del archivo, los del documento o, si no dice nada, al completar la
+vuelta al cuerpo); cambiados en Editar rutina, se guardan en el plan para todas las semanas. Hoy toca descanso si la última sesión
+hecha lo lleva detrás y aún no han pasado esos días; no bloquea: se puede entrenar igual. En Ver sesión, el ejercicio desplegado ya
+no repite lo que toca hoy, los músculos ni la clave (están en la ficha completa).

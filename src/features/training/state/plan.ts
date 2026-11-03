@@ -2,6 +2,7 @@
 // terminados. Aquí solo se lee: nada se guarda desde el estado.
 import { computed, signal } from '@preact/signals'
 import type { Level } from '../domain/catalog.ts'
+import { hoyTocaDescanso } from '../domain/restDays.ts'
 import { ultimaVez, type Entreno } from '../domain/workoutHistory.ts'
 import type { EjercicioPlan, Rotacion, SesionPlan } from '../domain/workoutPlan.ts'
 
@@ -16,6 +17,10 @@ export type PlanListo = {
   donde: string
   /** Las sesiones de la semana que toca, sin la vez anterior (va en `sesiones`). */
   semana: SesionPlan[]
+  /** Tras qué sesiones (1 = la primera) va un descanso obligatorio: los de la rutina o los que cambiaste. */
+  descansos: number[]
+  /** ¿Los cambiaste en Editar rutina? */
+  descansosCambiados: boolean
 }
 
 export type EstadoPlan = { status: 'loading' } | { status: 'none' } | PlanListo
@@ -48,6 +53,21 @@ export const tocaHoy = computed<SesionPlan | null>(() => {
     : null
 })
 
+/**
+ * ¿Hoy toca un descanso obligatorio? (`hoy`, «2026-11-03»). Cuenta desde tu último entreno de esta rutina: la sesión que
+ * hiciste es la anterior a la que toca.
+ */
+export function descansasHoy(hoy: string): boolean {
+  const plan = tuPlan.value
+  if (plan.status !== 'ready') return false
+  const fechas = entrenos.value.filter((x) => x.programId === plan.programId).map((x) => x.fecha)
+  if (!fechas.length) return false
+  const ultima = fechas.reduce((a, b) => (a > b ? a : b))
+  const dias = Math.round((Date.parse(`${hoy}T00:00:00Z`) - Date.parse(`${ultima}T00:00:00Z`)) / 86_400_000)
+  const hecha = plan.rotacion.siguiente === 0 ? plan.semana.length : plan.rotacion.siguiente
+  return hoyTocaDescanso(plan.descansos, hecha, dias)
+}
+
 /** Días de descanso que deja tu semana (7 menos sus sesiones), para la racha. */
 export const descansosPorSemana = computed(() => Math.max(0, 7 - sesiones.value.length))
 
@@ -76,6 +96,7 @@ export function enTuPlan(nombre: string): { sigla: string; indice: number; e: Ej
 
 export type { EjercicioPlan, SesionPlan } from '../domain/workoutPlan.ts'
 export { desdeBiblioteca, nombresDeSesiones } from '../domain/workoutPlan.ts'
+export { descansosPorSesion, trasDe } from '../domain/restDays.ts'
 export { progresoDeSesion, semanaDe, seriesPorMusculo } from '../domain/workoutHistory.ts'
 export { notaSugerido } from '../domain/workoutPlan.ts'
 export { anadir, cambiarPauta, claveDe, mover, pautaDe, quitar } from '../domain/routineEdit.ts'

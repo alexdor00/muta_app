@@ -11,18 +11,21 @@ import {
   anadir,
   cambiarPauta,
   claveDe,
+  descansosPorSesion,
   mover,
   nombresDeSesiones,
   pautaDe,
   quitar,
   sesiones,
   tocaHoy,
+  trasDe,
+  tuPlan,
   type EjercicioPlan,
 } from '../../state/plan.ts'
 import { descansoDe, elegirDescanso } from '../../state/sesionEnCurso.ts'
 import { equivalentesDe } from '../../use-cases/exerciseLibrary.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
-import { cambiarEnPlan, editarSesion, volverARutina } from '../../use-cases/training.ts'
+import { cambiarDescansos, cambiarEnPlan, editarSesion, volverARutina } from '../../use-cases/training.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import styles from './EditarRutinaHoja.module.css'
 
@@ -51,6 +54,7 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   const [aviso, setAviso] = useState<string | null>(null)
   const [vistos, setVistos] = useState<string[]>([])
   const sesion = lista.find((s) => s.sigla === sigla) ?? lista[0]
+  const plan = tuPlan.value.status === 'ready' ? tuPlan.value : null
   if (!sesion) return null
   const titulos = nombresDeSesiones(lista)
   const nombre = titulos[sesion.sigla]
@@ -179,6 +183,16 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
     <>
       <EditRoutineSheet
         sesiones={lista.map((s) => ({ value: s.sigla, label: titulos[s.sigla] }))}
+        descansos={plan ? descansosPorSesion(plan.descansos, lista.length) : lista.map(() => 0)}
+        descansosCambiados={plan?.descansosCambiados ?? false}
+        onDescansos={(n) => {
+          void cambiarDescansos(trasDe(n))
+          decir('Descansos cambiados')
+        }}
+        onDescansosRutina={() => {
+          void cambiarDescansos(null)
+          decir('Vuelves a los descansos de la rutina')
+        }}
         sigla={sesion.sigla}
         onSigla={setSigla}
         consejo={consejo}

@@ -1,8 +1,9 @@
 import { useState } from 'preact/hooks'
 import { formatClock, formatRange } from '../../../shared/lib/format.ts'
 import { ChoiceList } from '../../../shared/ui/Choice.tsx'
-import { ChevronDownIcon, ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
+import { ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
+import { Desplegable } from './Desplegable.tsx'
 import { ConsejoEntrenador } from './EditRoutineSheet.tsx'
 import styles from './EditExerciseSheet.module.css'
 
@@ -76,6 +77,7 @@ export function EditExerciseSheet(props: {
   onClose: () => void
 }) {
   const [p, setP] = useState(props.pauta)
+  const [quedanAbierto, setQuedanAbierto] = useState(false)
   const cambia = (c: Partial<PautaEdicion>) => {
     const nueva = { ...p, ...c }
     setP(nueva)
@@ -122,14 +124,12 @@ export function EditExerciseSheet(props: {
             })
           }
         />
-        <details class={styles.more}>
-          <summary>
-            <span>Al terminar la serie</span>
-            <span class={styles.value}>
-              {quedan.label}
-              <ChevronDownIcon />
-            </span>
-          </summary>
+        <Desplegable
+          titulo="Al terminar la serie"
+          valor={quedan.label}
+          abierto={quedanAbierto}
+          onAbrir={setQuedanAbierto}
+        >
           <small class={styles.hint}>Cuántas repeticiones más podrías hacer</small>
           <ChoiceList
             name="quedan"
@@ -138,7 +138,7 @@ export function EditExerciseSheet(props: {
             value={quedan.value}
             onChange={(v) => cambia({ rir: Number(v) })}
           />
-        </details>
+        </Desplegable>
       </section>
 
       {props.consejo && <ConsejoEntrenador texto={props.consejo} onVale={props.onVale} />}

@@ -15,6 +15,7 @@ import { EditarRutinaHoja } from '../editar-rutina/EditarRutinaHoja.tsx'
 import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { localDate } from '../../../../shared/lib/format.ts'
 import {
+  descansasHoy,
   detalleSesion,
   entrenos,
   semanaDe,
@@ -57,13 +58,21 @@ function TuPlan({ siguiente }: { siguiente: number }) {
 
   const hoy = localDate()
   const toca = tocaHoy.value
-  const semana = semanaDe(entrenos.value, hoy, toca?.sigla ?? '')
+  // Un descanso obligatorio de tu rutina: hoy sale como descanso y la sesión que toca, como la siguiente
+  const descansa = descansasHoy(hoy)
+  const semana = semanaDe(entrenos.value, hoy, toca?.sigla ?? '', descansa)
   const hechas = new Set(semana.filter((d) => d.estado === 'hecho').map((d) => d.sigla))
   const todas = sesionesPlan.value.map((s) => ({
     ...s,
     tono: tonoDe(s.sigla),
     detalle: detalleSesion(s),
-    estado: hechas.has(s.sigla) ? 'Hecha' : s.sigla === toca?.sigla ? 'Hoy' : 'Pendiente',
+    estado: hechas.has(s.sigla)
+      ? 'Hecha'
+      : s.sigla === toca?.sigla
+        ? descansa
+          ? 'Siguiente'
+          : 'Hoy'
+        : 'Pendiente',
   }))
   // La primera tarjeta es la que toca; detrás, las que siguen en el ciclo
   const deHoy = Math.max(0, siguiente)
@@ -110,6 +119,9 @@ function TuPlan({ siguiente }: { siguiente: number }) {
         ))}
       </div>
 
+      {descansa && (
+        <p class={styles.rest}>Hoy toca descanso: lo pide tu rutina. Si quieres, puedes entrenar igual.</p>
+      )}
       <div class={styles.actions}>
         <div class={styles.start}>
           <Button href={paths.session(elegida.toLowerCase())}>

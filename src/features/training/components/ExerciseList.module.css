@@ -91,44 +91,7 @@
   font: var(--text-subhead);
 }
 
-/* La ficha en pequeño */
-.facts {
-  display: grid;
-  gap: var(--space-1);
-  margin: 0 0 var(--space-2);
-}
-
-.facts div {
-  display: flex;
-  gap: var(--space-3);
-  font: var(--text-subhead);
-}
-
-.facts dt {
-  min-width: 5.5em;
-  color: var(--label-2);
-}
-
-.facts dd {
-  margin: 0;
-}
-
-.facts small {
-  font: var(--text-footnote);
-  color: var(--label-2);
-}
-
-/* La clave: dos líneas como mucho */
-.key {
-  display: -webkit-box;
-  overflow: hidden;
-  margin-bottom: var(--space-3);
-  font: var(--text-footnote);
-  color: var(--label-2);
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
+/* El enlace a la ficha completa */
 .more {
   display: inline-flex;
   align-items: center;

@@ -23,14 +23,18 @@ async function abrir(page: import('@playwright/test').Page) {
 const filas = (page: import('@playwright/test').Page, sesion = B1) =>
   page.getByRole('list', { name: `Ejercicios de ${sesion}` }).getByRole('listitem')
 
-test('se abre con la sesión que toca, por su nombre, y cada ejercicio con su pauta corta', async ({
+test('se abre con la sesión que toca, por su nombre en un desplegable, y cada ejercicio con su pauta corta', async ({
   page,
 }) => {
   const hoja = await abrir(page)
-  await expect(hoja.getByRole('radio', { name: B1 })).toBeChecked()
+  const sesion = hoja.locator('summary', { hasText: 'Sesión' })
+  await expect(sesion).toContainText(B1)
   await expect(filas(page).first()).toContainText('Peso muerto rumano')
   await expect(filas(page).first()).toContainText('3 × 6–10 · 3:00')
+  await sesion.click()
+  await expect(hoja.getByRole('radio', { name: B1 })).toBeChecked()
   await hoja.getByText('Espalda y cuádriceps', { exact: true }).click()
+  await expect(sesion).toContainText('Espalda y cuádriceps')
   await expect(page.getByRole('list', { name: 'Ejercicios de Espalda y cuádriceps' })).toContainText(
     'Remo en polea baja',
   )
@@ -131,4 +135,24 @@ test('cambiar por otro que hace lo mismo, en tu plan', async ({ page }) => {
   await cambiar.getByRole('button', { name: /^Peso muerto piernas rígidas/ }).click()
   await expect(filas(page).first()).toContainText('Peso muerto piernas rígidas')
   await expect(filas(page).first()).toContainText('En lugar de Peso muerto rumano')
+})
+
+test('los descansos obligatorios se cambian tras cada sesión y se vuelve a los de la rutina', async ({
+  page,
+}) => {
+  const hoja = await abrir(page)
+  const descansos = hoja.locator('summary', { hasText: 'Descansos' })
+  await expect(descansos).toContainText('2 a la semana')
+  await descansos.click()
+  await expect(hoja.getByText('los obligatorios de tu rutina', { exact: false })).toBeVisible()
+  await hoja.getByRole('button', { name: `Descansos tras ${B1}: menos` }).click()
+  await expect(descansos).toContainText('1 a la semana')
+  await expect(hoja.getByLabel(`Descansos tras ${B1}`, { exact: true })).toHaveText('0')
+  // Se guarda en el plan: al volver a abrir sigue igual, y se puede volver a los de la rutina
+  const otra = await abrir(page)
+  const deNuevo = otra.locator('summary', { hasText: 'Descansos' })
+  await expect(deNuevo).toContainText('1 a la semana')
+  await deNuevo.click()
+  await otra.getByRole('button', { name: 'Volver a los de la rutina' }).click()
+  await expect(deNuevo).toContainText('2 a la semana')
 })

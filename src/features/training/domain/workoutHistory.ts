@@ -76,9 +76,15 @@ export type DiaSemana = {
 
 /**
  * Tu semana de lunes a domingo: lo entrenado con su sigla, hoy con la sesión que toca (si aún no has entrenado), los
- * días pasados sin entrenar como descanso y los que faltan vacíos (la sesión va por rotación, sin días fijos).
+ * días pasados sin entrenar como descanso y los que faltan vacíos (la sesión va por rotación, sin días fijos). Si hoy toca
+ * un descanso obligatorio (`descansaHoy`) y aún no has entrenado, hoy también es descanso.
  */
-export function semanaDe(entrenos: readonly Entreno[], hoy: string, toca: string): DiaSemana[] {
+export function semanaDe(
+  entrenos: readonly Entreno[],
+  hoy: string,
+  toca: string,
+  descansaHoy = false,
+): DiaSemana[] {
   const t = Date.parse(`${hoy}T00:00:00Z`)
   const lunes = t - ((new Date(t).getUTCDay() + 6) % 7) * DIA
   return LETRAS.map((letra, i) => {
@@ -87,7 +93,10 @@ export function semanaDe(entrenos: readonly Entreno[], hoy: string, toca: string
     const hecho = enOrden(entrenos).find((x) => x.fecha === fecha)
     const dia = new Date(d).getUTCDate()
     if (hecho) return { letra, dia, sigla: hecho.sigla, estado: 'hecho' }
-    if (d === t) return { letra, dia, sigla: toca, estado: 'hoy' }
+    if (d === t)
+      return descansaHoy
+        ? { letra, dia, sigla: '', estado: 'descanso' }
+        : { letra, dia, sigla: toca, estado: 'hoy' }
     return { letra, dia, sigla: '', estado: d < t ? 'descanso' : 'pendiente' }
   })
 }

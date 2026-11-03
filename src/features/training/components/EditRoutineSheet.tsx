@@ -1,8 +1,9 @@
 import { useRef, useState } from 'preact/hooks'
 import { Button } from '../../../shared/ui/Button.tsx'
-import { ChoiceChips } from '../../../shared/ui/Choice.tsx'
-import { GripIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
+import { ChoiceList } from '../../../shared/ui/Choice.tsx'
+import { GripIcon, MinusIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
+import { Desplegable } from './Desplegable.tsx'
 import styles from './EditRoutineSheet.module.css'
 
 export type FilaEditar = {
@@ -25,8 +26,15 @@ export function ConsejoEntrenador(props: { texto: string; onVale: () => void }) 
   )
 }
 
+/** Hasta cuántos días de descanso seguidos se pueden poner tras una sesión. */
+const MAX_DESCANSOS = 2
+
+/** «2 a la semana», «Ninguno». */
+const textoDescansos = (n: number) => (n === 0 ? 'Ninguno' : `${n} a la semana`)
+
 /**
- * Editar rutina (A11): las sesiones por su nombre y la elegida con sus ejercicios (nombre y pauta). Tocar uno lo edita;
+ * Editar rutina (A11): las sesiones por su nombre (desplegable), los descansos obligatorios tras cada sesión
+ * (desplegable) y la elegida con sus ejercicios (nombre y pauta). Tocar uno lo edita;
  * arrastrar su asa (o, con el teclado, flechas sobre ella) lo cambia de sitio. Un consejo del entrenador como mucho,
  * «Añadir ejercicio» y volver a la rutina original.
  */
@@ -36,6 +44,12 @@ export function EditRoutineSheet(props: {
   sigla: string
   onSigla: (sigla: string) => void
   filas: FilaEditar[]
+  /** Días de descanso tras cada sesión, en el orden de `sesiones`. */
+  descansos: number[]
+  /** ¿Son otros que los de la rutina? */
+  descansosCambiados: boolean
+  onDescansos: (porSesion: number[]) => void
+  onDescansosRutina: () => void
   consejo: string | null
   onVale: () => void
   onAbrir: (i: number) => void
@@ -46,6 +60,10 @@ export function EditRoutineSheet(props: {
 }) {
   const lista = useRef<HTMLOListElement>(null)
   const [arrastre, setArrastre] = useState<{ de: number; a: number } | null>(null)
+  const [abierto, setAbierto] = useState<'sesion' | 'descansos' | null>(null)
+  const total = props.descansos.reduce((n, x) => n + x, 0)
+  const ponDescansos = (i: number, n: number) =>
+    props.onDescansos(props.descansos.map((x, j) => (j === i ? n : x)))
   const nombre = props.sesiones.find((s) => s.value === props.sigla)?.label ?? props.sigla
 
   // Mientras se arrastra, la lista se ve ya con el ejercicio en su sitio nuevo
@@ -66,13 +84,68 @@ export function EditRoutineSheet(props: {
 
   return (
     <Sheet title="Editar rutina" onClose={props.onClose} large>
-      <ChoiceChips
-        name="sesion-editar"
-        legend="Sesión"
-        options={props.sesiones}
-        value={props.sigla}
-        onChange={props.onSigla}
-      />
+      <Desplegable
+        titulo="Sesión"
+        valor={nombre}
+        abierto={abierto === 'sesion'}
+        onAbrir={(a) => setAbierto(a ? 'sesion' : null)}
+      >
+        <ChoiceList
+          name="sesion-editar"
+          legend="Sesión"
+          options={props.sesiones}
+          value={props.sigla}
+          onChange={(s) => {
+            props.onSigla(s)
+            setAbierto(null)
+          }}
+        />
+      </Desplegable>
+      <Desplegable
+        titulo="Descansos"
+        valor={textoDescansos(total)}
+        abierto={abierto === 'descansos'}
+        onAbrir={(a) => setAbierto(a ? 'descansos' : null)}
+      >
+        <p class={styles.hint}>
+          Días de descanso después de cada sesión:{' '}
+          {props.descansosCambiados ? 'los has cambiado tú.' : 'los obligatorios de tu rutina.'}
+        </p>
+        <ul class={styles.rests} aria-label="Descansos tras cada sesión">
+          {props.sesiones.map((s, i) => {
+            const n = props.descansos[i] ?? 0
+            return (
+              <li key={s.value}>
+                <span>Tras {s.label}</span>
+                <span class={styles.counter}>
+                  <button
+                    type="button"
+                    aria-label={`Descansos tras ${s.label}: menos`}
+                    disabled={n <= 0}
+                    onClick={() => ponDescansos(i, n - 1)}
+                  >
+                    <MinusIcon />
+                  </button>
+                  <b aria-label={`Descansos tras ${s.label}`}>{n}</b>
+                  <button
+                    type="button"
+                    aria-label={`Descansos tras ${s.label}: más`}
+                    disabled={n >= MAX_DESCANSOS}
+                    onClick={() => ponDescansos(i, n + 1)}
+                  >
+                    <PlusIcon />
+                  </button>
+                </span>
+              </li>
+            )
+          })}
+        </ul>
+        {props.descansosCambiados && (
+          <button type="button" class={styles.restore} onClick={props.onDescansosRutina}>
+            Volver a los de la rutina
+          </button>
+        )}
+      </Desplegable>
       {props.consejo && <ConsejoEntrenador texto={props.consejo} onVale={props.onVale} />}
       <ol ref={lista} class={styles.list} aria-label={`Ejercicios de ${nombre}`}>
         {orden.map((i) => {

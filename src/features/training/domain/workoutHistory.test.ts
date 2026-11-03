@@ -61,6 +61,10 @@ describe('historial', () => {
 
 describe('tu semana', () => {
   it('lo hecho, hoy con la que toca, lo pasado sin entrenar como descanso y lo que falta vacío', () => {
+    expect(semanaDe(ENTRENOS.slice(1), '2026-10-28', 'B1', true)[2]).toMatchObject({
+      sigla: '',
+      estado: 'descanso',
+    })
     const semana = semanaDe(ENTRENOS.slice(1), '2026-10-28', 'B1')
     expect(semana.map((d) => [d.letra, d.dia, d.sigla, d.estado])).toEqual([
       ['L', 26, 'A1', 'hecho'],
