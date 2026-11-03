@@ -10,7 +10,6 @@ import {
   PlayIcon,
   PlusIcon,
   RepeatIcon,
-  SearchIcon,
   TrashIcon,
   PencilIcon,
   PlatesIcon,
@@ -122,43 +121,6 @@ export function ExerciseOptionsSheet(props: {
           },
         ]}
       />
-    </Sheet>
-  )
-}
-
-/** Cambiar el ejercicio solo para hoy (C12): las sustituciones que da el programa para ese ejercicio. */
-export function SwapSheet(props: {
-  sustitutos: string[]
-  onElegir: (nombre: string) => void
-  /** «Elegir cualquier ejercicio»: la biblioteca, filtrada por su músculo (sesion-en-vivo.js · v7-swap-any). */
-  onBiblioteca: () => void
-  onClose: () => void
-}) {
-  return (
-    <Sheet title="Cambiar ejercicio" onClose={props.onClose} large>
-      <p class={styles.lead}>Solo cambia en esta sesión; tu plan sigue igual.</p>
-      <button type="button" class={styles.anyExercise} onClick={props.onBiblioteca}>
-        <SearchIcon />
-        Elegir cualquier ejercicio
-      </button>
-      {props.sustitutos.length ? (
-        <ul class={styles.options}>
-          {props.sustitutos.map((s) => (
-            <li key={s}>
-              <button type="button" class={styles.option} onClick={() => props.onElegir(s)}>
-                <span class={styles.text}>
-                  <span class={styles.title}>{s}</span>
-                </span>
-                <span class={styles.chevron} aria-hidden="true">
-                  <ChevronRightIcon />
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p class={styles.lead}>Tu programa no da otro ejercicio para cambiar este.</p>
-      )}
     </Sheet>
   )
 }

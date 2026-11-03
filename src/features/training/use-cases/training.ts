@@ -36,6 +36,8 @@ type PlanGuardado = {
   descansos?: Record<string, number>
   /** Mantener · Desarrollar · Prioridad o a mano, por músculo. */
   musculos?: Partial<Record<MuscleId, EleccionMusculo>>
+  /** Ejercicios que cambiaste en tu plan: nombre en la rutina → el que lo sustituye. */
+  cambios?: Record<string, string>
 }
 
 type RotacionGuardada = Rotacion & { id: 'current'; programId: string }
@@ -48,6 +50,8 @@ type FilaEntreno =
 
 /** El programa con tus elecciones (para avanzar la rotación al terminar). */
 let programa: ProgramData | null = null
+/** Lo que cambiaste en tu plan (se aplica al montar las sesiones). */
+let cambios: Record<string, string> = {}
 let carga: Promise<void> | null = null
 /** El último entreno guardado y la rotación de antes, para «Me faltó un ejercicio». */
 let ultimoGuardado: { id: string; rotacion: Rotacion } | null = null
@@ -87,6 +91,7 @@ async function leer(): Promise<void> {
     entrenos.value = filas.flatMap((f) => (f.status === WORKOUT_STATUS.finished ? [aEntreno(f)] : []))
     descansosElegidos.value = plan.descansos ?? {}
     elecciones.value = plan.musculos ?? {}
+    cambios = plan.cambios ?? {}
     ponerPlan(plan.programId, entry.title, nivel, rotacion)
     const enCurso = filas.find((f) => f.id === EN_CURSO)
     if (enCurso && 'sesion' in enCurso && !sesionEnCurso.value) sesionEnCurso.value = enCurso.sesion
@@ -112,7 +117,7 @@ function ponerPlan(programId: string, rutina: string, nivel: Level, rotacion: Ro
     nivel,
     rotacion,
     donde: dondeVas(programa, rotacion),
-    semana: sesionesDeSemana(programa, rotacion, porNombre),
+    semana: sesionesDeSemana(programa, rotacion, porNombre, cambios),
   }
 }
 
@@ -126,8 +131,8 @@ function vigilar() {
     void guardarEnCurso(en).catch((error) => logError(error, 'guardar la sesión en curso'))
   })
   effect(() => {
-    const cambios = { descansos: descansosElegidos.value, musculos: elecciones.value }
-    void guardarEnPlan(cambios).catch((error) => logError(error, 'guardar el plan'))
+    const parte = { descansos: descansosElegidos.value, musculos: elecciones.value }
+    void guardarEnPlan(parte).catch((error) => logError(error, 'guardar el plan'))
   })
 }
 
@@ -146,10 +151,10 @@ async function guardarEnCurso(en: SesionEnCurso | null): Promise<void> {
   await db.put('workouts', fila)
 }
 
-async function guardarEnPlan(cambios: Pick<PlanGuardado, 'descansos' | 'musculos'>): Promise<void> {
+async function guardarEnPlan(parte: Pick<PlanGuardado, 'descansos' | 'musculos' | 'cambios'>): Promise<void> {
   const db = await getDb()
   const plan = (await db.get('plans', 'current')) as PlanGuardado | undefined
-  if (plan) await db.put('plans', { ...plan, ...cambios })
+  if (plan) await db.put('plans', { ...plan, ...parte })
 }
 
 /** Lo hecho de una sesión, como se guarda: solo las series marcadas, en el orden de hoy. */
@@ -220,4 +225,36 @@ export async function reabrirEntreno(en: SesionEnCurso): Promise<void> {
   } catch (error) {
     logError(error, 'reabrir el entreno')
   }
+}
+
+/**
+ * Cambia un ejercicio en tu plan para las próximas veces (`nuevo`), o lo deja como en la rutina (null). `deLaRutina` es
+ * el nombre que trae la rutina. La pauta (series, repeticiones, esfuerzo y descanso) sigue siendo la de la rutina.
+ */
+export async function cambiarEnPlan(deLaRutina: string, nuevo: string | null): Promise<void> {
+  const plan = tuPlan.value
+  if (plan.status !== 'ready') return
+  const resto = Object.fromEntries(Object.entries(cambios).filter(([k]) => k !== deLaRutina))
+  cambios = nuevo && nuevo !== deLaRutina ? { ...resto, [deLaRutina]: nuevo } : resto
+  ponerPlan(plan.programId, plan.rutina, plan.nivel, plan.rotacion)
+  try {
+    await guardarEnPlan({ cambios })
+  } catch (error) {
+    logError(error, 'cambiar un ejercicio en el plan')
+  }
+}
+
+/**
+ * Lo que se cambia desde la sesión: hoy ya está cambiado; con `enPlan`, también en tu plan (o se vuelve al de la rutina si
+ * eliges ese). Devuelve el aviso que se enseña.
+ */
+export function cambiarDesdeSesion(
+  e: { nombre: string; enLugarDe?: string },
+  nuevo: string,
+  enPlan: boolean,
+): string {
+  if (!enPlan) return `Cambiado por ${nuevo}, solo para hoy`
+  const deLaRutina = e.enLugarDe ?? e.nombre
+  void cambiarEnPlan(deLaRutina, nuevo === deLaRutina ? null : nuevo)
+  return nuevo === deLaRutina ? `Vuelves a ${nuevo} en tu plan` : `Cambiado por ${nuevo} en tu plan`
 }

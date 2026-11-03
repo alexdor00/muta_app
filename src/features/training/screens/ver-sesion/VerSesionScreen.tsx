@@ -57,7 +57,10 @@ export function VerSesionScreen(props: { sessionId: string }) {
     return {
       nombre: e.nombre,
       detalle: `${e.series} series · ${e.reps} reps · ${effortLabel(e.rir)}`,
-      sugerido: notaSugerido(e),
+      sugerido:
+        [e.enLugarDe ? 'En lugar de ' + e.enLugarDe + ' (cambiado en tu plan)' : null, notaSugerido(e)]
+          .filter(Boolean)
+          .join(' · ') || null,
       ficha: { ...ficha, href: ficha.id ? paths.exercise(ficha.id) : null },
       ultima: e.ultima.map((u) => (u.kg != null ? `${formatDecimal(u.kg)} × ${u.reps}` : `${u.reps} reps`)),
     }

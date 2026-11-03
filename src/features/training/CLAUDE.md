@@ -67,6 +67,9 @@ resumen, ficha del ejercicio) existen como «pendientes» hasta tener diseño ap
   Los entrenos terminados van a `workouts` y de ahí sale todo (`domain/workoutHistory.ts`: la vez anterior, gráficas, tu semana,
   series por músculo); la sesión en curso, también en `workouts` con id `en-curso` (sobrevive a recargar). «Me faltó un ejercicio»
   deshace el guardado (`reabrirEntreno`). Sin plan, las pantallas enseñan `screens/comun/SinPlan`; cada una lo carga con `usePlan`.
+- **Cambiar ejercicio** (`SwapSheet`): «Solo hoy» o «En mi plan». Primero «Hacen lo mismo» (`domain/equivalence.ts`: mismo músculo y zona
+  de énfasis, con el porqué), luego los del programa y la biblioteca. En el plan, `cambiarEnPlan` guarda `plans/current.cambios` y
+  `sesionesDeSemana` monta el nuevo con la pauta de la rutina (`enLugarDe`; Ver sesión lo dice y se puede volver).
 - Nada obligatorio: lo opcional, a elección del usuario; lo que viene del documento, con sus palabras.
 - Cada función de `domain/` lleva su prueba; un archivo que solo declara tipos no la necesita.
 

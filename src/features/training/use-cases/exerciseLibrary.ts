@@ -1,5 +1,6 @@
 import aliases from '../../../shared/content/exercise-aliases.json'
 import exercises from '../../../shared/content/exercises.json'
+import { equivalentes, type Equivalente } from '../domain/equivalence.ts'
 import { searchLibrary, type LibraryExercise } from '../domain/exerciseLibrary.ts'
 import type { MuscleId } from '../domain/muscles.ts'
 
@@ -34,4 +35,19 @@ export function porNombre(nombre: string): LibraryExercise | null {
   if (exacto) return exacto
   const id = ALIAS[nombre]
   return id ? ejercicioDeBiblioteca(id) : null
+}
+
+/**
+ * Los ejercicios de la biblioteca que hacen lo mismo que uno de tu sesión (mismo músculo, misma zona; domain/equivalence.ts).
+ * Si está en la biblioteca, también su patrón.
+ */
+export function equivalentesDe(e: {
+  nombre: string
+  original?: string
+  musculo: MuscleId | null
+  compuesto: boolean
+  secundarios: readonly MuscleId[]
+}): Equivalente[] {
+  const lib = porNombre(e.nombre)
+  return equivalentes({ ...e, id: lib?.id, patron: lib?.pattern }, LIBRARY)
 }

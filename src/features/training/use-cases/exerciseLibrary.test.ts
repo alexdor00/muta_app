@@ -3,6 +3,7 @@ import aliases from '../../../shared/content/exercise-aliases.json'
 import { libraryProblems } from '../domain/exerciseLibrary.ts'
 import {
   buscarEjercicios,
+  equivalentesDe,
   ejercicioDeBiblioteca,
   idPorNombre,
   LIBRARY,
@@ -37,5 +38,15 @@ describe('biblioteca de ejercicios', () => {
   it('busca en el contenido real', () => {
     expect(buscarEjercicios('jalón', null).map((e) => e.name)).toContain('Jalón al pecho')
     expect(buscarEjercicios('', 'pecho').every((e) => e.primary === 'pecho')).toBe(true)
+  })
+  it('los que hacen lo mismo no incluyen el propio ejercicio, aunque se llame distinto (alias)', () => {
+    const r = equivalentesDe({
+      nombre: 'Curl predicador',
+      musculo: 'biceps',
+      compuesto: false,
+      secundarios: [],
+    })
+    expect(r.length).toBeGreaterThan(0)
+    expect(r.map((x) => x.ex.id)).not.toContain('curl_predicador_scott')
   })
 })

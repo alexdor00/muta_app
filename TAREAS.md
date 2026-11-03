@@ -10,6 +10,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   entrenos (`workouts`); la sesión que toca va por rotación, lo apuntado se guarda a cada serie y sigue al recargar, y al terminar
   se guarda y pasa a la siguiente (decisión 2026-11-03). Ya no hay `state/muestra/`. Verificado: `npm run check` (243 tests) y e2e 65 de 65.
   Unidos por alias 457 nombres de las rutinas con la biblioteca: el 76 % de los ejercicios tienen ficha (antes, el 22 %).
+  «Cambiar ejercicio» propone los que hacen lo mismo (músculo y zona: estirado, acortado…) y cambia solo hoy o en tu plan.
   Ver sesión despliega cada ejercicio con su ficha en pequeño y lo sugerido se ve en gris («Sugerido, no lo dice la rutina: …»).
   Falta verlo en un móvil real.
 - **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; Editar rutina (A11, con «Añadir un

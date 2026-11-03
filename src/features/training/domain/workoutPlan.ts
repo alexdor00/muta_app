@@ -36,6 +36,10 @@ export type EjercicioPlan = {
   /** Con qué se puede cambiar hoy: los sustitutos que da el programa. */
   sustitutos: string[]
   sugeridos: Sugerido[]
+  /** El nombre original (inglés) que trae la rutina, si lo trae: ayuda a saber qué trabaja. */
+  original?: string
+  /** Si en tu plan lo cambiaste por este: el de la rutina («En lugar de …»). */
+  enLugarDe?: string
 }
 
 export type SesionPlan = { sigla: string; nombre: string; minutos: number; ejercicios: EjercicioPlan[] }
@@ -110,6 +114,7 @@ export function ejercicioDelPlan(e: Exercise, lib: LibraryExercise | null): Ejer
     pesoCorporal: lib?.equipment === 'bodyweight',
     salto: o(null, lib?.stepKg, RELLENO.salto, 'salto'),
     sustitutos: e.substitutions ?? [],
+    ...(e.originalName && e.originalName !== e.name ? { original: e.originalName } : {}),
     sugeridos,
   }
 }
@@ -125,16 +130,37 @@ function hechos(s: Session): Exercise[] {
   )
 }
 
-/** Las sesiones de una semana del programa (sin los días de descanso), con la biblioteca para lo que falta. */
+/**
+ * Lo que cambiaste en tu plan (nombre en la rutina → el que lo sustituye): el nuevo con la pauta de la rutina (series,
+ * repeticiones, esfuerzo y descanso); lo demás (músculo, salto…), del nuevo.
+ */
+function conCambio(
+  e: Exercise,
+  cambios: Readonly<Record<string, string>>,
+): Exercise & { enLugarDe?: string } {
+  const nuevo = cambios[e.name]
+  if (!nuevo) return e
+  return { ...e, name: nuevo, originalName: undefined, muscle: undefined, kind: undefined, enLugarDe: e.name }
+}
+
+/**
+ * Las sesiones de una semana del programa (sin los días de descanso), con la biblioteca para lo que falta y lo que
+ * cambiaste en tu plan.
+ */
 export function sesionesDeSemana(
   program: ProgramData,
   rot: Rotacion,
   biblioteca: (nombre: string) => LibraryExercise | null,
+  cambios: Readonly<Record<string, string>> = {},
 ): SesionPlan[] {
   const semana = program.blocks[rot.bloque]?.weeks[rot.semana]
   if (!semana) return []
   return semana.days.filter(isSession).map((s, i) => {
-    const ejercicios = hechos(s).map((e) => ejercicioDelPlan(e, biblioteca(e.name)))
+    const ejercicios = hechos(s).map((original) => {
+      const e = conCambio(original, cambios)
+      const plan = ejercicioDelPlan(e, biblioteca(e.name))
+      return e.enLugarDe ? { ...plan, enLugarDe: e.enLugarDe } : plan
+    })
     return { ...siglaYNombre(s.name, i), minutos: Math.round(sessionMinutes(hechos(s)) / 5) * 5, ejercicios }
   })
 }

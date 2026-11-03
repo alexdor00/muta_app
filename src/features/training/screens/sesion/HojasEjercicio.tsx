@@ -3,7 +3,8 @@ import { formatDecimal, parseDecimal } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { SetTimer } from '../../components/SetTimer.tsx'
 import { PlatesSheet } from '../../components/PlatesSheet.tsx'
-import { ExerciseOptionsSheet, NoteSheet, SwapSheet } from '../../components/WorkoutSheets.tsx'
+import { SwapSheet, type Alcance } from '../../components/SwapSheet.tsx'
+import { ExerciseOptionsSheet, NoteSheet } from '../../components/WorkoutSheets.tsx'
 import type { EjercicioPlan } from '../../state/plan.ts'
 import { hacerAhora } from '../../state/ordenHoy.ts'
 import {
@@ -13,7 +14,7 @@ import {
   type SesionEnCurso,
 } from '../../state/sesionEnCurso.ts'
 import { discosPorLado } from '../../state/routines.ts'
-import { idPorNombre } from '../../use-cases/exerciseLibrary.ts'
+import { equivalentesDe, idPorNombre } from '../../use-cases/exerciseLibrary.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import { useCronometro } from './useCronometro.ts'
 
@@ -31,7 +32,8 @@ type Props = {
   onAviso: (texto: string) => void
   /** Abre un ejercicio (tras «Hacer ahora»). */
   onAbrir: (ej: number) => void
-  onCambiar: (nombre: string) => void
+  /** Cambiarlo por otro solo hoy o también en tu plan. */
+  onCambiar: (nombre: string, alcance: Alcance) => void
   onNota: (nota: string) => void
   /** El cronómetro terminó la serie `serie`: su tiempo y, con cadencia, las reps contadas. */
   onCronometro: (serie: number, r: { segundos: number; reps: number | null }) => void
@@ -63,6 +65,7 @@ export function HojasEjercicio(props: Props) {
   const kilos = x.series[serie]?.kg || grises(e, x, serie).kg
   const [total, setTotal] = useState(kilos)
   const [barra, setBarra] = useState<Barra>('20')
+  const [alcance, setAlcance] = useState<Alcance>('hoy')
   const cronometro = useCronometro((r) => {
     onCronometro(serie, r)
     onCerrar()
@@ -71,15 +74,22 @@ export function HojasEjercicio(props: Props) {
   if (hoja === 'cambiar') {
     return (
       <SwapSheet
+        equivalentes={equivalentesDe(e).map((q) => ({ nombre: q.ex.name, motivo: q.motivo }))}
         sustitutos={e.sustitutos}
+        enLugarDe={e.enLugarDe ?? null}
         onElegir={onCambiar}
-        onBiblioteca={() => setHoja('biblioteca')}
+        onBiblioteca={(a) => {
+          setAlcance(a)
+          setHoja('biblioteca')
+        }}
         onClose={onCerrar}
       />
     )
   }
   if (hoja === 'biblioteca') {
-    return <BibliotecaHoja musculo={e.musculo} onElegir={(ex) => onCambiar(ex.name)} onClose={onCerrar} />
+    return (
+      <BibliotecaHoja musculo={e.musculo} onElegir={(ex) => onCambiar(ex.name, alcance)} onClose={onCerrar} />
+    )
   }
   if (hoja === 'nota') return <NoteSheet nota={x.nota} onGuardar={onNota} onClose={onCerrar} />
   if (hoja === 'discos') {

@@ -50,7 +50,7 @@ import { HojasSesion, type HojaSesion } from './HojasSesion.tsx'
 import { useAviso } from './useAviso.ts'
 import { useReloj } from './useReloj.ts'
 import { useTeclado } from './useTeclado.ts'
-import { terminarEntreno } from '../../use-cases/training.ts'
+import { cambiarDesdeSesion, terminarEntreno } from '../../use-cases/training.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
 import styles from './SesionScreen.module.css'
@@ -354,9 +354,10 @@ export function SesionScreen(props: { sessionId: string }) {
           en={en}
           onAviso={decir}
           onAbrir={abrir}
-          onCambiar={(n) => {
+          onCambiar={(n, alcance) => {
             guardarSesion(cambiarEjercicio(en, hojaDe, n))
-            decir(`Cambiado por ${n}, solo para hoy`)
+            // En tu plan solo se cambian los de la rutina (no los añadidos hoy)
+            decir(cambiarDesdeSesion(ejercicios[hojaDe], n, alcance === 'plan' && hojaDe < en.base.length))
             setHojaDe(null)
           }}
           onNota={(nota) => {

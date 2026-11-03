@@ -364,3 +364,45 @@ test('lo apuntado se guarda: sigue al recargar y, al terminar, el entreno queda 
   await page.getByRole('button', { name: /Peso muerto rumano/ }).click()
   await expect(page.getByText('60 × 10')).toBeVisible()
 })
+
+test('«Cambiar ejercicio» propone los que hacen lo mismo y, en tu plan, lo cambia para las próximas veces', async ({
+  page,
+}) => {
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
+  await page.getByRole('button', { name: /Cambiar ejercicio/ }).click()
+  const hoja = page.getByRole('dialog', { name: 'Cambiar ejercicio' })
+  // El rumano trabaja el femoral estirado (bisagra): los que se proponen, también
+  await expect(hoja.getByRole('heading', { name: 'Hacen lo mismo' })).toBeVisible()
+  const piernasRigidas = hoja.getByRole('button', { name: /^Peso muerto piernas rígidas/ })
+  await expect(piernasRigidas).toContainText('Femoral · estirado (bisagras)')
+  await expect(hoja.getByRole('button', { name: /^Curl femoral/ })).toHaveCount(0)
+
+  await hoja.getByText('En mi plan').click()
+  await piernasRigidas.click()
+  await expect(page.getByText('Cambiado por Peso muerto piernas rígidas en tu plan')).toBeVisible()
+
+  // Las próximas veces, con la pauta de la rutina, y se puede volver al de la rutina
+  await page.goto('/entreno/rutina/b1')
+  const fila = page.getByRole('button', { name: /^Peso muerto piernas rígidas/ })
+  await expect(fila).toContainText('3 series · 6–10 reps · a 2 del fallo')
+  await expect(fila).toContainText('En lugar de Peso muerto rumano (cambiado en tu plan)')
+  await page.reload()
+  await expect(page.getByRole('button', { name: /^Peso muerto piernas rígidas/ })).toBeVisible()
+
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: 'Descartar sesión' }).click()
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /Descartar/ })
+    .last()
+    .click()
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: 'Opciones de Peso muerto piernas rígidas' }).click()
+  await page.getByRole('button', { name: /Cambiar ejercicio/ }).click()
+  await page.getByRole('dialog', { name: 'Cambiar ejercicio' }).getByText('En mi plan').click()
+  await page.getByRole('button', { name: /^Volver a Peso muerto rumano/ }).click()
+  await expect(page.getByText('Vuelves a Peso muerto rumano en tu plan')).toBeVisible()
+  await page.goto('/entreno/rutina/b1')
+  await expect(page.getByRole('button', { name: /^Peso muerto rumano/ })).not.toContainText('En lugar de')
+})

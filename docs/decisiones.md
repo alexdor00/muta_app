@@ -108,3 +108,13 @@ ejercicio. Se revisaron uno a uno (con el nombre original en inglés y, en los d
 técnica (pausa, excéntrica, 21s, parciales, dropset, lastrado), el ángulo o el recorrido, hacerlo a una mano y el prefijo de
 superserie; **no** el cambio de agarre (supino, inverso), de material (barra, mancuernas, máquina, banda) ni los «a elegir» o
 «X o Y». En pantalla se ve el nombre de la rutina; la ficha, la clave y los datos son los de la biblioteca. Quedan 235 sin pareja.
+
+## 2026-11-03 · Cambiar un ejercicio por otro que hace lo mismo, hoy o en tu plan
+
+El usuario pidió poder cambiar los ejercicios raros por otros que entrenen el mismo grupo de la misma forma (estiramiento,
+etc.). «Hacer lo mismo» se define con las zonas de énfasis de `docs/conocimiento/02-reglas.md` (bíceps estirado o acortado,
+tríceps cabeza larga, glúteo estirado o acortado, pecho superior, femoral bisagra o curl, dorsal vertical o remo, cuádriceps
+recto femoral o vastos): mismo músculo principal y misma zona obligatorios; después, el mismo patrón o tipo y los
+secundarios en común (`domain/equivalence.ts`). La zona sale del nombre, también del original en inglés. «Cambiar ejercicio»
+deja elegir **solo hoy** o **en mi plan**: en el plan se guarda «ejercicio de la rutina → el nuevo» (`plans/current.cambios`)
+y el nuevo conserva la pauta de la rutina (series, repeticiones, esfuerzo y descanso); se puede volver al de la rutina.

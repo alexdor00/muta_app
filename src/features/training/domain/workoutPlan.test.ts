@@ -219,3 +219,20 @@ describe('lo sugerido, a la vista', () => {
     expect(notaSugerido(desdeBiblioteca(hack))).toBeNull()
   })
 })
+
+describe('lo que cambias en tu plan', () => {
+  it('el nuevo ejercicio con la pauta de la rutina y a cuál sustituye', () => {
+    const [a1] = sesionesDeSemana(programa, INICIO, (n) => (n === 'Sentadilla hack' ? hack : null), {
+      'Sentadilla hack': 'Prensa rara',
+    })
+    expect(a1.ejercicios[0]).toMatchObject({
+      nombre: 'Prensa rara',
+      series: 3,
+      reps: '6–10',
+      rir: 2,
+      enLugarDe: 'Sentadilla hack',
+    })
+    const [sin] = sesionesDeSemana(programa, INICIO, () => null)
+    expect(sin.ejercicios[0].enLugarDe).toBeUndefined()
+  })
+})
