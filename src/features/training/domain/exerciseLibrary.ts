@@ -49,9 +49,15 @@ export function searchLibrary(
   list: LibraryExercise[],
   query: string,
   muscle: MuscleId | null,
+  /** Cuántas veces sale cada ejercicio en las rutinas: los más típicos, primero (a igualdad, en el orden de la lista). */
+  usos: Readonly<Record<string, number>> = {},
 ): LibraryExercise[] {
   const q = plainText(query.trim())
-  return list.filter((e) => (!muscle || e.primary === muscle) && (!q || plainText(e.name).includes(q)))
+  return list
+    .filter((e) => (!muscle || e.primary === muscle) && (!q || plainText(e.name).includes(q)))
+    .map((e, i) => ({ e, i }))
+    .sort((a, b) => (usos[b.e.id] ?? 0) - (usos[a.e.id] ?? 0) || a.i - b.i)
+    .map(({ e }) => e)
 }
 
 /** La línea de debajo del nombre: «Pecho, barra». */

@@ -1,6 +1,6 @@
 import aliases from '../../../shared/content/exercise-aliases.json'
 import exercises from '../../../shared/content/exercises.json'
-import { LOCAL_EXERCISES } from '../../../shared/data/localExercises.ts'
+import { LOCAL_EXERCISES, LOCAL_USES } from '../../../shared/data/localExercises.ts'
 import { equivalentes, type Equivalente } from '../domain/equivalence.ts'
 import { searchLibrary, type LibraryExercise } from '../domain/exerciseLibrary.ts'
 import type { MuscleId } from '../domain/muscles.ts'
@@ -23,7 +23,7 @@ export function idPorNombre(nombre: string): string | null {
 
 /** Buscar en la biblioteca por nombre y, si hay, por músculo principal. */
 export function buscarEjercicios(query: string, muscle: MuscleId | null): LibraryExercise[] {
-  return searchLibrary(BIBLIOTECA, query, muscle)
+  return searchLibrary(BIBLIOTECA, query, muscle, LOCAL_USES)
 }
 
 /**

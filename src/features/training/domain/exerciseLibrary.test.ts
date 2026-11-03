@@ -39,6 +39,14 @@ describe('searchLibrary', () => {
     expect(searchLibrary(LISTA, '', 'gluteo').map((e) => e.id)).toEqual(['hip_thrust'])
     expect(searchLibrary(LISTA, 'press', 'dorsal')).toEqual([])
   })
+  it('los más típicos (los que más salen en las rutinas) primero; a igualdad, en su orden', () => {
+    const usos = { hip_thrust: 160, jalon: 140 }
+    expect(searchLibrary(LISTA, '', null, usos).map((e) => e.id)).toEqual([
+      'hip_thrust',
+      'jalon',
+      'press_banca',
+    ])
+  })
 })
 
 describe('libraryLine', () => {
