@@ -55,3 +55,13 @@ Un hueco de punto débil se reconoce por su nombre original (`Weak Point Exercis
 
 Dos modos: **Culturismo** (un músculo y, de su tabla, ejercicio 1 y 2; dos tablas, fase 1 y fase 2, extraídas del Excel «WEAK POINTS TABLE») y **Torso y pierna**
 (músculo y ejercicio por día; tabla de la página 59 del PDF, escrita a mano). Viven en el campo `weakPoints` del programa. Herramientas: `wp-extract.cjs`, `wp-build.cjs`.
+
+## Sustituciones (2026-11-03)
+
+Las sustituciones de cada ejercicio salen del documento, en su orden de preferencia. Las rutinas que no las traían en la tabla
+las tienen en la lista «Exercise Substitutions» del final del documento: `private/herramientas/sustituciones.cjs` la lee
+(sobre el texto de `pdftotext -layout`), busca cada ejercicio por su nombre original (también sin la técnica: pausa,
+excéntrica, top set…), traduce con `translate.cjs` y corrige con `sustituciones-es.tsv` (traducciones revisadas a mano; vacío =
+resto de un corte, no es un ejercicio). Solo rellena donde no hay nada. Rev 15 de `_meta.json`: el 74 % de los ejercicios
+tienen sustituciones del documento. Sin lista en el documento: Women's Foundation, Optimization, Glute Hypertrophy y At-Home;
+pendientes: Women's Specialization (en columnas de la tabla) y Comeback Bridge (la página es una imagen).
