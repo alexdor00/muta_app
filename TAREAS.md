@@ -15,7 +15,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   Falta verlo en un móvil real.
 - **Sustituciones de los documentos** (rutinas locales, rev 15): el 74 % de los ejercicios las traen (antes, el 48 %); ver
   [docs/datos.md](docs/datos.md). Faltan Women's Specialization y Comeback Bridge.
-- **Editar rutina (A11–A14)**: PNG de funcionalidades en `DesktopMUTA-A11-editar-rutina-funcionalidades.png`; **esperando el visto bueno**.
+- **Editar rutina (A11–A14)**: PNG de funcionalidades en `Desktop/MUTA-A11-editar-rutina-funcionalidades.png`; **esperando el visto bueno**.
 - **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; Editar rutina (A11, con «Añadir un
   ejercicio» de la ficha del músculo); editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
   el material); el consejo de prioridades; la imagen para compartir (hoy, texto);
