@@ -71,9 +71,11 @@ resumen, ficha del ejercicio) existen como «pendientes» hasta tener diseño ap
   de énfasis, con el porqué), luego los del programa y la biblioteca. En el plan, `cambiarEnPlan` guarda `plans/current.cambios` y
   `sesionesDeSemana` monta el nuevo con la pauta de la rutina (`enLugarDe`; Ver sesión lo dice y se puede volver).
 - **Editar rutina** (A11–A13, `screens/editar-rutina/EditarRutinaHoja.tsx` con `EditRoutineSheet` y `EditExerciseSheet`, desde «Tu rutina»):
-  por sesión, reordenar (mantener pulsado o «Subir/Bajar un puesto»), añadir de la biblioteca, editar series, repeticiones, «al terminar
-  la serie», descanso, salto y nota, copiar a otra sesión, quitar, cambiar por otro (`SwapSheet soloPlan`) y volver a la rutina
-  original. Se guarda en `plans/current.ediciones` por sigla (`domain/routineEdit.ts · aplicarEdicion`, para todas las semanas); el
+  minimalista. Las sesiones, por su nombre (`nombresDeSesiones`: «Torso 1» y «Torso 2» si se repite); cada fila «3 × 6–10 · 3:00»
+  con su asa para moverla (arrastrar o flechas del teclado). Un ejercicio: series, repeticiones (el rango, de 2 en 2) y descanso (de
+  15 en 15 s) con − / +, «Al terminar la serie» en una lista plegada; cada toque se guarda solo. «Cambiar por otro» (`SwapSheet
+soloPlan`) y «Quitar»; añadir de la biblioteca y volver a la rutina original. El entrenador (`ConsejoEntrenador`) dice un consejo
+  de la sesión cada vez (los de Ver sesión, `consejosDeSesion`), en gris y con «Vale». El salto y la nota ya no se editan aquí. Se guarda en `plans/current.ediciones` por sigla (`domain/routineEdit.ts · aplicarEdicion`, para todas las semanas); el
   descanso, en `descansosElegidos`, y el cambio de ejercicio, en `cambios`. Todo el plan se escribe en cola con el estado completo.
 - Nada obligatorio: lo opcional, a elección del usuario; lo que viene del documento, con sus palabras.
 - Cada función de `domain/` lleva su prueba; un archivo que solo declara tipos no la necesita.

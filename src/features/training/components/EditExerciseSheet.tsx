@@ -1,27 +1,15 @@
 import { useState } from 'preact/hooks'
-import { formatClock, formatDecimal, formatRange } from '../../../shared/lib/format.ts'
-import { Button } from '../../../shared/ui/Button.tsx'
-import { ChoiceChips } from '../../../shared/ui/Choice.tsx'
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  MinusIcon,
-  PlusIcon,
-  SwapIcon,
-  TrashIcon,
-} from '../../../shared/ui/icons.tsx'
+import { formatClock, formatRange } from '../../../shared/lib/format.ts'
+import { ChoiceList } from '../../../shared/ui/Choice.tsx'
+import { ChevronDownIcon, ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
-import { DESCANSOS } from './WorkoutSheets.tsx'
+import { ConsejoEntrenador } from './EditRoutineSheet.tsx'
 import styles from './EditExerciseSheet.module.css'
 
 export type PautaEdicion = {
   series: number
   reps: [number, number]
   rir: number
-  salto: number
-  nota: string
   /** Segundos. */
   descanso: number
 }
@@ -32,230 +20,136 @@ const QUEDAN = [
   { value: '2', label: 'Quedan 2' },
   { value: '3', label: 'Quedan 3' },
 ]
-const SALTOS = [1, 1.25, 2, 2.5, 4, 5, 10]
+/** El rango de repeticiones se mueve entero, de 2 en 2; el descanso, de 15 en 15 s (hasta 5 min). */
+const PASO_REPS = 2
+const PASO_DESCANSO = 15
+const MAX_DESCANSO = 300
 
 function Contador(p: {
   nombre: string
-  valor: number
-  min: number
-  max: number
-  onCambio: (v: number) => void
+  texto: string
+  puedeMenos: boolean
+  puedeMas: boolean
+  onPaso: (paso: -1 | 1) => void
 }) {
   return (
-    <div class={styles.counter}>
-      <button
-        type="button"
-        aria-label={`${p.nombre}: menos`}
-        disabled={p.valor <= p.min}
-        onClick={() => p.onCambio(p.valor - 1)}
-      >
-        <MinusIcon />
-      </button>
-      <b aria-label={p.nombre}>{p.valor}</b>
-      <button
-        type="button"
-        aria-label={`${p.nombre}: más`}
-        disabled={p.valor >= p.max}
-        onClick={() => p.onCambio(p.valor + 1)}
-      >
-        <PlusIcon />
-      </button>
+    <div class={styles.line}>
+      <span>{p.nombre}</span>
+      <span class={styles.counter}>
+        <button
+          type="button"
+          aria-label={`${p.nombre}: menos`}
+          disabled={!p.puedeMenos}
+          onClick={() => p.onPaso(-1)}
+        >
+          <MinusIcon />
+        </button>
+        <b aria-label={p.nombre}>{p.texto}</b>
+        <button
+          type="button"
+          aria-label={`${p.nombre}: más`}
+          disabled={!p.puedeMas}
+          onClick={() => p.onPaso(1)}
+        >
+          <PlusIcon />
+        </button>
+      </span>
     </div>
   )
 }
 
 /**
- * Editar ejercicio (A12–A13): series, repeticiones, lo que queda al terminar la serie y descanso; en «Más opciones», salto
- * de peso, nota, copiar a otra sesión y subir o bajar un puesto. Cambiar por otro, quitar y «Guardar cambios».
+ * Editar ejercicio (A12–A13): series, repeticiones y descanso con − / +, y «Al terminar la serie» en una lista plegada.
+ * Cada toque se guarda solo. Un consejo del entrenador como mucho; «Cambiar por otro» y «Quitar».
  */
 export function EditExerciseSheet(props: {
   nombre: string
-  /** Músculo y material («Pecho», «Mancuerna»). */
-  chips: string[]
+  /** El nombre de la sesión, para volver a ella. */
+  sesion: string
   pauta: PautaEdicion
-  otrasSesiones: { value: string; label: string }[]
-  puedeSubir: boolean
-  puedeBajar: boolean
-  onGuardar: (p: PautaEdicion) => void
+  consejo: string | null
+  onVale: () => void
+  onCambio: (p: PautaEdicion) => void
   onCambiar: () => void
   onQuitar: () => void
-  onCopiar: (sigla: string) => void
-  onMover: (paso: -1 | 1) => void
   onVolver: () => void
   onClose: () => void
 }) {
   const [p, setP] = useState(props.pauta)
-  const [copiar, setCopiar] = useState(false)
-  const cambia = (c: Partial<PautaEdicion>) => setP({ ...p, ...c })
+  const cambia = (c: Partial<PautaEdicion>) => {
+    const nueva = { ...p, ...c }
+    setP(nueva)
+    props.onCambio(nueva)
+  }
   const [min, max] = p.reps
-  const queda = p.rir <= 0 ? 'al fallo' : `a ${p.rir} del fallo`
+  const quedan = QUEDAN[Math.min(3, Math.max(0, p.rir))]
   return (
-    <Sheet
-      title={props.nombre}
-      onClose={props.onClose}
-      large
-      footer={<Button onClick={() => props.onGuardar(p)}>Guardar cambios</Button>}
-    >
-      <div class={styles.top}>
-        <button type="button" class={styles.back} onClick={props.onVolver}>
-          <ChevronLeftIcon />
-          Rutina
-        </button>
-        <ul class={styles.chips}>
-          {props.chips.map((c) => (
-            <li key={c}>{c}</li>
-          ))}
-        </ul>
-      </div>
-      <p class={styles.summary}>
-        {p.series} series de {formatRange(p.reps)} reps, {queda}
-      </p>
+    <Sheet title={props.nombre} onClose={props.onClose} large>
+      <button type="button" class={styles.back} onClick={props.onVolver}>
+        <ChevronLeftIcon />
+        {props.sesion}
+      </button>
 
       <section class={styles.card} aria-label="Pauta">
-        <div class={styles.line}>
-          <span>Series</span>
-          <Contador
-            nombre="Series"
-            valor={p.series}
-            min={1}
-            max={10}
-            onCambio={(series) => cambia({ series })}
-          />
-        </div>
-        <div class={styles.line}>
-          <span>Repeticiones</span>
-          <span class={styles.pair}>
-            <Contador
-              nombre="Mínimo de repeticiones"
-              valor={min}
-              min={1}
-              max={max}
-              onCambio={(v) => cambia({ reps: [v, max] })}
-            />
-            <small>a</small>
-            <Contador
-              nombre="Máximo de repeticiones"
-              valor={max}
-              min={min}
-              max={50}
-              onCambio={(v) => cambia({ reps: [min, v] })}
-            />
-          </span>
-        </div>
-        <div class={styles.block}>
-          <span>Al terminar la serie</span>
-          <small>Cuántas repeticiones más podrías hacer</small>
-          <ChoiceChips
+        <Contador
+          nombre="Series"
+          texto={String(p.series)}
+          puedeMenos={p.series > 1}
+          puedeMas={p.series < 10}
+          onPaso={(paso) => cambia({ series: p.series + paso })}
+        />
+        <Contador
+          nombre="Repeticiones"
+          texto={formatRange(p.reps)}
+          puedeMenos={min - PASO_REPS >= 1}
+          puedeMas={max + PASO_REPS <= 50}
+          onPaso={(paso) => cambia({ reps: [min + paso * PASO_REPS, max + paso * PASO_REPS] })}
+        />
+        <Contador
+          nombre="Descanso"
+          texto={formatClock(p.descanso)}
+          puedeMenos={p.descanso > PASO_DESCANSO}
+          puedeMas={p.descanso < MAX_DESCANSO}
+          onPaso={(paso) =>
+            cambia({
+              descanso: Math.min(
+                MAX_DESCANSO,
+                Math.max(
+                  PASO_DESCANSO,
+                  Math.round(p.descanso / PASO_DESCANSO) * PASO_DESCANSO + paso * PASO_DESCANSO,
+                ),
+              ),
+            })
+          }
+        />
+        <details class={styles.more}>
+          <summary>
+            <span>Al terminar la serie</span>
+            <span class={styles.value}>
+              {quedan.label}
+              <ChevronDownIcon />
+            </span>
+          </summary>
+          <small class={styles.hint}>Cuántas repeticiones más podrías hacer</small>
+          <ChoiceList
             name="quedan"
             legend="Al terminar la serie"
             options={QUEDAN}
-            value={String(Math.min(3, p.rir))}
+            value={quedan.value}
             onChange={(v) => cambia({ rir: Number(v) })}
           />
-        </div>
+        </details>
       </section>
 
-      <section class={styles.card} aria-label="Descanso">
-        <span>Descanso</span>
-        <div class={styles.options} role="group" aria-label="Descanso entre series">
-          {DESCANSOS.map((s) => (
-            <button
-              key={s}
-              type="button"
-              class={styles.option}
-              aria-pressed={s === p.descanso}
-              onClick={() => cambia({ descanso: s })}
-            >
-              {formatClock(s)}
-            </button>
-          ))}
-        </div>
-      </section>
+      {props.consejo && <ConsejoEntrenador texto={props.consejo} onVale={props.onVale} />}
 
-      <details class={styles.more}>
-        <summary>
-          Más opciones
-          <ChevronDownIcon />
-        </summary>
-        <span class={styles.label}>Salto de peso</span>
-        <small class={styles.hint}>Cuánto subes cada vez</small>
-        <div class={styles.options} role="group" aria-label="Salto de peso">
-          {SALTOS.map((s) => (
-            <button
-              key={s}
-              type="button"
-              class={styles.option}
-              aria-pressed={s === p.salto}
-              onClick={() => cambia({ salto: s })}
-            >
-              {formatDecimal(s)} kg
-            </button>
-          ))}
-        </div>
-        <label class={styles.label}>
-          Nota
-          <textarea
-            class={styles.note}
-            value={p.nota}
-            placeholder="Agarre, agujero, en el descanso de…"
-            onInput={(e) => cambia({ nota: e.currentTarget.value })}
-          />
-        </label>
-        <div class={styles.actions}>
-          <button
-            type="button"
-            class={styles.action}
-            disabled={!props.puedeSubir}
-            onClick={() => props.onMover(-1)}
-          >
-            <ArrowUpIcon />
-            Subir un puesto
-          </button>
-          <button
-            type="button"
-            class={styles.action}
-            disabled={!props.puedeBajar}
-            onClick={() => props.onMover(1)}
-          >
-            <ArrowDownIcon />
-            Bajar un puesto
-          </button>
-          {props.otrasSesiones.length > 0 && (
-            <button
-              type="button"
-              class={styles.action}
-              aria-expanded={copiar}
-              onClick={() => setCopiar(!copiar)}
-            >
-              <PlusIcon />
-              Copiar a otra sesión
-            </button>
-          )}
-          {copiar && (
-            <div class={styles.options} role="group" aria-label="Copiar a">
-              {props.otrasSesiones.map((s) => (
-                <button
-                  key={s.value}
-                  type="button"
-                  class={styles.option}
-                  onClick={() => props.onCopiar(s.value)}
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </details>
-
-      <div class={styles.actions}>
-        <button type="button" class={styles.action} onClick={props.onCambiar}>
+      <div class={styles.links}>
+        <button type="button" onClick={props.onCambiar}>
           <SwapIcon />
-          Cambiar por otro ejercicio
+          Cambiar por otro
         </button>
-        <button type="button" class={`${styles.action} ${styles.danger}`} onClick={props.onQuitar}>
-          <TrashIcon />
-          Quitar de la rutina
+        <button type="button" class={styles.danger} onClick={props.onQuitar}>
+          Quitar
         </button>
       </div>
     </Sheet>

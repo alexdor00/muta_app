@@ -75,6 +75,8 @@ pendientes: Women's Specialization (en columnas de la tabla) y Comeback Bridge (
   `node private/herramientas/biblioteca-local.mts` en `private/biblioteca/ejercicios.json`: músculo con `muscleOf`, material,
   tipo y patrón por el nombre, la pauta más habitual y la explicación más repetida de su documento, con los programas de los
   que sale. Quedan fuera los estiramientos y los «a elegir». Volver a generarla al cambiar rutinas, alias o explicaciones.
+  Los 25 cuyo documento no trae explicación la tienen de una web de técnica (`private/herramientas/explicaciones-web.tsv`: id,
+  texto en español y web); la ficha lo dice («Explicación de strengthlog.com · sale en: …», campo `keyWeb`).
 - **Orden de la biblioteca.** El generador cuenta cuántas veces sale cada ejercicio (de MUTA o local, con sus alias) en todas las
   rutinas y lo guarda en `private/biblioteca/usos.json`: al buscar o filtrar por músculo salen primero los más típicos. Sin ese
   archivo (CI, pruebas), el orden de la biblioteca de MUTA.

@@ -5,6 +5,7 @@ import {
   avanzar,
   desdeBiblioteca,
   kilosDeHoy,
+  nombresDeSesiones,
   notaSugerido,
   rangoDe,
   descansoDe,
@@ -239,5 +240,16 @@ describe('lo que cambias en tu plan', () => {
     })
     const [sin] = sesionesDeSemana(programa, INICIO, () => null)
     expect(sin.ejercicios[0].enLugarDe).toBeUndefined()
+  })
+})
+
+describe('nombresDeSesiones', () => {
+  it('cada sesión por su nombre; si dos se llaman igual, con su número', () => {
+    const lista = [
+      { sigla: 'S1', nombre: 'Torso' },
+      { sigla: 'S2', nombre: 'Pierna' },
+      { sigla: 'S3', nombre: 'Torso' },
+    ]
+    expect(nombresDeSesiones(lista)).toEqual({ S1: 'Torso 1', S2: 'Pierna', S3: 'Torso 2' })
   })
 })

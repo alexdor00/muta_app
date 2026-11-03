@@ -75,7 +75,7 @@ export function enTuPlan(nombre: string): { sigla: string; indice: number; e: Ej
 }
 
 export type { EjercicioPlan, SesionPlan } from '../domain/workoutPlan.ts'
-export { desdeBiblioteca } from '../domain/workoutPlan.ts'
+export { desdeBiblioteca, nombresDeSesiones } from '../domain/workoutPlan.ts'
 export { progresoDeSesion, semanaDe, seriesPorMusculo } from '../domain/workoutHistory.ts'
 export { notaSugerido } from '../domain/workoutPlan.ts'
 export { anadir, cambiarPauta, claveDe, mover, pautaDe, quitar } from '../domain/routineEdit.ts'

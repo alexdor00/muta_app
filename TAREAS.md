@@ -17,8 +17,11 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   [docs/datos.md](docs/datos.md). Faltan Women's Specialization y Comeback Bridge.
 - **Explicaciones y biblioteca local**: las 1.140 explicaciones de los documentos traducidas (9.901 ejercicios las enseñan) y
   208 ejercicios originales de las rutinas en la biblioteca local, con su explicación («Cómo hacerlo · Del documento de …»).
-- **Editar rutina (A11–A13)** hecha: reordenar, añadir, editar la pauta, copiar, quitar, cambiar por otro y volver a la rutina
-  original, para todas las semanas (e2e 72 de 72). Falta: superserie y «cada serie distinta» (A14), que piden cambiar la sesión y el
+- **Editar rutina (A11–A13)** hecha y simplificada: sesiones por su nombre, filas «3 × 6–10 · 3:00» con asa para mover, un ejercicio
+  con series, repeticiones y descanso que se guardan solos, «Al terminar la serie» en lista, cambiar por otro, quitar y volver a la
+  rutina original; el entrenador dice un consejo cada vez (nuevo: tope de ~8–11 series del mismo músculo por sesión). Los 194
+  ejercicios de la biblioteca local tienen explicación (25 de una web, con su fuente). **Duda abierta**: cambiar los descansos
+  obligatorios (ver propuesta). Falta: superserie y «cada serie distinta» (A14), que piden cambiar la sesión y el
   motor, y «Añadir un ejercicio» desde la ficha del músculo. Verlo en el móvil real.
 - **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
   el material); el consejo de prioridades; la imagen para compartir (hoy, texto);

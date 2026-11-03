@@ -133,3 +133,12 @@ Editar rutina (A11–A13) guarda lo que cambias en cada sesión aparte de la rut
 todas las semanas, como «Cambiar ejercicio · En mi plan». El descanso y el ejercicio cambiado por otro siguen siendo de todo el plan.
 Al probarlo salió un error: dos cambios casi a la vez (la pauta y el descanso) leían y escribían el plan por separado y el segundo
 pisaba al primero. Ahora todas las escrituras del plan van en cola y cada una guarda el estado completo más reciente.
+
+## 2026-11-03 · Editar rutina, más sencilla, y explicaciones de la web para lo que el documento no explica
+
+El usuario pidió una Editar rutina minimalista y con los consejos del entrenador. Se quitan el salto de peso, la nota, copiar a
+otra sesión y subir/bajar un puesto; cada cambio se guarda solo (sin «Guardar cambios») y «Al terminar la serie» queda en una lista
+plegada. Las sesiones se nombran por lo que trabajan, no por su sigla. El entrenador enseña un solo consejo cada vez, los mismos de
+Ver sesión, más uno nuevo de docs/conocimiento (no más de ~8–11 series directas del mismo músculo por sesión). Para los 25
+ejercicios de la biblioteca local sin explicación en su documento, el usuario pidió buscarla en internet: se escribió en español a
+partir de webs de técnica y la ficha dice de qué web sale.

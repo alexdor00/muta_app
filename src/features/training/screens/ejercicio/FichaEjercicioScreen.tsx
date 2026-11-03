@@ -129,7 +129,9 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
             },
           ]}
         />
-        {ex.key && <FichaClave texto={plainEffort(ex.key)} fuente={ex.deRutina ? ex.source : null} />}
+        {ex.key && (
+          <FichaClave texto={plainEffort(ex.key)} fuente={ex.deRutina ? ex.source : null} web={ex.keyWeb} />
+        )}
         <FichaSugerencia
           etiqueta={f.sugerencia.etiqueta}
           valor={f.sugerencia.valor}

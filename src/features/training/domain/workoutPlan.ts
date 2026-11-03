@@ -64,6 +64,18 @@ export function siglaYNombre(nombre: string, puesto: number): { sigla: string; n
   return m ? { sigla: m[1], nombre: m[2] } : { sigla: `S${puesto + 1}`, nombre }
 }
 
+/** El nombre de cada sesión; si dos se llaman igual («Torso» y «Torso»), con su número: «Torso 1», «Torso 2». */
+export function nombresDeSesiones(lista: { sigla: string; nombre: string }[]): Record<string, string> {
+  const vistas: Record<string, number> = {}
+  return Object.fromEntries(
+    lista.map((s) => {
+      const repetido = lista.filter((x) => x.nombre === s.nombre).length > 1
+      vistas[s.nombre] = (vistas[s.nombre] ?? 0) + 1
+      return [s.sigla, repetido ? `${s.nombre} ${vistas[s.nombre]}` : s.nombre]
+    }),
+  )
+}
+
 /** «2-3», «2each», 4 → el primer número; null si no hay. */
 export function seriesDe(sets: Exercise['sets']): number | null {
   if (typeof sets === 'number') return sets > 0 ? sets : null

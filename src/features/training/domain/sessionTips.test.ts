@@ -29,6 +29,7 @@ const IDS: TipId[] = [
   'antebrazoSinTiron',
   'curlFemoralYBisagra',
   'hackYPrensa',
+  'demasiadasSeries',
 ]
 // Textos de prueba: el id como texto; los «Bien: …» marcados como ok
 const OK = new Set<TipId>(['bicepsEnEmpuje', 'tricepsEnTiron', 'antebrazoSinTiron'])
@@ -37,7 +38,12 @@ const TEXTOS = Object.fromEntries(
     id,
     {
       ok: OK.has(id),
-      text: id === 'prioridadTarde' ? '{musculo} en el puesto {puesto}' : id,
+      text:
+        id === 'prioridadTarde'
+          ? '{musculo} en el puesto {puesto}'
+          : id === 'demasiadasSeries'
+            ? '{musculo}: {series}'
+            : id,
       why: '',
       source: 'V1',
     },
@@ -100,5 +106,15 @@ describe('sessionTips', () => {
     const hack = ej('sentadilla_hack', 'cuadriceps', 'sentadilla')
     expect(sessionTips([prensa, hack], TEXTOS).at(-1)?.accion).toEqual({ tipo: 'invertir', a: 0, b: 1 })
     expect(sessionTips([hack, prensa], TEXTOS).at(-1)).toMatchObject({ id: 'hackYPrensa', accion: null })
+  })
+  it('más de 11 series directas del mismo músculo en la sesión: el primer aviso', () => {
+    const curl = (id: string, sets: number) => ({ ...ej(id, 'biceps', 'aislamiento'), sets })
+    expect(sessionTips([curl('a', 6), curl('b', 5)], TEXTOS).map((t) => t.id)).not.toContain(
+      'demasiadasSeries',
+    )
+    expect(sessionTips([curl('a', 6), curl('b', 6)], TEXTOS)[0]).toMatchObject({
+      id: 'demasiadasSeries',
+      text: 'Bíceps: 12',
+    })
   })
 })

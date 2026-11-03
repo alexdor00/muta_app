@@ -31,6 +31,8 @@ export type LibraryExercise = {
    * rutinas de las que sale.
    */
   deRutina?: boolean
+  /** Si su documento no trae explicación: la web de la que sale `key` («strengthlog.com»). */
+  keyWeb?: string
   /** Otros nombres con los que sale en las rutinas (la misma técnica con otra intensidad o tipo de serie). */
   alias?: string[]
 }

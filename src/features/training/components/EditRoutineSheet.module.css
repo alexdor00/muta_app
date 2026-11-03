@@ -1,9 +1,14 @@
-/* Editar rutina (A11): lista numerada de la sesión, mantener pulsado para moverla, añadir y volver a la rutina. */
+/* Editar rutina (A11): las sesiones por su nombre, la lista con su asa para moverla, un consejo y añadir. */
 
 .list {
-  margin: var(--space-4) 0 0;
+  margin: var(--space-3) 0 0;
   padding: 0;
   list-style: none;
+}
+
+.list li {
+  display: flex;
+  align-items: center;
 }
 
 .list li + li {
@@ -18,9 +23,10 @@
 
 .row {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(var(--space-1) / 2);
+  min-width: 0;
   min-height: var(--row);
   padding: var(--space-3) 0;
   border: 0;
@@ -28,28 +34,6 @@
   color: var(--label);
   text-align: left;
   cursor: pointer;
-  user-select: none;
-}
-
-.number {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: var(--badge);
-  height: var(--badge);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
-  color: var(--label-2);
-}
-
-.text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: calc(var(--space-1) / 2);
-  min-width: 0;
 }
 
 .name {
@@ -67,29 +51,65 @@
   font: var(--text-footnote);
 }
 
-.chevron {
+/* El asa: se arrastra sin esperar (no hace falta mantener pulsado) */
+.handle {
   display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  background: none;
   color: var(--label-2);
+  cursor: grab;
+  touch-action: none;
 }
 
-.chevron svg {
+.handle svg {
   width: var(--icon-sm);
   height: var(--icon-sm);
 }
 
-.hint {
-  margin: var(--space-4) 0;
-  font: var(--text-subhead);
+/* El entrenador: pequeño, en gris, y se va con «Vale» */
+.tip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+
+.tip p {
+  flex: 1;
+  margin: 0;
+  font: var(--text-footnote);
   color: var(--label-2);
 }
 
+.tip button {
+  flex: none;
+  min-height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
 .add {
+  margin-top: var(--space-4);
+}
+
+.addLabel {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-.add svg {
+.addLabel svg {
   width: var(--icon-sm);
   height: var(--icon-sm);
 }

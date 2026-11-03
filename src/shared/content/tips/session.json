@@ -94,5 +94,11 @@
     "text": "Sentadilla hack y prensa en la misma sesión: pon la prensa después, cuando ya vas más fatigado (por ejemplo 2 + 3 series).",
     "why": "La prensa es más estable y carga menos la espalda.",
     "source": "V4"
+  },
+  "demasiadasSeries": {
+    "ok": false,
+    "text": "{musculo}: {series} series directas hoy. No pases de unas 8–11 del mismo músculo por sesión: lleva las de más a otro día.",
+    "why": "Si las últimas series salen flojas, mejor redistribuirlas en otro día que subir volumen.",
+    "source": "V18 · V19 · V3"
   }
 }

@@ -20,6 +20,7 @@ export type TipId =
   | 'antebrazoSinTiron'
   | 'curlFemoralYBisagra'
   | 'hackYPrensa'
+  | 'demasiadasSeries'
 
 /** Un texto del contenido: `ok` son los «Bien: …», que no se enseñan (como en el prototipo). */
 export type TipText = { ok: boolean; text: string; why: string; source: string }
@@ -34,6 +35,8 @@ type Ejercicio = Pick<LibraryExercise, 'id' | 'name' | 'primary' | 'equipment' |
 const PUSH = new Set(['empuje_h', 'empuje_inc', 'empuje_v'])
 const PULL = new Set(['traccion_v', 'traccion_h'])
 const LEG = new Set(['sentadilla', 'bisagra', 'unilateral', 'empuje_cadera'])
+/** Más series directas del mismo músculo en una sesión que esto, y sale el aviso (docs/conocimiento: «~8–11»). */
+export const TOPE_SERIES_SESION = 11
 const BISAGRAS = ['peso_muerto_rumano', 'peso_muerto_piernas_rigidas', 'peso_muerto_rumano_con_mancuernas']
 
 /** Empuje, tirón, pierna o mixta: la que más series suma (los patrones cuentan entero; el músculo, a medias). */
@@ -74,6 +77,13 @@ export function sessionTips(
     const text = Object.entries(huecos).reduce((s, [k, v]) => s.replace(`{${k}}`, v), t.text)
     out.push({ id, text, why: t.why, source: t.source, accion })
   }
+
+  // Primero, lo que más pesa: un músculo con más de ~8–11 series directas hoy
+  const directas = new Map<MuscleId, number>()
+  for (const e of ejercicios) directas.set(e.primary, (directas.get(e.primary) ?? 0) + e.sets)
+  for (const [m, n] of directas)
+    if (n > TOPE_SERIES_SESION)
+      add('demasiadasSeries', null, { musculo: MUSCLES[m].label, series: String(n) })
 
   if (hasId('elevaciones_laterales_en_polea')) {
     if (kind === 'empuje') add('lateralEmpuje')

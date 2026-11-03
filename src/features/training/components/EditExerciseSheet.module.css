@@ -1,17 +1,11 @@
-/* Editar ejercicio (A12–A13): pauta en tarjetas grises, descanso y salto en píldoras, más opciones plegadas. */
-
-.top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
+/* Editar ejercicio (A12–A13): tres contadores, «Al terminar la serie» plegado y dos enlaces. */
 
 .back {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   min-height: var(--tap-min);
+  margin-bottom: var(--space-3);
   padding: 0 var(--space-4) 0 var(--space-2);
   border: 0;
   border-radius: var(--radius-pill);
@@ -27,63 +21,19 @@
   height: var(--icon-sm);
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.chips li {
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  font: var(--text-footnote);
-}
-
-.summary {
-  margin: var(--space-4) 0;
-  font: var(--text-body);
-}
-
 .card {
   display: grid;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--surface);
   font: var(--text-body);
 }
 
-.line {
+.line,
+.more summary {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  padding-bottom: var(--space-3);
+  min-height: var(--row);
   border-bottom: var(--hairline) solid var(--separator);
-}
-
-.pair {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.pair small,
-.block small,
-.hint {
-  font: var(--text-footnote);
-  color: var(--label-2);
-}
-
-.block {
-  display: grid;
-  gap: var(--space-2);
 }
 
 .counter {
@@ -91,11 +41,11 @@
   align-items: center;
   gap: var(--space-1);
   border-radius: var(--radius-pill);
-  background: var(--bg);
+  background: var(--surface);
 }
 
 .counter b {
-  min-width: 2ch;
+  min-width: 5ch;
   font: var(--text-headline);
   text-align: center;
 }
@@ -117,43 +67,14 @@
   cursor: default;
 }
 
-.counter svg {
+.counter svg,
+.value svg,
+.links svg {
   width: var(--icon-sm);
   height: var(--icon-sm);
 }
 
-.options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.option {
-  min-height: var(--tap-min);
-  padding: 0 var(--space-4);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--bg);
-  color: var(--label);
-  font: var(--text-subhead);
-  cursor: pointer;
-}
-
-.option[aria-pressed='true'] {
-  background: var(--label);
-  color: var(--bg);
-}
-
-.more {
-  border-top: var(--hairline) solid var(--separator);
-}
-
 .more summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: var(--control);
-  font: var(--text-body);
   list-style: none;
   cursor: pointer;
 }
@@ -162,72 +83,43 @@
   display: none;
 }
 
-.more summary svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
+.value {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   color: var(--label-2);
 }
 
-.more[open] summary svg {
+.more[open] .value svg {
   transform: rotate(180deg);
 }
 
-.more .option {
-  background: var(--surface);
+.hint {
+  display: block;
+  margin: var(--space-3) 0 var(--space-2);
+  font: var(--text-footnote);
+  color: var(--label-2);
 }
 
-.more .option[aria-pressed='true'] {
-  background: var(--label);
-}
-
-.label {
-  display: grid;
-  gap: var(--space-1);
-  margin-top: var(--space-3);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
-}
-
-.note {
-  min-height: calc(var(--control) * 1.5);
-  padding: var(--space-3);
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--label);
-  font: var(--text-body);
-  resize: vertical;
-}
-
-.actions {
-  display: grid;
-  margin-top: var(--space-3);
-}
-
-.action {
+.links {
   display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-4);
+}
+
+.links button {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
-  min-height: var(--control);
+  gap: var(--space-2);
+  min-height: var(--tap-min);
   border: 0;
-  border-top: var(--hairline) solid var(--separator);
   background: none;
   color: var(--label);
   font: var(--text-body);
-  text-align: left;
+  font-weight: var(--weight-semibold);
   cursor: pointer;
 }
 
-.action:disabled {
-  color: var(--label-2);
-  cursor: default;
-}
-
-.action svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-}
-
-.danger {
+.links .danger {
   color: var(--critical-label);
 }

@@ -344,3 +344,12 @@ export function ArrowLeftIcon() {
     </svg>
   )
 }
+
+/** Asa para arrastrar (≡). */
+export function GripIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M5 8h14M5 12h14M5 16h14" />
+    </svg>
+  )
+}

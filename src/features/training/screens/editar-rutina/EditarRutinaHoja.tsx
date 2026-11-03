@@ -11,24 +11,24 @@ import {
   anadir,
   cambiarPauta,
   claveDe,
-  EQUIPMENT_LABEL,
   mover,
+  nombresDeSesiones,
   pautaDe,
   quitar,
   sesiones,
   tocaHoy,
   type EjercicioPlan,
 } from '../../state/plan.ts'
-import { MUSCLES, effortLabel } from '../../state/routines.ts'
 import { descansoDe, elegirDescanso } from '../../state/sesionEnCurso.ts'
-import { equivalentesDe, porNombre } from '../../use-cases/exerciseLibrary.ts'
+import { equivalentesDe } from '../../use-cases/exerciseLibrary.ts'
+import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
 import { cambiarEnPlan, editarSesion, volverARutina } from '../../use-cases/training.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import styles from './EditarRutinaHoja.module.css'
 
 type Hoja = 'lista' | 'ejercicio' | 'cambiar' | 'biblioteca' | 'quitar' | 'volver'
 
-/** Lo que se pone al añadir o copiar un ejercicio: su pauta de ahora. */
+/** Lo que se pone al cambiar un ejercicio añadido por otro: su pauta de ahora. */
 const comoAnadido = (e: EjercicioPlan) => ({
   nombre: e.nombre,
   series: e.series,
@@ -38,9 +38,10 @@ const comoAnadido = (e: EjercicioPlan) => ({
 })
 
 /**
- * Editar rutina (A11–A13, desde «Tu rutina»): la lista de cada sesión, reordenar, añadir de la biblioteca, editar la
- * pauta de un ejercicio, cambiarlo por otro (los del programa y los que hacen lo mismo), quitarlo y volver a la rutina.
- * Todo se guarda en tu plan para todas las semanas.
+ * Editar rutina (A11–A13, desde «Tu rutina»): la lista de cada sesión (por su nombre), reordenar, añadir de la
+ * biblioteca, editar la pauta de un ejercicio, cambiarlo por otro (los del programa y los que hacen lo mismo), quitarlo y
+ * volver a la rutina. Todo se guarda en tu plan para todas las semanas. El entrenador (los consejos de la sesión, los
+ * mismos de Ver sesión) dice uno cada vez; «Vale» lo oculta mientras la hoja está abierta.
  */
 export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   const lista = sesiones.value
@@ -48,8 +49,13 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   const [abierto, setAbierto] = useState<number | null>(null)
   const [hoja, setHoja] = useState<Hoja>('lista')
   const [aviso, setAviso] = useState<string | null>(null)
+  const [vistos, setVistos] = useState<string[]>([])
   const sesion = lista.find((s) => s.sigla === sigla) ?? lista[0]
   if (!sesion) return null
+  const titulos = nombresDeSesiones(lista)
+  const nombre = titulos[sesion.sigla]
+  const consejo = consejosDeSesion(sesion.ejercicios).find((t) => !vistos.includes(t.text))?.text ?? null
+  const vale = () => consejo && setVistos([...vistos, consejo])
   const e = abierto !== null ? (sesion.ejercicios[abierto] ?? null) : null
   const editar = (cambio: Parameters<typeof editarSesion>[1]) => void editarSesion(sesion.sigla, cambio)
   const decir = (texto: string) => {
@@ -72,7 +78,7 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
             editar((ed) => anadir(quitar(ed, e.nombre), { ...comoAnadido(e), nombre: ex.name }, nombres))
           else if (e) void cambiarEnPlan(claveDe(e), ex.name === claveDe(e) ? null : ex.name)
           else editar((ed) => anadir(ed, nuevo, nombres))
-          decir(e ? `Cambiado por ${ex.name}` : `${ex.name} añadido a ${sesion.sigla}`)
+          decir(e ? `Cambiado por ${ex.name}` : `${ex.name} añadido a ${nombre}`)
           aLista()
         }}
         onClose={aLista}
@@ -106,11 +112,11 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
     return (
       <DangerSheet
         titulo={`¿Quitar ${e.nombre}?`}
-        texto={`Sale de ${sesion.sigla} en todas las semanas. Puedes volver a la rutina original cuando quieras.`}
+        texto={`Sale de ${nombre} en todas las semanas. Puedes volver a la rutina original cuando quieras.`}
         accion="Quitar"
         onSi={() => {
           editar((ed) => quitar(ed, claveDe(e)))
-          decir(`${e.nombre} quitado de ${sesion.sigla}`)
+          decir(`${e.nombre} quitado de ${nombre}`)
           aLista()
         }}
         onClose={() => setHoja('ejercicio')}
@@ -127,11 +133,11 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
             variant="secondary"
             onClick={() => {
               void volverARutina(sesion.sigla)
-              decir(`${sesion.sigla} vuelve a la rutina`)
+              decir(`${nombre} vuelve a la rutina`)
               setHoja('lista')
             }}
           >
-            Solo {sesion.sigla}
+            Solo {nombre}
           </Button>
           <Button
             onClick={() => {
@@ -148,47 +154,21 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   }
 
   if (hoja === 'ejercicio' && e && abierto !== null) {
-    const lib = porNombre(e.nombre)
-    const chips = [e.musculo ? MUSCLES[e.musculo].label : null, lib ? EQUIPMENT_LABEL[lib.equipment] : null]
-    const p = pautaDe(e)
+    const { series, reps, rir } = pautaDe(e)
     return (
       <EditExerciseSheet
         key={`${sesion.sigla}-${claveDe(e)}`}
         nombre={e.nombre}
-        chips={chips.filter((c): c is string => Boolean(c))}
-        pauta={{ ...p, descanso: descansoDe(e) }}
-        otrasSesiones={lista
-          .filter((s) => s.sigla !== sesion.sigla)
-          .map((s) => ({ value: s.sigla, label: s.sigla }))}
-        puedeSubir={abierto > 0}
-        puedeBajar={abierto < sesion.ejercicios.length - 1}
-        onGuardar={(n: PautaEdicion) => {
-          editar((ed) =>
-            cambiarPauta(ed, claveDe(e), {
-              series: n.series,
-              reps: n.reps,
-              rir: n.rir,
-              salto: n.salto,
-              nota: n.nota,
-            }),
-          )
+        sesion={nombre}
+        pauta={{ series, reps, rir, descanso: descansoDe(e) }}
+        consejo={consejo}
+        onVale={vale}
+        onCambio={(n: PautaEdicion) => {
+          editar((ed) => cambiarPauta(ed, claveDe(e), { series: n.series, reps: n.reps, rir: n.rir }))
           if (n.descanso !== descansoDe(e)) elegirDescanso(e.nombre, n.descanso)
-          decir('Cambios guardados')
-          aLista()
         }}
         onCambiar={() => setHoja('cambiar')}
         onQuitar={() => setHoja('quitar')}
-        onCopiar={(otra) => {
-          const destino = lista.find((s) => s.sigla === otra)
-          void editarSesion(otra, (ed) =>
-            anadir(ed, comoAnadido(e), destino?.ejercicios.map((x) => x.nombre) ?? []),
-          )
-          decir(`Copiado a ${otra}`)
-        }}
-        onMover={(paso) => {
-          editar((ed) => mover(ed, sesion.ejercicios, abierto, abierto + paso))
-          setAbierto(abierto + paso)
-        }}
         onVolver={aLista}
         onClose={onClose}
       />
@@ -198,12 +178,14 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   return (
     <>
       <EditRoutineSheet
-        sesiones={lista.map((s) => ({ value: s.sigla, label: s.sigla }))}
+        sesiones={lista.map((s) => ({ value: s.sigla, label: titulos[s.sigla] }))}
         sigla={sesion.sigla}
         onSigla={setSigla}
+        consejo={consejo}
+        onVale={vale}
         filas={sesion.ejercicios.map((x) => ({
           nombre: x.nombre,
-          detalle: `${x.series} series de ${x.reps}, ${effortLabel(x.rir)}, ${formatClock(descansoDe(x))}`,
+          detalle: `${x.series} × ${x.reps} · ${formatClock(descansoDe(x))}`,
           nota: x.enLugarDe ? `En lugar de ${x.enLugarDe}` : x.anadido ? 'Añadido por ti' : null,
         }))}
         onAbrir={(i) => {
