@@ -1,0 +1,109 @@
+/* Barra de la sesión en curso, fija arriba: «Salir» · tiempo y series · «Terminar» (píldora negra). */
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  /* Los lados, siempre iguales: el tiempo no se mueve aunque cambie el texto de debajo */
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding: calc(var(--space-3) + var(--safe-top)) var(--gutter) var(--space-3);
+  border-bottom: var(--hairline) solid var(--separator);
+  background: var(--bg);
+}
+
+/* Raya de progreso pegada al borde de abajo de la barra */
+.track {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--hairline) * -1);
+  left: 0;
+  height: calc(var(--space-1) / 2);
+}
+
+.track i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--duration-sheet) var(--ease);
+}
+
+.exit {
+  justify-self: start;
+  display: grid;
+  align-items: center;
+  min-height: var(--tap-min);
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+  color: var(--label);
+  text-decoration: none;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time {
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--label);
+  font: var(--text-title-2);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+/* Parado: el número se queda en gris */
+.paused {
+  color: var(--label-2);
+}
+
+.progress {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space-1) / 2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  cursor: pointer;
+}
+
+.progress svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.finish {
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  height: var(--control-sm);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Se ve pequeño, pero la zona de toque sigue siendo de 44 */
+.finish {
+  position: relative;
+}
+
+.finish::after {
+  position: absolute;
+  inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;
+  content: '';
+}

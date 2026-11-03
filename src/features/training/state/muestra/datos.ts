@@ -1,5 +1,7 @@
 // DATOS DE PRUEBA, solo para ver cómo queda una pantalla. Escritos a mano, no vienen de ningún documento
 // ni de nadie. Esta carpeta (state/muestra/) se borra entera cuando haya datos reales.
+import { parseDecimal } from '../../../../shared/lib/format.ts'
+import type { MuscleId } from '../../domain/muscles.ts'
 
 /** Un ejercicio de una sesión: series, rango de repeticiones, esfuerzo (lo que queda al fallo) y la última vez. */
 export type EjercicioMuestra = {
@@ -10,9 +12,21 @@ export type EjercicioMuestra = {
   rir: number
   /** Kilos × repeticiones de cada serie la última vez. */
   ultima: string[]
+  /** Descanso entre series, en segundos. */
+  descanso: number
+  /** Para calcular el calentamiento (domain/warmup.ts): músculo principal, los que también trabajan y si es básico. */
+  musculo: MuscleId
+  secundarios: MuscleId[]
+  compuesto: boolean
+  pesoCorporal?: boolean
+  /** Salto de peso: 2,5 kg en barra y máquina, 2 kg en mancuernas. */
+  salto: number
+  /** Con qué se puede cambiar hoy: las «substitutions» del programa MUTA Cuerpo completo (content/programs). */
+  sustitutos: string[]
 }
 
 // Las sesiones B (isquios, glúteo y pecho) y las A (espalda y cuádriceps); B2 y A1 repiten los de B1 y A2.
+// Los kilos, descansos y la última vez de B salen de la captura de la sesión del prototipo anterior (C01).
 const B: EjercicioMuestra[] = [
   {
     nombre: 'Peso muerto rumano',
@@ -20,37 +34,91 @@ const B: EjercicioMuestra[] = [
     reps: '6–10',
     rir: 2,
     ultima: ['60 × 10', '62,5 × 6', '60 × 7'],
+    descanso: 165,
+    musculo: 'femoral',
+    secundarios: ['gluteo'],
+    compuesto: true,
+    salto: 2.5,
+    sustitutos: ['Peso muerto rumano con mancuernas', 'Hiperextensión'],
   },
   {
     nombre: 'Press inclinado con mancuernas',
     series: 3,
     reps: '8–12',
     rir: 1,
-    ultima: ['26 × 12', '26 × 10', '26 × 9'],
+    ultima: ['22 × 12', '22 × 11', '22 × 10'],
+    descanso: 135,
+    musculo: 'pecho',
+    secundarios: ['hombro_ant', 'triceps'],
+    compuesto: true,
+    salto: 2,
+    sustitutos: ['Press inclinado en máquina', 'Press banca inclinado', 'Flexiones pies elevados'],
   },
   {
     nombre: 'Curl inclinado con mancuernas',
     series: 5,
     reps: '10–15',
     rir: 0,
-    ultima: ['12 × 15', '12 × 13', '12 × 12', '10 × 15', '10 × 13'],
+    ultima: ['12 × 11', '12 × 10', '12 × 10', '10 × 12', '10 × 11'],
+    descanso: 90,
+    musculo: 'biceps',
+    secundarios: [],
+    compuesto: false,
+    salto: 2,
+    sustitutos: [],
   },
-  { nombre: 'Curl femoral tumbado', series: 2, reps: '10–15', rir: 0, ultima: ['45 × 14', '45 × 12'] },
+  {
+    nombre: 'Curl femoral tumbado',
+    series: 2,
+    reps: '10–15',
+    rir: 0,
+    ultima: ['40 × 10', '40 × 9'],
+    descanso: 90,
+    musculo: 'femoral',
+    secundarios: [],
+    compuesto: false,
+    salto: 2.5,
+    sustitutos: ['Curl femoral sentado', 'Curl nórdico'],
+  },
   {
     nombre: 'Curl predicador (Scott)',
     series: 4,
     reps: '10–15',
     rir: 0,
-    ultima: ['25 × 15', '25 × 13', '25 × 12', '22,5 × 14'],
+    ultima: ['35 × 15', '35 × 13', '35 × 12', '35 × 11'],
+    descanso: 75,
+    musculo: 'biceps',
+    secundarios: [],
+    compuesto: false,
+    salto: 2.5,
+    sustitutos: ['Curl predicador a una mano', 'Curl concentrado'],
   },
   {
     nombre: 'Elevaciones laterales en polea',
     series: 5,
     reps: '10–15',
     rir: 0,
-    ultima: ['7,5 × 15', '7,5 × 14', '7,5 × 13', '7,5 × 12', '5 × 15'],
+    ultima: ['15 × 13', '15 × 12', '15 × 11', '15 × 10', '15 × 10'],
+    descanso: 75,
+    musculo: 'hombro_lat',
+    secundarios: [],
+    compuesto: false,
+    salto: 2.5,
+    sustitutos: ['Laterales con mancuernas', 'Laterales en máquina', 'Laterales con banda'],
   },
-  { nombre: 'Crunch en máquina', series: 2, reps: '10–15', rir: 0, ultima: ['50 × 15', '50 × 14'] },
+  {
+    nombre: 'Crunch en máquina',
+    series: 2,
+    reps: '10–15',
+    rir: 0,
+    ultima: ['40 × 11', '40 × 10'],
+    descanso: 75,
+    musculo: 'core',
+    secundarios: [],
+    compuesto: false,
+    salto: 2.5,
+    sustitutos: ['Crunch en polea', 'Crunch en suelo'],
+  },
 ]
 const A: EjercicioMuestra[] = [
   {
@@ -59,14 +127,38 @@ const A: EjercicioMuestra[] = [
     reps: '8–12',
     rir: 1,
     ultima: ['55 × 12', '55 × 11', '55 × 10'],
+    descanso: 135,
+    musculo: 'espalda_alta',
+    secundarios: ['dorsal', 'biceps'],
+    compuesto: true,
+    salto: 2.5,
+    sustitutos: ['Remo en máquina', 'Remo con mancuerna', 'Remo invertido'],
   },
-  { nombre: 'Prensa', series: 3, reps: '6–10', rir: 2, ultima: ['160 × 10', '160 × 9', '160 × 8'] },
+  {
+    nombre: 'Prensa',
+    series: 3,
+    reps: '6–10',
+    rir: 2,
+    ultima: ['160 × 10', '160 × 9', '160 × 8'],
+    descanso: 165,
+    musculo: 'cuadriceps',
+    secundarios: ['gluteo'],
+    compuesto: true,
+    salto: 5,
+    sustitutos: ['Sentadilla búlgara', 'Zancadas', 'Step-up'],
+  },
   {
     nombre: 'Extensión de tríceps en polea',
     series: 2,
     reps: '10–15',
     rir: 0,
     ultima: ['30 × 15', '30 × 12'],
+    descanso: 75,
+    musculo: 'triceps',
+    secundarios: [],
+    compuesto: false,
+    salto: 2.5,
+    sustitutos: ['Extensión en polea con cuerda', 'Fondos en máquina', 'Patada', 'Fondos entre bancos'],
   },
   {
     nombre: 'Jalón al pecho agarre abierto',
@@ -74,16 +166,53 @@ const A: EjercicioMuestra[] = [
     reps: '8–12',
     rir: 1,
     ultima: ['60 × 12', '60 × 10', '60 × 9'],
+    descanso: 135,
+    musculo: 'dorsal',
+    secundarios: [],
+    compuesto: true,
+    salto: 2.5,
+    sustitutos: ['Jalón al pecho', 'Dominadas', 'Dominadas asistidas', 'Pullover con mancuerna'],
   },
-  { nombre: 'Sissy squat', series: 2, reps: '10–15', rir: 1, ultima: ['0 × 15', '0 × 13'] },
+  {
+    nombre: 'Sissy squat',
+    series: 2,
+    reps: '10–15',
+    rir: 1,
+    ultima: ['0 × 15', '0 × 13'],
+    descanso: 90,
+    musculo: 'cuadriceps',
+    secundarios: [],
+    compuesto: false,
+    pesoCorporal: true,
+    salto: 2.5,
+    sustitutos: ['Extensión de cuádriceps', 'Step-up'],
+  },
   {
     nombre: 'Elevación de talones sentado',
     series: 3,
     reps: '10–15',
     rir: 0,
     ultima: ['40 × 15', '40 × 14', '40 × 12'],
+    descanso: 75,
+    musculo: 'gemelo',
+    secundarios: [],
+    compuesto: false,
+    salto: 2.5,
+    sustitutos: ['Elevación de talones de pie', 'Elevación de talones a una pierna'],
   },
-  { nombre: 'Vuelos posteriores', series: 2, reps: '10–15', rir: 1, ultima: ['8 × 15', '8 × 13'] },
+  {
+    nombre: 'Vuelos posteriores',
+    series: 2,
+    reps: '10–15',
+    rir: 1,
+    ultima: ['8 × 15', '8 × 13'],
+    descanso: 75,
+    musculo: 'hombro_post',
+    secundarios: [],
+    compuesto: false,
+    salto: 1,
+    sustitutos: ['Contractora posterior', 'Face pull'],
+  },
 ]
 
 /** Hoy, para que la semana y el historial de las pantallas sean siempre los mismos. */
@@ -166,6 +295,14 @@ function historial() {
   Object.assign(b1[b1.length - 2], { toneladas: 7.6, reps: 304 })
   Object.assign(b1[b1.length - 1], { toneladas: 7.1, reps: 274 })
   return entrenos
+}
+
+/** Lo que hiciste la última vez en cada serie de un ejercicio, en números («62,5 × 6» → 62,5 kg y 6 reps). */
+export function anteriores(e: EjercicioMuestra): { kg: number | null; reps: number }[] {
+  return e.ultima.map((s) => {
+    const [kg, reps] = s.split(' × ')
+    return { kg: parseDecimal(kg), reps: parseDecimal(reps) ?? 0 }
+  })
 }
 
 /** Color de la tarjeta de una sesión: fijo, por su orden en la rutina (1 lima, 2 rayas, 3 naranja, 4 negro). */

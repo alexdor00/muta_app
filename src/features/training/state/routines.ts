@@ -87,8 +87,15 @@ export {
   matches,
   type Filters,
 } from '../domain/routineView.ts'
-export { effortLabel } from '../domain/effort.ts'
-export { MUSCLES, type MuscleId } from '../domain/muscles.ts'
+export { effortLabel, plainEffort } from '../domain/effort.ts'
+export { avisoDeOrden, cambioDesdePrimera } from '../domain/exerciseProgress.ts'
+export type { SessionTip } from '../domain/sessionTips.ts'
+export { teclear } from '../domain/workoutSet.ts'
+export { diasDeRacha } from '../domain/streak.ts'
+export { CADENCIAS, discosPorLado, faseCadencia, type Cadencia } from '../domain/workoutTools.ts'
+export { MUSCLE_IDS, MUSCLES, rangeFor, type Mode, type MuscleId } from '../domain/muscles.ts'
+export { barMax, muscleInPlan, stepRange, verdict } from '../domain/muscleInPlan.ts'
+export { libraryLine, type LibraryExercise } from '../domain/exerciseLibrary.ts'
 export { SPLIT_LABEL, type Split, type VolumeTier } from '../domain/programInfo.ts'
 export {
   ALL_SECTION,

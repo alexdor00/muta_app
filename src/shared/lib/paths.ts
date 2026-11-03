@@ -20,7 +20,9 @@ export const paths = {
   sessionStart: (sessionId: string) => `/entreno/sesion/${sessionId}/inicio`,
   session: (sessionId: string) => `/entreno/sesion/${sessionId}`,
   summary: (sessionId: string) => `/entreno/sesion/${sessionId}/resumen`,
-  exercise: (exerciseId: string) => `/entreno/ejercicio/${exerciseId}`,
+  /** Ficha de un ejercicio de la biblioteca; desde la sesión en curso, con la sesión y el ejercicio al que volver. */
+  exercise: (exerciseId: string, desde?: { sesion: string; ejercicio: number }) =>
+    `/entreno/ejercicio/${exerciseId}${desde ? `?sesion=${desde.sesion}&ej=${desde.ejercicio}` : ''}`,
   nutrition: '/comida',
   progress: '/progreso',
   profile: '/perfil',
@@ -55,11 +57,12 @@ export function tabOf(path: string): Tab | null {
 }
 
 /**
- * Pantalla completa, sin barra de pestañas: la bienvenida, ver una sesión (lleva «Empezar» fijo abajo) y entrenar
+ * Pantalla completa, sin barra de pestañas: la bienvenida, ver una sesión (lleva «Empezar» fijo abajo), la ficha de un
+ * ejercicio (lleva su propia flecha atrás) y entrenar
  * (sesión en curso y resumen), para no salir por error. La sesión antes de empezar (inicio) sí lleva pestañas.
  */
 export function isFullScreen(path: string): boolean {
   if (path === paths.welcome || path.startsWith(`${paths.welcome}/`)) return true
-  if (path.startsWith(`${paths.routine}/`)) return true
+  if (path.startsWith(`${paths.routine}/`) || path.startsWith('/entreno/ejercicio/')) return true
   return /^\/entreno\/sesion\/[^/]+(\/resumen)?\/?$/.test(path)
 }

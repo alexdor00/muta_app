@@ -21,7 +21,13 @@ describe('isFullScreen', () => {
     expect(isFullScreen(paths.sessionStart('a1'))).toBe(false)
     expect(isFullScreen(paths.training)).toBe(false)
     expect(isFullScreen(paths.routine)).toBe(false)
-    expect(isFullScreen(paths.exercise('press_banca'))).toBe(false)
+  })
+
+  it('la ficha de un ejercicio va a pantalla completa (con o sin la sesión de la que viene)', () => {
+    expect(isFullScreen(paths.exercise('press_banca'))).toBe(true)
+    expect(paths.exercise('press_banca', { sesion: 'b1', ejercicio: 2 })).toBe(
+      '/entreno/ejercicio/press_banca?sesion=b1&ej=2',
+    )
   })
 })
 

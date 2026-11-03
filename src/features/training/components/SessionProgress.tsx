@@ -3,19 +3,25 @@ import { formatDecimal, formatShortDate } from '../../../shared/lib/format.ts'
 import { ChoiceSegmented } from '../../../shared/ui/Choice.tsx'
 import styles from './SessionProgress.module.css'
 
-const METRICAS = [
+/** Lo que enseña la gráfica de una sesión (Ver sesión). */
+export const METRICAS_SESION = [
   { value: 'ton', label: 'Tonelaje' },
   { value: 'reps', label: 'Repeticiones' },
   { value: 'min', label: 'Duración' },
 ] as const
-export type Metrica = (typeof METRICAS)[number]['value']
+export type Metrica = (typeof METRICAS_SESION)[number]['value']
 
 // Tamaño del dibujo de la gráfica (unidades del SVG; se escala al ancho que tenga sin deformarse)
 const W = 300
 const H = 160
 
-type Props = {
-  /** «7,1 t», o null si aún no hay entrenos de esta sesión. */
+type Props<M extends string> = {
+  /** Qué se puede enseñar (Tonelaje · Repeticiones · Duración en una sesión; Máximo · Volumen en un ejercicio). */
+  metricas: readonly { value: M; label: string }[]
+  /** Nombre de la tarjeta para el lector de pantalla, y el texto si aún no hay ningún entreno. */
+  etiqueta: string
+  vacio: string
+  /** «7,1 t», o null si aún no hay entrenos. */
   valor: string | null
   /** «−7 % que la anterior» o «Igual que la anterior»; null la primera vez. */
   cambio: string | null
@@ -23,8 +29,12 @@ type Props = {
   fecha: string | null
   /** Valor de cada entreno (fecha AAAA-MM-DD), el más antiguo primero. */
   puntos: { fecha: string; valor: number }[]
-  metrica: Metrica
-  onMetrica: (metrica: Metrica) => void
+  metrica: M
+  onMetrica: (metrica: M) => void
+  /** Los puntos hechos en otro puesto de la sesión que el último (se marcan con un círculo hueco). */
+  otroPuesto?: boolean[]
+  /** Advertencia bajo la cifra: «La última vez lo hiciste en otro puesto…». */
+  aviso?: string | null
 }
 
 /** Marcas del eje vertical: números redondos (1, 2, 5…) que abarcan todos los puntos, con dos tramos como poco. */
@@ -55,13 +65,24 @@ function curva(xy: (readonly [number, number])[]) {
 }
 
 /**
- * «Progreso de la sesión» (como la gráfica del prototipo anterior): el último valor en grande, cuánto cambió, su
- * fecha y la gráfica con su eje, el área sombreada y las fechas de inicio y fin; debajo, Tonelaje · Repeticiones ·
- * Duración.
+ * Progreso de una sesión o de un ejercicio (como la gráfica del prototipo anterior): el último valor en grande, cuánto
+ * cambió, su fecha y la gráfica con su eje, el área sombreada y las fechas de inicio y fin; debajo, qué enseña.
  */
-export function SessionProgress({ valor, cambio, fecha, puntos, metrica, onMetrica }: Props) {
+export function SessionProgress<M extends string>({
+  metricas,
+  etiqueta,
+  vacio,
+  valor,
+  cambio,
+  fecha,
+  puntos,
+  metrica,
+  onMetrica,
+  otroPuesto = [],
+  aviso = null,
+}: Props<M>) {
   const degradado = useId()
-  const nombre = METRICAS.find((m) => m.value === metrica)?.label ?? ''
+  const nombre = metricas.find((m) => m.value === metrica)?.label ?? ''
   const { bajo, alto, lista } = marcas(puntos.length ? puntos.map((p) => p.valor) : [0])
   const y = (v: number) => ((alto - v) / (alto - bajo)) * H
   const xy = puntos.map(
@@ -70,12 +91,17 @@ export function SessionProgress({ valor, cambio, fecha, puntos, metrica, onMetri
   const linea = curva(xy)
   const ultimo = xy.at(-1)
   return (
-    <section class={styles.card} aria-label="Progreso de la sesión">
+    <section class={styles.card} aria-label={etiqueta}>
       <div class={styles.head}>
         <p class={styles.value}>{valor ?? '—'}</p>
         {cambio && <p class={styles.change}>{cambio}</p>}
         {fecha && <p class={styles.date}>{fecha}</p>}
       </div>
+      {aviso && (
+        <p class={styles.warning} role="note">
+          {aviso}
+        </p>
+      )}
       {puntos.length ? (
         <div class={styles.chart}>
           <div class={styles.axis} aria-hidden="true">
@@ -105,21 +131,30 @@ export function SessionProgress({ valor, cambio, fecha, puntos, metrica, onMetri
               <path class={styles.area} fill={`url(#${degradado})`} d={`${linea} L${W},${H} L0,${H} Z`} />
             )}
             {linea && <path class={styles.line} d={linea} pathLength={1} />}
+            {xy.map(([x, yy], i) =>
+              otroPuesto[i] ? <circle key={i} class={styles.otherDot} cx={x} cy={yy} r="4" /> : null,
+            )}
             {ultimo && <circle class={styles.dot} cx={ultimo[0]} cy={ultimo[1]} r="5" />}
           </svg>
           <div class={`${styles.dates} ${puntos.length < 2 ? styles.single : ''}`} aria-hidden="true">
             <span>{formatShortDate(puntos[0].fecha)}</span>
             {puntos.length > 1 && <span>{formatShortDate(puntos[puntos.length - 1].fecha)}</span>}
           </div>
+          {otroPuesto.some(Boolean) && (
+            <p class={styles.legend}>
+              <span class={styles.legendDot} aria-hidden="true" />
+              Hecho en otro puesto de la sesión
+            </p>
+          )}
         </div>
       ) : (
-        <p class={styles.empty}>Aún no has hecho esta sesión.</p>
+        <p class={styles.empty}>{vacio}</p>
       )}
       <div class={styles.metrics}>
         <ChoiceSegmented
           name="metrica"
           legend="Qué enseña la gráfica"
-          options={[...METRICAS]}
+          options={[...metricas]}
           value={metrica}
           onChange={onMetrica}
         />

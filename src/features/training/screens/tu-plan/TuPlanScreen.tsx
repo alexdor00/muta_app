@@ -10,8 +10,10 @@ import { MusclesCard } from '../../components/MusclesCard.tsx'
 import { SessionCard } from '../../components/SessionCard.tsx'
 import { TuRutinaSheet } from '../../components/TuRutinaSheet.tsx'
 import { WeekCard } from '../../components/WeekCard.tsx'
+import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
+import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { actividadMuestra, detalleSesion, MUESTRA, tonoDe, type Periodo } from '../../state/muestra/datos.ts'
-import { MUSCLES } from '../../state/routines.ts'
+import { MUSCLES, type MuscleId } from '../../state/routines.ts'
 import styles from './TuPlanScreen.module.css'
 
 const ESTADO = { hecho: 'Hecha', hoy: 'Hoy', pendiente: 'Pendiente', descanso: 'Descanso' } as const
@@ -28,6 +30,7 @@ const NOMBRES = Object.fromEntries(Object.entries(MUSCLES).map(([id, m]) => [id,
 /** Tu plan (pestaña Entreno): la sesión de hoy, «Empezar», tu semana y los músculos. Datos de prueba (state/muestra/). */
 export function TuPlanScreen() {
   const sheet = useSheet('rutina')
+  const biblioteca = useSheet('biblioteca')
   // Al bajar, la cabecera grande se va y arriba queda una barra con el título (como en las listas de rutinas)
   const cabecera = useRef<HTMLDivElement>(null)
   const hoy = MUESTRA.semana.find((d) => d.estado === 'hoy')?.sigla ?? MUESTRA.sesiones[0].sigla
@@ -41,6 +44,7 @@ export function TuPlanScreen() {
   const [periodo, setPeriodo] = useState<Periodo>('hoy')
   const [lado, setLado] = useState<'front' | 'back'>('front')
   const [musculo, setMusculo] = useState<string | null>(null)
+  const [ficha, setFicha] = useState<MuscleId | null>(null)
   // «Empezar» va con la sesión que se ve en el carrusel
   const elegida = sesiones[visible]?.sigla ?? hoy
   const actividad = actividadMuestra(periodo)
@@ -81,7 +85,7 @@ export function TuPlanScreen() {
 
       <div class={styles.actions}>
         <div class={styles.start}>
-          <Button href={paths.sessionStart(elegida.toLowerCase())}>
+          <Button href={paths.session(elegida.toLowerCase())}>
             <span class={styles.startLabel}>
               <PlayIcon />
               Empezar {elegida}
@@ -109,9 +113,15 @@ export function TuPlanScreen() {
           series={actividad.series}
           porMusculo={actividad.porMusculo}
           names={NOMBRES}
+          onFicha={(m) => {
+            setMusculo(null)
+            setFicha(m as MuscleId)
+          }}
         />
       </div>
-      {sheet.open && <TuRutinaSheet onClose={sheet.close} />}
+      {sheet.open && <TuRutinaSheet onClose={sheet.close} onBiblioteca={biblioteca.showInstead} />}
+      {biblioteca.open && <BibliotecaHoja onClose={biblioteca.close} />}
+      {ficha && <MusculoHoja musculo={ficha} onClose={() => setFicha(null)} />}
     </>
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks'
+import { plainText } from '../../../shared/lib/format.ts'
 import { ChoiceList, ChoicePills } from '../../../shared/ui/Choice.tsx'
 import styles from './SlotPanel.module.css'
 
@@ -54,7 +55,6 @@ export type SlotPanelProps = Common &
 const NONE = ''
 const UNSET = '__sin_elegir'
 
-const plain = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 const GROUP = { upper: 'Torso', lower: 'Pierna' } as const
 
 /**
@@ -68,7 +68,7 @@ function MuscleSearch(props: {
   onChange: (id: string) => void
 }) {
   const [query, setQuery] = useState('')
-  const found = props.muscles.filter((m) => plain(m.label).includes(plain(query.trim())))
+  const found = props.muscles.filter((m) => plainText(m.label).includes(plainText(query.trim())))
   const shown = query.trim() || !props.value ? found : props.muscles.filter((m) => m.id === props.value)
   return (
     <div class={styles.search}>

@@ -9,10 +9,7 @@ test('la tarjeta de B1 abre Ver sesión, sin pestañas, y «Empezar B1» lleva a
   await expect(page.getByRole('heading', { name: 'B1 Isquios, glúteo y pecho', level: 1 })).toBeVisible()
   await expect(page.getByText('7 ejercicios · 24 series · 65 min')).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Pestañas' })).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Empezar B1' })).toHaveAttribute(
-    'href',
-    '/entreno/sesion/b1/inicio',
-  )
+  await expect(page.getByRole('link', { name: 'Empezar B1' })).toHaveAttribute('href', '/entreno/sesion/b1')
   await page.getByRole('link', { name: 'Volver a Tu plan' }).click()
   await expect(page).toHaveURL('/entreno')
 })

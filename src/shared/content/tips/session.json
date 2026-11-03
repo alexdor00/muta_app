@@ -1,0 +1,98 @@
+{
+  "lateralEmpuje": {
+    "ok": false,
+    "text": "Hoy es de empuje: coloca la lateral en polea con el cable por delante del cuerpo.",
+    "why": "Tiende a generar abducción con rotación interna y colabora el deltoides posterior, que llega fresco.",
+    "source": "V5"
+  },
+  "lateralTiron": {
+    "ok": false,
+    "text": "Hoy es de tirón: coloca la lateral en polea con el cable por detrás del cuerpo.",
+    "why": "Lleva el hombro a rotación externa o neutra y casi no pelea con lo que ya has hecho.",
+    "source": "V5"
+  },
+  "lateralPorDetras": {
+    "ok": false,
+    "text": "Opcional: prueba la lateral en polea alta con el brazo pasando por detrás del cuerpo (2–3 series).",
+    "why": "Es la única variante con un rango distinto, en estiramiento.",
+    "source": "V5"
+  },
+  "bicepsEnEmpuje": {
+    "ok": true,
+    "text": "Bien: el bíceps va en el día de empuje. Hazlo intercalado entre las series de press.",
+    "why": "Llega fresco, apenas interfiere y el pecho y el hombro se recuperan.",
+    "source": "V8"
+  },
+  "bicepsFaltaEnEmpuje": {
+    "ok": false,
+    "text": "Hoy no tienes bíceps. Mételo en el día de empuje, entre los press (predicador o martillo).",
+    "why": "No viene fatigado de tirar y aprovechas el descanso de los press.",
+    "source": "V8"
+  },
+  "tricepsEnTiron": {
+    "ok": true,
+    "text": "Bien: el tríceps va en el día de tirón. Hazlo intercalado entre los ejercicios de espalda.",
+    "why": "No viene fatigado de empujar y la cabeza larga no suele limitar remos ni jalones.",
+    "source": "V8"
+  },
+  "tricepsFaltaEnTiron": {
+    "ok": false,
+    "text": "Hoy no tienes tríceps. Mételo en el día de tirón, entre los ejercicios de espalda.",
+    "why": "Llega fresco; los press de otro día ya le dieron trabajo indirecto.",
+    "source": "V8"
+  },
+  "bicepsEnTiron": {
+    "ok": false,
+    "text": "Tienes bíceps en un día de tirón: ponlo tarde y no esperes mover lo mismo que fresco.",
+    "why": "Después de remos y jalones los flexores del codo y el agarre llegan fatigados.",
+    "source": "V8 · V17"
+  },
+  "prioridadTarde": {
+    "ok": false,
+    "text": "{musculo} es tu prioridad y va en el puesto {puesto}: colócalo entre los dos primeros.",
+    "why": "Protege la tarea que más valor perdería si llegase fatigada.",
+    "source": "V17"
+  },
+  "gemelo": {
+    "ok": false,
+    "text": "El gemelo no cansa: intercálalo entre series de prensa, extensiones, hip thrust o búlgaras en vez de hacerlo al final.",
+    "why": "No interfiere con el sistema nervioso como los ejercicios grandes y acumulas volumen sin darte cuenta.",
+    "source": "V7 · V11"
+  },
+  "coreConCarga": {
+    "ok": false,
+    "text": "Pon el abdomen en un hueco que no compita, o en superserie con las laterales.",
+    "why": "Casi no interfiere con lo demás.",
+    "source": "V16 · V11"
+  },
+  "coreEstabilidad": {
+    "ok": false,
+    "text": "Tu abdomen de hoy es de estabilidad o peso corporal: para crecer añade un crunch con carga progresable (polea o máquina).",
+    "why": "La plancha y la rueda mejoran la estabilidad, pero no dan la sobrecarga progresiva que el recto abdominal necesita.",
+    "source": "V9"
+  },
+  "antebrazoEnTiron": {
+    "ok": false,
+    "text": "El antebrazo directo va después de los tirones, no antes.",
+    "why": "Si lo fatigas antes, limita remos y jalones.",
+    "source": "V10"
+  },
+  "antebrazoSinTiron": {
+    "ok": true,
+    "text": "Bien: antebrazo fresco en un día sin tirón. Deja 24–48 h hasta una sesión de espalda importante.",
+    "why": "Un agarre fatigado te limita los ejercicios importantes de tirón.",
+    "source": "V10"
+  },
+  "curlFemoralYBisagra": {
+    "ok": false,
+    "text": "Tienes curl femoral y bisagra: si la fatiga del curl hunde tu rumano o empeora su técnica, invierte el orden.",
+    "why": "La prefatiga empeora el ejercicio más técnico.",
+    "source": "V11"
+  },
+  "hackYPrensa": {
+    "ok": false,
+    "text": "Sentadilla hack y prensa en la misma sesión: pon la prensa después, cuando ya vas más fatigado (por ejemplo 2 + 3 series).",
+    "why": "La prensa es más estable y carga menos la espalda.",
+    "source": "V4"
+  }
+}

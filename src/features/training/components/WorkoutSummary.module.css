@@ -1,0 +1,276 @@
+/* Resumen de la sesión (C24): sigla grande, la racha con su fuego y la semana, cuatro cifras y la lista frente a la
+   última vez. */
+
+.page {
+  position: relative;
+  min-height: 100dvh;
+  padding: calc(var(--space-6) + var(--safe-top)) var(--gutter) calc(var(--space-6) + var(--safe-bottom));
+  background: var(--bg);
+}
+
+.close {
+  position: absolute;
+  top: calc(var(--space-3) + var(--safe-top));
+  right: var(--gutter);
+}
+
+.head {
+  margin-top: var(--space-8);
+  text-align: center;
+}
+
+.sigla {
+  font: var(--text-summary-sigla);
+}
+
+.sub {
+  margin-top: var(--space-1);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.week {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--gap-block);
+  padding: var(--space-4) var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  text-align: center;
+}
+
+.weekText {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space-1) * 1.5);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.weekText b {
+  font: var(--text-session-sigla);
+  color: var(--label);
+}
+
+/* El fuego de la racha, en naranja como en el prototipo anterior (decisión 2026-11-02) */
+.flame {
+  display: grid;
+  color: var(--streak);
+}
+
+.flame svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+.days {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--space-2) + var(--space-1) / 2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.days li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.day {
+  display: grid;
+  place-items: center;
+  width: calc(var(--space-6) + var(--space-1));
+  height: calc(var(--space-6) + var(--space-1));
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+/* Días entrenados: círculo naranja con ✓ blanco */
+.dayDone {
+  background: var(--streak);
+  color: var(--on-photo);
+}
+
+.day svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.letter {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+}
+
+.today .letter {
+  color: var(--label);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4) var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.value b {
+  font: var(--text-session-value);
+}
+
+.value small {
+  margin-left: var(--space-1);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.tileName {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.listHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: var(--gap-block);
+}
+
+.listHead h2 {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.listHead span {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.list {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.rowText {
+  flex: 1;
+}
+
+.name {
+  font: var(--text-body);
+  font-weight: var(--weight-medium, var(--weight-semibold));
+}
+
+.sets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2);
+  margin-top: var(--space-1);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.sets span + span::before {
+  content: '· ';
+  color: var(--label-2);
+  font-weight: var(--weight-regular);
+}
+
+.better {
+  color: var(--label);
+  font-weight: var(--weight-bold);
+}
+
+.change {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.sign {
+  display: grid;
+  font-weight: var(--weight-bold);
+}
+
+.sign svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Mejoras: solo el signo en naranja (↑ más peso, + más reps); lo que baja o queda igual, en gris */
+.kg .sign,
+.reps .sign {
+  color: var(--streak);
+}
+
+.baja,
+.igual {
+  color: var(--label-2);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--gap-block);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  cursor: pointer;
+}
+
+.share {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.share svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.hidden {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+}

@@ -1,0 +1,403 @@
+/* Un ejercicio de la sesión en curso (C01). Una insignia con el número a la izquierda; en el abierto, el calentamiento
+   en píldoras centradas y las series en filas de casillas iguales. Todas las cifras, misma letra y tamaño. */
+
+.exercise {
+  display: grid;
+  grid-template-columns: var(--control-sm) 1fr auto;
+  align-items: center;
+  column-gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-5) 0;
+  border: 0;
+  border-bottom: var(--hairline) solid var(--separator);
+  background: none;
+  color: var(--label);
+  text-align: left;
+  scroll-margin-top: calc(var(--control-lg) + var(--space-6));
+}
+
+.row {
+  cursor: pointer;
+}
+
+.head {
+  display: contents;
+}
+
+/* El número del ejercicio: círculo gris; el abierto, negro; el terminado, ✓ o ★ */
+.badge {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label-2);
+  font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
+}
+
+.badge svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.open .badge,
+.finished .badge {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-1) / 2);
+  min-width: 0;
+}
+
+.name {
+  font: var(--text-headline);
+}
+
+.detail {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* La pauta en etiquetas: series, reps, esfuerzo y descanso */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: calc(var(--control-sm) - var(--space-2));
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.restChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Se ve pequeño, pero la zona de toque llega a 44 */
+.restChip {
+  position: relative;
+}
+
+.restChip::after {
+  position: absolute;
+  inset: calc((var(--tap-min) - var(--control-sm) + var(--space-2)) / -2) calc(var(--space-2) * -1);
+  content: '';
+}
+
+.chips svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.note {
+  margin-top: var(--space-1);
+  font: var(--text-footnote);
+  font-style: italic;
+  color: var(--label-2);
+}
+
+.summary {
+  color: var(--label);
+}
+
+.more,
+.chevron {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  margin-right: calc(var(--space-3) * -1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label-2);
+}
+
+.more {
+  color: var(--label);
+  cursor: pointer;
+}
+
+.more svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.chevron svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Calentamiento: rótulo y píldoras centradas, todas del mismo ancho */
+.warmup {
+  grid-column: 1 / -1;
+  margin-top: var(--space-5);
+  text-align: center;
+}
+
+.warmupLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+}
+
+.warmupLabel svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--streak);
+}
+
+.warmupSets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.warmupSet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: var(--control);
+  padding: 0 var(--space-1) 0 var(--space-3);
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.warmupSet b {
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.warmupSet small {
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+.tick {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: calc(var(--control-sm) - var(--space-2));
+  height: calc(var(--control-sm) - var(--space-2));
+  margin-left: auto;
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-pill);
+}
+
+.tick svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.warmupSet.done .tick {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Series: Nº · Kg · Reps · Quedan · círculo; las tres casillas del mismo ancho */
+.sets {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.set {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--control-sm) repeat(3, minmax(0, 1fr)) var(--control);
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg);
+  transition: transform var(--duration-sheet) var(--ease);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.header {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Deslizar a la izquierda descubre «Eliminar» */
+.swipe {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+}
+
+.swiped {
+  transform: translateX(calc(var(--control-lg) * -1.6));
+}
+
+.delete {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: calc(var(--control-lg) * 1.6 - var(--space-2));
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--critical-label);
+  color: var(--on-photo);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  visibility: hidden;
+}
+
+/* Solo asoma mientras se desliza la fila o cuando se queda abierta */
+.swipe:has(.swiped) .delete,
+.swipe:has(.set[style*='translate']) .delete {
+  visibility: visible;
+}
+
+.index,
+.cell {
+  font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.index {
+  color: var(--label-2);
+}
+
+.cell {
+  display: block;
+  width: 100%;
+  height: var(--control);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  caret-color: transparent;
+}
+
+.cell::placeholder {
+  color: var(--label-2);
+  font-weight: var(--weight-regular);
+  text-align: center;
+}
+
+.cell:focus-visible,
+.active {
+  outline: var(--border) solid var(--accent);
+  outline-offset: calc(var(--border) * -1);
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: var(--control);
+  height: var(--control);
+  padding: 0;
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--on-accent);
+  cursor: pointer;
+  transition:
+    background var(--duration-tap) var(--ease),
+    border-color var(--duration-tap) var(--ease);
+}
+
+.check svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.check.done {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+/* Una serie hecha: sus casillas se apagan y destaca lo que falta */
+.doneRow .cell {
+  background: none;
+  box-shadow: inset 0 0 0 var(--hairline) var(--separator);
+}
+
+.add {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-self: center;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--control-sm);
+  margin-top: var(--space-4);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.add svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.hidden {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Se ve pequeño, pero la zona de toque sigue siendo de 44 */
+.add {
+  position: relative;
+}
+
+.add::after {
+  position: absolute;
+  inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;
+  content: '';
+}

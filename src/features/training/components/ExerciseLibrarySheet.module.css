@@ -1,0 +1,128 @@
+/* Biblioteca de ejercicios (A16): buscador gris, chips en una fila que se desliza y filas de dos líneas. */
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label-2);
+}
+
+.search svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--control);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--label);
+  font: var(--text-body);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--label-2);
+}
+
+.search:focus-within {
+  box-shadow: 0 0 0 var(--focus-ring) var(--accent);
+}
+
+/* Los chips llegan al borde de la hoja y se deslizan de lado */
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-4) calc(-1 * var(--gutter)) 0;
+  padding: 0 var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-subhead);
+  cursor: pointer;
+}
+
+.chip.on {
+  background: var(--label);
+  color: var(--bg);
+}
+
+.list {
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--label);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.name {
+  font: var(--text-body);
+}
+
+.line {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.chevron {
+  display: grid;
+  color: var(--label-2);
+}
+
+.chevron svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.empty {
+  margin-top: var(--space-6);
+  font: var(--text-subhead);
+  color: var(--label-2);
+  text-align: center;
+}

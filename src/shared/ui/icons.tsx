@@ -34,6 +34,33 @@ export function BookmarkIcon(props: { filled?: boolean }) {
   )
 }
 
+/** Rayo: lo que te toca hoy (peso sugerido). */
+export function BoltIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke} fill="currentColor">
+      <path d="M13 2L4 14h7l-1 8 9-12h-7z" />
+    </svg>
+  )
+}
+
+export function ClockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  )
+}
+
+export function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M16 16l5 5" />
+    </svg>
+  )
+}
+
 export function CloseIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
@@ -67,6 +94,124 @@ export function ChevronDownIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
       <path d="M5 9l7 7 7-7" />
+    </svg>
+  )
+}
+
+/** Cambiar una cosa por otra (dos flechas). */
+export function SwapIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4" />
+    </svg>
+  )
+}
+
+/** Escribir una nota. */
+export function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" />
+    </svg>
+  )
+}
+
+/** Discos apilados. */
+export function PlatesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M12 3l9 5-9 5-9-5 9-5zM3 12.5l9 5 9-5M3 16.5l9 5 9-5" />
+    </svg>
+  )
+}
+
+/** Cronómetro. */
+export function StopwatchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l2.5 2M10 2h4M12 2v3" />
+    </svg>
+  )
+}
+
+/** Subió (resumen frente a la última vez). */
+export function ArrowUpIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke} stroke-width={2.5}>
+      <path d="M12 20V5M6 11l6-6 6 6" />
+    </svg>
+  )
+}
+
+/** Bajó. */
+export function ArrowDownIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke} stroke-width={2.5}>
+      <path d="M12 4v15M6 13l6 6 6-6" />
+    </svg>
+  )
+}
+
+/** Compartir. */
+export function ShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M6 12H5v8h14v-8h-1" />
+    </svg>
+  )
+}
+
+/** Pausa. */
+export function PauseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+      <rect x="6" y="5" width="4" height="14" rx="1" />
+      <rect x="14" y="5" width="4" height="14" rx="1" />
+    </svg>
+  )
+}
+
+/** Volver a empezar. */
+export function RepeatIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" />
+    </svg>
+  )
+}
+
+/** Papelera. */
+export function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" />
+    </svg>
+  )
+}
+
+/** Añadir. */
+export function PlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  )
+}
+
+export function MinusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M5 12h14" />
+    </svg>
+  )
+}
+
+/** Llama (calentamiento, racha): la del prototipo anterior, «flame» relleno de Phosphor Icons (MIT). */
+export function FlameIcon() {
+  return (
+    <svg viewBox="0 0 256 256" aria-hidden="true" fill="currentColor">
+      <path d="M143.38,17.85a8,8,0,0,0-12.63,3.41l-22,60.41L84.59,58.26a8,8,0,0,0-11.93.89C51,87.53,40,116.08,40,144a88,88,0,0,0,176,0C216,84.55,165.21,36,143.38,17.85Zm40.51,135.49a57.6,57.6,0,0,1-46.56,46.55A7.65,7.65,0,0,1,136,200a8,8,0,0,1-1.32-15.89c16.57-2.79,30.63-16.85,33.44-33.45a8,8,0,0,1,15.78,2.68Z" />
     </svg>
   )
 }

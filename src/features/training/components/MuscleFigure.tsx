@@ -37,23 +37,25 @@ export function partName(part: string, names: Record<string, string>): string {
 type Props = {
   side: 'front' | 'back'
   /** Pieza tocada (p. ej. «biceps»), que se marca con un borde; null si ninguna. */
-  selected: string | null
+  selected?: string | null
   /**
    * Avisa al tocar una pieza que es un músculo que seguimos, con la pieza tocada para colocar al lado lo que se
-   * enseñe; con null al tocar la misma otra vez o fuera de los músculos.
+   * enseñe; con null al tocar la misma otra vez o fuera de los músculos. Sin él, el dibujo solo se mira.
    */
-  onSelect: (part: string | null, anchor?: Element) => void
+  onSelect?: (part: string | null, anchor?: Element) => void
   /** Series de cada músculo en el periodo que se ve; los que no están, o con 0, no se marcan. */
   series: Record<string, number>
   /** Nombre de cada músculo (por su id) para el lector de pantalla. */
   names: Record<string, string>
+  /** Lo que dice el lector de pantalla de un dibujo que solo se mira (en vez de las series de cada músculo). */
+  label?: string
 }
 
 /**
  * Dibujo del cuerpo, de frente o de espalda. Los músculos con más series (la mitad o más que el que más)
  * van en negro; los demás trabajados, en gris medio; el resto, en gris muy claro.
  */
-export function MuscleFigure({ side, selected, onSelect, series, names }: Props) {
+export function MuscleFigure({ side, selected = null, onSelect, series, names, label: fixed }: Props) {
   const { viewBox, outline, parts } = side === 'front' ? FRONT : BACK
   const seriesOf = (muscle: string) => Math.max(0, ...(IDS[muscle] ?? []).map((id) => series[id] ?? 0))
   const top = Math.max(0, ...Object.values(series))
@@ -69,6 +71,20 @@ export function MuscleFigure({ side, selected, onSelect, series, names }: Props)
         .map((id) => `${names[id] ?? id}, ${series[id]} series`)
         .join('; ')}`
     : `Músculos, ${side === 'front' ? 'de frente' : 'de espalda'}: ninguno trabajado`
+  if (!onSelect) {
+    return (
+      <svg class={styles.figure} viewBox={viewBox} role="img" aria-label={fixed ?? label}>
+        <path class={styles.outline} d={outline} />
+        {parts.map((part) => (
+          <g key={part.muscle}>
+            {part.paths.map((d) => (
+              <path key={d} class={classOf(part.muscle)} d={d} />
+            ))}
+          </g>
+        ))}
+      </svg>
+    )
+  }
   const toggle = (part: string, anchor: Element) =>
     part === selected ? onSelect(null) : onSelect(part, anchor)
   return (

@@ -33,6 +33,55 @@ test('tu plan, con un músculo tocado y con la hoja Tu rutina abierta', async ({
   await sinFallos(page)
 })
 
+test('la ficha del ejercicio, desde la sesión y con el volumen', async ({ page }) => {
+  await page.goto('/entreno/ejercicio/peso_muerto_rumano?sesion=b1&ej=0')
+  await expect(page.getByRole('button', { name: 'Empezar ejercicio' })).toBeVisible()
+  await sinFallos(page)
+  await page.getByRole('region', { name: 'Progreso del ejercicio' }).getByText('Volumen').click()
+  await sinFallos(page)
+})
+
+test('«Consejos de hoy» (C10), con uno marcado y un consejo aplicado', async ({ page }) => {
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: /consejos para esta sesión/ }).click()
+  const hoja = page.getByRole('dialog', { name: 'Consejos de hoy' })
+  await sinFallos(page)
+  await hoja.getByRole('button', { name: /^Decide qué tarea/ }).click()
+  await hoja.getByRole('button', { name: 'Invertir hoy' }).click()
+  await sinFallos(page)
+})
+
+test('la ficha del músculo, en Resumen (con el rango a mano abierto) y en Consejos', async ({ page }) => {
+  await page.goto('/entreno/ejercicio/peso_muerto_rumano')
+  await page
+    .getByRole('region', { name: 'Músculos que trabaja' })
+    .getByRole('button', { name: 'Femoral' })
+    .click()
+  const hoja = page.getByRole('dialog', { name: 'Femoral' })
+  await hoja.getByText('Ajustar a mano').click()
+  await sinFallos(page)
+  await hoja.getByText('Consejos', { exact: true }).click()
+  await hoja.getByText('Ver 5 consejos más').click()
+  await sinFallos(page)
+})
+
+test('«Elegir ejercicio» en la sesión (C19)', async ({ page }) => {
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: 'Añadir ejercicio' }).click()
+  await expect(page.getByRole('dialog', { name: 'Elegir ejercicio' })).toBeVisible()
+  await sinFallos(page)
+})
+
+test('la biblioteca de ejercicios, con un músculo elegido', async ({ page }) => {
+  // Dos pasadas de axe sobre los 141 ejercicios: con todas las pruebas a la vez pasa de los 30 s
+  test.slow()
+  await page.goto('/entreno?hoja=biblioteca')
+  const hoja = page.getByRole('dialog', { name: 'Biblioteca de ejercicios' })
+  await sinFallos(page)
+  await hoja.getByRole('button', { name: 'Dorsal' }).click()
+  await sinFallos(page)
+})
+
 test('ver sesión, con un ejercicio desplegado', async ({ page }) => {
   await page.goto('/entreno/rutina/b1')
   await page.getByRole('button', { name: /Peso muerto rumano/ }).click()
@@ -41,6 +90,40 @@ test('ver sesión, con un ejercicio desplegado', async ({ page }) => {
   // La cabecera naranja (texto oscuro) también
   await page.goto('/entreno/rutina/a2')
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await sinFallos(page)
+})
+
+test('sesión en curso, con una serie y un calentamiento hechos', async ({ page }) => {
+  await page.goto('/entreno/sesion/b1')
+  await page
+    .getByRole('button', { name: /^Calentamiento:/ })
+    .first()
+    .click()
+  await page.getByRole('button', { name: 'Serie 1 hecha' }).click()
+  await sinFallos(page)
+  // Con el teclado abierto y el descanso encima
+  await page.getByLabel('Kilos de la serie 2').click()
+  await expect(page.getByRole('group', { name: 'Teclado numérico' })).toBeVisible()
+  await sinFallos(page)
+})
+
+test('hojas de la sesión: esta sesión y descanso', async ({ page }) => {
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: /^Esta sesión/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Esta sesión' })).toBeVisible()
+  await sinFallos(page)
+  await page.getByRole('button', { name: 'Cerrar' }).click()
+  await page.getByRole('button', { name: /Descanso 2:45, cambiar/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Descanso' })).toBeVisible()
+  await sinFallos(page)
+})
+
+test('tarjeta final de la sesión', async ({ page }) => {
+  await page.goto('/entreno/sesion/b1')
+  for (const n of [1, 2, 3]) await page.getByRole('button', { name: `Serie ${n} hecha` }).click()
+  await page.getByRole('button', { name: 'Terminar' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Terminar' }).click()
+  await expect(page.getByText(/días de racha/)).toBeVisible()
   await sinFallos(page)
 })
 

@@ -4,7 +4,7 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
 
 | Carpeta     | Qué es                                                                                               | Puede usar        |
 | ----------- | ---------------------------------------------------------------------------------------------------- | ----------------- |
-| `ui/`       | `tokens.css`, `base.css` y componentes (Button, Choice, Sheet, ListRow, Tiles…)                      | `ui`, `lib`       |
+| `ui/`       | `tokens.css`, `base.css` y componentes (Button, Choice, Sheet, Toast, ListRow, Tiles…)               | `ui`, `lib`       |
 | `data/`     | IndexedDB: `db.ts`, `schema.ts` (almacenes), `migrations/`, copia de seguridad, programas locales    | `data`, `lib`     |
 | `content/`  | JSON versionado: programas de MUTA, consejos, `program-info.json`                                    | `content`, `lib`  |
 | `platform/` | Vibración, avisos, wake lock, archivos (versión web)                                                 | `platform`, `lib` |
@@ -17,4 +17,8 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
 - **data**: el esquema lleva versión; cada cambio de formato es una migración numerada con su prueba y una copia previa.
   Los registros llevan `id`, `createdAt`, `updatedAt`, `deletedAt`. Lo que cambia el usuario va aparte del contenido.
 - **content**: archivos JSON que no se editan a mano sin revisar su prueba. Los programas de terceros **no** van aquí: van en `private/`.
+- `exercises.json` es la biblioteca (141 ejercicios): sale del prototipo anterior con `node scripts/exercises-from-prototype.cjs`; no se
+  edita a mano, se vuelve a generar. Los 4 de cuello no traen fuente: el prototipo los da como criterio orientativo.
+- `tips/pre.json` (los 9 de antes de empezar), `tips/muscles.json` (la clave, los 137 consejos y el reparto de cada músculo) y `tips/session.json` (textos de las reglas de la sesión, por id) salen del prototipo con
+  `node scripts/tips-from-prototype.cjs`; tampoco se editan a mano.
 - `programs.ts` guarda los programas locales (`private/programs/*.json`, rev en `_meta.json`: subirla al cambiar un archivo).

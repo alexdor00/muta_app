@@ -14,6 +14,13 @@ export function useSheet(name: string) {
     route(`${path}?${params}`)
   }
 
+  /** Abre esta hoja en lugar de la que está abierta: atrás vuelve a la pantalla, no a la otra hoja. */
+  function showInstead() {
+    const params = new URLSearchParams(query)
+    params.set('hoja', name)
+    route(`${path}?${params}`, true)
+  }
+
   function close() {
     if (!open) return
     // Si la hoja se abrió desde la app, volver atrás la cierra. Si se entró con el enlace
@@ -22,5 +29,5 @@ export function useSheet(name: string) {
     else route(path, true)
   }
 
-  return { open, show, close }
+  return { open, show, showInstead, close }
 }

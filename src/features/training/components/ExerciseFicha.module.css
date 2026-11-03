@@ -1,0 +1,192 @@
+/* Tarjetas de la ficha del ejercicio: grises, redondeadas, una debajo de otra. */
+
+.card {
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.name {
+  font: var(--text-title-1);
+}
+
+.chips,
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: grid;
+  place-items: center;
+  min-height: var(--control-sm);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+/* Los de la tarjeta de músculos se tocan (abren su ficha): zona de toque de 44 */
+.lists .chip {
+  min-height: var(--tap-min);
+  cursor: pointer;
+}
+
+.soft {
+  background: var(--bg);
+  font-weight: var(--weight-regular);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  font: var(--text-subhead);
+}
+
+.pill svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  color: var(--label);
+}
+
+.icon svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.rowText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.title {
+  font: var(--text-headline);
+}
+
+.text {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.suggestion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-headline);
+}
+
+.tag {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--label);
+  color: var(--bg);
+  font: var(--text-caption);
+  line-height: var(--control-sm);
+}
+
+.muscles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  padding-right: var(--space-4);
+  border-right: var(--hairline) solid var(--separator);
+}
+
+.lists {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.lists .chips + .title {
+  margin-top: var(--space-2);
+}
+
+.rest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.restTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--text-headline);
+}
+
+.restTitle svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.restControls {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.restButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control);
+  border: var(--hairline) solid var(--separator);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-headline);
+  cursor: pointer;
+}
+
+.restValue {
+  font: var(--text-set-value);
+}
+
+.restButton svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}

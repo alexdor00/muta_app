@@ -1,0 +1,336 @@
+// DATOS DE PRUEBA (ver datos.ts): la sesión en curso vive solo en memoria. Sobrevive a salir de la pantalla y volver,
+// no a recargar la app. Cuando haya datos reales se guarda en IndexedDB con su caso de uso.
+import { signal } from '@preact/signals'
+import { formatDecimal, parseDecimal } from '../../../../shared/lib/format.ts'
+import { planCalentamiento } from '../../domain/warmup.ts'
+import { compararConAntes, descansoTras, revisarNumeros, type SerieHecha } from '../../domain/workoutSet.ts'
+import { resumenSesion } from '../../domain/workoutSummary.ts'
+import { anteriores, type EjercicioMuestra, type SesionMuestra } from './datos.ts'
+import { kilosDeHoy, sugerenciaDe } from './ejercicios.ts'
+
+/** Lo escrito en una serie: kilos, repeticiones y las que quedaban, tal cual se teclean («62,5»). */
+export type SerieEnCurso = { kg: string; reps: string; quedan: string; hecha: boolean }
+
+export type EjercicioEnCurso = {
+  series: SerieEnCurso[]
+  calentamiento: boolean[]
+  /** Nota de técnica («Agujero 11, agarre neutro»). */
+  nota: string
+  /** Si hoy se hace otro en su lugar (solo esta sesión; el plan no cambia). */
+  cambiadoPor: string | null
+}
+
+export type SesionEnCurso = {
+  sigla: string
+  /** Cuándo empezó (ms), para el tiempo de arriba. */
+  inicio: number
+  /** Tiempo en pausa: desde cuándo (null si corre) y cuánto se ha parado ya. */
+  pausadaEn: number | null
+  pausaMs: number
+  /** Cuándo se terminó (null mientras sigue). */
+  terminada: number | null
+  /** Lo apuntado de cada ejercicio: los del plan y, detrás, los añadidos hoy (en el mismo orden). */
+  ejercicios: EjercicioEnCurso[]
+  /** Ejercicios añadidos hoy desde la biblioteca (C19); el plan no cambia. */
+  anadidos: EjercicioMuestra[]
+  /** El orden de hoy: posiciones en `ejercicios`, de primero a último (se cambia solo hoy: ordenHoy.ts). */
+  orden: number[]
+  /** «Consejos de hoy» (C10): lo marcado de «Antes de la primera serie», si ya se vio el aviso y los consejos aplicados. */
+  marcados: boolean[]
+  consejosVistos: boolean
+  aplicados: string[]
+}
+
+type Campo = keyof Omit<SerieEnCurso, 'hecha'>
+
+export const sesionEnCurso = signal<SesionEnCurso | null>(null)
+
+/** Guarda cómo va la sesión (cada serie apuntada, cada cambio). */
+export function guardarSesion(sesion: SesionEnCurso | null): void {
+  sesionEnCurso.value = sesion
+}
+
+export const SERIE_VACIA: SerieEnCurso = { kg: '', reps: '', quedan: '', hecha: false }
+
+/** Los ejercicios de hoy: los de la sesión del plan y los añadidos. */
+export const ejerciciosDe = (sesion: SesionMuestra, en: SesionEnCurso): EjercicioMuestra[] => [
+  ...sesion.ejercicios,
+  ...en.anadidos,
+]
+
+/** Añade un ejercicio al final, solo para hoy: sus series vacías y, sin vez anterior, sin calentamiento. */
+export function anadirEjercicio(en: SesionEnCurso, e: EjercicioMuestra): SesionEnCurso {
+  return {
+    ...en,
+    anadidos: [...en.anadidos, e],
+    orden: [...en.orden, en.ejercicios.length],
+    ejercicios: [
+      ...en.ejercicios,
+      {
+        series: Array.from({ length: e.series }, () => ({ ...SERIE_VACIA })),
+        calentamiento: [],
+        nota: '',
+        cambiadoPor: null,
+      },
+    ],
+  }
+}
+
+/** El calentamiento de cada ejercicio, calculado con el peso de hoy de su primera serie (el que propone el motor). */
+export function calentamientos(ejercicios: readonly EjercicioMuestra[]) {
+  return planCalentamiento(
+    ejercicios.map((e) => ({
+      musculo: e.musculo,
+      secundarios: e.secundarios,
+      compuesto: e.compuesto,
+      pesoCorporal: e.pesoCorporal ?? false,
+      kilos: kilosDeHoy(e),
+      salto: e.salto,
+    })),
+  )
+}
+
+/** Al empezar: tantas series vacías como pide cada ejercicio y nada calentado. */
+export function nuevaSesion(sesion: SesionMuestra, inicio: number): SesionEnCurso {
+  const plan = calentamientos(sesion.ejercicios)
+  return {
+    sigla: sesion.sigla,
+    inicio,
+    pausadaEn: null,
+    pausaMs: 0,
+    terminada: null,
+    anadidos: [],
+    orden: sesion.ejercicios.map((_, i) => i),
+    marcados: [],
+    consejosVistos: false,
+    aplicados: [],
+    ejercicios: sesion.ejercicios.map((e, i) => ({
+      series: Array.from({ length: e.series }, () => ({ ...SERIE_VACIA })),
+      calentamiento: (plan[i] ?? []).map(() => false),
+      nota: '',
+      cambiadoPor: null,
+    })),
+  }
+}
+
+/** Segundos que lleva la sesión, sin contar las pausas. */
+export function segundosSesion(en: SesionEnCurso, ahora: number): number {
+  const fin = en.terminada ?? en.pausadaEn ?? ahora
+  return Math.max(0, (fin - en.inicio - en.pausaMs) / 1000)
+}
+
+/** Para o vuelve a poner en marcha el tiempo de la sesión. */
+export function alternarPausa(en: SesionEnCurso, ahora: number): SesionEnCurso {
+  return en.pausadaEn === null
+    ? { ...en, pausadaEn: ahora }
+    : { ...en, pausadaEn: null, pausaMs: en.pausaMs + (ahora - en.pausadaEn) }
+}
+
+// El ejercicio que hay que abrir al volver a la sesión («Empezar ejercicio» en su ficha)
+let pedido: number | null = null
+
+export function pedirEjercicio(indice: number): void {
+  pedido = indice
+}
+
+/** El ejercicio pedido desde su ficha (una sola vez: luego se olvida), o null. */
+export function tomarPedido(): number | null {
+  const i = pedido
+  pedido = null
+  return i
+}
+
+/** Descanso elegido para cada ejercicio (C18): vale en todas las sesiones y semanas siguientes (por nombre del ejercicio). */
+export const descansosElegidos = signal<Record<string, number>>({})
+
+export function elegirDescanso(nombre: string, segundos: number): void {
+  descansosElegidos.value = { ...descansosElegidos.value, [nombre]: segundos }
+}
+
+/** El descanso entre series de un ejercicio: el elegido o, si no, el del plan. */
+export const descansoDe = (e: EjercicioMuestra) => descansosElegidos.value[e.nombre] ?? e.descanso
+
+/** Vuelve a contar el tiempo desde ahora (si la sesión se empezó sin querer). */
+export function contarDesdeAhora(en: SesionEnCurso, ahora: number): SesionEnCurso {
+  return { ...en, inicio: ahora, pausaMs: 0, pausadaEn: null }
+}
+
+/** El nombre de lo que se hace hoy (el del plan o el que lo sustituye). */
+export const nombreHoy = (e: EjercicioMuestra, x: EjercicioEnCurso) => x.cambiadoPor ?? e.nombre
+
+/** Lo de la vez anterior: nada si hoy se cambió el ejercicio. */
+const antesDe = (e: EjercicioMuestra, x: EjercicioEnCurso): SerieHecha[] =>
+  x.cambiadoPor ? [] : anteriores(e)
+
+/** Hoy se hace otro ejercicio en su lugar: series vacías, sin calentamiento ni vez anterior. */
+export function cambiarEjercicio(en: SesionEnCurso, ej: number, nombre: string): SesionEnCurso {
+  return {
+    ...en,
+    ejercicios: en.ejercicios.map((x, i) =>
+      i === ej
+        ? { ...x, cambiadoPor: nombre, calentamiento: [], series: x.series.map(() => ({ ...SERIE_VACIA })) }
+        : x,
+    ),
+  }
+}
+
+/** Lo que se ve en gris en cada casilla vacía: kilos y reps de la vez anterior y las que deben quedar. */
+export function grises(e: EjercicioMuestra, x: EjercicioEnCurso, j: number): Record<Campo, string> {
+  const antes = antesDe(e, x)[j]
+  const previa: string = j > 0 ? x.series[j - 1].kg || grises(e, x, j - 1).kg : ''
+  return {
+    kg: antes?.kg != null ? formatDecimal(antes.kg) : previa,
+    reps: antes ? String(antes.reps) : e.reps,
+    quedan: String(e.rir),
+  }
+}
+
+/** La serie como números (lo escrito o, si está vacía, lo gris). */
+function numeros(e: EjercicioMuestra, x: EjercicioEnCurso, j: number): SerieHecha {
+  const g = grises(e, x, j)
+  const s = x.series[j]
+  return { kg: parseDecimal(s.kg || g.kg), reps: parseDecimal(s.reps || g.reps) ?? 0 }
+}
+
+export const terminado = (x: EjercicioEnCurso) => x.series.every((s) => s.hecha)
+
+/** La serie está hecha y mejora la misma serie de la vez anterior. */
+export const esRecord = (e: EjercicioMuestra, x: EjercicioEnCurso, j: number) =>
+  x.series[j].hecha && compararConAntes(numeros(e, x, j), antesDe(e, x)[j] ?? null) === 1
+
+/** Cada serie del ejercicio abierto con lo gris de sus casillas y si es récord. */
+export function seriesVistas(e: EjercicioMuestra, x: EjercicioEnCurso) {
+  return x.series.map((s, j) => {
+    const g = grises(e, x, j)
+    return { ...s, kgGris: g.kg, repsGris: g.reps, quedanGris: g.quedan, record: esRecord(e, x, j) }
+  })
+}
+
+/**
+ * Un ejercicio cerrado: pendiente, «Hoy 24 kg · antes 22 kg × 12»; terminado, lo hecho con ★ en las series récord, y
+ * si alguna lo fue.
+ */
+export function filaCerrada(e: EjercicioMuestra, x: EjercicioEnCurso) {
+  if (!terminado(x)) {
+    const [kg, reps] = (e.ultima[0] ?? '').split(' × ')
+    const hoy = sugerenciaDe(e)
+    const texto = hoy.kg != null ? `${formatDecimal(hoy.kg)} kg` : `${hoy.reps} reps`
+    return {
+      estado: 'pendiente' as const,
+      resumen: x.cambiadoPor
+        ? 'Cambiado solo para hoy'
+        : e.ultima.length
+          ? `Hoy ${texto} · antes ${kg} kg × ${reps}`
+          : `Primera vez: ${e.reps} reps`,
+    }
+  }
+  const records = x.series.map((_, j) => esRecord(e, x, j))
+  return {
+    estado: records.some(Boolean) ? ('record' as const) : ('hecho' as const),
+    resumen: x.series.map((s, j) => `${records[j] ? '★ ' : ''}${s.kg} kg × ${s.reps}`).join(' · '),
+  }
+}
+
+/** Los números de una serie para enseñarlos al confirmar («320 kg × 10»). */
+export function textoSerie(e: EjercicioMuestra, x: EjercicioEnCurso, j: number): string {
+  const n = numeros(e, x, j)
+  return `${formatDecimal(n.kg ?? 0)} kg × ${n.reps}`
+}
+
+export type Apunte =
+  | { tipo: 'faltanReps' | 'imposible' | 'alto' }
+  | {
+      tipo: 'hecha'
+      sesion: SesionEnCurso
+      /** 1 mejor que la vez anterior, 0 igual, −1 peor, null sin vez anterior. */
+      comparacion: -1 | 0 | 1 | null
+      /** Segundos de descanso; null tras la última serie de la sesión. */
+      descanso: number | null
+      bajada: { de: number; a: number } | null
+      ejercicioTerminado: boolean
+    }
+
+/**
+ * Apunta una serie con lo escrito o, si está vacía, con lo gris (un toque basta). Si los números no valen, lo dice
+ * sin apuntar. La serie siguiente sin tocar hereda los kilos si cambiaste el peso.
+ */
+export function apuntarSerie(
+  sesion: SesionMuestra,
+  en: SesionEnCurso,
+  ej: number,
+  j: number,
+  confirmado: boolean,
+): Apunte {
+  const e = ejerciciosDe(sesion, en)[ej]
+  const x = en.ejercicios[ej]
+  const g = grises(e, x, j)
+  const { kg, reps } = numeros(e, x, j)
+  if (!(reps > 0)) return { tipo: 'faltanReps' }
+  const revision = revisarNumeros(kg, reps)
+  if (revision === 'imposible') return { tipo: 'imposible' }
+  if (revision === 'alto' && !confirmado) return { tipo: 'alto' }
+
+  const kgTexto = x.series[j].kg || g.kg
+  const cambioPeso = x.series[j].kg !== '' && x.series[j].kg !== g.kg
+  const nuevas = x.series.map((s, k) => {
+    if (k === j) return { kg: kgTexto, reps: String(reps), quedan: s.quedan || g.quedan, hecha: true }
+    if (k === j + 1 && cambioPeso && !s.hecha && !s.kg) return { ...s, kg: kgTexto }
+    return s
+  })
+  const ejercicios = en.ejercicios.map((y, i) => (i === ej ? { ...y, series: nuevas } : y))
+  const previas = x.series
+    .slice(0, j)
+    .filter((s) => s.hecha)
+    .map((s) => ({ kg: parseDecimal(s.kg), reps: parseDecimal(s.reps) ?? 0 }))
+  const d = descansoTras(descansoDe(e), previas, { kg, reps })
+  const fin = ejercicios.every(terminado)
+  return {
+    tipo: 'hecha',
+    sesion: { ...en, ejercicios },
+    comparacion: compararConAntes({ kg, reps }, antesDe(e, x)[j] ?? null),
+    descanso: fin ? null : d.segundos,
+    bajada: fin ? null : d.bajada,
+    ejercicioTerminado: nuevas.every((s) => s.hecha),
+  }
+}
+
+/** Series sin marcar y hechas, para avisar al terminar (C23). */
+export function cuentaSeries(en: SesionEnCurso) {
+  const todas = en.ejercicios.flatMap((x) => x.series)
+  const hechas = todas.filter((s) => s.hecha).length
+  return { hechas, total: todas.length, pendientes: todas.length - hechas }
+}
+
+/** Lo que se pregunta al terminar (C23): con menos de la mitad hecha, o con series sin marcar; null si está todo. */
+export function avisoAlTerminar(en: SesionEnCurso): { titulo: string; texto: string } | null {
+  const { hechas, total, pendientes } = cuentaSeries(en)
+  if (hechas / total < 0.5) {
+    return {
+      titulo: '¿Terminar con tan poco?',
+      texto: `Solo has hecho ${hechas} de ${total} series. Si terminas, se guarda lo hecho.`,
+    }
+  }
+  if (pendientes) {
+    return {
+      titulo: '¿Terminar ya?',
+      texto: `Te quedan ${pendientes} series sin marcar. Se guarda solo lo hecho.`,
+    }
+  }
+  return null
+}
+
+/** El resumen de la sesión terminada (C24): cifras y cada ejercicio frente a la vez anterior. */
+export function resumenDe(sesion: SesionMuestra, en: SesionEnCurso) {
+  return resumenSesion(
+    ejerciciosDe(sesion, en).map((e, i) => {
+      const x = en.ejercicios[i]
+      return {
+        nombre: nombreHoy(e, x),
+        hechas: x.series
+          .filter((s) => s.hecha)
+          .map((s) => ({ kg: parseDecimal(s.kg), reps: parseDecimal(s.reps) ?? 0 })),
+        antes: antesDe(e, x),
+      }
+    }),
+  )
+}

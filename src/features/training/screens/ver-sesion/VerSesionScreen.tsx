@@ -6,14 +6,16 @@ import { PlayIcon } from '../../../../shared/ui/icons.tsx'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { ExerciseList } from '../../components/ExerciseList.tsx'
 import { SessionHero } from '../../components/SessionHero.tsx'
-import { SessionProgress, type Metrica } from '../../components/SessionProgress.tsx'
+import { METRICAS_SESION, SessionProgress, type Metrica } from '../../components/SessionProgress.tsx'
+import { SessionTipsCard } from '../../components/SessionTips.tsx'
 import { detalleSesion, progresoMuestra, sesionMuestra, tonoDe } from '../../state/muestra/datos.ts'
 import { effortLabel } from '../../state/routines.ts'
+import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
 import styles from './VerSesionScreen.module.css'
 
 /**
- * Ver sesión (al tocar una tarjeta de Tu plan): cabecera con el color de la sesión, su progreso, sus ejercicios y
- * «Empezar» fijo abajo. Datos de prueba (state/muestra/).
+ * Ver sesión (al tocar una tarjeta de Tu plan): cabecera con el color de la sesión, su progreso, los consejos para esta
+ * sesión (si hay), sus ejercicios y «Empezar» fijo abajo. Datos de prueba (state/muestra/).
  */
 export function VerSesionScreen(props: { sessionId: string }) {
   const [metrica, setMetrica] = useState<Metrica>('ton')
@@ -52,6 +54,9 @@ export function VerSesionScreen(props: { sessionId: string }) {
       />
       <div class={styles.panel}>
         <SessionProgress
+          metricas={METRICAS_SESION}
+          etiqueta="Progreso de la sesión"
+          vacio="Aún no has hecho esta sesión."
           valor={ultimo ? texto(ultimo.valor) : null}
           cambio={
             pct === null
@@ -65,10 +70,13 @@ export function VerSesionScreen(props: { sessionId: string }) {
           metrica={metrica}
           onMetrica={setMetrica}
         />
+        <SessionTipsCard
+          consejos={consejosDeSesion(sesion.ejercicios).map((t) => ({ text: t.text, why: t.why }))}
+        />
         <ExerciseList ejercicios={ejercicios} abierto={abierto} onAbrir={setAbierto} />
       </div>
       <div class={styles.footer}>
-        <Button href={paths.sessionStart(sesion.sigla.toLowerCase())}>
+        <Button href={paths.session(sesion.sigla.toLowerCase())}>
           <span class={styles.startLabel}>
             <PlayIcon />
             Empezar {sesion.sigla}

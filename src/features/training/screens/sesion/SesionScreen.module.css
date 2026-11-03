@@ -1,0 +1,84 @@
+/* Sesión en curso (C01): la barra arriba y la lista de ejercicios; al final, añadir ejercicio y descartar. */
+
+.page {
+  min-height: 100dvh;
+  /* Sitio para el descanso, que va fijo abajo */
+  padding-bottom: calc(var(--control-lg) * 2 + var(--safe-bottom));
+  background: var(--bg);
+}
+
+/* Con el teclado abierto, espacio abajo para poder subir la serie que se escribe por encima de él */
+.withKeypad {
+  padding-bottom: calc(var(--control) * 7 + var(--space-10));
+}
+
+.confirmText {
+  font: var(--text-body);
+  color: var(--label-2);
+}
+
+.confirmActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.hidden {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--gutter);
+}
+
+.addExercise {
+  display: flex;
+  align-self: center;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--control-sm);
+  margin-top: var(--gap-block);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.addExercise svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.discard {
+  align-self: center;
+  min-height: var(--tap-min);
+  margin-top: var(--space-4);
+  padding: 0 var(--space-4);
+  border: 0;
+  background: none;
+  color: var(--critical-label);
+  font: var(--text-headline);
+  cursor: pointer;
+}
+
+/* Se ve pequeño, pero la zona de toque sigue siendo de 44 */
+.addExercise {
+  position: relative;
+}
+
+.addExercise::after {
+  position: absolute;
+  inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;
+  content: '';
+}

@@ -1,0 +1,307 @@
+/* Ficha del músculo: barra del rango en una tarjeta gris, pestañas, los tres objetivos y las listas. */
+
+.siblings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.chip {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.chip.on {
+  background: var(--label);
+  color: var(--bg);
+}
+
+/* La barra */
+.meter {
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.value b {
+  font: var(--text-session-hero);
+}
+
+.value span {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.track {
+  position: relative;
+  height: var(--space-2);
+  margin-top: var(--space-5);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--radius-pill);
+  background: var(--label);
+}
+
+/* Tu plan: punto naranja con borde blanco, centrado en su valor */
+.dot {
+  position: absolute;
+  top: 50%;
+  width: var(--icon);
+  height: var(--icon);
+  border: var(--space-1) solid var(--bg);
+  border-radius: var(--radius-pill);
+  background: var(--range-dot);
+  transform: translate(-50%, -50%);
+}
+
+.ticks {
+  position: relative;
+  height: var(--space-5);
+  margin-top: var(--space-2);
+  font: var(--text-chart-axis);
+  color: var(--label-2);
+}
+
+.ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.verdict {
+  margin-top: var(--space-2);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.tabs {
+  display: flex;
+  margin-top: var(--space-5);
+}
+
+/* Mantener · Desarrollar · Prioridad */
+.modes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--row);
+  padding: var(--space-3) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-subhead);
+  cursor: pointer;
+}
+
+.mode b {
+  font: var(--text-session-label);
+}
+
+.mode.on {
+  background: var(--label);
+  color: var(--bg);
+}
+
+.manual {
+  margin-top: var(--space-3);
+  border: var(--hairline) solid var(--separator);
+  border-radius: var(--radius-control);
+}
+
+.manual summary,
+.fold summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--control);
+  padding: 0 var(--space-4);
+  font: var(--text-subhead);
+  list-style: none;
+  cursor: pointer;
+}
+
+.fold summary {
+  padding: 0;
+  font: var(--text-body);
+  color: var(--label-2);
+}
+
+.manual summary::-webkit-details-marker,
+.fold summary::-webkit-details-marker {
+  display: none;
+}
+
+.manual summary svg,
+.fold summary svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.manual[open] summary svg,
+.fold[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.steppers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+}
+
+.stepper {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.stepper div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+}
+
+.stepper b {
+  font: var(--text-headline);
+  color: var(--label);
+}
+
+.stepper button {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.stepper svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.manual .note {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.note {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.label {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-lg);
+  color: var(--label);
+  text-decoration: none;
+}
+
+.rowName {
+  flex: 1;
+  font: var(--text-body);
+}
+
+.rowName small {
+  margin-left: var(--space-1);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.rowSets {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.row svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+}
+
+.fold {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.fold + .fold,
+.rows + .fold {
+  margin-top: 0;
+}
+
+.foldBody {
+  padding-bottom: var(--space-3);
+}
+
+/* La clave */
+.key {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.key .label {
+  margin-top: 0;
+}
+
+.key p {
+  font: var(--text-headline);
+}

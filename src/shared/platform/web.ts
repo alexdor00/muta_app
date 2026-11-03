@@ -89,6 +89,20 @@ export const webPlatform: Platform = {
     else new Notification(title, { body, tag: 'muta' })
   },
 
+  async share(title, text) {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text })
+        return 'shared'
+      }
+      await navigator.clipboard.writeText(text)
+      return 'copied'
+    } catch {
+      // Cancelado o sin permiso: no pasa nada
+      return 'none'
+    }
+  },
+
   async saveFile(fileName, contents) {
     const url = URL.createObjectURL(contents)
     const link = Object.assign(document.createElement('a'), { href: url, download: fileName })

@@ -10,7 +10,7 @@ test('el carrusel cambia la sesión de «Empezar»', async ({ page }) => {
     .getByRole('group', { name: 'Sesiones de tu rutina' })
     .evaluate((rail) => rail.scrollTo({ left: rail.clientWidth * 3 }))
   await expect(empezar).not.toHaveText('Empezar B1')
-  await expect(empezar).toHaveAttribute('href', /\/entreno\/sesion\/[ab]\d\/inicio$/)
+  await expect(empezar).toHaveAttribute('href', /\/entreno\/sesion\/[ab]\d$/)
 })
 
 test.describe('con ratón (ordenador)', () => {
@@ -38,6 +38,50 @@ test('«···» abre la hoja Tu rutina y se cierra', async ({ page }) => {
   await expect(hoja.getByText('Biblioteca de ejercicios')).toBeVisible()
   await hoja.getByRole('button', { name: 'Cerrar' }).click()
   await expect(hoja).toHaveCount(0)
+})
+
+test('en la hoja Tu rutina, lo que aún no existe dice «Pronto» y «Cambiar de rutina» lleva al catálogo', async ({
+  page,
+}) => {
+  await page.goto('/entreno')
+  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Tu rutina' })
+  await expect(hoja.getByText('Pronto')).toHaveCount(4)
+  await expect(hoja.getByRole('button', { name: /Mis consejos/ })).toHaveCount(0)
+  await hoja.getByRole('link', { name: 'Cambiar de rutina' }).click()
+  await expect(page).toHaveURL(/\/entreno\/rutinas$/)
+  await expect(page.getByRole('heading', { name: 'Elige tu rutina' })).toBeVisible()
+})
+
+test('la biblioteca busca, filtra por músculo y abre la ficha', async ({ page }) => {
+  await page.goto('/entreno')
+  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Biblioteca de ejercicios' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Biblioteca de ejercicios' })
+  await expect(page.getByRole('dialog', { name: 'Tu rutina' })).toHaveCount(0)
+  await expect(hoja.getByRole('link')).toHaveCount(141)
+  await expect(hoja.getByRole('link', { name: /^Press banca Pecho, barra/ })).toBeVisible()
+
+  await hoja.getByRole('searchbox', { name: 'Buscar ejercicio' }).fill('jalon')
+  await expect(hoja.getByRole('link', { name: /^Jalón al pecho/ }).first()).toBeVisible()
+  await expect(hoja.getByRole('link', { name: /^Press banca/ })).toHaveCount(0)
+
+  await hoja.getByRole('searchbox', { name: 'Buscar ejercicio' }).fill('')
+  await hoja.getByRole('button', { name: 'Glúteo' }).click()
+  await expect(hoja.getByRole('button', { name: 'Glúteo' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(hoja.getByRole('link', { name: /^Press banca/ })).toHaveCount(0)
+  await hoja.getByRole('searchbox', { name: 'Buscar ejercicio' }).fill('xyz')
+  await expect(hoja.getByText('Sin resultados.')).toBeVisible()
+
+  await hoja.getByRole('searchbox', { name: 'Buscar ejercicio' }).fill('')
+  await hoja.getByRole('link').first().click()
+  await expect(page).toHaveURL(/\/entreno\/ejercicio\//)
+  // Atrás vuelve a la biblioteca, y otra vez atrás a Tu plan (no a la hoja Tu rutina)
+  await page.goBack()
+  await expect(page.getByRole('dialog', { name: 'Biblioteca de ejercicios' })).toBeVisible()
+  await page.goBack()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page).toHaveURL(/\/entreno$/)
 })
 
 test('tocar un músculo enseña sus series y tocar fuera las quita', async ({ page }) => {

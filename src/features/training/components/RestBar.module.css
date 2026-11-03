@@ -1,0 +1,57 @@
+/* Descanso entre series: barra negra baja y alargada, fija abajo (C03); al acabar cambia el rótulo (C04). */
+
+.bar {
+  position: fixed;
+  bottom: calc(var(--space-4) + var(--safe-bottom));
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: calc(100% - var(--gutter) * 2);
+  max-width: calc(var(--app-max-width) - var(--gutter) * 2);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5);
+  border-radius: var(--radius-pill);
+  background: var(--rest-bg);
+  color: var(--rest-fg);
+  transform: translateX(-50%);
+}
+
+.text {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.label {
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+  color: var(--streak);
+  text-transform: uppercase;
+}
+
+.time {
+  font: var(--text-set-value);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Se ve pequeño, pero la zona de toque sigue siendo de 44 */
+.skip {
+  position: relative;
+  height: var(--control-sm);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--rest-fg);
+  color: var(--rest-bg);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.skip::after {
+  position: absolute;
+  inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;
+  content: '';
+}

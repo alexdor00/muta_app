@@ -27,11 +27,13 @@ type Props = {
   porMusculo: Record<string, number>
   /** Nombre de cada músculo, por su id. */
   names: Record<string, string>
+  /** «Ver ficha» en la burbuja: abre la del músculo tocado (en hombros, el primero trabajado). */
+  onFicha: (musculo: string) => void
 }
 
 /**
  * Tarjeta «Músculos» de Tu plan: resumen, periodo, el cuerpo grande y Frente/Espalda debajo. Al tocar un músculo
- * sale encima una burbuja con sus series (como en el prototipo anterior); tocar fuera la cierra.
+ * sale encima una burbuja con sus series (como en el prototipo anterior) y «Ver ficha»; tocar fuera la cierra.
  */
 export function MusclesCard({
   periodo,
@@ -44,6 +46,7 @@ export function MusclesCard({
   series,
   porMusculo,
   names,
+  onFicha,
 }: Props) {
   const cuando = periodo === 'hoy' ? 'hoy' : 'esta semana'
   const ids = musculo ? musclesOfPart(musculo) : []
@@ -93,10 +96,17 @@ export function MusclesCard({
         <MuscleFigure side={lado} selected={musculo} onSelect={elegir} series={porMusculo} names={names} />
         <div class={styles.bubbleSpot} aria-live="polite">
           {musculo && (
-            <p class={styles.bubble} style={{ left: `${sitio.left}px`, top: `${sitio.top}px` }}>
+            <div class={styles.bubble} style={{ left: `${sitio.left}px`, top: `${sitio.top}px` }}>
               <strong>{nombre}</strong>
               <span>{detalle}</span>
-            </p>
+              <button
+                type="button"
+                class={styles.bubbleLink}
+                onClick={() => onFicha(trabajados[0] ?? ids[0])}
+              >
+                Ver ficha
+              </button>
+            </div>
           )}
         </div>
       </div>

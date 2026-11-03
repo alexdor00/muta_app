@@ -12,6 +12,8 @@ export interface Platform {
   keepScreenOn(on: boolean): Promise<void>
   /** Aviso del sistema (fin del descanso con la app en segundo plano). */
   notify(title: string, body: string): Promise<void>
+  /** Compartir un texto (hoja del sistema); si no hay, se copia. Dice cuál de las dos pasó. */
+  share(title: string, text: string): Promise<'shared' | 'copied' | 'none'>
   saveFile(fileName: string, contents: Blob): Promise<void>
   pickFile(accept: string): Promise<File | null>
 }

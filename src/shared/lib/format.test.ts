@@ -1,5 +1,38 @@
 import { describe, expect, it } from 'vitest'
-import { formatChange, formatDayDate, formatDecimal, formatShortDate, formatTons } from './format.ts'
+import {
+  formatChange,
+  formatClock,
+  formatDayDate,
+  formatDecimal,
+  formatShortDate,
+  formatTons,
+  parseDecimal,
+  plainText,
+} from './format.ts'
+
+describe('plainText', () => {
+  it('quita tildes y mayúsculas para buscar', () => {
+    expect(plainText('Glúteo')).toBe('gluteo')
+    expect(plainText('Jalón al PECHO')).toBe('jalon al pecho')
+  })
+})
+
+describe('parseDecimal', () => {
+  it('lee la coma decimal; vacío es null', () => {
+    expect(parseDecimal('62,5')).toBe(62.5)
+    expect(parseDecimal(' 8 ')).toBe(8)
+    expect(parseDecimal('')).toBeNull()
+    expect(parseDecimal(',')).toBeNull()
+  })
+})
+
+describe('formatClock', () => {
+  it('minutos y segundos; horas solo si las hay', () => {
+    expect(formatClock(4)).toBe('0:04')
+    expect(formatClock(165)).toBe('2:45')
+    expect(formatClock(3909)).toBe('1:05:09')
+  })
+})
 
 describe('fechas', () => {
   it('día y mes abreviado, sin punto; con el día de la semana delante', () => {
@@ -13,6 +46,7 @@ describe('formatDecimal', () => {
   it('coma decimal', () => {
     expect(formatDecimal(2.5)).toBe('2,5')
     expect(formatDecimal(8)).toBe('8')
+    expect(formatDecimal(1.25)).toBe('1,25')
   })
 })
 

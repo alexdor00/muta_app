@@ -1,0 +1,782 @@
+{
+  "pecho": {
+    "key": "Aducción horizontal (codo hacia la línea media del esternón) con los hombros atrás. El pectoral superior es solo ~20 % del volumen.",
+    "tips": [
+      {
+        "text": "Hombros atrás y caja torácica expandida: el pecho es lo más adelantado del torso. No arquees como un gimnasta.",
+        "why": "Si los hombros se adelantan (anteriorización), el deltoides anterior toma el control y el pectoral se desconecta.",
+        "source": "V3"
+      },
+      {
+        "text": "Que el codo viaje hacia la línea media del esternón, casi perpendicular al cuerpo.",
+        "why": "Esa aducción de hombro, el patrón rey, somete a la mayor parte del pectoral a una tensión brutal.",
+        "source": "V3"
+      },
+      {
+        "text": "No empujes en raíl recto: dibuja un arco en el que tus bíceps acaban apretando los laterales del pecho.",
+        "why": "Si las manos solo van hacia delante, el tríceps se lleva más carga según extiendes y el pectoral pierde estímulo.",
+        "source": "V3"
+      },
+      {
+        "text": "El 80 % del trabajo para aducción horizontal; el pectoral superior (clavicular) es solo ~20 % del volumen.",
+        "why": "Hacer mil inclinados y olvidar la base deja el pecho plano y los hombros pidiendo clemencia.",
+        "source": "V3"
+      },
+      {
+        "text": "Pectoral superior: piensa en flexión oblicua, el brazo en diagonal de fuera adentro y de abajo arriba, no «hacia arriba».",
+        "why": "Es la única forma de que el resto del pectoral no le robe protagonismo.",
+        "source": "V3"
+      },
+      {
+        "text": "Mantén la inclinación real: si arqueas tanto que el esternón mira al techo, el inclinado se vuelve plano.",
+        "why": "Tu caja torácica y la inclinación de tu esternón cambian el ángulo con el que llega la resistencia.",
+        "source": "V3"
+      },
+      {
+        "text": "Alinea los codos con la resistencia: ni por delante ni por detrás de la barra, ni agarre muy cerrado ni muy abierto.",
+        "why": "Perder la alineación mete otros músculos y resta eficiencia, sobre todo en multipower.",
+        "source": "V3"
+      },
+      {
+        "text": "Agarre neutro en las máquinas de press inclinado.",
+        "why": "Facilita la flexión oblicua y deja el hombro en una posición segura.",
+        "source": "V3"
+      },
+      {
+        "text": "Reparte el pecho en 2–3 sesiones: mejor 7 un día y 8 otro que 15 de golpe.",
+        "why": "Cada serie llega fresca y no se pierde en las últimas series basura.",
+        "source": "V3"
+      },
+      {
+        "text": "Si en tu gimnasio solo hay press lineales o multipower, no te obsesiones: entrena con intención.",
+        "why": "Lo peor que puede pasar es que crezca también el tríceps; rara vez es el limitante real.",
+        "source": "V3"
+      },
+      {
+        "text": "Un press y un pec deck hacen crecer igual el pectoral si la intensidad es la misma.",
+        "why": "Para el húmero es el mismo movimiento; cambia solo el codo.",
+        "source": "V1 · V3"
+      }
+    ],
+    "where": "Empuje A: un press inclinado no convergente primero y después un horizontal o declinado de perfil plano o descendente. Empuje B: horizontal primero y después un inclinado específico (convergente, agarre neutro o aperturas inclinadas)."
+  },
+  "dorsal": {
+    "key": "Codo a la cadera, hombros bajos y alineación del cable con las fibras. Combina extensión y aducción de hombro.",
+    "tips": [
+      {
+        "text": "Lleva el codo hacia la cadera: si el codo se acerca a la cadera, el dorsal está trabajando.",
+        "why": "Es lo que hace el dorsal: tirar del brazo hacia el cuerpo. La imagen es la canoa: el remo pegado al torso avanza más.",
+        "source": "V2"
+      },
+      {
+        "text": "Ligera flexión de tronco y retroversión pélvica: mete la cadera y deja el abdomen algo «acortado».",
+        "why": "Te da más fuerza, estabilidad y mejores series cerca del fallo.",
+        "source": "V2"
+      },
+      {
+        "text": "Hombros relativamente bajos para que el trapecio no gane protagonismo.",
+        "why": "Si los hombros suben, el trapecio hace el trabajo que debería hacer el dorsal.",
+        "source": "V2"
+      },
+      {
+        "text": "En unilateral añade flexión lateral del tronco, elevando las costillas del lado que trabaja.",
+        "why": "Más estiramiento y mejor alineación del dorsal.",
+        "source": "V2"
+      },
+      {
+        "text": "En máquina de resistencia variable, al final de la excéntrica «descuelga el hombro» sin mover el torso.",
+        "why": "Estira las fibras más longitudinales y mejora cómo aplicas la fuerza.",
+        "source": "V2"
+      },
+      {
+        "text": "Combina extensión de hombro (región torácica) con aducción y más flexión de hombro (regiones bajas).",
+        "why": "Frank «duplicó» su dorsal sin cambiar el volumen, solo combinando ambos gestos.",
+        "source": "V2"
+      },
+      {
+        "text": "Máquina divergente: hazla unilateral y asómate hacia el lado que trabaja.",
+        "why": "Corriges la divergencia, que a priori no beneficia al dorsal.",
+        "source": "V2"
+      },
+      {
+        "text": "Excéntrica de 2–3 s y concéntrica explosiva pero controlada, sin tirones con el cuerpo.",
+        "why": "El músculo también crece al estirarse bajo carga; la fuerza tiene que nacer de los codos.",
+        "source": "V2"
+      },
+      {
+        "text": "Entre 6–8 y 12–15 repeticiones, cerca del fallo (RIR 1–2).",
+        "why": "Por debajo compensas con otros músculos; por encima te limita el sistema cardiovascular o el agarre.",
+        "source": "V2"
+      },
+      {
+        "text": "Reparto de espalda 40-40-20: dorsal 40 %, trapecio 40 %, erectores 20 % (1–2 series, 1–2 veces/semana).",
+        "why": "Con 16 series semanales serían unas 7 + 7 + 2: equilibra anchura, grosor y base.",
+        "source": "V2"
+      },
+      {
+        "text": "Si te arden los bíceps y no sientes la espalda: straps y revisa dónde pasa el cable respecto al codo.",
+        "why": "Normalmente se fatiga el braquiorradial o la línea de la resistencia pasa mal por el codo.",
+        "source": "V2 · V10"
+      },
+      {
+        "text": "Cuidado con los dos errores de alineación: demasiado cerca de la línea de la resistencia con el codo muy flexionado, o la resistencia por debajo del codo.",
+        "why": "En el primero arden los flexores del codo; en el segundo trabajan de más los extensores.",
+        "source": "V2"
+      }
+    ],
+    "where": "Primer día de tirón: remo con abducción y apoyo, luego jalón o dominada por aducción. Segundo día: dorsal primero con extensión de hombro y un segundo remo con apoyo."
+  },
+  "espalda_alta": {
+    "key": "Para el trapecio hace falta retracción escapular; codos abiertos 30–60° y apoyo frontal.",
+    "tips": [
+      {
+        "text": "En los remos para trapecio mueve las escápulas: sin retracción escapular el trapecio está «de vacaciones».",
+        "why": "A diferencia del dorsal, aquí las escápulas sí tienen que viajar.",
+        "source": "V2"
+      },
+      {
+        "text": "Deja que las escápulas se vayan hacia delante y arriba al estirar, y retrae con potencia al final.",
+        "why": "Estiras el trapecio y completas el recorrido útil.",
+        "source": "V2"
+      },
+      {
+        "text": "Abre los codos entre 30 y 60° del torso.",
+        "why": "Así las regiones del dorsal pierden capacidad de aplicar fuerza y trabaja más el trapecio medio.",
+        "source": "V2"
+      },
+      {
+        "text": "Lleva los codos por detrás de la línea del tronco.",
+        "why": "El dorsal pierde protagonismo y el trabajo recae en el trapecio y el deltoides posterior.",
+        "source": "V2"
+      },
+      {
+        "text": "Empuja el apoyo frontal con el esternón mientras tiras. Puedes redondear algo, pero sin exagerar la excéntrica («no quiero gatos enfadados»).",
+        "why": "Cuando las escápulas ya se han separado del todo, flexionar más el tronco no estira más el trapecio.",
+        "source": "V2"
+      },
+      {
+        "text": "Tip secreto: al fallo en el remo, quédate al final con los codos extendidos y sigue con retracciones escapulares (tipo Kelso).",
+        "why": "Si aún puedes sacar repeticiones, el cuello de botella eran los brazos y no el trapecio.",
+        "source": "V2"
+      },
+      {
+        "text": "Remo en T con agarre amplio y apoyo mejor que remo con barra.",
+        "why": "Sin punto de restricción frontal es fácil trampear; el apoyo te estabiliza y te deja acercarte al fallo.",
+        "source": "V2"
+      },
+      {
+        "text": "Encogimientos: mejor entre poleas bajas con amplitud mayor que el ancho de hombros, dando un paso atrás.",
+        "why": "Te alinea con el gesto de elevar y llevar atrás los hombros.",
+        "source": "V2"
+      },
+      {
+        "text": "Trapecio inferior: hombros bajos y la barbilla lo más separada de clavículas y hombros.",
+        "why": "Evitas que el trapecio superior se lleve el trabajo.",
+        "source": "V2"
+      }
+    ],
+    "where": "Primer día de tirón, con el remo con apoyo al principio; retracciones (Kelso) en la última serie del remo."
+  },
+  "hombro_lat": {
+    "key": "Escápulas ligeramente deprimidas, plano escapular, muñeca neutra y agresividad controlada. Ahí está la anchura.",
+    "tips": [
+      {
+        "text": "Escápulas ligeramente deprimidas, como si un hilo tirase de los hombros hacia el suelo.",
+        "why": "Si los hombros suben hacia las orejas, el trapecio superior toma el control y el lateral se apaga.",
+        "source": "V5"
+      },
+      {
+        "text": "Plano escapular: brazo unos 20–30° por delante, o alineado con el torso.",
+        "why": "Es el ángulo natural de la escápula: más eficiencia y sin tensión en el manguito. El plano frontal puro puede forzar rotación interna.",
+        "source": "V5"
+      },
+      {
+        "text": "Muñeca neutra (imagina un vaso de agua) y no rotes hacia fuera al final para llegar arriba.",
+        "why": "Esa rotación se ayuda del deltoides anterior y apaga el lateral.",
+        "source": "V5"
+      },
+      {
+        "text": "Sal con agresividad controlada, retén un instante arriba y baja con control.",
+        "why": "La aceleración inicial añade demanda al principio del recorrido.",
+        "source": "V5"
+      },
+      {
+        "text": "Si fallas por desventaja mecánica (con mancuernas, a media subida), sigue con parciales en el rango donde aún aplicas fuerza.",
+        "why": "Te acercas al fallo real del deltoides.",
+        "source": "V5"
+      },
+      {
+        "text": "Si te falla el agarre antes que el deltoides: muñequeras o straps. Para progresar, acerca la muñequera al codo.",
+        "why": "Cuanto más cerca del hombro está el punto de la fuerza, menor es el brazo de momento y menos pesa.",
+        "source": "V5"
+      },
+      {
+        "text": "Cable por delante en días de empuje y por detrás en días de tirón.",
+        "why": "Por delante genera abducción con rotación interna y el posterior llega fresco; por detrás va a rotación externa o neutra.",
+        "source": "V5"
+      },
+      {
+        "text": "Elevación lateral en polea alta, con el brazo pasando por detrás del cuerpo: 2–3 series semanales unas semanas.",
+        "why": "Es la única variante con un rango de recorrido realmente distinto (más estiramiento). No hay estudio, pero su equipo la usa años.",
+        "source": "V5"
+      },
+      {
+        "text": "Mancuerna, polea o máquina dan igual: elige lo que mejor controles y donde puedas progresar.",
+        "why": "Los estudios no ven diferencias de hipertrofia entre perfiles de resistencia.",
+        "source": "V5"
+      },
+      {
+        "text": "El lateral genera poca fatiga: cabe en cualquier sesión, incluso en pierna.",
+        "why": "Puedes añadir volumen sin interferir con los grandes ejercicios.",
+        "source": "V5"
+      },
+      {
+        "text": "El remo al mentón no te hace falta y el press militar no es «el» ejercicio del lateral.",
+        "why": "El remo al mentón fuerza rotación interna; el press alinea el deltoides anterior, no el lateral.",
+        "source": "V5"
+      }
+    ],
+    "where": "Al principio de la sesión o en el segundo día de tirón si es prioridad; al final, como mantenimiento, si ya está desarrollado. Puedes alternar el hueco entre los dos días de empuje."
+  },
+  "hombro_ant": {
+    "key": "Ya trabaja en todos los press: 0 series directas salvo que sea prioridad máxima.",
+    "tips": [
+      {
+        "text": "No hacen falta series directas de hombro anterior en casi ningún caso.",
+        "why": "Cualquier press (banca, inclinado, militar, flexiones) ya lo trabaja.",
+        "source": "V5"
+      },
+      {
+        "text": "Las elevaciones frontales solo valen si tu pectoral domina mucho sobre tu hombro o si es tu prioridad absoluta.",
+        "why": "Para el resto es tiempo que rinde más en elevaciones laterales.",
+        "source": "V5"
+      },
+      {
+        "text": "Press militar: antebrazo vertical, muñeca sobre el codo, fuerza desde las piernas y no bajes más allá de barbilla o nariz.",
+        "why": "Así la resistencia no cae sobre el tríceps y no comprometes la rotación interna del hombro.",
+        "source": "V5"
+      },
+      {
+        "text": "Pon el press militar al principio si el hombro es prioridad; si no, al final.",
+        "why": "«No lo pongas el último y luego concluyas que tus hombros no progresan».",
+        "source": "V11"
+      },
+      {
+        "text": "Deja el press Arnold.",
+        "why": "Bajar las mancuernas con esa rotación trabaja de forma isométrica y es más ineficiente que el militar.",
+        "source": "V5"
+      }
+    ],
+    "where": "Al principio solo si es prioridad; si no, al final o no lo hagas."
+  },
+  "hombro_post": {
+    "key": "Remos con codos por detrás del tronco ya lo trabajan; si va rezagado, abducción horizontal con rotación interna.",
+    "tips": [
+      {
+        "text": "Cualquier tracción con el brazo alto que pase del torso (remo, jalón, dominada) ya lo trabaja.",
+        "why": "Si tu espalda está bien colocada, ya recibe estímulo suficiente.",
+        "source": "V5"
+      },
+      {
+        "text": "Si va rezagado: 2–6 series semanales de abducción horizontal (mancuernas, polea o máquina).",
+        "why": "Es el movimiento que lo alinea; Félix lo reconstruyó así semana tras semana.",
+        "source": "V5"
+      },
+      {
+        "text": "Con rotación interna y el brazo por debajo de la línea del hombro.",
+        "why": "Así el trapecio no le roba protagonismo.",
+        "source": "V5"
+      },
+      {
+        "text": "Si el tríceps te limita con el codo extendido, flexiona el codo.",
+        "why": "La resistencia deja de pasar por el tríceps.",
+        "source": "V5"
+      },
+      {
+        "text": "El face pull no es un ejercicio de hipertrofia del deltoides posterior.",
+        "why": "Mete demasiada rotación externa y movimiento escapular, y se pelean rotadores, romboides y trapecio.",
+        "source": "V5"
+      }
+    ],
+    "where": "Un hueco opcional en el primer día de tirón (abducción horizontal)."
+  },
+  "biceps": {
+    "key": "Piensa en funciones: un predicador estable, una variante con el hombro por detrás y un martillo para el braquiorradial.",
+    "tips": [
+      {
+        "text": "Los curls trabajan tres músculos a la vez: bíceps braquial, braquial y braquiorradial.",
+        "why": "Ningún ejercicio apaga uno y enciende otro; cambia cuál queda mejor colocado según agarre, hombro y perfil.",
+        "source": "V8"
+      },
+      {
+        "text": "Predicador: tu base estable y progresable.",
+        "why": "Difícil de falsear, estandariza el recorrido y carga mucho el braquial, con crecimiento sobre todo cerca del codo.",
+        "source": "V8"
+      },
+      {
+        "text": "Martillo (agarre neutro): el mejor para priorizar el braquiorradial.",
+        "why": "Con mancuernas es más duro en la zona media del recorrido, justo donde el braquiorradial aplica bien la fuerza.",
+        "source": "V8"
+      },
+      {
+        "text": "Bayesiano o inclinado: añade una variante con el hombro por detrás del cuerpo.",
+        "why": "El bíceps parte más alargado, sobre todo la cabeza larga; complementa al predicador, no lo sustituye.",
+        "source": "V8"
+      },
+      {
+        "text": "Supino para el bíceps; el braquial trabaja igual con cualquier agarre.",
+        "why": "El bíceps se inserta en el radio y depende de la posición de la mano; el braquial no.",
+        "source": "V8"
+      },
+      {
+        "text": "No saltes a prono total pensando que será mejor.",
+        "why": "Pierdes carga y progresión; si quieres algo más, termina la subida con una ligera pronación.",
+        "source": "V8"
+      },
+      {
+        "text": "Parciales abajo (con el codo extendido) tras el fallo mecánico del predicador.",
+        "why": "Es la zona donde los flexores reciben mucho estímulo y trabaja más el braquial.",
+        "source": "V8"
+      },
+      {
+        "text": "Más estirado no es automáticamente mejor.",
+        "why": "Cuenta también dónde pesa más, cuánto puedes cargar, la estabilidad y el recorrido.",
+        "source": "V8"
+      },
+      {
+        "text": "Bíceps el día de empuje, intercalado entre los press.",
+        "why": "Llega fresco, no interfiere con el pectoral y aprovechas el descanso.",
+        "source": "V8"
+      },
+      {
+        "text": "Entre 8 y 20 repeticiones, cerca del fallo.",
+        "why": "Menos de 8 se vuelve tirón de todo el cuerpo; más de 20 acaba por quemazón, no por fatiga muscular.",
+        "source": "V8"
+      }
+    ],
+    "where": "Día de empuje, intercalado entre los press (también en superserie)."
+  },
+  "triceps": {
+    "key": "Una extensión con el hombro elevado (katana, overhead) y otra con el hombro neutro. El agarre no cambia qué cabeza trabaja.",
+    "tips": [
+      {
+        "text": "Extensión con el hombro elevado: katana en plano escapular, overhead en polea o máquina por encima de la cabeza.",
+        "why": "La cabeza larga nace en la escápula y trabaja más alargada que en un push down; en un estudio de 12 semanas creció más que con el brazo pegado.",
+        "source": "V8"
+      },
+      {
+        "text": "Cuidado con una posición demasiado alargada: no hace falta llegar a 180° ni flexionar muchísimo el codo.",
+        "why": "Con la cabeza larga muy estirada pierde fuerza activa y la medial asume más; sirve para la larga hasta cierto punto y, bien hecha, hizo crecer las tres cabezas.",
+        "source": "V8"
+      },
+      {
+        "text": "Completa con una extensión con hombro neutro (push down o máquina).",
+        "why": "Te deja acumular volumen estable y con buena tolerancia.",
+        "source": "V8"
+      },
+      {
+        "text": "El agarre (cuerda, barra, prono, neutro, supino) no cambia qué cabeza trabaja.",
+        "why": "Las tres cabezas acaban en un tendón común en el olécranon; el agarre cambia comodidad y repeticiones, no la cabeza.",
+        "source": "V8"
+      },
+      {
+        "text": "En polea importa más la dirección del cable que el agarre: que pase cerca del hombro y siga al codo.",
+        "why": "De espaldas a poleas dobles, cruzando por arriba, queda muy alineado con la dirección de extensión.",
+        "source": "V8"
+      },
+      {
+        "text": "El cable sigue al codo en semicírculo: sin máxima demanda al inicio, mucha hacia 90° y sin pelea final contra muñeca u hombro.",
+        "why": "En la posición más alargada hay mucha tensión pasiva pero menos capacidad de fuerza activa.",
+        "source": "V8"
+      },
+      {
+        "text": "Apoyo y restricción: apoya el codo en algo para empujar mejor; en la katana el propio cable actúa como restricción.",
+        "why": "Controlas el hombro y el tríceps es el que limita la serie.",
+        "source": "V8"
+      },
+      {
+        "text": "Press cerrado y JM press: no los uses como primera opción para añadir tríceps.",
+        "why": "Cansan más, coordinan más y dirigen menos que una extensión bien planteada.",
+        "source": "V8"
+      },
+      {
+        "text": "Tríceps el día de tirón, intercalado entre los ejercicios de espalda.",
+        "why": "No viene fatigado de empujar y la cabeza larga no limita remos ni jalones.",
+        "source": "V8"
+      },
+      {
+        "text": "Parciales en la zona media del recorrido (codo aún flexionado), no solo bloqueando arriba.",
+        "why": "La parte final no es la más interesante y se convierte en pelea contra el codo.",
+        "source": "V8"
+      }
+    ],
+    "where": "Día de tirón, intercalado entre ejercicios de espalda."
+  },
+  "antebrazo": {
+    "key": "Completa lo que tu rutina no cubre: flexión de dedos, flexión y extensión de muñeca. Los extensores casi nunca se entrenan solos.",
+    "tips": [
+      {
+        "text": "El antebrazo no es un solo músculo: cuenta por zonas (flexores de dedos, braquiorradial, flexores y extensores de muñeca).",
+        "why": "Diez series de espalda no son diez series de antebrazo; el trabajo indirecto se cuenta zona por zona.",
+        "source": "V10"
+      },
+      {
+        "text": "Flexores de los dedos: curl de dedos con barra (deja rodar la barra y vuelve a cerrar), gripper, paseos con carga o colgarte.",
+        "why": "Son la zona de más volumen y la peor entendida: cerrar la mano no es flexionar la muñeca.",
+        "source": "V10"
+      },
+      {
+        "text": "Extensión de muñeca con el antebrazo apoyado.",
+        "why": "Los extensores rara vez llegan al fallo con el entrenamiento convencional y es de lo menos cubierto por el trabajo indirecto.",
+        "source": "V10"
+      },
+      {
+        "text": "Curl de muñeca con el antebrazo apoyado y decide si dejas rodar la barra o no.",
+        "why": "Apoyar reduce el movimiento de hombro y codo; rodar la barra añade flexión de dedos y cambia el factor limitante.",
+        "source": "V10"
+      },
+      {
+        "text": "Pronación: palanca controlable (martillo, maza, mancuerna asimétrica), con cargas moderadas.",
+        "why": "Un peso pequeño lejos de la mano aumenta muchísimo el esfuerzo; ve con prudencia.",
+        "source": "V10"
+      },
+      {
+        "text": "Si el curl martillo ya está en tu rutina, no lo repitas por pensar en el antebrazo.",
+        "why": "Ese trabajo ya existe: la rutina de antebrazo debe completar lo que falta.",
+        "source": "V10"
+      },
+      {
+        "text": "Si es un complemento, hazlo después de los tirones; si es prioridad, fresco en otro día, y deja 24–48 h antes de una sesión importante de espalda.",
+        "why": "Un agarre fatigado te limita los ejercicios importantes de tirón.",
+        "source": "V10"
+      },
+      {
+        "text": "Entre 8 y 20 repeticiones y 0–3 RIR; en máquina o apoyado puedes llegar al fallo.",
+        "why": "Con 4–5 reps el peso te hace rebotar y con 40–50 aguanta el ardor, no el músculo.",
+        "source": "V10"
+      }
+    ],
+    "where": "Al final de la sesión de espalda si es un complemento; fresco en empuje o pierna si es prioridad; nunca justo antes de un tirón importante."
+  },
+  "cuadriceps": {
+    "key": "Cerca del fallo en un patrón de sentadilla estable, más extensión de rodilla para el recto femoral y aductores entrenados estirados.",
+    "tips": [
+      {
+        "text": "Hack y prensa: empujas contra plataforma y respaldo, así la rodilla es la protagonista y el cuádriceps falla primero.",
+        "why": "La sentadilla con barra da resultados parecidos si hay la misma intensidad; la clave no es el ejercicio, es la intensidad.",
+        "source": "V4"
+      },
+      {
+        "text": "Pies en posición intermedia: más abajo o atrás da más trabajo de rodilla, pero no los pongas atrás del todo.",
+        "why": "Perderías eficiencia para empujar.",
+        "source": "V4"
+      },
+      {
+        "text": "Si te sale dominante de cadera: eleva los talones con discos o usa una hack con respaldo.",
+        "why": "Con poca movilidad de tobillo tiendes a echar el culo atrás; eso es tu biomecánica, no un error.",
+        "source": "V4"
+      },
+      {
+        "text": "Hack pendular o goma en la hack de raíles, con los pies relativamente abajo.",
+        "why": "La pendular pesa más según subes: quita demanda abajo y la suma donde el cuádriceps aplica más fuerza.",
+        "source": "V4"
+      },
+      {
+        "text": "Multipower inclinada: usa la de mayor inclinación.",
+        "why": "Los pies empujan el suelo hacia delante y suben las demandas de extensión de rodilla.",
+        "source": "V4"
+      },
+      {
+        "text": "La sentadilla deja «fuera de juego» al recto femoral: complementa con extensión de rodilla con la cadera quieta.",
+        "why": "Al extender cadera y rodilla a la vez no cambia de longitud y no crece bien.",
+        "source": "V4 · V1"
+      },
+      {
+        "text": "Extensión de rodilla con la cadera menos flexionada (respaldo reclinado, ~40° en vez de 90°).",
+        "why": "El recto femoral se estira más y creció más en el estudio; no arquees la espalda ni despegues la pelvis.",
+        "source": "V4 · V16"
+      },
+      {
+        "text": "Si tu máquina no reclina: sissy squat o nórdico inverso con goma, con un step bajo las rodillas.",
+        "why": "La goma te ayuda donde el recto femoral está tan estirado que no puede aplicar fuerza.",
+        "source": "V4"
+      },
+      {
+        "text": "Monoarticulares: cinturón sobre la pelvis anclado a la máquina, o straps.",
+        "why": "Si la cadera no se mueve, el estímulo es máximo.",
+        "source": "V4"
+      },
+      {
+        "text": "Sentadillas y prensas entre 6 y 12 repeticiones; extensión de rodilla entre 8 y 15.",
+        "why": "Por encima de 15–20 en un patrón de sentadilla fallan antes pulmones y corazón que las piernas.",
+        "source": "V4"
+      },
+      {
+        "text": "Frecuencia 2: no metas todo el cuádriceps en una sesión maratoniana.",
+        "why": "No es lo mismo tu serie 12 agotado que la sexta de un segundo día fresco.",
+        "source": "V4"
+      },
+      {
+        "text": "Prensa tras la sentadilla (por ejemplo 2 + 3 series) si quieres más trabajo en la misma sesión.",
+        "why": "Llevas la cadera más flexionada y apuntas más a glúteo y aductores; cargas menos la espalda.",
+        "source": "V4"
+      }
+    ],
+    "where": "Pierna A: aducción, prensa inclinada profunda y extensión de rodilla. Pierna B: hack (pendular si encaja) primero."
+  },
+  "aductores": {
+    "key": "Entrénalos en su máximo estiramiento y también con aducción pura en máquina, sin adelantar la cadera.",
+    "tips": [
+      {
+        "text": "Sentadillas y prensas profundas también los trabajan: en el fondo el aductor mayor es un extensor de cadera.",
+        "why": "Para aductores «como rocas» hay que entrenarlos en su máximo estiramiento.",
+        "source": "V4"
+      },
+      {
+        "text": "Aducción en máquina: la única forma de tensión constante en el plano exacto de sus fibras, sin fatiga de glúteo ni cuádriceps.",
+        "why": "Su función principal es aducir; no le confíes todo el crecimiento al empuje.",
+        "source": "V4"
+      },
+      {
+        "text": "Mantén la cadera flexionada y no la adelantes.",
+        "why": "Si adelantas la cadera, las fibras inferiores del glúteo pasan a aducir y el ejercicio es menos específico.",
+        "source": "V4"
+      },
+      {
+        "text": "Si te quedas corto de peso, antes de añadir discos externos añade más flexión de cadera e incluso anteversión pélvica.",
+        "why": "Estiras más el aductor y lo colocas en una posición menos eficiente.",
+        "source": "V4"
+      },
+      {
+        "text": "Entre 8–10 y 15 repeticiones, con un cinturón sobre la pelvis para que no se mueva.",
+        "why": "Con cargas altas la cadera se adelanta sola.",
+        "source": "V4"
+      }
+    ],
+    "where": "Primer ejercicio del primer día de pierna, de 2 series a RIR 0 o fallo."
+  },
+  "femoral": {
+    "key": "Curl sentado si solo haces uno; bisagra con la cadera hacia atrás y variantes con la cadera más extendida en otra sesión.",
+    "tips": [
+      {
+        "text": "Si solo pudieras hacer un curl femoral, elige el sentado.",
+        "why": "Con la cadera flexionada los isquios parten más estirados, y entrenar en longitudes largas es de lo más potente para su hipertrofia.",
+        "source": "V6"
+      },
+      {
+        "text": "Cadera pegada al banco, sin levantar el glúteo, sin rebotar y excéntrica controlada.",
+        "why": "Si levantas el glúteo para cerrar repeticiones tu cuerpo escapa de la posición donde los isquios ya no pueden.",
+        "source": "V6"
+      },
+      {
+        "text": "Añade en otra sesión un curl con la cadera más extendida (tumbado o de pie).",
+        "why": "Cambia el estímulo y completa el trabajo.",
+        "source": "V6"
+      },
+      {
+        "text": "Rumano: manda la cadera hacia una pared imaginaria detrás de ti y para cuando la columna o la pelvis no aguanten.",
+        "why": "Cuando dejas de mandar la cadera atrás solo añades flexión de columna, no glúteo ni isquios.",
+        "source": "V6"
+      },
+      {
+        "text": "Rumano con rodillas algo flexionadas; piernas rígidas con menos flexión y más profundidad.",
+        "why": "Rígidas mantienen los isquios más estirados también por la rodilla y les dan algo más de estímulo.",
+        "source": "V6"
+      },
+      {
+        "text": "Baja de forma continua frenando poco a poco al llegar a la máxima flexión de cadera, en 2–3 s.",
+        "why": "Evitas que la barra se precipite y obligue a isquios, glúteo y columna a absorber la aceleración.",
+        "source": "V14"
+      },
+      {
+        "text": "Entre 6 y 10–12 series directas semanales suelen ser más que suficientes (sumando bisagras).",
+        "why": "Las bisagras (rumano, buenos días, rígidas) también los trabajan.",
+        "source": "V6"
+      },
+      {
+        "text": "Si la fatiga del curl hunde tu rumano, invierte el orden.",
+        "why": "La prefatiga empeora la técnica del ejercicio más técnico.",
+        "source": "V11"
+      }
+    ],
+    "where": "Curl sentado en pierna A; curl tumbado y rumano o piernas rígidas en el segundo día de tirón."
+  },
+  "gluteo": {
+    "key": "Piensa en patrones: acortado (hip thrust), estirado (sentadilla profunda, bisagra, búlgara) y abducción en dos posiciones.",
+    "tips": [
+      {
+        "text": "El glúteo mayor no se entrena igual en todas las longitudes: combina acortado (hip thrust) y estirado (sentadilla profunda, búlgara, rumano).",
+        "why": "Si solo trabajas una longitud, dejas estímulo en la mesa.",
+        "source": "V6"
+      },
+      {
+        "text": "Hip thrust: tibia vertical, rodilla sobre el tobillo, barbilla recogida, pelvis estable y extensión completa.",
+        "why": "Si notas más el cuádriceps, los pies están muy cerca; si notas los isquios, muy lejos.",
+        "source": "V6"
+      },
+      {
+        "text": "Abducciones en dos posiciones: una con la cadera más flexionada (sentada) y otra con más extensión (de pie).",
+        "why": "Cada una alinea otra región del glúteo medio y del complejo abductor.",
+        "source": "V6"
+      },
+      {
+        "text": "En la máquina de abducciones: pelvis fija, separa las rodillas, pausa de 1 s y vuelve sin que choquen las placas.",
+        "why": "Arquear la espalda o empujar con la pelvis es usar la máquina como un sillón, no entrenar mejor.",
+        "source": "V6"
+      },
+      {
+        "text": "Búlgara: tronco algo inclinado, tibia estable y cadera viajando atrás. Carga contralateral (mancuerna en la mano opuesta).",
+        "why": "Aumenta la estabilidad pélvica y obliga al glúteo medio a trabajar más.",
+        "source": "V6"
+      },
+      {
+        "text": "Patadas en polea: sube la polea para que el cable vaya pegado a la rodilla.",
+        "why": "La resistencia se acerca a la cadera según extiendes, partes más estirada y la rodilla no recibe demanda (por eso no te notas los isquios).",
+        "source": "V6"
+      },
+      {
+        "text": "Sin «baile lumbar» ni 40 repeticiones con una placa: progresa en carga, técnica o repeticiones.",
+        "why": "La escalera no es una rutina de glúteo y las bandas no construyen uno serio.",
+        "source": "V6"
+      },
+      {
+        "text": "Base para la mayoría: un ejercicio acortado, una bisagra, un unilateral, abducciones en dos posiciones y sentadilla o prensa.",
+        "why": "Con eso construyes un glúteo mejor que el de la mayoría de rutinas que ves en redes.",
+        "source": "V6"
+      },
+      {
+        "text": "Si vienes de entrenarlo poco, empieza por el rango bajo de series.",
+        "why": "«No pases de cero a atleta Wellness en una semana».",
+        "source": "V6"
+      }
+    ],
+    "where": "Pierna A: hip thrust y abducción sentada; pierna B: segunda abducción y unilateral con mucha flexión de cadera."
+  },
+  "gemelo": {
+    "key": "Rodilla extendida, bajada controlada sin rebote y pausa abajo. Es el comodín para intercalar entre series de otros músculos.",
+    "tips": [
+      {
+        "text": "Baja el talón todo lo que tu movilidad permita, sin rebotar, y quédate abajo un instante hasta notar ausencia total de movimiento.",
+        "why": "El Aquiles devuelve energía elástica en el rebote; con pausa el gemelo tiene que producir la fuerza por sí mismo.",
+        "source": "V7"
+      },
+      {
+        "text": "Sube con intención, como empujando la plataforma con el antepié, sin doblar rodillas ni lanzar la cadera.",
+        "why": "Hace la repetición difícil de falsear.",
+        "source": "V7"
+      },
+      {
+        "text": "Mantén las rodillas totalmente extendidas toda la serie: si necesitas flexionarlas, la serie ha terminado.",
+        "why": "Flexionar la rodilla acorta el gemelo por arriba y lo convierte en una mini sentadilla; mejor 8 limpias que 15 «bailando con la cadera».",
+        "source": "V7"
+      },
+      {
+        "text": "Rodilla extendida para el gastrocnemio; flexionada (sentado) para añadir sóleo.",
+        "why": "En un estudio el sóleo creció igual con ambas, pero el gastrocnemio solo creció mucho con la rodilla extendida.",
+        "source": "V7"
+      },
+      {
+        "text": "La prensa es muy buena opción para gemelo.",
+        "why": "Reduce la carga axial, da estabilidad y evita trampear con la cadera.",
+        "source": "V7"
+      },
+      {
+        "text": "Parciales en estiramiento al final, solo cuando ya domines la repetición completa.",
+        "why": "La zona estirada parece especialmente interesante para el gemelo; no termines todas las series así.",
+        "source": "V7"
+      },
+      {
+        "text": "Entre 8 y 15 repeticiones (hasta 20), cerca del fallo real.",
+        "why": "El ardor llega rapidísimo, pero muchas veces se acaba la serie por incomodidad y no por falta de fuerza.",
+        "source": "V7"
+      },
+      {
+        "text": "Intercálalo entre series de prensa, extensiones, hip thrust o búlgaras.",
+        "why": "No interfiere con el sistema nervioso como los ejercicios grandes y acumulas volumen sin darte cuenta.",
+        "source": "V7 · V11"
+      },
+      {
+        "text": "Punteras hacia fuera potencian más la cabeza interna; hacia dentro, la externa; al frente, equilibrado.",
+        "why": "Solo para afinar si una cabeza va rezagada y ya dominas lo importante.",
+        "source": "V7"
+      },
+      {
+        "text": "Si se te marca el gemelo en el curl femoral tumbado, mantén el tobillo en dorsiflexión.",
+        "why": "Si lo llevas a flexión plantar el gemelo se acorta y colabora más.",
+        "source": "V7"
+      }
+    ],
+    "where": "Entre series de prensa o hack, o en el primer día de tirón mientras se recupera el tríceps."
+  },
+  "core": {
+    "key": "Un ejercicio progresable de flexión de tronco por sesión (crunch en polea o máquina) y llegar al fallo real.",
+    "tips": [
+      {
+        "text": "Entrénalo como cualquier otro músculo: carga progresable y cerca del fallo.",
+        "why": "La mayoría olvida la ciencia en el abdomen y se dedica a repeticiones «mágicas» para sentir quemazón.",
+        "source": "V9"
+      },
+      {
+        "text": "Flexiona el tronco, no solo la cadera: lleva las costillas hacia la pelvis.",
+        "why": "Si solo flexionas la cadera, los abdominales no notan nada.",
+        "source": "V9"
+      },
+      {
+        "text": "Crunch en polea: de rodillas sobre un cojín, pelvis fija, cuerda en la parte posterior de la cabeza (no en el cuello) y las manos solo son ganchos.",
+        "why": "Así la pelvis no se mueve y los flexores de cadera no participan de más.",
+        "source": "V9"
+      },
+      {
+        "text": "Arriba deja que las costillas se alejen de la pelvis con un ligero arco; baja con control hasta el máximo estiramiento.",
+        "why": "Tensión alta en longitudes largas, con un perfil de resistencia que se ajusta a tu fuerza.",
+        "source": "V9"
+      },
+      {
+        "text": "Pausa de medio segundo al final de la contracción.",
+        "why": "Solo para afianzar el control del peso.",
+        "source": "V9"
+      },
+      {
+        "text": "La serie termina cuando ya no puedes flexionar la columna con el abdomen, no cuando encuentras otra forma de hacer trampa.",
+        "why": "Tirar del cuello, usar los brazos o arquear la zona lumbar son trampas.",
+        "source": "V9"
+      },
+      {
+        "text": "Para la hipertrofia, entre 8 y 20 repeticiones: olvida las 50 o 100.",
+        "why": "Para crecer necesitas tensión mecánica y proximidad al fallo, no repeticiones infinitas.",
+        "source": "V9"
+      },
+      {
+        "text": "Entre 2 y 4 series por sesión (4–12 semanales); en principiantes 4–6 semanales ya son muy eficaces.",
+        "why": "El abdomen no necesita 20 series semanales.",
+        "source": "V9"
+      },
+      {
+        "text": "No hay un «abdomen inferior» que se trabaje aparte.",
+        "why": "La mayor actividad eléctrica de las elevaciones de piernas no demuestra una hipertrofia localizada.",
+        "source": "V9"
+      },
+      {
+        "text": "Plancha y rueda sirven para estabilidad, pero no para progresar de forma analítica.",
+        "why": "Para crecer interesa una tarea con fase concéntrica y excéntrica y proximidad al fallo medible.",
+        "source": "V9"
+      },
+      {
+        "text": "Si el objetivo es una cintura estrecha en V, cuidado con los oblicuos con ejercicios directos duros.",
+        "why": "Son superficiales y, si crecen mucho, ensanchan visualmente la cintura.",
+        "source": "V9"
+      },
+      {
+        "text": "El abdomen se ve por la grasa y la genética: mantén un porcentaje de grasa controlado todo el año.",
+        "why": "Su capacidad de hipertrofia es menor que la del cuádriceps, la espalda o el pecho.",
+        "source": "V9"
+      }
+    ],
+    "where": "En huecos que no compiten: segundo hueco del tirón A o primero del empuje B; en superserie con las laterales al final."
+  },
+  "cuello": {
+    "key": "La guía no trata el cuello: no hay consejos suyos.",
+    "tips": [],
+    "where": null
+  }
+}

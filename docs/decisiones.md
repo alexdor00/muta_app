@@ -39,3 +39,47 @@ Si una decisión cambia, se añade una línea nueva que la sustituye; no se borr
 | 2026-10-30 | Las tarjetas de sesión de Tu plan son de colores (lima, rayas azules, naranja, negro), con la sigla y el título en Barlow Condensed (OFL, en `public/fonts/`), como en el prototipo anterior                                                                                                                            | Lo pidió el usuario; es la excepción a la paleta sin naranja, solo en estas tarjetas (`--session-1…4` en `tokens.css`)                                                                                                                                                                         |
 | 2026-11-01 | La barra de pestañas mide `--tab-bar-height` y lo fijo abajo (el pie «Empezar esta rutina») va encima de ella                                                                                                                                                                                                           | Con la barra fija abajo, el pie del detalle de rutina quedaba tapado y no se podía pulsar (lo detectó el e2e de la bienvenida)                                                                                                                                                                 |
 | 2026-10-29 | Mujer por secciones (Base y fundamentos, Especialización en glúteo y tren inferior, En casa) con selector de días, «Ver todas» y filtros en cada nivel                                                                                                                                                                  | Diseño aportado por el dueño (agrupar por objetivo y contexto, no por volumen o días); solo Mujer, el resto de tipos igual                                                                                                                                                                     |
+
+## 2026-11-02 · La racha del resumen final va en naranja
+
+La app sigue sin naranja (decisión del 2026-10-29), salvo en el resumen final de la sesión, copiado del prototipo anterior a petición
+del usuario: el fuego de la racha, los círculos de los días entrenados y el signo de lo que mejora (↑ +). También, como en el
+prototipo, la palabra «Descanso» (o «¡A por ella!») de la barra de descanso y la llama del calentamiento; los números no. Es el
+token `--streak`; no se usa para nada más.
+
+## 2026-11-02 · Semana de descarga solo si la pauta la rutina
+
+No hay descarga programada: la sesión solo va en modo descarga (menos series, más lejos del fallo) cuando la rutina lo dice en su
+documento. MUTA no la pone cada N semanas ni la activa el coach por señales de fatiga, aunque la app anterior lo hiciera
+([docs/conocimiento/02-reglas.md](conocimiento/02-reglas.md), «Descarga»).
+
+## 2026-11-02 · La biblioteca de ejercicios se extrae del prototipo con un script
+
+Los 141 ejercicios salen de la constante `EXERCISES` de `prueba/js/nucleo/conocimiento.js` con
+`scripts/exercises-from-prototype.cjs`, que renombra los campos según [03-migracion.md](conocimiento/03-migracion.md) y falla si
+encuentra un valor desconocido. Así no se copia ni se inventa nada a mano, y si el prototipo cambia basta con volver a ejecutarlo.
+
+## 2026-11-02 · Ficha del ejercicio con el diseño nuevo y el motor de doble progresión
+
+La ficha sigue el diseño que trajo el usuario, sin foto y con una gráfica del progreso. «Peso sugerido» sale del motor
+(`domain/progression.ts`, la tabla de [02-reglas.md](conocimiento/02-reglas.md)), sin el caso de descarga. La tarjeta
+«Descanso» cambia el descanso del ejercicio en el plan (sin «Saltar»), y «Empezar ejercicio» solo sale si vienes de la sesión.
+
+## 2026-11-02 · La racha se cuenta en días y el descanso cuenta
+
+El usuario pidió que los días de descanso cuenten para la racha. La racha pasa de semanas (como en el prototipo) a días:
+suman los días entrenados y los de descanso del plan, y solo la rompe un día de entreno sin entrenar. Hoy no la rompe mientras
+no hayas entrenado (`domain/streak.ts · diasDeRacha`).
+
+## 2026-11-03 · Consejos de hoy: a la vista antes de empezar, sin estorbar
+
+Los consejos que dependen de los ejercicios de hoy salen en Ver sesión y, en la sesión, en un aviso que solo aparece si hay alguno
+y se va al tocarlo o al marcar la primera serie; los 9 generales (los que uno acaba sabiéndose) solo dentro de la hoja. Nada se
+abre solo salvo que actives «Mostrar al empezar». Como un consejo de orden no sirve si no se puede cambiar el orden, la sesión
+lo cambia solo hoy («Invertir hoy», «Hacer ahora»), y la ficha avisa cuando se compara un ejercicio hecho en otro puesto.
+
+## 2026-11-03 · Ficha del músculo: el rango en una barra recta, con el punto naranja
+
+El usuario pidió el rango de series en una barra recta (no en medio círculo, como el prototipo) y el punto de tu plan en naranja:
+el naranja deja de ser solo de la racha y los récords (token `--range-dot`, el mismo color que `--streak`). El énfasis
+(Equilibrado · Estirado · Acortado) no se pone: solo sirve al coach, que aún no existe.

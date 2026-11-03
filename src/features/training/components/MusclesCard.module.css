@@ -74,6 +74,23 @@
   opacity: 0.75;
 }
 
+/* La burbuja sí se toca: «Ver ficha» abre la del músculo */
+.bubble {
+  pointer-events: auto;
+}
+
+.bubbleLink {
+  min-height: var(--tap-min);
+  margin: calc(var(--space-1) * -1) 0 calc(var(--space-2) * -1);
+  border: 0;
+  background: none;
+  color: var(--bg);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .hint {
   display: flex;
   align-items: center;

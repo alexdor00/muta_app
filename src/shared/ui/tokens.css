@@ -25,7 +25,15 @@
   --good: #34c759;
   --warning: #ff9f0a;
   --critical: #ff3b30;
+  --critical-label: #d70015; /* rojo para texto: contraste 4,5:1 sobre el fondo */
   --on-photo: #ffffff;
+  --streak: #ff7a1a; /* racha y mejoras del resumen final, como en el prototipo anterior (decisión 2026-11-02) */
+  --range-dot: var(
+    --streak
+  ); /* lo que hace tu plan sobre el rango de un músculo (A17), naranja como en el prototipo */
+  --rest-bg: #111113; /* píldora del descanso en la sesión (C03) */
+  --rest-fg: #ffffff;
+  --rest-step: rgb(255 255 255 / 16%);
   --on-photo-label: #111113; /* texto sobre la píldora blanca encima de una foto (igual en oscuro) */
   --photo-placeholder: #000000; /* fondo mientras carga una foto */
   /* Fondos de tarjeta con foto mientras no haya foto propia (oscuros: el texto va en blanco) */
@@ -74,9 +82,12 @@
   --font-condensed: 'Barlow Condensed', 'Futura Condensed ExtraBold', 'Arial Narrow', sans-serif;
   --text-session-sigla: italic 900 1.125rem / 1.2 var(--font-condensed); /* 18: sigla de la tarjeta de sesión (como en el diseño) */
   --text-session-title: italic 900 1.375rem / 1.1 var(--font-condensed); /* 22 */
+  --text-summary-sigla: italic 900 5rem / 0.9 var(--font-condensed); /* 80: sigla del resumen final */
   --text-session-hero: italic 900 2.5rem / 1 var(--font-condensed); /* 40: sigla grande de Ver sesión */
   --text-session-label: italic 900 1.375rem / 1 var(--font-condensed); /* 22: nombre en la burbuja de un músculo */
   --text-session-value: italic 900 1.875rem / 1 var(--font-condensed); /* 30: tonelaje de la gráfica de Ver sesión */
+  --text-timer: 700 4.5rem / 1 var(--font); /* 72: número del cronómetro de una serie */
+  --text-set-value: 700 1.375rem / 1 var(--font); /* 22: kilos de una serie en la sesión */
   --text-chart-axis: 500 0.8125rem / 1 var(--font); /* 13: números y fechas de los ejes de una gráfica */
   --text-session-ghost: italic 900 11.875rem / 0.8 var(--font-condensed); /* 190: sigla de fondo, solo contorno */
   --text-brand: 800 4rem / 1 var(--font); /* 64: solo el logotipo MUTA de la bienvenida */
@@ -157,6 +168,8 @@
     --good: #30d158;
     --warning: #ffd60a;
     --critical: #ff453a;
+    --critical-label: #ff6961;
+    --rest-bg: #2c2c2e;
   }
 }
 
@@ -172,6 +185,8 @@
   --good: #30d158;
   --warning: #ffd60a;
   --critical: #ff453a;
+  --critical-label: #ff6961;
+  --rest-bg: #2c2c2e;
   color-scheme: dark;
 }
 

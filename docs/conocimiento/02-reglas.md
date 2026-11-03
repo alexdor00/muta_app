@@ -117,6 +117,10 @@ Kilos redondeados hacia abajo al salto; se quitan repetidos y los que igualan el
 ### Descarga
 Al empezar en ciclo de descarga: 70 % de las series (redondeado, mínimo 1), RIR 3, mismos kilos.
 
+> **Decisión 2026-11-02 (usuario):** solo hay semana de descarga si **la rutina la pauta**. MUTA no la programa ni la activa por su
+> cuenta (ni cada N semanas ni por señales del coach). Lo de arriba y la «Descarga» de la revisión de ciclo (apartado 5) son de la app
+> anterior y no se usan para decidir una descarga.
+
 ## 4. Rotación y generador → `domain/rotation.ts`, `domain/generator.ts`
 
 ### Ciclo (no depende del calendario)
@@ -150,7 +154,7 @@ Al empezar en ciclo de descarga: 70 % de las series (redondeado, mínimo 1), RIR
 | Ritmo de pérdida | En definición, > 1,2 % del peso/semana |
 
 ### Revisión de ciclo
-1. **Descarga.** Señales: 2+ ejercicios bajan; ≥30 % estancados (con ≥4 evaluados); cada señal de mala recuperación. Con 3+ señales y ≥3 ciclos desde la última descarga: descarga (si automático) o propuesta. Con 2: aviso «Vigila la recuperación».
+1. **Descarga** (no se usa: ver la decisión del 2026-11-02 en «Descarga», apartado 3). Señales: 2+ ejercicios bajan; ≥30 % estancados (con ≥4 evaluados); cada señal de mala recuperación. Con 3+ señales y ≥3 ciclos desde la última descarga: descarga (si automático) o propuesta. Con 2: aviso «Vigila la recuperación».
 2. **Estancados**, en orden: lejos del fallo (RIR real ≥ objetivo + 2) → «acércate al RIR antes de cambiar nada»; mala recuperación → «primero sueño y comida»; prioridades → análisis de volumen; en definición → un solo aviso («mantener los kilos ya es buen resultado en déficit»); resto → prueba de cambio de rango ±2 (mín ≥10 baja; si no, sube). Máximo 2 pruebas a la vez.
 3. **Volumen por grupo muscular** (apartado 6).
 4. **Resumen positivo:** ejercicios que progresan («No toques lo que funciona»).

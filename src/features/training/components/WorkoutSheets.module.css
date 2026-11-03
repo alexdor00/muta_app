@@ -1,0 +1,293 @@
+/* Hojas de la sesión en curso: opciones del ejercicio, cambiarlo, nota, discos y terminar (C11–C14, C23). */
+
+.options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.options li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(var(--space-1) / 2);
+}
+
+.title {
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+.detail {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+.option:disabled .title,
+.option:disabled .icon,
+.option:disabled .chevron {
+  color: var(--label-2);
+}
+
+.danger {
+  color: var(--critical-label);
+}
+
+.chevron {
+  display: grid;
+  color: var(--label-2);
+}
+
+.chevron svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.lead {
+  font: var(--text-body);
+  color: var(--label-2);
+}
+
+.lead + .options {
+  margin-top: var(--space-3);
+}
+
+/* «Elegir cualquier ejercicio»: botón gris a todo el ancho, con la lupa */
+.anyExercise {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--control);
+  margin: var(--space-4) 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-headline);
+  cursor: pointer;
+}
+
+.anyExercise svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.note {
+  display: block;
+  width: 100%;
+  min-height: calc(var(--control-lg) * 2);
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-body);
+  resize: vertical;
+}
+
+.actions {
+  margin-top: var(--space-4);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+/* Discos */
+.label {
+  display: block;
+  margin: var(--space-4) 0 var(--space-2);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.total {
+  display: block;
+  width: 100%;
+  height: calc(var(--control-lg) * 1.4);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-session-value);
+  font-style: normal;
+  text-align: center;
+}
+
+.bars > fieldset > div {
+  width: 100%;
+}
+
+/* La barra de lado: manguito, discos (más altos cuanto más pesan), tope y el final */
+.barbell {
+  display: flex;
+  align-items: center;
+  height: calc(var(--control-lg) * 2);
+  margin-top: var(--space-6);
+}
+
+.sleeve,
+.end {
+  height: var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.sleeve {
+  flex: 1;
+}
+
+.end {
+  width: var(--space-10);
+}
+
+.collar {
+  width: var(--space-3);
+  height: var(--space-8);
+  margin: 0 var(--space-1);
+  border-radius: var(--space-1);
+  background: var(--label-2);
+}
+
+.plate {
+  display: grid;
+  place-items: center;
+  width: var(--space-8);
+  height: var(--control-lg);
+  margin-left: var(--space-1);
+  border-radius: var(--space-1);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.plate[data-kg='25'],
+.plate[data-kg='20'] {
+  height: calc(var(--control-lg) * 2);
+}
+
+.plate[data-kg='15'] {
+  height: calc(var(--control-lg) * 1.7);
+}
+
+.plate[data-kg='10'] {
+  height: calc(var(--control-lg) * 1.4);
+}
+
+.plate[data-kg='5'] {
+  width: var(--space-6);
+  height: var(--control-lg);
+}
+
+.plate[data-kg='2.5'],
+.plate[data-kg='1.25'] {
+  width: var(--space-5);
+  height: var(--control);
+  background: var(--label-2);
+}
+
+.perSide {
+  margin-top: var(--space-5);
+  font: var(--text-body);
+}
+
+.strong {
+  color: var(--label);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.withIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.withIcon svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* Descansos en píldoras; el elegido, en negro */
+.rests {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.rest {
+  height: var(--control);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.restOn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.dangerButton {
+  height: var(--control-lg);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--critical-label);
+  font: var(--text-headline);
+  cursor: pointer;
+}
