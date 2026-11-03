@@ -5,6 +5,7 @@ import {
   avanzar,
   desdeBiblioteca,
   kilosDeHoy,
+  notaSugerido,
   rangoDe,
   descansoDe,
   dondeVas,
@@ -198,5 +199,23 @@ describe('lo que toca hoy', () => {
       salto: 5,
       sustitutos: [],
     })
+  })
+})
+
+describe('lo sugerido, a la vista', () => {
+  it('dice lo que no viene de la rutina, con su valor; nada si todo viene de ella o de la biblioteca', () => {
+    const sinNada = ejercicioDelPlan(
+      { name: 'Curl predicador', originalName: 'Preacher curl', kind: 'isolation' },
+      null,
+    )
+    expect(notaSugerido(sinNada)).toBe(
+      'Sugerido, no lo dice la rutina: 3 series, 8–12 reps, a 2 del fallo, descanso 1:30, salto de 2,5 kg',
+    )
+    const soloSalto = ejercicioDelPlan(
+      { name: 'Curl predicador', sets: 2, reps: '10-15', rpe: '9', rest: '~1-2 min' },
+      null,
+    )
+    expect(notaSugerido(soloSalto)).toBe('Sugerido, no lo dice la rutina: salto de 2,5 kg')
+    expect(notaSugerido(desdeBiblioteca(hack))).toBeNull()
   })
 })

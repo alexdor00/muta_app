@@ -27,7 +27,7 @@ test('la gráfica enseña la última vez y cambia de medida', async ({ page }) =
   await expect(page.getByRole('img', { name: /^Repeticiones de \d+ entrenos$/ })).toBeVisible()
 })
 
-test('un ejercicio se despliega con lo que hiciste la última vez', async ({ page }) => {
+test('un ejercicio se despliega con su ficha en pequeño y lo que hiciste la última vez', async ({ page }) => {
   await page.goto('/entreno/rutina/b1')
   const fila = page.getByRole('button', { name: /Peso muerto rumano/ })
   await expect(fila).toHaveAttribute('aria-expanded', 'false')
@@ -35,6 +35,13 @@ test('un ejercicio se despliega con lo que hiciste la última vez', async ({ pag
   await expect(fila).toHaveAttribute('aria-expanded', 'true')
   await expect(page.getByText('Última vez')).toBeVisible()
   await expect(page.getByText('62,5 × 6')).toBeVisible()
+  // La ficha en pequeño: lo que toca hoy, los músculos, la clave y el enlace a la completa
+  await expect(page.getByText('62,5 kg × 6–10')).toBeVisible()
+  await expect(page.getByText('Femoral · Glúteo · Aductores')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Ver ficha' })).toHaveAttribute(
+    'href',
+    '/entreno/ejercicio/peso_muerto_rumano',
+  )
   await fila.click()
   await expect(page.getByText('Última vez')).toHaveCount(0)
 })
@@ -42,4 +49,16 @@ test('un ejercicio se despliega con lo que hiciste la última vez', async ({ pag
 test('una sesión que no existe lo dice', async ({ page }) => {
   await page.goto('/entreno/rutina/z9')
   await expect(page.getByRole('heading', { name: 'Esta sesión no existe' })).toBeVisible()
+})
+
+test('lo que no dice la rutina sale como sugerido; sin biblioteca, sin enlace a la ficha', async ({
+  page,
+}) => {
+  await page.goto('/entreno/rutina/b1')
+  const fila = page.getByRole('button', { name: /Laterales en polea/ })
+  await expect(fila).toContainText('Sugerido, no lo dice la rutina: salto de 2,5 kg')
+  await expect(page.getByRole('button', { name: /Peso muerto rumano/ })).not.toContainText('Sugerido')
+  await fila.click()
+  await expect(page.getByText('15 kg × 14')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Ver ficha' })).toHaveCount(0)
 })

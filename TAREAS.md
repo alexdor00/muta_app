@@ -8,11 +8,12 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   (A16), las fichas del ejercicio y del músculo (A17–A21), los consejos de hoy (C10) y la hoja «Tu rutina» con «Cambiar de rutina»;
   encima, **sin commit**, los **datos reales**: Tu plan, Ver sesión, la sesión, el resumen y las fichas leen la rutina guardada y tus
   entrenos (`workouts`); la sesión que toca va por rotación, lo apuntado se guarda a cada serie y sigue al recargar, y al terminar
-  se guarda y pasa a la siguiente (decisión 2026-11-03). Ya no hay `state/muestra/`. Verificado: `npm run check` (242 tests) y e2e 64 de 64.
+  se guarda y pasa a la siguiente (decisión 2026-11-03). Ya no hay `state/muestra/`. Verificado: `npm run check` (243 tests) y e2e 65 de 65.
+  Ver sesión despliega cada ejercicio con su ficha en pequeño y lo sugerido se ve en gris («Sugerido, no lo dice la rutina: …»).
   Falta verlo en un móvil real.
 - **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; Editar rutina (A11, con «Añadir un
   ejercicio» de la ficha del músculo); editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
-  el material); el consejo de prioridades; la imagen para compartir (hoy, texto); enseñar en pantalla lo marcado como `sugeridos`;
+  el material); el consejo de prioridades; la imagen para compartir (hoy, texto);
   ficha para los ejercicios que no están en la biblioteca (hoy no tienen). Las cuatro filas «Pronto» de la hoja «Tu rutina».
   Semana de descarga: solo si la rutina la pauta (decisión 2026-11-02).
 

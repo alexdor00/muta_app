@@ -1,6 +1,8 @@
 // Tu plan de verdad: las sesiones de la semana que toca de la rutina guardada, con lo que la sesión necesita de cada
 // ejercicio. Lo que trae la rutina manda; lo que falta sale de la biblioteca y, si tampoco está, se rellena y se marca
 // como sugerido (decisión 2026-11-03).
+import { formatClock, formatDecimal } from '../../../shared/lib/format.ts'
+import { effortLabel } from './effort.ts'
 import type { LibraryExercise } from './exerciseLibrary.ts'
 import { muscleOf } from './muscleOf.ts'
 import type { MuscleId, Range } from './muscles.ts'
@@ -193,3 +195,20 @@ export const kilosDeHoy = (e: EjercicioPlan, i = 0) => sugerenciaDe(e, i).kg
  */
 export const desdeBiblioteca = (ex: LibraryExercise): EjercicioPlan =>
   ejercicioDelPlan({ name: ex.name, sets: 3 }, ex)
+
+/**
+ * Lo que se ha rellenado porque no lo dice la rutina, con su valor, para enseñarlo: «Sugerido, no lo dice la rutina:
+ * 3 series, salto de 2,5 kg». Null si todo viene de la rutina o de la biblioteca. El músculo no se dice: si no se
+ * sabe, no se rellena.
+ */
+export function notaSugerido(e: EjercicioPlan): string | null {
+  const partes = e.sugeridos.flatMap((s) => {
+    if (s === 'series') return [`${e.series} series`]
+    if (s === 'reps') return [`${e.reps} reps`]
+    if (s === 'rir') return [effortLabel(e.rir)]
+    if (s === 'descanso') return [`descanso ${formatClock(e.descanso)}`]
+    if (s === 'salto') return [`salto de ${formatDecimal(e.salto)} kg`]
+    return []
+  })
+  return partes.length ? `Sugerido, no lo dice la rutina: ${partes.join(', ')}` : null
+}

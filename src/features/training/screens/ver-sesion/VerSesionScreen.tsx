@@ -8,9 +8,18 @@ import { ExerciseList } from '../../components/ExerciseList.tsx'
 import { SessionHero } from '../../components/SessionHero.tsx'
 import { METRICAS_SESION, SessionProgress, type Metrica } from '../../components/SessionProgress.tsx'
 import { SessionTipsCard } from '../../components/SessionTips.tsx'
-import { detalleSesion, entrenos, progresoDeSesion, sesionDe, tonoDe } from '../../state/plan.ts'
+import {
+  detalleSesion,
+  entrenos,
+  notaSugerido,
+  progresoDeSesion,
+  sesionDe,
+  tonoDe,
+} from '../../state/plan.ts'
 import { effortLabel } from '../../state/routines.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
+import { fichaCorta } from '../../state/ficha.ts'
+import { porNombre } from '../../use-cases/exerciseLibrary.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
 import styles from './VerSesionScreen.module.css'
@@ -43,11 +52,16 @@ export function VerSesionScreen(props: { sessionId: string }) {
     metrica === 'ton' ? formatTons(v) : `${v} ${metrica === 'reps' ? 'reps' : 'min'}`
   // El cambio frente a la vez anterior, redondeado: si redondea a 0 %, «Igual que la anterior»
   const pct = ultimo && anterior?.valor ? Math.round((ultimo.valor / anterior.valor - 1) * 100) : null
-  const ejercicios = sesion.ejercicios.map((e) => ({
-    nombre: e.nombre,
-    detalle: `${e.series} series · ${e.reps} reps · ${effortLabel(e.rir)}`,
-    ultima: e.ultima.map((u) => (u.kg != null ? `${formatDecimal(u.kg)} × ${u.reps}` : `${u.reps} reps`)),
-  }))
+  const ejercicios = sesion.ejercicios.map((e) => {
+    const ficha = fichaCorta(e, porNombre(e.nombre))
+    return {
+      nombre: e.nombre,
+      detalle: `${e.series} series · ${e.reps} reps · ${effortLabel(e.rir)}`,
+      sugerido: notaSugerido(e),
+      ficha: { ...ficha, href: ficha.id ? paths.exercise(ficha.id) : null },
+      ultima: e.ultima.map((u) => (u.kg != null ? `${formatDecimal(u.kg)} × ${u.reps}` : `${u.reps} reps`)),
+    }
+  })
   return (
     <div class={styles.page}>
       <SessionHero

@@ -32,6 +32,8 @@ type Props = {
   pauta: string[]
   /** Descanso entre series: «2:45». */
   descanso: string
+  /** Lo que no dice la rutina y se ha puesto por costumbre, o null. */
+  sugerido: string | null
   /** Nota de técnica que escribió (vacía si no hay). */
   nota: string
   onOpciones: () => void
@@ -269,6 +271,7 @@ export function WorkoutExercise(props: Props) {
               </button>
             </li>
           </ul>
+          {props.sugerido && <p class={styles.suggested}>{props.sugerido}</p>}
           {props.nota && <p class={styles.note}>{props.nota}</p>}
         </div>
         <button

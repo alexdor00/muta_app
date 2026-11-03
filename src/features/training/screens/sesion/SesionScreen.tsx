@@ -11,7 +11,7 @@ import { WorkoutExercise, WorkoutExerciseRow } from '../../components/WorkoutExe
 import { WorkoutKeypad } from '../../components/WorkoutKeypad.tsx'
 import { TipsBanner } from '../../components/SessionTips.tsx'
 import { ConfirmSheet, FinishSheet } from '../../components/WorkoutSheets.tsx'
-import { sesionDe, type SesionPlan } from '../../state/plan.ts'
+import { notaSugerido, sesionDe, type SesionPlan } from '../../state/plan.ts'
 import {
   calentamientosHoy,
   consejosAlEmpezar,
@@ -243,6 +243,7 @@ export function SesionScreen(props: { sessionId: string }) {
               pauta={[`${e.series} series`, `${e.reps} reps`, effortLabel(e.rir)]}
               descanso={formatClock(descansoDe(e))}
               onDescanso={() => setHoja({ tipo: 'descanso', ejercicio: e, segundos: descansoDe(e) })}
+              sugerido={x.cambiadoPor ? null : notaSugerido(e)}
               nota={x.nota}
               onOpciones={() => setHojaDe(i)}
               calentamiento={calienta.map((c, k) => ({

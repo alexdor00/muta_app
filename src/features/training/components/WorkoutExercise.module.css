@@ -116,6 +116,13 @@
   height: var(--icon-xs);
 }
 
+/* Lo que no dice la rutina (sugerido) */
+.suggested {
+  margin-top: var(--space-1);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
 .note {
   margin-top: var(--space-1);
   font: var(--text-footnote);
