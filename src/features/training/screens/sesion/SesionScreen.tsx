@@ -11,14 +11,14 @@ import { WorkoutExercise, WorkoutExerciseRow } from '../../components/WorkoutExe
 import { WorkoutKeypad } from '../../components/WorkoutKeypad.tsx'
 import { TipsBanner } from '../../components/SessionTips.tsx'
 import { ConfirmSheet, FinishSheet } from '../../components/WorkoutSheets.tsx'
-import { sesionMuestra } from '../../state/muestra/datos.ts'
+import { sesionDe, type SesionPlan } from '../../state/plan.ts'
 import {
   calentamientosHoy,
   consejosAlEmpezar,
   paraConsejos,
   primeroSinTerminar,
   siguienteSinTerminar,
-} from '../../state/muestra/ordenHoy.ts'
+} from '../../state/ordenHoy.ts'
 import {
   alternarPausa,
   apuntarSerie,
@@ -41,7 +41,7 @@ import {
   textoSerie,
   type EjercicioEnCurso,
   type SerieEnCurso,
-} from '../../state/muestra/sesionEnCurso.ts'
+} from '../../state/sesionEnCurso.ts'
 import { effortLabel } from '../../state/routines.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
 import { avisar } from '../../use-cases/workoutFeedback.ts'
@@ -50,20 +50,28 @@ import { HojasSesion, type HojaSesion } from './HojasSesion.tsx'
 import { useAviso } from './useAviso.ts'
 import { useReloj } from './useReloj.ts'
 import { useTeclado } from './useTeclado.ts'
+import { terminarEntreno } from '../../use-cases/training.ts'
+import { SinPlan } from '../comun/SinPlan.tsx'
+import { usePlan } from '../comun/usePlan.ts'
 import styles from './SesionScreen.module.css'
 
 /**
  * La sesión en curso (C01–C06): barra con Salir, tiempo, Terminar y la raya de progreso; el ejercicio abierto con su
  * calentamiento y sus series (la vez anterior en gris), el teclado propio, el descanso y el récord; los demás cerrados.
- * Datos de prueba (state/muestra/), solo en memoria.
+ * Lo apuntado se guarda en IndexedDB a cada cambio (use-cases/training.ts).
  */
 export function SesionScreen(props: { sessionId: string }) {
   const { route, path } = useLocation()
-  const sesion = sesionMuestra(props.sessionId)
+  const plan = usePlan()
+  const delPlan = sesionDe(props.sessionId)
   const guardada = sesionEnCurso.value
-  const en = sesion && guardada?.sigla === sesion.sigla ? guardada : null
+  // La sesión empezada manda (lleva sus ejercicios): así sigue igual aunque el plan haya pasado de semana
+  const en = guardada?.sigla.toLowerCase() === props.sessionId.toLowerCase() ? guardada : null
+  const sesion: SesionPlan | null = en
+    ? { sigla: en.sigla, nombre: en.nombre, minutos: delPlan?.minutos ?? 0, ejercicios: en.base }
+    : delPlan
   const [abierto, setAbierto] = useState(() => tomarPedido() ?? primeroSinTerminar(en))
-  const { activa, entrar, tecla, siguiente, teclado, vista } = useTeclado(sesion, en)
+  const { activa, entrar, tecla, siguiente, teclado, vista } = useTeclado(en)
   const { ahora, descanso, setDescanso, quedanDescanso, tiempoDescanso } = useReloj()
   const { aviso, setAviso, deshacer, setDeshacer, decir } = useAviso()
   const [confirmar, setConfirmar] = useState<{ ej: number; serie: number } | null>(null)
@@ -78,10 +86,12 @@ export function SesionScreen(props: { sessionId: string }) {
   useEffect(() => {
     // Solo en su dirección: al descartar, el enrutador vuelve a pintar esta pantalla un momento mientras sale, y no
     // debe dejar otra sesión vacía contando
-    if (sesion && !en && path === paths.session(sesion.sigla.toLowerCase()))
-      guardarSesion(nuevaSesion(sesion, ahora))
-  }, [sesion, en, ahora, path])
+    if (delPlan && !en && path === paths.session(delPlan.sigla.toLowerCase()))
+      guardarSesion(nuevaSesion(delPlan, ahora))
+  }, [delPlan, en, ahora, path])
 
+  if (plan.status === 'loading') return null
+  if (plan.status === 'none' && !en) return <SinPlan />
   if (!sesion) {
     return (
       <Pending code="404" title="Esta sesión no existe">
@@ -92,9 +102,9 @@ export function SesionScreen(props: { sessionId: string }) {
   if (!en) return null
 
   const id = sesion.sigla.toLowerCase()
-  const ejercicios = ejerciciosDe(sesion, en)
-  const plan = calentamientosHoy(sesion, en)
-  const consejos = consejosDeSesion(paraConsejos(sesion, en))
+  const ejercicios = ejerciciosDe(en)
+  const calientes = calentamientosHoy(en)
+  const consejos = consejosDeSesion(paraConsejos(en))
   const { hechas, total } = cuentaSeries(en)
 
   const guardar = (ej: number, cambio: (x: EjercicioEnCurso) => EjercicioEnCurso) =>
@@ -111,7 +121,7 @@ export function SesionScreen(props: { sessionId: string }) {
 
   /** Termina la sesión (se guarda solo lo hecho) y abre el resumen. */
   const terminarYa = () => {
-    guardarSesion({ ...en, terminada: ahora })
+    void terminarEntreno(en, ahora)
     setDescanso(null)
     route(paths.summary(id))
   }
@@ -134,7 +144,7 @@ export function SesionScreen(props: { sessionId: string }) {
       cambiarSerie(ej, j, { hecha: false })
       return
     }
-    const apunte = apuntarSerie(sesion, en, ej, j, confirmado)
+    const apunte = apuntarSerie(en, ej, j, confirmado)
     if (apunte.tipo !== 'hecha') {
       if (apunte.tipo === 'alto') return setConfirmar({ ej, serie: j })
       if (apunte.tipo === 'imposible') avisar('inputError')
@@ -224,7 +234,7 @@ export function SesionScreen(props: { sessionId: string }) {
             )
           }
           // El calentamiento solo antes de empezar las series del ejercicio
-          const calienta = x.series.some((s) => s.hecha) ? [] : (plan[i] ?? [])
+          const calienta = x.series.some((s) => s.hecha) ? [] : (calientes[i] ?? [])
           return (
             <WorkoutExercise
               key={`${i}-${e.nombre}`}

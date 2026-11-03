@@ -1,6 +1,7 @@
 import { logError } from '../../../shared/lib/logger.ts'
 import { routineDetail } from '../state/routines.ts'
 import { chooseRoutine } from './chooseRoutine.ts'
+import { cargarPlan } from './training.ts'
 
 /** Empieza la rutina que está abierta, con lo que hayas elegido en ella. Devuelve si se guardó. */
 export async function startOpenRoutine(): Promise<boolean> {
@@ -11,6 +12,7 @@ export async function startOpenRoutine(): Promise<boolean> {
       weakPoints: state.weak?.choice ?? null,
       priorities: state.choice,
     })
+    await cargarPlan(true)
     return true
   } catch (error) {
     logError(error, 'empezar rutina')

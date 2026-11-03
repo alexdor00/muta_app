@@ -1,0 +1,9 @@
+/* Sin rutina elegida. */
+
+.empty {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6) 0;
+  font: var(--text-body);
+  color: var(--label-2);
+}

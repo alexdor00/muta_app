@@ -27,9 +27,10 @@ JSON del programa ── shared/content (MUTA) o private/programs → IndexedDB 
         │
         ▼  use-cases/routineDetail.ts · openRoutine(id)
    selectVariant → show():
-        applyPriorities      (opcionales de MUTA, regla de tiempo)        domain/priorities.ts
-        applyWeakPoints      (huecos de punto débil)                      domain/weakPoints.ts
-        applyMarkedOptionals ("(optional)" de los originales)             domain/optionals.ts
+        applyChoices         (tus elecciones, en este orden:)             domain/planProgram.ts
+          applyPriorities      (opcionales de MUTA, regla de tiempo)      domain/priorities.ts
+          applyWeakPoints      (huecos de punto débil)                    domain/weakPoints.ts
+          applyMarkedOptionals ("(optional)" de los originales)           domain/optionals.ts
         phasesView           (filas listas para pintar)                   domain/routineView.ts
         applyRestRules       (descansos: archivo → reglas → patrones)     domain/routineView.ts · restCycles.ts
         factsOf              (datos clave)                                domain/routineView.ts
@@ -42,6 +43,23 @@ JSON del programa ── shared/content (MUTA) o private/programs → IndexedDB 
 
 Cada paso de `show()` recibe un `ProgramData` y devuelve otro; no modifica el original. Las filas que se pueden
 cambiar llevan `slot` (nunca se borran) y el resto del código decide qué hacer con él.
+
+## Flujo de datos: entrenar
+
+```
+IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts`
+        │
+        ▼  use-cases/training.ts · cargarPlan()   (cada pantalla de Entreno, con screens/comun/usePlan)
+   selectVariant → applyChoices → sesionesDeSemana(rotación, biblioteca)        domain/workoutPlan.ts
+        │
+        ▼  state/plan.ts · `tuPlan`, `entrenos`; `sesiones` = la semana + la vez anterior (domain/workoutHistory.ts)
+   Tu plan · Ver sesión · sesión · resumen · fichas  (solo pintan)
+        │  cada serie → state/sesionEnCurso.ts → efecto → IndexedDB `workouts/en-curso`
+        ▼  «Terminar» → terminarEntreno: `workouts` (terminado) y la rotación avanza → `rotation/current`
+```
+
+Todo lo que se enseña de tus entrenos (la vez anterior, gráficas, tu semana, series por músculo, racha) se calcula
+desde `workouts`; no hay otra copia.
 
 ## Datos y contenido
 

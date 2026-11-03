@@ -5,8 +5,7 @@ import {
   SessionSheet,
   SessionTimeSheet,
 } from '../../components/WorkoutSheets.tsx'
-import type { EjercicioMuestra, SesionMuestra } from '../../state/muestra/datos.ts'
-import { desdeBiblioteca } from '../../state/muestra/ejercicios.ts'
+import { desdeBiblioteca, type EjercicioPlan, type SesionPlan } from '../../state/plan.ts'
 import {
   alternarPausa,
   anadirEjercicio,
@@ -16,7 +15,7 @@ import {
   guardarSesion,
   segundosSesion,
   type SesionEnCurso,
-} from '../../state/muestra/sesionEnCurso.ts'
+} from '../../state/sesionEnCurso.ts'
 import type { SessionTip } from '../../state/routines.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import { HojaConsejos } from './HojaConsejos.tsx'
@@ -28,12 +27,12 @@ export type HojaSesion =
   | { tipo: 'descartar' }
   | { tipo: 'anadir' }
   | { tipo: 'consejos' }
-  | { tipo: 'descanso'; ejercicio: EjercicioMuestra; segundos: number }
+  | { tipo: 'descanso'; ejercicio: EjercicioPlan; segundos: number }
 
 type Props = {
   hoja: HojaSesion
   onHoja: (hoja: HojaSesion | null) => void
-  sesion: SesionMuestra
+  sesion: SesionPlan
   en: SesionEnCurso
   /** «Para esta sesión», con el orden de hoy. */
   consejos: SessionTip[]

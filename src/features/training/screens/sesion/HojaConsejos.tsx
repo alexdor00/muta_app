@@ -1,13 +1,13 @@
 import { TodayTipsSheet } from '../../components/SessionTips.tsx'
-import { detalleSesion, type SesionMuestra } from '../../state/muestra/datos.ts'
+import { detalleSesion, type SesionPlan } from '../../state/plan.ts'
 import {
   alternarConsejosAlEmpezar,
   consejosAlEmpezar,
   hacerAhora,
   invertir,
   marcarConsejo,
-} from '../../state/muestra/ordenHoy.ts'
-import { guardarSesion, type SesionEnCurso } from '../../state/muestra/sesionEnCurso.ts'
+} from '../../state/ordenHoy.ts'
+import { guardarSesion, type SesionEnCurso } from '../../state/sesionEnCurso.ts'
 import type { SessionTip } from '../../state/routines.ts'
 import { CONSEJOS_ANTES } from '../../use-cases/sessionTips.ts'
 
@@ -18,7 +18,7 @@ const ETIQUETA = { invertir: 'Invertir hoy', subir: 'Subirlo hoy' } as const
  * y «Antes de la primera serie», con lo marcado guardado en la sesión.
  */
 export function HojaConsejos(props: {
-  sesion: SesionMuestra
+  sesion: SesionPlan
   en: SesionEnCurso
   consejos: SessionTip[]
   onAviso: (texto: string) => void

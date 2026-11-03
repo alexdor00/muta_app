@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test, type Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
+import { expect, test } from './plan.ts'
 
 // Accesibilidad de las pantallas (contraste, nombres de botones, foco). Falla ante cualquier fallo grave.
 async function sinFallos(page: Page, sinContraste = false) {
@@ -113,7 +114,7 @@ test('hojas de la sesión: esta sesión y descanso', async ({ page }) => {
   await expect(page.getByRole('dialog', { name: 'Esta sesión' })).toBeVisible()
   await sinFallos(page)
   await page.getByRole('button', { name: 'Cerrar' }).click()
-  await page.getByRole('button', { name: /Descanso 2:45, cambiar/ }).click()
+  await page.getByRole('button', { name: /Descanso 3:00, cambiar/ }).click()
   await expect(page.getByRole('dialog', { name: 'Descanso' })).toBeVisible()
   await sinFallos(page)
 })

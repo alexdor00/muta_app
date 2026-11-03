@@ -55,3 +55,8 @@ export function formatChange(ratio: number): string {
   const sign = pct > 0 ? '+' : pct < 0 ? '−' : ''
   return `${sign}${Math.abs(pct)} %`
 }
+
+/** La fecha de un momento en hora local, como AAAA-MM-DD (la de hoy, sin argumento). */
+export function localDate(at = new Date()): string {
+  return new Date(at.getTime() - at.getTimezoneOffset() * 60_000).toISOString().slice(0, 10)
+}

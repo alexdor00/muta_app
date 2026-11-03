@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { formatChange, formatDayDate, formatTons } from '../../../../shared/lib/format.ts'
+import { formatChange, formatDayDate, formatDecimal, formatTons } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { PlayIcon } from '../../../../shared/ui/icons.tsx'
@@ -8,19 +8,24 @@ import { ExerciseList } from '../../components/ExerciseList.tsx'
 import { SessionHero } from '../../components/SessionHero.tsx'
 import { METRICAS_SESION, SessionProgress, type Metrica } from '../../components/SessionProgress.tsx'
 import { SessionTipsCard } from '../../components/SessionTips.tsx'
-import { detalleSesion, progresoMuestra, sesionMuestra, tonoDe } from '../../state/muestra/datos.ts'
+import { detalleSesion, entrenos, progresoDeSesion, sesionDe, tonoDe } from '../../state/plan.ts'
 import { effortLabel } from '../../state/routines.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
+import { SinPlan } from '../comun/SinPlan.tsx'
+import { usePlan } from '../comun/usePlan.ts'
 import styles from './VerSesionScreen.module.css'
 
 /**
  * Ver sesión (al tocar una tarjeta de Tu plan): cabecera con el color de la sesión, su progreso, los consejos para esta
- * sesión (si hay), sus ejercicios y «Empezar» fijo abajo. Datos de prueba (state/muestra/).
+ * sesión (si hay), sus ejercicios con la última vez y «Empezar» fijo abajo.
  */
 export function VerSesionScreen(props: { sessionId: string }) {
   const [metrica, setMetrica] = useState<Metrica>('ton')
   const [abierto, setAbierto] = useState<number | null>(null)
-  const sesion = sesionMuestra(props.sessionId)
+  const plan = usePlan()
+  if (plan.status === 'loading') return null
+  if (plan.status === 'none') return <SinPlan />
+  const sesion = sesionDe(props.sessionId)
   if (!sesion) {
     return (
       <Pending code="404" title="Esta sesión no existe">
@@ -28,7 +33,7 @@ export function VerSesionScreen(props: { sessionId: string }) {
       </Pending>
     )
   }
-  const puntos = progresoMuestra(sesion.sigla).map((e) => ({
+  const puntos = progresoDeSesion(entrenos.value, sesion.sigla).map((e) => ({
     fecha: e.fecha,
     valor: metrica === 'ton' ? e.toneladas : metrica === 'reps' ? e.reps : e.minutos,
   }))
@@ -41,7 +46,7 @@ export function VerSesionScreen(props: { sessionId: string }) {
   const ejercicios = sesion.ejercicios.map((e) => ({
     nombre: e.nombre,
     detalle: `${e.series} series · ${e.reps} reps · ${effortLabel(e.rir)}`,
-    ultima: e.ultima,
+    ultima: e.ultima.map((u) => (u.kg != null ? `${formatDecimal(u.kg)} × ${u.reps}` : `${u.reps} reps`)),
   }))
   return (
     <div class={styles.page}>

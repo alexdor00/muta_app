@@ -8,7 +8,7 @@ import type { ProgramInfo } from '../domain/programInfo.ts'
 import { metaLines } from '../domain/routineView.ts'
 import { routines, type RoutineItem } from '../state/routines.ts'
 
-const LEVELS: Level[] = ['beginner', 'intermediate', 'advanced']
+export const LEVELS: Level[] = ['beginner', 'intermediate', 'advanced']
 const GOALS: Goal[] = ['gain_muscle', 'lose_fat', 'feel_better']
 
 /** Hechos y tipos medidos de cada rutina (scripts/program-info.ts). */

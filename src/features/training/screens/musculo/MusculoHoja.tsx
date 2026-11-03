@@ -1,8 +1,8 @@
 import { useState } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { MuscleSheet } from '../../components/MuscleSheet.tsx'
-import { MUESTRA } from '../../state/muestra/datos.ts'
-import { elegirModo, NIVEL_MUESTRA, rangoMusculo, rangoPropio } from '../../state/muestra/musculos.ts'
+import { elegirModo, nivelDelPlan, rangoMusculo, rangoPropio } from '../../state/musculos.ts'
+import { sesiones } from '../../state/plan.ts'
 import {
   barMax,
   muscleInPlan,
@@ -22,19 +22,18 @@ const MODOS: { id: Mode; label: string }[] = [
   { id: 'develop', label: 'Desarrollar' },
   { id: 'priority', label: 'Prioridad' },
 ]
-const SEMANA = huecosDelPlan(MUESTRA.sesiones)
 
 /**
  * La ficha de un músculo (A17–A21): cuántas series le da tu plan por semana frente a su rango, el objetivo (Mantener,
- * Desarrollar, Prioridad o a mano), dónde lo entrenas y sus consejos. Datos de prueba (state/muestra/).
+ * Desarrollar, Prioridad o a mano), dónde lo entrenas (las sesiones de tu semana) y sus consejos.
  */
 export function MusculoHoja(props: { musculo: MuscleId; onClose: () => void }) {
   const [musculo, setMusculo] = useState(props.musculo)
   const [pestana, setPestana] = useState<'resumen' | 'consejos'>('resumen')
   const { modo, rango, propio } = rangoMusculo(musculo)
-  const plan = muscleInPlan(SEMANA, musculo)
+  const plan = muscleInPlan(huecosDelPlan(sesiones.value), musculo)
   const consejos = consejosDeMusculo(musculo)
-  const fila = (h: (typeof plan.directos)[number]) => ({ ...h, href: paths.exercise(h.id) })
+  const fila = (h: (typeof plan.directos)[number]) => ({ ...h, href: h.id ? paths.exercise(h.id) : null })
   return (
     <MuscleSheet
       titulo={MUSCLES[musculo].label}
@@ -48,7 +47,7 @@ export function MusculoHoja(props: { musculo: MuscleId; onClose: () => void }) {
       pestana={pestana}
       onPestana={setPestana}
       modos={MODOS.map((m) => {
-        const [a, b] = rangeFor(musculo, NIVEL_MUESTRA, m.id)
+        const [a, b] = rangeFor(musculo, nivelDelPlan(), m.id)
         return { id: m.id, label: m.label, rango: `${a}–${b}`, on: !propio && m.id === modo }
       })}
       onModo={(id) => elegirModo(musculo, id as Mode)}

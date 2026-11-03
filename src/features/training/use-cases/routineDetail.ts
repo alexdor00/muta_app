@@ -17,11 +17,11 @@ import {
   trimmedKeys,
   type PriorityChoice,
 } from '../domain/priorities.ts'
-import { applyMarkedOptionals } from '../domain/optionals.ts'
+import { applyChoices } from '../domain/planProgram.ts'
 import type { ProgramData } from '../domain/program.ts'
 import { selectVariant } from '../domain/programInfo.ts'
 import { applyRestRules, factsOf, metaLines, phasesView } from '../domain/routineView.ts'
-import { applyWeakPoints, hasWeakPoints, type WeakChoice, type WeakTable } from '../domain/weakPoints.ts'
+import { hasWeakPoints, type WeakChoice, type WeakTable } from '../domain/weakPoints.ts'
 import {
   routineDetail,
   routines,
@@ -64,9 +64,7 @@ function show() {
         minutes: limitOf(priorityChoice),
       }
     : null
-  let shown: Program = afterPriorities
-  if (table) shown = applyWeakPoints(shown, table, weakChoice) as Program
-  if (!canPrioritize) shown = applyMarkedOptionals(shown, priorityChoice) as Program
+  const shown = applyChoices(program, { weakPoints: weakChoice, priorities: priorityChoice }, level)
   const phases = applyRestRules(phasesView(shown), program.restRules)
   routineDetail.value = {
     status: 'ready',

@@ -1,7 +1,6 @@
-// DATOS DE PRUEBA (ver datos.ts): el orden de la sesión en curso, que se cambia solo hoy («Hacer ahora» y los consejos
+// El orden de la sesión en curso, que se cambia solo hoy («Hacer ahora» y los consejos
 // que se arreglan con un toque), y lo de «Consejos de hoy» (C10). El plan no cambia.
 import { signal } from '@preact/signals'
-import type { SesionMuestra } from './datos.ts'
 import { calentamientos, ejerciciosDe, nombreHoy, terminado, type SesionEnCurso } from './sesionEnCurso.ts'
 
 /** «Mostrar al empezar»: la hoja de consejos se abre sola al empezar una sesión. Desactivado de serie. */
@@ -40,8 +39,8 @@ export function invertir(en: SesionEnCurso, a: number, b: number): SesionEnCurso
 }
 
 /** El calentamiento de cada ejercicio con el orden de hoy (solo calienta el primero de cada músculo), por su número. */
-export function calentamientosHoy(sesion: SesionMuestra, en: SesionEnCurso) {
-  const ejercicios = ejerciciosDe(sesion, en)
+export function calentamientosHoy(en: SesionEnCurso) {
+  const ejercicios = ejerciciosDe(en)
   const enOrden = calentamientos(en.orden.map((i) => ejercicios[i]))
   const plan: (typeof enOrden)[number][] = []
   en.orden.forEach((i, pos) => (plan[i] = enOrden[pos]))
@@ -49,8 +48,8 @@ export function calentamientosHoy(sesion: SesionMuestra, en: SesionEnCurso) {
 }
 
 /** Los ejercicios de hoy en su orden, para «Para esta sesión»: el nombre de hoy y sus series. */
-export const paraConsejos = (sesion: SesionMuestra, en: SesionEnCurso) => {
-  const ejercicios = ejerciciosDe(sesion, en)
+export const paraConsejos = (en: SesionEnCurso) => {
+  const ejercicios = ejerciciosDe(en)
   return en.orden.map((i) => ({
     nombre: nombreHoy(ejercicios[i], en.ejercicios[i]),
     series: en.ejercicios[i].series.length,

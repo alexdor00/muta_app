@@ -3,9 +3,11 @@
 Playwright en un iPhone 13 simulado, sobre la app construida **sin rutinas privadas** (como la CI).
 
 - `bienvenida.spec.ts` — bienvenida completa, elegir rutina, detalle y empezar; guarda capturas en `capturas/` (ignoradas por git).
-- `tu-plan.spec.ts` — Tu plan con los datos de prueba: carrusel y «Empezar», hoja Tu rutina, tocar un músculo, barra al bajar.
+- `plan.ts` — punto de partida de los recorridos de Entreno: perfil, rutina MUTA Cuerpo completo guardada, toca B1 y un
+  historial escrito a mano (B1 hace 7, 14 y 21 días). Los recorridos de Entreno importan `test` de aquí, no de Playwright.
+- `tu-plan.spec.ts` — Tu plan con tu plan: carrusel y «Empezar», hoja Tu rutina, tocar un músculo, barra al bajar, sin rutina.
 - `ver-sesion.spec.ts` — Ver sesión: abrirla desde la tarjeta, gráfica y su medida, desplegar un ejercicio, sesión que no existe.
-- `sesion.spec.ts` — sesión en curso: la vez anterior en gris, teclado, descanso, récord, números imposibles, calentamiento calculado, plegar al terminar, deslizar para eliminar (con ratón), «Terminar» sin series, «Esta sesión» y sus hojas, cambiar el descanso, el resumen.
+- `sesion.spec.ts` — sesión en curso: la vez anterior en gris, teclado, descanso, récord, números imposibles, calentamiento calculado, plegar al terminar, deslizar para eliminar (con ratón), «Terminar» sin series, «Esta sesión» y sus hojas, cambiar el descanso, el resumen, lo apuntado sigue al recargar y terminar guarda y pasa a la siguiente.
 - `accesibilidad.spec.ts` — axe (WCAG 2 A y AA) en las pantallas reales y en `/dev/ui` (claro y oscuro). Falla ante fallos graves.
 - `sistema-diseno.spec.ts` — las piezas de `/dev/ui` miden lo que dicen los tokens.
 - `zz-galeria.spec.ts` — genera la galería de pantallas (solo local).

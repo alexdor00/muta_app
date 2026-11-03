@@ -4,34 +4,17 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- **Rama `pantalla/sesion`** (sale de `pantalla/ver-sesion`, sin commit): sesión en curso con datos de prueba y las funcionalidades del prototipo
-  anterior de esta pantalla (ver `Desktop\MUTA-C01-sesion-todas-funcionalidades.png`): la vez anterior en gris, teclado propio, descanso,
-  récord, calentamiento calculado (`domain/warmup.ts`), validación, deslizar o mantener pulsado para eliminar (con «Deshacer»),
-  plegar al terminar, pausa al tocar el tiempo, «···» (cambiar hoy, nota, discos, cronómetro), descanso abajo solo con Saltar y la tarjeta final al terminar.
-  Hechas también «Esta sesión», tiempo, descanso del ejercicio, cambiar de sesión y descartar (C08, C09, C18, C20, C21).
-  Falta: guardar en IndexedDB, añadir ejercicio y consejos de hoy (sin biblioteca ni textos), la ficha del ejercicio y la imagen
-  para compartir (hoy comparte texto). Sin datos de prueba para
-  «La clave», nota ni superserie. Semana de descarga: solo si la rutina la pauta (decisión 2026-11-02).
-- **Biblioteca de ejercicios (A16)**, en la misma rama y sin commit: los 141 ejercicios del prototipo anterior, sacados con
-  `scripts/exercises-from-prototype.cjs` a `src/shared/content/exercises.json` (con su prueba), buscador sin tildes y filtro por
-  músculo. Se abre desde «Tu rutina» y cada ejercicio lleva a su ficha. Falta «No está en tu material»: el perfil aún no guarda el material.
-- **Ficha del músculo (A17–A21)**, sin commit: barra recta del rango con el punto naranja de tu plan, Mantener · Desarrollar ·
-  Prioridad y a mano, dónde lo entrenas y Consejos (sacados del prototipo). Sin énfasis. Falta: «Añadir un ejercicio» (con Editar
-  rutina, A11), editar y añadir consejos (A22–A23) y guardar lo elegido en el plan real. También: barra del descanso a lo ancho y
-  consejos de Ver sesión plegados.
-- **Consejos de hoy (C10)**, sin commit: en Ver sesión (tarjeta), en la sesión (aviso que se va al empezar) y en «Esta sesión»;
-  «Para esta sesión» según los ejercicios de hoy y los 9 de antes de empezar con casilla; «Invertir hoy» y «Hacer ahora» cambian el
-  orden solo hoy; «Mostrar al empezar», desactivado. La ficha avisa si la última vez y la anterior el ejercicio iba en otro puesto.
-  Arreglado: descartar ya no deja otra sesión vacía contando; soltar el dedo fuera de la fila (el teclado se abre debajo)
-  ya no borra la serie por «mantener pulsado». Falta: el consejo de prioridades (cuando la sesión lea el plan real) y
-  «Editar consejos» (A22–A25).
-- **La sesión usa el motor y la biblioteca**, sin commit: los kilos de hoy salen de la doble progresión (ya no hay kilos a mano),
-  «Añadir ejercicio» (C19) añade uno de la biblioteca solo para hoy y «Cambiar ejercicio» deja elegir cualquiera, filtrado por su
-  músculo.
-- **Ficha del ejercicio** (diseño del 2026-11-02, sin foto), en la misma rama y sin commit: nombre, músculos y pauta, la clave
-  (sin siglas: `plainEffort`), peso sugerido con el **motor de doble progresión** (`domain/progression.ts`), gráfica Máximo ·
-  Volumen con historial de prueba, músculos en el muñeco, descanso (lista y −15/+15, para todas las sesiones) y, desde la sesión,
-  «Empezar ejercicio», que vuelve con ese ejercicio abierto. Sin «···» (cabecera y la clave): editar consejos aún no existe.
+- **Rama `pantalla/sesion`** (sale de `pantalla/ver-sesion`): commit 712da0d con la sesión en curso, el resumen, la biblioteca
+  (A16), las fichas del ejercicio y del músculo (A17–A21), los consejos de hoy (C10) y la hoja «Tu rutina» con «Cambiar de rutina»;
+  encima, **sin commit**, los **datos reales**: Tu plan, Ver sesión, la sesión, el resumen y las fichas leen la rutina guardada y tus
+  entrenos (`workouts`); la sesión que toca va por rotación, lo apuntado se guarda a cada serie y sigue al recargar, y al terminar
+  se guarda y pasa a la siguiente (decisión 2026-11-03). Ya no hay `state/muestra/`. Verificado: `npm run check` (242 tests) y e2e 64 de 64.
+  Falta verlo en un móvil real.
+- **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; Editar rutina (A11, con «Añadir un
+  ejercicio» de la ficha del músculo); editar consejos (A22–A25) y el «···» de la ficha; «No está en tu material» (el perfil no guarda
+  el material); el consejo de prioridades; la imagen para compartir (hoy, texto); enseñar en pantalla lo marcado como `sugeridos`;
+  ficha para los ejercicios que no están en la biblioteca (hoy no tienen). Las cuatro filas «Pronto» de la hoja «Tu rutina».
+  Semana de descarga: solo si la rutina la pauta (decisión 2026-11-02).
 
 - **Unir la rama `pantalla/estilo-blanco-negro` a `main`** (PR en GitHub, con la CI en verde): revisarla antes en un móvil real con
   `npm run dev` (grupos, selector de días, «!» de cada tarjeta, descansos). Hasta ahora solo se ha visto en el navegador simulado.

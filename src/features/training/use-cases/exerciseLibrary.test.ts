@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { libraryProblems } from '../domain/exerciseLibrary.ts'
-import { buscarEjercicios, ejercicioDeBiblioteca, idPorNombre, LIBRARY } from './exerciseLibrary.ts'
+import {
+  buscarEjercicios,
+  ejercicioDeBiblioteca,
+  idPorNombre,
+  LIBRARY,
+  porNombre,
+} from './exerciseLibrary.ts'
 
 describe('biblioteca de ejercicios', () => {
   it('trae los 141 ejercicios del prototipo, sin problemas', () => {
@@ -18,6 +24,7 @@ describe('biblioteca de ejercicios', () => {
     expect(ejercicioDeBiblioteca('no_existe')).toBeNull()
     expect(idPorNombre('Peso muerto rumano')).toBe('peso_muerto_rumano')
     expect(idPorNombre('Otro')).toBeNull()
+    expect(porNombre('peso muerto RUMANO')?.id).toBe('peso_muerto_rumano')
   })
   it('busca en el contenido real', () => {
     expect(buscarEjercicios('jalón', null).map((e) => e.name)).toContain('Jalón al pecho')

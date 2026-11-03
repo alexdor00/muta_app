@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './plan.ts'
 
 // La sesión en curso (C01–C06) con los datos de prueba de state/muestra.
 
@@ -6,7 +6,7 @@ test('«Empezar B1» abre la sesión: tiempo, series y sin pestañas', async ({ 
   await page.goto('/entreno/rutina/b1')
   await page.getByRole('link', { name: 'Empezar B1' }).click()
   await expect(page).toHaveURL('/entreno/sesion/b1')
-  await expect(page.getByText('B1 · 0 de 24 series')).toBeVisible()
+  await expect(page.getByText('B1 · 0 de 17 series')).toBeVisible()
   await expect(page.getByRole('button', { name: /^Tiempo de la sesión/ })).toHaveText(/^0:0\d$/)
   await expect(page.getByRole('navigation', { name: 'Pestañas' })).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Salir' })).toHaveAttribute('href', '/entreno/rutina/b1')
@@ -29,7 +29,8 @@ test('la vez anterior sale en gris y un toque la apunta; el descanso empieza', a
   await expect(page.getByRole('button', { name: /^Calentamiento:/ })).toHaveCount(0)
 
   const descanso = page.getByRole('timer', { name: 'Descanso' })
-  await expect(descanso).toContainText('2:4')
+  // El peso muerto rumano descansa «~3 min»
+  await expect(descanso).toContainText('2:5')
   await descanso.getByRole('button', { name: 'Saltar' }).click()
   await expect(descanso).toHaveCount(0)
 
@@ -87,7 +88,7 @@ test('al terminar las series el ejercicio se pliega y se abre el siguiente', asy
   for (const n of [1, 2, 3]) await page.getByRole('button', { name: `Serie ${n} hecha` }).click()
   await expect(page.getByRole('heading', { name: 'Press inclinado con mancuernas' })).toBeVisible()
   await expect(page.getByRole('button', { name: /Peso muerto rumano.*terminado/ })).toBeVisible()
-  await expect(page.getByText('B1 · 3 de 24 series')).toBeVisible()
+  await expect(page.getByText('B1 · 3 de 17 series')).toBeVisible()
 })
 
 test.describe('con ratón', () => {
@@ -167,7 +168,7 @@ test('tocar el tiempo lo para y lo vuelve a poner en marcha', async ({ page }) =
   await page.waitForTimeout(1500)
   await expect(tiempo).toHaveText(parado!)
   await tiempo.click()
-  await expect(page.getByText('B1 · 0 de 24 series')).toBeVisible()
+  await expect(page.getByText('B1 · 0 de 17 series')).toBeVisible()
 })
 
 test('«···»: nota, cambiar ejercicio solo hoy y discos por lado', async ({ page }) => {
@@ -214,7 +215,7 @@ test('terminar con series sin marcar pregunta y abre el resumen', async ({ page 
   for (let n = 1; n <= 3; n++) await page.getByRole('button', { name: `Serie ${n} hecha` }).click()
   await page.getByRole('button', { name: 'Terminar' }).click()
   const hoja = page.getByRole('dialog', { name: '¿Terminar con tan poco?' })
-  await expect(hoja).toContainText('Solo has hecho 3 de 24 series')
+  await expect(hoja).toContainText('Solo has hecho 3 de 17 series')
   await hoja.getByRole('button', { name: 'Terminar' }).click()
 
   await expect(page).toHaveURL('/entreno/sesion/b1/resumen')
@@ -225,7 +226,7 @@ test('terminar con series sin marcar pregunta y abre el resumen', async ({ page 
 
   await page.getByRole('button', { name: /Me faltó un ejercicio/ }).click()
   await expect(page).toHaveURL('/entreno/sesion/b1')
-  await expect(page.getByText('B1 · 3 de 24 series')).toBeVisible()
+  await expect(page.getByText('B1 · 3 de 17 series')).toBeVisible()
 })
 
 test('«Esta sesión»: tiempo (pausar y contar desde ahora)', async ({ page }) => {
@@ -246,12 +247,12 @@ test('«Esta sesión»: tiempo (pausar y contar desde ahora)', async ({ page }) 
   await hoja.getByRole('button', { name: /Tiempo de la sesión/ }).click()
   await page.getByRole('button', { name: 'Contar desde ahora' }).click()
   await expect(page.getByRole('button', { name: /^Tiempo de la sesión/ })).toHaveText(/^0:0\d$/)
-  await expect(page.getByText('B1 · 0 de 24 series')).toBeVisible()
+  await expect(page.getByText('B1 · 0 de 17 series')).toBeVisible()
 })
 
 test('tocar el descanso lo cambia para ese ejercicio y el descanso usa el nuevo', async ({ page }) => {
   await page.goto('/entreno/sesion/b1')
-  await page.getByRole('button', { name: /Descanso 2:45, cambiar/ }).click()
+  await page.getByRole('button', { name: /Descanso 3:00, cambiar/ }).click()
   const hoja = page.getByRole('dialog', { name: 'Descanso' })
   await expect(hoja).toContainText('Se guarda para Peso muerto rumano')
   await hoja.getByRole('button', { name: '1:30' }).click()
@@ -282,7 +283,7 @@ test('descartar la sesión borra lo apuntado', async ({ page }) => {
   // No queda una sesión vacía contando: al volver a empezar, el tiempo empieza de cero
   await page.waitForTimeout(2500)
   await page.getByRole('link', { name: 'Empezar B1' }).click()
-  await expect(page.getByText('B1 · 0 de 24 series')).toBeVisible()
+  await expect(page.getByText('B1 · 0 de 17 series')).toBeVisible()
   await expect(page.getByRole('button', { name: /^Tiempo de la sesión/ })).toHaveText(/^0:0[01]$/)
 })
 
@@ -298,7 +299,7 @@ test('«Añadir ejercicio» elige uno de la biblioteca y lo abre al final, solo 
   await expect(page.getByRole('heading', { name: 'Hip thrust' })).toBeVisible()
   await expect(page.getByLabel('Kilos de la serie 3')).toBeVisible()
   await expect(page.getByLabel('Kilos de la serie 1')).toHaveAttribute('placeholder', '')
-  await expect(page.getByText('B1 · 0 de 27 series')).toBeVisible()
+  await expect(page.getByText('B1 · 0 de 20 series')).toBeVisible()
 })
 
 test('desde «Esta sesión» también se añade un ejercicio', async ({ page }) => {
@@ -326,4 +327,40 @@ test('«Cambiar ejercicio» deja elegir cualquiera de la biblioteca, filtrada po
   )
   await hoja.getByRole('button', { name: /^Curl femoral sentado/ }).click()
   await expect(page.getByRole('heading', { name: 'Curl femoral sentado' })).toBeVisible()
+})
+
+test('lo apuntado se guarda: sigue al recargar y, al terminar, el entreno queda y toca la siguiente', async ({
+  page,
+}) => {
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: 'Serie 1 hecha' }).click()
+  await page.reload()
+  await expect(page.getByLabel('Kilos de la serie 1')).toHaveValue('60')
+  await expect(page.getByText('B1 · 1 de 17 series')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Terminar' }).click()
+  await page
+    .getByRole('dialog', { name: '¿Terminar con tan poco?' })
+    .getByRole('button', { name: 'Terminar' })
+    .click()
+  await expect(page).toHaveURL('/entreno/sesion/b1/resumen')
+  // «Me faltó un ejercicio» deshace el guardado: B1 sigue tocando
+  await page.getByRole('button', { name: /Me faltó un ejercicio/ }).click()
+  await page.goto('/entreno')
+  await expect(page.getByRole('link', { name: 'Empezar B1' })).toBeVisible()
+
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: 'Terminar' }).click()
+  await page
+    .getByRole('dialog', { name: '¿Terminar con tan poco?' })
+    .getByRole('button', { name: 'Terminar' })
+    .click()
+  await page.getByRole('button', { name: 'Hecho' }).click()
+  await expect(page).toHaveURL('/entreno')
+  await page.reload()
+  await expect(page.getByRole('link', { name: 'Empezar A2' })).toBeVisible()
+  // La próxima B1 tiene como «vez anterior» lo de hoy: 60 × 10 en la serie 1
+  await page.goto('/entreno/rutina/b1')
+  await page.getByRole('button', { name: /Peso muerto rumano/ }).click()
+  await expect(page.getByText('60 × 10')).toBeVisible()
 })

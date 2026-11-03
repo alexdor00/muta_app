@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   formatChange,
+  localDate,
   formatClock,
   formatDayDate,
   formatDecimal,
@@ -63,5 +64,12 @@ describe('formatChange', () => {
     expect(formatChange(-0.066)).toBe('−7 %')
     expect(formatChange(0.024)).toBe('+2 %')
     expect(formatChange(0.001)).toBe('0 %')
+  })
+})
+
+describe('localDate', () => {
+  it('la fecha en hora local, no en UTC', () => {
+    const tarde = new Date(2026, 10, 3, 23, 30)
+    expect(localDate(tarde)).toBe('2026-11-03')
   })
 })

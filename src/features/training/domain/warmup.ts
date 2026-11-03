@@ -16,8 +16,8 @@ const GRANDES: ReadonlySet<MuscleId> = new Set([
 ])
 
 export type EjercicioACalentar = {
-  /** Músculo principal. */
-  musculo: MuscleId
+  /** Músculo principal; null si no se sabe (se calienta como si fuera el primero). */
+  musculo: MuscleId | null
   /** Los que trabajan bastante sin ser el principal: cuentan como ya calentados. */
   secundarios: readonly MuscleId[]
   /** Básico (varias articulaciones) o aislamiento. */
@@ -34,7 +34,7 @@ export type SerieCalentamiento = { kilos: number; reps: number }
 /** Rampa (tanto por uno del peso de trabajo × reps) según el ejercicio; null si no se calienta (peso corporal). */
 export function rampa(e: EjercicioACalentar): [number, number][] | null {
   if (e.pesoCorporal) return null
-  const grande = GRANDES.has(e.musculo)
+  const grande = e.musculo !== null && GRANDES.has(e.musculo)
   if (e.compuesto && grande) {
     return e.kilos !== null && e.kilos >= 30
       ? [
@@ -65,8 +65,8 @@ export function planCalentamiento(
 ): (SerieCalentamiento[] | null)[] {
   const calentados = new Set<MuscleId>()
   return ejercicios.map((e) => {
-    const primero = !calentados.has(e.musculo)
-    calentados.add(e.musculo)
+    const primero = e.musculo === null || !calentados.has(e.musculo)
+    if (e.musculo) calentados.add(e.musculo)
     for (const m of e.secundarios) calentados.add(m)
     const pasos = primero ? rampa(e) : null
     if (!pasos || e.kilos === null) return null

@@ -83,3 +83,19 @@ lo cambia solo hoy («Invertir hoy», «Hacer ahora»), y la ficha avisa cuando 
 El usuario pidió el rango de series en una barra recta (no en medio círculo, como el prototipo) y el punto de tu plan en naranja:
 el naranja deja de ser solo de la racha y los récords (token `--range-dot`, el mismo color que `--streak`). El énfasis
 (Equilibrado · Estirado · Acortado) no se pone: solo sirve al coach, que aún no existe.
+
+## 2026-11-03 · Datos reales en Entreno: rotación, relleno marcado y semana al completarla
+
+Tu plan, Ver sesión, la sesión, el resumen y las fichas dejan los datos de prueba y leen la rutina guardada y tus entrenos
+(`workouts`). El usuario decidió tres cosas:
+
+- **La sesión que toca va por rotación**: la siguiente a la última que hiciste. No hay días fijos de la semana; por eso la
+  racha cuenta los descansos que deja tu semana (7 menos sus sesiones), no qué día caen (`domain/streak.ts`).
+- **Lo que no trae la rutina se rellena y se marca**: el 78 % de los ejercicios de las rutinas no está en la biblioteca y casi
+  ninguno trae su músculo. Primero manda la rutina, luego la biblioteca y, si no, un valor por costumbre (3 series, 8–12, a 2
+  del fallo, 2,5 kg; el descanso, por tipo) que queda en `sugeridos`; el músculo sale del nombre (`muscleOf`). Con un rango de
+  RPE vale el más alto; con uno de descanso, el medio (`restMinutes`, el mismo que los minutos de la rutina).
+- **La semana pasa al completarla**, no por calendario; tras la última semana de la última fase se vuelve a empezar.
+
+Las sesiones sin sigla en su nombre («Torso 1») se llaman S1, S2… por su orden en la semana. La sesión en curso se guarda a
+cada cambio con una copia de sus ejercicios, así el resumen compara con la vez anterior aunque el entreno ya esté guardado.

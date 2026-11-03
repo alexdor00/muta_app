@@ -1,25 +1,33 @@
-// Lo que enseña la ficha de un ejercicio con los DATOS DE PRUEBA (se borra con el resto de state/muestra/).
-import { formatDecimal } from '../../../../shared/lib/format.ts'
-import type { LibraryExercise } from '../../domain/exerciseLibrary.ts'
-import { progresoDe } from '../../domain/exerciseProgress.ts'
-import { suggestFor } from '../../domain/progression.ts'
-import { anteriores } from './datos.ts'
-import { enTuPlan, historialEjercicio, rangoDe, sugerenciaDe } from './ejercicios.ts'
+// Lo que enseña la ficha de un ejercicio: tu plan y tus entrenos.
+import { formatDecimal } from '../../../shared/lib/format.ts'
+import type { LibraryExercise } from '../domain/exerciseLibrary.ts'
+import { progresoDe } from '../domain/exerciseProgress.ts'
+import { suggestFor } from '../domain/progression.ts'
+import { historialDe, ultimaVez } from '../domain/workoutHistory.ts'
+import { rangoDe, sugerenciaDe } from '../domain/workoutPlan.ts'
+import { entrenos, enTuPlan } from './plan.ts'
 
 /**
  * La ficha de un ejercicio de la biblioteca: si está en tu plan, con la pauta de su sesión, lo que toca hoy (lo mismo
  * que propone la sesión: doble progresión desde la última vez) y su historial; si no, con lo de la biblioteca y
  * «Primera vez».
  */
-export function fichaMuestra(ex: LibraryExercise) {
+export function fichaDe(ex: LibraryExercise) {
   const plan = enTuPlan(ex.name)
+  const ultima = ultimaVez(entrenos.value, ex.name)
   const rango = (plan && rangoDe(plan.e.reps)) ?? ex.reps
   const rir = plan ? plan.e.rir : ex.rir
   const pesoCorporal = ex.equipment === 'bodyweight' || Boolean(plan?.e.pesoCorporal)
   const sugerencia = plan
     ? sugerenciaDe(plan.e)
-    : suggestFor({ ultima: null, rango, rir, salto: ex.stepKg, pesoCorporal })
-  const antes = plan ? anteriores(plan.e)[0] : null
+    : suggestFor({
+        ultima: ultima.length ? ultima.map((s) => ({ ...s, rir: null })) : null,
+        rango,
+        rir,
+        salto: ex.stepKg,
+        pesoCorporal,
+      })
+  const antes = ultima[0] ?? null
   // Como en el prototipo: «+1 rep» si con el mismo peso toca una rep más que la última vez
   const etiqueta = {
     sube: '↑ Sube',
@@ -41,6 +49,6 @@ export function fichaMuestra(ex: LibraryExercise) {
           ? `${formatDecimal(sugerencia.kg)} kg × ${sugerencia.reps}`
           : `${sugerencia.reps} reps`,
     },
-    progreso: plan ? progresoDe(historialEjercicio(plan.e), rir) : [],
+    progreso: progresoDe(historialDe(entrenos.value, ex.name), rir),
   }
 }

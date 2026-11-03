@@ -10,13 +10,14 @@ describe('ficha del músculo con el contenido real', () => {
     expect(consejosDeMusculo('cuello')?.tips).toEqual([])
   })
 
-  it('el plan se une con la biblioteca por el nombre (los que no están no cuentan)', () => {
+  it('el plan se une con la biblioteca por el nombre; si no está, cuenta para su músculo, y si no se sabe, no cuenta', () => {
     const huecos = huecosDelPlan([
       {
         sigla: 'B1',
         ejercicios: [
           { nombre: 'Peso muerto rumano', series: 3 },
           { nombre: 'No existe', series: 2 },
+          { nombre: 'Curl predicador', series: 4, musculo: 'biceps' },
         ],
       },
     ])
@@ -28,6 +29,7 @@ describe('ficha del músculo con el contenido real', () => {
         series: 3,
         contributes: expect.objectContaining({ femoral: 1 }),
       },
+      { id: null, sigla: 'B1', nombre: 'Curl predicador', series: 4, contributes: { biceps: 1 } },
     ])
   })
 })

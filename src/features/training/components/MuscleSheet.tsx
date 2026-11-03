@@ -8,7 +8,8 @@ import styles from './MuscleSheet.module.css'
 // Ficha del músculo (A17–A21 del prototipo anterior): el rango en una barra recta con el punto naranja de tu plan
 // (decisión 2026-11-03), y dos pestañas, Resumen y Consejos. Sin énfasis: lo usa el coach, que aún no está.
 
-type Fila = { id: string; nombre: string; sigla: string; series: number; href: string }
+/** Sin `href` (no está en la biblioteca), la fila no lleva a ninguna ficha. */
+type Fila = { id: string | null; nombre: string; sigla: string; series: number; href: string | null }
 
 type Props<M extends string> = {
   titulo: string
@@ -66,20 +67,34 @@ function RangeBar(p: { series: number; rango: [number, number]; max: number; ver
   )
 }
 
+function FilaTexto({ f }: { f: Fila }) {
+  return (
+    <>
+      <span class={styles.rowName}>
+        {f.nombre} <small>{f.sigla}</small>
+      </span>
+      <span class={styles.rowSets}>
+        {f.series} {f.series === 1 ? 'serie' : 'series'}
+      </span>
+    </>
+  )
+}
+
 function Filas({ filas }: { filas: Fila[] }) {
   return (
     <ul class={styles.rows}>
       {filas.map((f) => (
-        <li key={`${f.sigla}-${f.id}`}>
-          <a class={styles.row} href={f.href}>
-            <span class={styles.rowName}>
-              {f.nombre} <small>{f.sigla}</small>
-            </span>
-            <span class={styles.rowSets}>
-              {f.series} {f.series === 1 ? 'serie' : 'series'}
-            </span>
-            <ChevronRightIcon />
-          </a>
+        <li key={`${f.sigla}-${f.nombre}`}>
+          {f.href ? (
+            <a class={styles.row} href={f.href}>
+              <FilaTexto f={f} />
+              <ChevronRightIcon />
+            </a>
+          ) : (
+            <div class={styles.row}>
+              <FilaTexto f={f} />
+            </div>
+          )}
         </li>
       ))}
     </ul>

@@ -59,4 +59,12 @@ describe('planCalentamiento', () => {
     )
     expect(planCalentamiento([{ ...base, kilos: null }])).toEqual([null])
   })
+
+  it('sin músculo conocido se calienta siempre, como un músculo pequeño', () => {
+    const plan = planCalentamiento([
+      { ...base, musculo: null, compuesto: false, kilos: 40 },
+      { ...base, musculo: null, compuesto: false, kilos: 40 },
+    ])
+    expect(plan).toEqual([[{ kilos: 22.5, reps: 10 }], [{ kilos: 22.5, reps: 10 }]])
+  })
 })

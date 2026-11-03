@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks'
-import type { SesionEnCurso } from '../../state/muestra/sesionEnCurso.ts'
+import type { SesionEnCurso } from '../../state/sesionEnCurso.ts'
 
 /** El aviso de abajo (4 s) y, si lo lleva, lo que se acaba de borrar para «Deshacer» mientras dura. */
 export function useAviso() {

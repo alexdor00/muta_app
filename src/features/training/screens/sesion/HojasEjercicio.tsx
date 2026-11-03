@@ -4,14 +4,14 @@ import { paths } from '../../../../shared/lib/paths.ts'
 import { SetTimer } from '../../components/SetTimer.tsx'
 import { PlatesSheet } from '../../components/PlatesSheet.tsx'
 import { ExerciseOptionsSheet, NoteSheet, SwapSheet } from '../../components/WorkoutSheets.tsx'
-import type { EjercicioMuestra } from '../../state/muestra/datos.ts'
-import { hacerAhora } from '../../state/muestra/ordenHoy.ts'
+import type { EjercicioPlan } from '../../state/plan.ts'
+import { hacerAhora } from '../../state/ordenHoy.ts'
 import {
   grises,
   guardarSesion,
   type EjercicioEnCurso,
   type SesionEnCurso,
-} from '../../state/muestra/sesionEnCurso.ts'
+} from '../../state/sesionEnCurso.ts'
 import { discosPorLado } from '../../state/routines.ts'
 import { idPorNombre } from '../../use-cases/exerciseLibrary.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
@@ -21,7 +21,7 @@ type Hoja = 'opciones' | 'cambiar' | 'biblioteca' | 'nota' | 'discos' | 'cronome
 type Barra = '20' | '15' | '10' | '0'
 
 type Props = {
-  e: EjercicioMuestra
+  e: EjercicioPlan
   x: EjercicioEnCurso
   nombre: string
   /** La sesión y el ejercicio, para que su ficha pueda volver con él abierto. */

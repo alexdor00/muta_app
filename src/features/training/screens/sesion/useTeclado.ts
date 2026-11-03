@@ -2,14 +2,13 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import { formatDecimal } from '../../../../shared/lib/format.ts'
 import type { CampoSerie } from '../../components/WorkoutExercise.tsx'
 import type { Tecla } from '../../components/WorkoutKeypad.tsx'
-import type { SesionMuestra } from '../../state/muestra/datos.ts'
 import {
   ejerciciosDe,
   grises,
   guardarSesion,
   nombreHoy,
   type SesionEnCurso,
-} from '../../state/muestra/sesionEnCurso.ts'
+} from '../../state/sesionEnCurso.ts'
 import { teclear } from '../../state/routines.ts'
 
 export type Casilla = { ej: number; serie: number; campo: CampoSerie }
@@ -30,7 +29,7 @@ const ORDEN: CampoSerie[] = ['kg', 'reps', 'quedan']
  * El teclado propio de la sesión (C02): qué casilla se escribe, qué hace cada tecla, › a la casilla siguiente sin hacer,
  * y tocar fuera lo cierra. La casilla que se escribe sube por encima del teclado.
  */
-export function useTeclado(sesion: SesionMuestra | null, en: SesionEnCurso | null) {
+export function useTeclado(en: SesionEnCurso | null) {
   const [activa, setActiva] = useState<Casilla | null>(null)
   // La primera tecla tras entrar en una casilla sustituye lo que hay; las siguientes escriben detrás
   const [fresca, setFresca] = useState(true)
@@ -58,10 +57,10 @@ export function useTeclado(sesion: SesionMuestra | null, en: SesionEnCurso | nul
   }
 
   function tecla(t: Tecla) {
-    if (!activa || !en || !sesion) return
+    if (!activa || !en) return
     const { ej, serie, campo } = activa
     const x = en.ejercicios[ej]
-    const e = ejerciciosDe(sesion, en)[ej]
+    const e = ejerciciosDe(en)[ej]
     const r = teclear(
       { campo, valor: x.series[serie][campo], gris: grises(e, x, serie)[campo], fresca, salto: e.salto },
       t,
@@ -82,7 +81,7 @@ export function useTeclado(sesion: SesionMuestra | null, en: SesionEnCurso | nul
     entrar(otra >= 0 ? { ej, serie: otra, campo: 'kg' } : null)
   }
 
-  const e = activa && sesion && en ? ejerciciosDe(sesion, en)[activa.ej] : null
+  const e = activa && en ? ejerciciosDe(en)[activa.ej] : null
   const vista =
     activa && e && en
       ? {

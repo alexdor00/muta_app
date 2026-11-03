@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './plan.ts'
 
 // Tu plan (pestaña Entreno) con los datos de prueba de state/muestra: carrusel, «Empezar», hoja y músculos.
 
@@ -89,12 +89,13 @@ test('tocar un músculo enseña sus series y tocar fuera las quita', async ({ pa
   const burbuja = page.locator('[aria-live="polite"]')
   // Se toca un trozo del músculo (el bíceps son dos piezas, una por brazo)
   await page
-    .getByRole('button', { name: /^Bíceps: 9 series/ })
+    .getByRole('button', { name: /^Bíceps: 4 series/ })
     .locator('path')
     .first()
     .click()
   await expect(burbuja).toContainText('Bíceps')
-  await expect(burbuja).toContainText('9 series hoy')
+  // B1: curl inclinado y curl predicador, 2 series cada uno
+  await expect(burbuja).toContainText('4 series hoy')
 
   await page.getByRole('radio', { name: 'Semana' }).check({ force: true })
   await expect(burbuja).toContainText('esta semana')
@@ -110,4 +111,21 @@ test('al bajar queda arriba una barra con «Entrenamiento»', async ({ page }) =
   await page.evaluate(() => window.scrollTo(0, 600))
   await expect(page.getByText('Entrenamiento', { exact: true }).first()).toBeInViewport()
   await expect(page.getByRole('heading', { name: 'Entrenamiento', level: 1 })).not.toBeInViewport()
+})
+
+test('sin rutina elegida lo dice y lleva al catálogo', async ({ page }) => {
+  await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((ok) => {
+      const r = indexedDB.open('muta')
+      r.onsuccess = () => ok(r.result)
+    })
+    const tx = db.transaction('plans', 'readwrite')
+    tx.objectStore('plans').delete('current')
+    await new Promise((ok) => (tx.oncomplete = ok))
+    db.close()
+  })
+  await page.goto('/entreno')
+  await expect(page.getByText('Aún no has elegido rutina.')).toBeVisible()
+  await page.getByRole('link', { name: 'Elegir rutina' }).click()
+  await expect(page).toHaveURL('/entreno/rutinas')
 })

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './plan.ts'
 
 // Ficha del ejercicio (diseño aprobado del 2026-11-02): datos de prueba de state/muestra/ y la biblioteca real.
 
@@ -13,7 +13,7 @@ test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos
   const pauta = page.getByRole('list', { name: 'Pauta' })
   await expect(pauta.getByLabel('3 series')).toBeVisible()
   await expect(pauta.getByLabel('6 a 10 repeticiones')).toBeVisible()
-  await expect(pauta.getByLabel('Descanso 2:45')).toBeVisible()
+  await expect(pauta.getByLabel('Descanso 3:00')).toBeVisible()
 
   await expect(page.getByRole('region', { name: 'La clave' })).not.toContainText('RIR')
   const sugerido = page.getByRole('region', { name: 'Peso sugerido' })
@@ -33,8 +33,8 @@ test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos
 
   const descanso = page.getByRole('region', { name: 'Descanso' })
   await descanso.getByRole('button', { name: '15 segundos más' }).click()
-  await expect(descanso.getByRole('button', { name: /^Descanso 3:00/ })).toBeVisible()
-  await descanso.getByRole('button', { name: /^Descanso 3:00/ }).click()
+  await expect(descanso.getByRole('button', { name: /^Descanso 3:15/ })).toBeVisible()
+  await descanso.getByRole('button', { name: /^Descanso 3:15/ }).click()
   await page.getByRole('dialog', { name: 'Descanso' }).getByRole('button', { name: '2:00' }).click()
   await expect(pauta.getByLabel('Descanso 2:00')).toBeVisible()
   // Solo se puede empezar si vienes de la sesión

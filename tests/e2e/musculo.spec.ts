@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './plan.ts'
 
 // Ficha del músculo (A17–A21): barra del rango, objetivo, a mano, dónde lo entrenas y consejos. Datos de prueba.
 
@@ -11,16 +11,18 @@ test('desde la ficha del ejercicio: rango en barra, objetivo, a mano y dónde lo
     .getByRole('button', { name: 'Femoral' })
     .click()
   const hoja = page.getByRole('dialog', { name: 'Femoral' })
-  // Rumano 3 + 3 y curl femoral 2 + 2 a la semana: 10, dentro de 6–10
+  // Rumano 3 y curl femoral tumbado 2 (B1) y curl femoral sentado 2 (B2): 7, dentro de 6–10
   await expect(
-    hoja.getByRole('img', { name: /^10 series por semana en tu plan\. Tu rango es 6–10\. Vas bien/ }),
+    hoja.getByRole('img', { name: /^7 series por semana en tu plan\. Tu rango es 6–10\. Vas bien/ }),
   ).toBeVisible()
   await expect(hoja.getByRole('button', { name: /^Desarrollar/ })).toHaveAttribute('aria-pressed', 'true')
   await expect(hoja.getByRole('link', { name: /^Peso muerto rumano B1/ })).toBeVisible()
-  await expect(hoja.getByRole('link', { name: /^Curl femoral tumbado B2/ })).toBeVisible()
+  await expect(hoja.getByRole('link', { name: /^Curl femoral sentado B2/ })).toBeVisible()
 
+  // Con Prioridad, 7 se queda por debajo de 10–12
   await hoja.getByRole('button', { name: /^Prioridad/ }).click()
-  await expect(hoja.getByRole('img', { name: /Tu rango es 10–12. Vas bien/ })).toBeVisible()
+  await expect(hoja.getByRole('img', { name: /Tu rango es 10–12\./ })).toBeVisible()
+  await expect(hoja.getByRole('img', { name: /Vas bien/ })).toHaveCount(0)
 
   await hoja.getByText('Ajustar a mano').click()
   await hoja.getByRole('button', { name: 'Máximo: más' }).click()

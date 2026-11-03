@@ -8,11 +8,11 @@ export type WeekDay = {
   estado: 'hecho' | 'hoy' | 'pendiente' | 'descanso'
 }
 
-type Props = { dias: readonly WeekDay[] }
+/** `total`: entrenos de tu semana (las sesiones de la rutina). */
+type Props = { dias: readonly WeekDay[]; total: number }
 
 /** «Tu semana»: entrenos hechos, barra de progreso y un círculo por día (sin leyenda: se entiende sola). */
-export function WeekCard({ dias }: Props) {
-  const total = dias.filter((d) => d.sigla).length
+export function WeekCard({ dias, total }: Props) {
   const hechos = dias.filter((d) => d.estado === 'hecho').length
   return (
     <section class={styles.card} aria-labelledby="tu-semana">

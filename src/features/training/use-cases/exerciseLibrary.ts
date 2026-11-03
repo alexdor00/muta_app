@@ -10,12 +10,18 @@ export function ejercicioDeBiblioteca(id: string): LibraryExercise | null {
   return LIBRARY.find((e) => e.id === id) ?? null
 }
 
-/** El id de un ejercicio por su nombre exacto (los de una sesión), o null si no está en la biblioteca. */
+/** El id de un ejercicio por su nombre (los de una sesión), o null si no está en la biblioteca. */
 export function idPorNombre(nombre: string): string | null {
-  return LIBRARY.find((e) => e.name === nombre)?.id ?? null
+  return porNombre(nombre)?.id ?? null
 }
 
 /** Buscar en la biblioteca por nombre y, si hay, por músculo principal. */
 export function buscarEjercicios(query: string, muscle: MuscleId | null): LibraryExercise[] {
   return searchLibrary(LIBRARY, query, muscle)
+}
+
+/** Un ejercicio de la biblioteca por su nombre, sin mirar mayúsculas (los de una rutina), o null. */
+export function porNombre(nombre: string): LibraryExercise | null {
+  const n = nombre.toLowerCase()
+  return LIBRARY.find((e) => e.name.toLowerCase() === n) ?? null
 }

@@ -14,8 +14,8 @@ import {
 } from '../../components/ExerciseFicha.tsx'
 import { SessionProgress } from '../../components/SessionProgress.tsx'
 import { RestChoiceSheet } from '../../components/WorkoutSheets.tsx'
-import { fichaMuestra } from '../../state/muestra/ficha.ts'
-import { descansoDe, elegirDescanso, pedirEjercicio } from '../../state/muestra/sesionEnCurso.ts'
+import { fichaDe } from '../../state/ficha.ts'
+import { descansoDe, elegirDescanso, pedirEjercicio } from '../../state/sesionEnCurso.ts'
 import {
   avisoDeOrden,
   cambioDesdePrimera,
@@ -26,6 +26,7 @@ import {
 } from '../../state/routines.ts'
 import { ejercicioDeBiblioteca } from '../../use-cases/exerciseLibrary.ts'
 import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
+import { usePlan } from '../comun/usePlan.ts'
 import styles from './FichaEjercicioScreen.module.css'
 
 const METRICAS = [
@@ -39,10 +40,11 @@ const NOMBRES = Object.fromEntries(MUSCLE_IDS.map((id) => [id, MUSCLES[id].label
 /**
  * Ficha del ejercicio (diseño aprobado del 2026-11-02, sin foto): nombre y pauta, la clave, el peso que toca hoy con su
  * porqué (doble progresión), cómo ha ido a lo largo del tiempo, qué músculos trabaja y su descanso. Desde la sesión,
- * «Empezar ejercicio» vuelve a ella con este ejercicio abierto. Datos de prueba (state/muestra/).
+ * «Empezar ejercicio» vuelve a ella con este ejercicio abierto. Con tu plan y tus entrenos.
  */
 export function FichaEjercicioScreen(props: { exerciseId: string }) {
   const { query, route } = useLocation()
+  usePlan()
   const [metrica, setMetrica] = useState<MetricaEjercicio>('maximo')
   const [eligiendo, setEligiendo] = useState(false)
   const [musculo, setMusculo] = useState<MuscleId | null>(null)
@@ -55,7 +57,7 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
       </Pending>
     )
   }
-  const f = fichaMuestra(ex)
+  const f = fichaDe(ex)
   const musculos = (min: number, max: number) =>
     (Object.entries(ex.contributes) as [MuscleId, number][])
       .filter(([, c]) => c >= min && c < max)

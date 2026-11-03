@@ -1,13 +1,13 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './plan.ts'
 
-// Ver sesión (al tocar una tarjeta de Tu plan) con los datos de prueba de state/muestra.
+// Ver sesión (al tocar una tarjeta de Tu plan) con el plan de prueba (plan.ts): B1 real de MUTA y su historial.
 
 test('la tarjeta de B1 abre Ver sesión, sin pestañas, y «Empezar B1» lleva a la sesión', async ({ page }) => {
   await page.goto('/entreno')
   await page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).click()
   await expect(page).toHaveURL('/entreno/rutina/b1')
   await expect(page.getByRole('heading', { name: 'B1 Isquios, glúteo y pecho', level: 1 })).toBeVisible()
-  await expect(page.getByText('7 ejercicios · 24 series · 65 min')).toBeVisible()
+  await expect(page.getByText('7 ejercicios · 17 series · 55 min')).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Pestañas' })).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Empezar B1' })).toHaveAttribute('href', '/entreno/sesion/b1')
   await page.getByRole('link', { name: 'Volver a Tu plan' }).click()
@@ -16,14 +16,14 @@ test('la tarjeta de B1 abre Ver sesión, sin pestañas, y «Empezar B1» lleva a
 
 test('la gráfica enseña la última vez y cambia de medida', async ({ page }) => {
   await page.goto('/entreno/rutina/b1')
-  await expect(page.getByText('7,1 t', { exact: true })).toBeVisible()
-  await expect(page.getByText('−7 % que la anterior')).toBeVisible()
-  await expect(page.getByText('Mar 20 oct')).toBeVisible()
+  // Hace 7 días, 5493 kg; hace 14, con 2,5 kg menos en cada serie, 5040 kg
+  await expect(page.getByText('5,5 t', { exact: true })).toBeVisible()
+  await expect(page.getByText('+10 % que la anterior')).toBeVisible()
   await expect(page.getByRole('img', { name: /^Tonelaje de \d+ entrenos$/ })).toBeVisible()
 
   await page.getByText('Repeticiones', { exact: true }).click()
-  await expect(page.getByText('274 reps', { exact: true })).toBeVisible()
-  await expect(page.getByText('−10 % que la anterior')).toBeVisible()
+  await expect(page.getByText('181 reps', { exact: true })).toBeVisible()
+  await expect(page.getByText('Igual que la anterior')).toBeVisible()
   await expect(page.getByRole('img', { name: /^Repeticiones de \d+ entrenos$/ })).toBeVisible()
 })
 

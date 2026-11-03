@@ -5,8 +5,8 @@ import type { MuscleId, Range } from './muscles.ts'
 
 /** Un ejercicio de una sesión de la semana: su sesión, sus series y lo que aporta a cada músculo. */
 export type HuecoPlan = {
-  /** El ejercicio en la biblioteca. */
-  id: string
+  /** El ejercicio en la biblioteca (null si no está: entonces solo cuenta para su músculo principal). */
+  id: string | null
   sigla: string
   nombre: string
   series: number

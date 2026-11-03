@@ -1,14 +1,16 @@
 import { useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
-import { formatDayDate, formatDecimal, formatTons } from '../../../../shared/lib/format.ts'
+import { formatDayDate, formatDecimal, formatTons, localDate } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { WorkoutSummary } from '../../components/WorkoutSummary.tsx'
-import { MUESTRA, sesionMuestra } from '../../state/muestra/datos.ts'
-import { guardarSesion, resumenDe, segundosSesion, sesionEnCurso } from '../../state/muestra/sesionEnCurso.ts'
+import { descansosPorSemana, entrenos, semanaDe, sesiones, tocaHoy } from '../../state/plan.ts'
+import { guardarSesion, resumenDe, segundosSesion, sesionEnCurso } from '../../state/sesionEnCurso.ts'
 import { diasDeRacha } from '../../state/routines.ts'
+import { reabrirEntreno } from '../../use-cases/training.ts'
 import { compartir } from '../../use-cases/workoutFeedback.ts'
+import { usePlan } from '../comun/usePlan.ts'
 
 type Serie = { kg: number | null; reps: number }
 
@@ -33,32 +35,33 @@ function cambioDe(hoy: Serie, antes: Serie | null) {
 /**
  * Resumen de la sesión que se acaba de terminar (C24): la racha con su fuego y la semana, series superadas, récords,
  * volumen y duración, y cada ejercicio frente a la última vez. «Hecho» la cierra; «Me faltó un ejercicio» vuelve a la
- * sesión. Datos de prueba (state/muestra/).
+ * sesión (y deshace su guardado).
  */
 export function ResumenScreen(props: { sessionId: string }) {
   const { route } = useLocation()
   const [aviso, setAviso] = useState<string | null>(null)
-  const sesion = sesionMuestra(props.sessionId)
+  usePlan()
   const en = sesionEnCurso.value
-  if (!sesion || !en || en.sigla !== sesion.sigla || en.terminada === null) {
+  if (!en || en.sigla.toLowerCase() !== props.sessionId.toLowerCase() || en.terminada === null) {
     return (
       <Pending code="C24" title="No hay ninguna sesión terminada">
         <a href={paths.training}>Volver a Tu plan</a>
       </Pending>
     )
   }
-  const r = resumenDe(sesion, en)
-  const fecha = formatDayDate(MUESTRA.hoy).toLowerCase()
+  const sesion = en
+  const r = resumenDe(en)
+  const hoy = localDate(new Date(en.terminada))
+  const fecha = formatDayDate(hoy).toLowerCase()
   const minutos = Math.max(1, Math.round(segundosSesion(en, en.terminada) / 60))
-  // La semana y la racha de prueba, con la sesión de hoy ya hecha
-  const semana = MUESTRA.semana.map((d) => ({
+  // Tu semana y la racha con lo guardado (el entreno de hoy ya está dentro)
+  const diaHoy = (new Date(`${hoy}T00:00:00Z`).getUTCDay() + 6) % 7
+  const semana = semanaDe(entrenos.value, hoy, tocaHoy.value?.sigla ?? '').map((d, i) => ({
     letra: d.letra,
-    hecho: d.estado === 'hecho' || d.sigla === sesion.sigla,
-    hoy: d.estado === 'hoy',
+    hecho: d.estado === 'hecho',
+    hoy: i === diaHoy,
   }))
-  // Los días de descanso del plan cuentan (lunes = 0)
-  const descansos = MUESTRA.semana.flatMap((d, i) => (d.estado === 'descanso' ? [i] : []))
-  const racha = diasDeRacha([...MUESTRA.entrenos.map((x) => x.fecha), MUESTRA.hoy], descansos, MUESTRA.hoy)
+  const racha = diasDeRacha([...entrenos.value.map((x) => x.fecha), hoy], descansosPorSemana.value, hoy)
   const comparados = r.ejercicios.filter((e) => e.cambio !== null)
 
   return (
@@ -67,7 +70,7 @@ export function ResumenScreen(props: { sessionId: string }) {
         sigla={sesion.sigla}
         subtitulo={`${sesion.nombre} · ${fecha}`}
         racha={racha}
-        semanaTexto={`${semana.filter((d) => d.hecho).length} de ${MUESTRA.semana.filter((d) => d.sigla).length} esta semana`}
+        semanaTexto={`${semana.filter((d) => d.hecho).length} de ${sesiones.value.length} esta semana`}
         semana={semana}
         cifras={[
           { valor: String(r.superadas), unidad: `de ${r.comparables}`, nombre: 'Series superadas' },
@@ -97,7 +100,7 @@ export function ResumenScreen(props: { sessionId: string }) {
           }
         }}
         onVolver={() => {
-          guardarSesion({ ...en, terminada: null })
+          void reabrirEntreno(en)
           route(paths.session(sesion.sigla.toLowerCase()))
         }}
       />
