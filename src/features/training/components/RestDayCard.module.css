@@ -1,0 +1,39 @@
+/* Hoy descansas: del alto de las tarjetas de sesión, gris claro, con la luna arriba y el texto abajo. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: calc(var(--photo-card-height) * 1.4);
+  margin: 0 var(--gutter);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--label);
+}
+
+.moon {
+  margin-bottom: auto;
+  color: var(--label);
+}
+
+.moon svg {
+  width: calc(var(--icon) * 2);
+  height: calc(var(--icon) * 2);
+}
+
+.title {
+  margin: 0;
+  font: var(--text-session-title);
+  text-transform: uppercase;
+}
+
+.text {
+  margin: var(--space-1) 0 0;
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.text b {
+  color: var(--label);
+}

@@ -6,12 +6,16 @@ export type WeekDay = {
   dia: number
   sigla: string
   estado: 'hecho' | 'hoy' | 'pendiente' | 'descanso'
+  hoy: boolean
 }
 
 /** `total`: entrenos de tu semana (las sesiones de la rutina). */
 type Props = { dias: readonly WeekDay[]; total: number }
 
-/** «Tu semana»: entrenos hechos, barra de progreso y un círculo por día (sin leyenda: se entiende sola). */
+/**
+ * «Tu semana»: entrenos hechos, barra de progreso y un círculo por día: ✓ lo hecho, la luna los descansos (también los que
+ * tocan) y la sigla de lo que toca (sin leyenda: se entiende sola).
+ */
 export function WeekCard({ dias, total }: Props) {
   const hechos = dias.filter((d) => d.estado === 'hecho').length
   return (
@@ -32,9 +36,7 @@ export function WeekCard({ dias, total }: Props) {
             <span class={styles.circle} role="img" aria-label={`${d.letra} ${d.dia}: ${d.estado}`}>
               {d.estado === 'hecho' ? <CheckIcon /> : d.estado === 'descanso' ? <MoonIcon /> : d.sigla}
             </span>
-            <span class={styles.note}>
-              {d.estado === 'hoy' ? 'HOY' : d.estado === 'hecho' ? d.sigla : ''}
-            </span>
+            <span class={styles.note}>{d.hoy ? 'HOY' : d.estado === 'hecho' ? d.sigla : ''}</span>
           </li>
         ))}
       </ol>

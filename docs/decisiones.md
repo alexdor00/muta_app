@@ -184,3 +184,11 @@ píldoras («Tu semana») y el descanso tras cada una se pone tocando el hueco d
 llevar el nombre que quieras (se guarda en el plan y sale en todas partes). Los consejos van en una fila que abre su hoja,
 numerados como en la ficha del músculo. Un descanso de 0 en el documento (pasar directamente al siguiente) se enseña como
 «sin descanso», sin cambiar el dato.
+
+## 2026-11-04 · Tu semana con lo planeado, el día de descanso y tu rutina desde un CSV
+
+«Tu semana» de Tu plan ya no deja vacío lo que falta: desde el primer día sin entrenar reparte las sesiones que tocan en su
+orden con sus descansos obligatorios (si un día no entrenas, todo se corre, porque la rutina va por rotación). Cuando hoy
+toca descanso, la tarjeta de la sesión deja paso a «Hoy descansas» con «Entrenar igualmente». El esfuerzo de un ejercicio
+se escribe como «Repeticiones antes del fallo» con − / +, en vez de una lista. El usuario pidió cargar su propia rutina
+desde un CSV: se guarda como un programa más (`programs`, id `mia:…`) y el plan la lee como las del catálogo.

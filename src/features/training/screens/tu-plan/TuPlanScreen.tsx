@@ -9,6 +9,7 @@ import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { MusclesCard } from '../../components/MusclesCard.tsx'
 import { SessionCard } from '../../components/SessionCard.tsx'
 import { TuRutinaSheet } from '../../components/TuRutinaSheet.tsx'
+import { RestDayCard } from '../../components/RestDayCard.tsx'
 import { WeekCard } from '../../components/WeekCard.tsx'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import { fotosSesion } from '../../state/fotos.ts'
@@ -19,11 +20,12 @@ import {
   descansasHoy,
   detalleSesion,
   entrenos,
-  semanaDe,
   seriesPorMusculo,
   sesiones as sesionesPlan,
   tocaHoy,
   tonoDe,
+  tuSemana,
+  type Tono,
 } from '../../state/plan.ts'
 import { MUSCLES, type MuscleId } from '../../state/routines.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
@@ -54,14 +56,14 @@ function TuPlan({ siguiente }: { siguiente: number }) {
   const [lado, setLado] = useState<'front' | 'back'>('front')
   const [musculo, setMusculo] = useState<string | null>(null)
   const [ficha, setFicha] = useState<MuscleId | null>(null)
-  // Con el dedo se desliza; con el ratón, se arrastra
-  const carrusel = useDragScroll<HTMLDivElement>()
+  // Hoy toca descanso, pero quieres entrenar: vuelven las sesiones y «Empezar»
+  const [entrenarIgual, setEntrenarIgual] = useState(false)
 
   const hoy = localDate()
   const toca = tocaHoy.value
   // Un descanso obligatorio de tu rutina: hoy sale como descanso y la sesión que toca, como la siguiente
   const descansa = descansasHoy(hoy)
-  const semana = semanaDe(entrenos.value, hoy, toca?.sigla ?? '', descansa)
+  const semana = tuSemana(hoy)
   const hechas = new Set(semana.filter((d) => d.estado === 'hecho').map((d) => d.sigla))
   const todas = sesionesPlan.value.map((s) => ({
     ...s,
@@ -93,45 +95,26 @@ function TuPlan({ siguiente }: { siguiente: number }) {
       <div ref={cabecera}>
         <ScreenHeader title="Entrenamiento" avatarHref={paths.profile} inline />
       </div>
-      <div
-        ref={carrusel}
-        class={styles.cards}
-        role="group"
-        aria-label="Sesiones de tu rutina"
-        onScroll={(event) =>
-          setVisible(Math.round(event.currentTarget.scrollLeft / carouselStep(event.currentTarget)))
-        }
-      >
-        {sesiones.map((s) => (
-          <div key={s.sigla} class={styles.card}>
-            <SessionCard
-              sigla={s.sigla}
-              nombre={s.nombre}
-              detalle={s.detalle}
-              estado={s.estado}
-              tono={s.tono}
-              foto={fotosSesion.value[s.sigla] ?? null}
-            />
-          </div>
-        ))}
-      </div>
-      <div class={styles.dots} aria-hidden="true">
-        {sesiones.map((s, i) => (
-          <span key={s.sigla} class={`${styles.dot} ${i === visible ? styles.current : ''}`} />
-        ))}
-      </div>
-
-      {descansa && (
-        <p class={styles.rest}>Hoy toca descanso: lo pide tu rutina. Si quieres, puedes entrenar igual.</p>
+      {descansa && !entrenarIgual ? (
+        <RestDayCard siguiente={toca ? `${toca.sigla} · ${toca.nombre}` : null} />
+      ) : (
+        <Carrusel sesiones={sesiones} visible={visible} onVisible={setVisible} />
       )}
+
       <div class={styles.actions}>
         <div class={styles.start}>
-          <Button href={paths.session(elegida.toLowerCase())}>
-            <span class={styles.startLabel}>
-              <PlayIcon />
-              Empezar {elegida}
-            </span>
-          </Button>
+          {descansa && !entrenarIgual ? (
+            <Button variant="secondary" onClick={() => setEntrenarIgual(true)}>
+              Entrenar igualmente
+            </Button>
+          ) : (
+            <Button href={paths.session(elegida.toLowerCase())}>
+              <span class={styles.startLabel}>
+                <PlayIcon />
+                Empezar {elegida}
+              </span>
+            </Button>
+          )}
         </div>
         <button type="button" class={styles.more} aria-label="Tu rutina" onClick={sheet.show}>
           <DotsIcon />
@@ -172,6 +155,44 @@ function TuPlan({ siguiente }: { siguiente: number }) {
       {biblioteca.open && <BibliotecaHoja onClose={biblioteca.close} />}
       {editar.open && <EditarRutinaHoja onClose={editar.close} />}
       {ficha && <MusculoHoja musculo={ficha} onClose={() => setFicha(null)} />}
+    </>
+  )
+}
+
+type Tarjeta = { sigla: string; nombre: string; detalle: string; estado: string; tono: Tono }
+
+/** Las tarjetas de las sesiones, que se deslizan con el dedo (y se arrastran con el ratón), sin flechas; y sus puntos. */
+function Carrusel(props: { sesiones: Tarjeta[]; visible: number; onVisible: (i: number) => void }) {
+  const carrusel = useDragScroll<HTMLDivElement>()
+  return (
+    <>
+      <div
+        ref={carrusel}
+        class={styles.cards}
+        role="group"
+        aria-label="Sesiones de tu rutina"
+        onScroll={(event) =>
+          props.onVisible(Math.round(event.currentTarget.scrollLeft / carouselStep(event.currentTarget)))
+        }
+      >
+        {props.sesiones.map((s) => (
+          <div key={s.sigla} class={styles.card}>
+            <SessionCard
+              sigla={s.sigla}
+              nombre={s.nombre}
+              detalle={s.detalle}
+              estado={s.estado}
+              tono={s.tono}
+              foto={fotosSesion.value[s.sigla] ?? null}
+            />
+          </div>
+        ))}
+      </div>
+      <div class={styles.dots} aria-hidden="true">
+        {props.sesiones.map((s, i) => (
+          <span key={s.sigla} class={`${styles.dot} ${i === props.visible ? styles.current : ''}`} />
+        ))}
+      </div>
     </>
   )
 }

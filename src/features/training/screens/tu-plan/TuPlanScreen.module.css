@@ -11,7 +11,7 @@
 }
 
 .card {
-  flex: 0 0 100%;
+  flex: 0 0 calc(100% - var(--space-6));
   scroll-snap-align: start;
 }
 
@@ -32,13 +32,6 @@
 .current {
   width: var(--space-5);
   background: var(--label);
-}
-
-/* Hoy toca un descanso obligatorio */
-.rest {
-  margin: var(--space-4) var(--gutter) 0;
-  font: var(--text-subhead);
-  color: var(--label-2);
 }
 
 .actions {

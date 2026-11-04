@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { Day } from './program.ts'
-import { descansosDeRutina, descansosPorSesion, hoyTocaDescanso, trasDe } from './restDays.ts'
+import {
+  descansosDeRutina,
+  descansosPendientes,
+  descansosPorSesion,
+  hoyTocaDescanso,
+  trasDe,
+} from './restDays.ts'
 
 const S = (name: string): Day => ({ name, exercises: [] })
 const R: Day = { rest: true }
@@ -45,5 +51,16 @@ describe('hoyTocaDescanso', () => {
     expect(hoyTocaDescanso([2], 1, 1)).toBe(false)
     expect(hoyTocaDescanso([2], 2, 0)).toBe(false)
     expect(hoyTocaDescanso([2], null, null)).toBe(false)
+  })
+})
+
+describe('descansosPendientes', () => {
+  it('entrenaste hoy: todos los de esa sesión; ayer: los que quedan, contando hoy', () => {
+    expect(descansosPendientes([2, 2], 2, 0)).toBe(2)
+    expect(descansosPendientes([2, 2], 2, 1)).toBe(2)
+    expect(descansosPendientes([2, 2], 2, 2)).toBe(1)
+    expect(descansosPendientes([2], 2, 3)).toBe(0)
+    expect(descansosPendientes([2], 1, 1)).toBe(0)
+    expect(descansosPendientes([2], null, null)).toBe(0)
   })
 })

@@ -169,7 +169,7 @@ test('elegir rutina y detalle de una rutina de MUTA', async ({ page }) => {
   await sinFallos(page)
 })
 
-test('Editar rutina, sus consejos del entrenador y Editar ejercicio (con «Al terminar la serie» abierto)', async ({
+test('Editar rutina, sus consejos del entrenador y Editar ejercicio (con las repeticiones abiertas)', async ({
   page,
 }) => {
   await page.goto('/entreno')
@@ -182,7 +182,7 @@ test('Editar rutina, sus consejos del entrenador y Editar ejercicio (con «Al te
   await sinFallos(page)
   await page.getByRole('button', { name: /^Peso muerto rumano/ }).click()
   const ej = page.getByRole('dialog', { name: 'Peso muerto rumano' })
-  await ej.locator('summary', { hasText: 'Al terminar la serie' }).click()
+  await ej.locator('summary', { hasText: 'Repeticiones' }).click()
   await sinFallos(page)
 })
 

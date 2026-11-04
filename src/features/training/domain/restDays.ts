@@ -52,3 +52,17 @@ export function hoyTocaDescanso(
   if (ultimaHecha === null || diasDesdeUltimo === null || diasDesdeUltimo < 1) return false
   return diasDesdeUltimo <= tras.filter((t) => t === ultimaHecha).length
 }
+
+/**
+ * Días de descanso que aún se deben antes de la siguiente sesión, contando desde el primer día sin entrenar: si entrenaste
+ * hoy (0 días desde el último), todos los de la sesión hecha; si fue antes, los que queden de ellos (hoy incluido).
+ */
+export function descansosPendientes(
+  tras: readonly number[],
+  ultimaHecha: number | null,
+  diasDesdeUltimo: number | null,
+): number {
+  if (ultimaHecha === null || diasDesdeUltimo === null) return 0
+  const deEsa = tras.filter((t) => t === ultimaHecha).length
+  return Math.max(0, deEsa - Math.max(0, diasDesdeUltimo - 1))
+}

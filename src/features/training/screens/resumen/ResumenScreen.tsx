@@ -5,7 +5,7 @@ import { paths } from '../../../../shared/lib/paths.ts'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { WorkoutSummary } from '../../components/WorkoutSummary.tsx'
-import { descansosPorSemana, entrenos, semanaDe, sesiones, tocaHoy } from '../../state/plan.ts'
+import { descansosPorSemana, entrenos, semanaDe, sesiones } from '../../state/plan.ts'
 import { guardarSesion, resumenDe, segundosSesion, sesionEnCurso } from '../../state/sesionEnCurso.ts'
 import { diasDeRacha } from '../../state/routines.ts'
 import { reabrirEntreno } from '../../use-cases/training.ts'
@@ -56,7 +56,7 @@ export function ResumenScreen(props: { sessionId: string }) {
   const minutos = Math.max(1, Math.round(segundosSesion(en, en.terminada) / 60))
   // Tu semana y la racha con lo guardado (el entreno de hoy ya está dentro)
   const diaHoy = (new Date(`${hoy}T00:00:00Z`).getUTCDay() + 6) % 7
-  const semana = semanaDe(entrenos.value, hoy, tocaHoy.value?.sigla ?? '').map((d, i) => ({
+  const semana = semanaDe(entrenos.value, hoy).map((d, i) => ({
     letra: d.letra,
     hecho: d.estado === 'hecho',
     hoy: i === diaHoy,

@@ -20,6 +20,7 @@ import {
   sesionesDeSemana,
   type Rotacion,
 } from '../domain/workoutPlan.ts'
+import { PREFIJO_MIA, type RutinaMia } from '../domain/csvRoutine.ts'
 import { descansosDeRutina } from '../domain/restDays.ts'
 import { elecciones, type EleccionMusculo } from '../state/musculos.ts'
 import { entrenos, tuPlan } from '../state/plan.ts'
@@ -93,10 +94,17 @@ async function leer(): Promise<void> {
     const db = await getDb()
     const plan = (await db.get('plans', 'current')) as PlanGuardado | undefined
     const entry = plan && CATALOG.find((e) => e.id === plan.programId)
-    const raw =
-      entry &&
-      ((BUILT_IN[sourceOf(entry)] ?? (await db.get('programs', sourceOf(entry)))) as ProgramData | undefined)
-    if (!plan || !entry || !raw) {
+    // Una rutina tuya (cargada desde un CSV) no está en el catálogo: vive en `programs` con su nombre
+    const mia =
+      plan && !entry && plan.programId.startsWith(PREFIJO_MIA)
+        ? ((await db.get('programs', plan.programId)) as RutinaMia | undefined)
+        : undefined
+    const raw = entry
+      ? ((BUILT_IN[sourceOf(entry)] ?? (await db.get('programs', sourceOf(entry)))) as
+          ProgramData | undefined)
+      : mia
+    const titulo = entry?.title ?? mia?.title
+    if (!plan || !raw || !titulo) {
       programa = null
       tuPlan.value = { status: 'none' }
       return
@@ -104,7 +112,7 @@ async function leer(): Promise<void> {
     const perfil = (await db.get('profile', 'me')) as { level?: string } | undefined
     const nivel = LEVELS.find((l) => l === perfil?.level) ?? ('intermediate' satisfies Level)
     programa = applyChoices(
-      selectVariant(raw, entry.variant),
+      selectVariant(raw, entry?.variant),
       { weakPoints: plan.weakPoints ?? null, priorities: plan.priorities ?? null },
       nivel,
     )
@@ -121,7 +129,7 @@ async function leer(): Promise<void> {
     ediciones = plan.ediciones ?? {}
     nombresPropios = plan.nombres ?? {}
     descansosTras = plan.descansosTras ?? null
-    ponerPlan(plan.programId, entry.title, nivel, rotacion)
+    ponerPlan(plan.programId, titulo, nivel, rotacion)
     void cargarFotos(plan.programId)
     const enCurso = filas.find((f) => f.id === EN_CURSO)
     if (enCurso && 'sesion' in enCurso && !sesionEnCurso.value) sesionEnCurso.value = enCurso.sesion

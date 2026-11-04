@@ -1,0 +1,121 @@
+/* Tu propia rutina desde un CSV: la tarjeta gris de abajo y la hoja con la vista previa o los errores. */
+
+.card {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 var(--gutter);
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.title {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.text {
+  margin: 0 0 var(--space-2);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.load {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control);
+  border-radius: var(--radius-pill);
+  background: var(--label);
+  color: var(--bg);
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.load svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.load input {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.load:focus-within {
+  outline: var(--border) solid var(--label);
+  outline-offset: var(--space-1);
+}
+
+.template {
+  display: grid;
+  place-items: center;
+  min-height: var(--tap-min);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.errors {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-5);
+  font: var(--text-subhead);
+  color: var(--critical-label);
+}
+
+.errors li + li {
+  margin-top: var(--space-1);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.field input {
+  min-height: var(--control);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-headline);
+}
+
+.days {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.days li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--row);
+  border-bottom: var(--hairline) solid var(--separator);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.days b {
+  color: var(--label);
+}
+
+.days .rest {
+  justify-content: flex-start;
+}
+
+.rest svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}

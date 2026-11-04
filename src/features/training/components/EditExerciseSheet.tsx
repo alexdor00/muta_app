@@ -1,6 +1,5 @@
 import { useState } from 'preact/hooks'
 import { formatRange, formatRest } from '../../../shared/lib/format.ts'
-import { ChoiceList } from '../../../shared/ui/Choice.tsx'
 import { ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import { Desplegable } from './Desplegable.tsx'
@@ -14,12 +13,8 @@ export type PautaEdicion = {
   descanso: number
 }
 
-const QUEDAN = [
-  { value: '0', label: 'Al fallo' },
-  { value: '1', label: 'Queda 1' },
-  { value: '2', label: 'Quedan 2' },
-  { value: '3', label: 'Quedan 3' },
-]
+/** Repeticiones que te quedarían antes del fallo al terminar cada serie: de 0 (al fallo) a 5. */
+const MAX_RIR = 5
 /** Las repeticiones, mínimo y máximo de 1 en 1 (hasta 50); el descanso, de 15 en 15 s (hasta 5 min). */
 const MAX_REPS = 50
 const PASO_DESCANSO = 15
@@ -59,8 +54,8 @@ function Contador(p: {
 }
 
 /**
- * Editar ejercicio (A12–A13): series y descanso con − / +; repeticiones (mínimo y máximo) y «Al terminar la serie»,
- * desplegables.
+ * Editar ejercicio (A12–A13): series, descanso y repeticiones antes del fallo con − / + (con una línea que lo explica);
+ * repeticiones (mínimo y máximo) en un desplegable.
  * Cada toque se guarda solo. «Cambiar por otro» y «Quitar».
  */
 export function EditExerciseSheet(props: {
@@ -75,15 +70,13 @@ export function EditExerciseSheet(props: {
   onClose: () => void
 }) {
   const [p, setP] = useState(props.pauta)
-  // Un desplegable abierto cada vez: repeticiones o «Al terminar la serie»
-  const [abierto, setAbierto] = useState<'reps' | 'quedan' | null>(null)
+  const [abierto, setAbierto] = useState(false)
   const cambia = (c: Partial<PautaEdicion>) => {
     const nueva = { ...p, ...c }
     setP(nueva)
     props.onCambio(nueva)
   }
   const [min, max] = p.reps
-  const quedan = QUEDAN[Math.min(3, Math.max(0, p.rir))]
   return (
     <Sheet title={props.nombre} onClose={props.onClose} large>
       <button type="button" class={styles.back} onClick={props.onVolver}>
@@ -99,12 +92,7 @@ export function EditExerciseSheet(props: {
           puedeMas={p.series < 10}
           onPaso={(paso) => cambia({ series: p.series + paso })}
         />
-        <Desplegable
-          titulo="Repeticiones"
-          valor={formatRange(p.reps)}
-          abierto={abierto === 'reps'}
-          onAbrir={(a) => setAbierto(a ? 'reps' : null)}
-        >
+        <Desplegable titulo="Repeticiones" valor={formatRange(p.reps)} abierto={abierto} onAbrir={setAbierto}>
           <Contador
             nombre="Mínimo de reps"
             texto={String(min)}
@@ -134,21 +122,18 @@ export function EditExerciseSheet(props: {
             })
           }
         />
-        <Desplegable
-          titulo="Al terminar la serie"
-          valor={quedan.label}
-          abierto={abierto === 'quedan'}
-          onAbrir={(a) => setAbierto(a ? 'quedan' : null)}
-        >
-          <small class={styles.hint}>Cuántas repeticiones más podrías hacer</small>
-          <ChoiceList
-            name="quedan"
-            legend="Al terminar la serie"
-            options={QUEDAN}
-            value={quedan.value}
-            onChange={(v) => cambia({ rir: Number(v) })}
-          />
-        </Desplegable>
+        <Contador
+          nombre="Repeticiones antes del fallo"
+          texto={String(p.rir)}
+          puedeMenos={p.rir > 0}
+          puedeMas={p.rir < MAX_RIR}
+          onPaso={(paso) => cambia({ rir: p.rir + paso })}
+        />
+        <small class={styles.hint}>
+          {p.rir === 0
+            ? 'Cada serie, hasta el fallo: hasta que no puedas hacer otra repetición bien.'
+            : `Termina cada serie cuando aún podrías hacer ${p.rir === 1 ? '1 repetición más' : `${p.rir} repeticiones más`}.`}
+        </small>
       </section>
 
       <div class={styles.links}>

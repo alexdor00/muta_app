@@ -72,33 +72,50 @@ export type DiaSemana = {
   dia: number
   sigla: string
   estado: 'hecho' | 'hoy' | 'pendiente' | 'descanso'
+  /** ¿Es hoy? (también si hoy es descanso o ya entrenaste). */
+  hoy: boolean
+}
+
+/** Lo que hace falta de tu plan para repartir la semana: tus sesiones en orden, la que toca y tus descansos. */
+export type PlanSemana = {
+  /** Las siglas de tus sesiones, en el orden de la rutina. */
+  orden: readonly string[]
+  /** La que toca (su puesto en `orden`). */
+  siguiente: number
+  /** Tras qué sesiones (1 = la primera) va un descanso obligatorio; repetido, dos días. */
+  tras: readonly number[]
+  /** Días de descanso que aún se deben antes de la siguiente, empezando por el primer día sin entrenar (hoy o mañana). */
+  pendientes: number
 }
 
 /**
- * Tu semana de lunes a domingo: lo entrenado con su sigla, hoy con la sesión que toca (si aún no has entrenado), los
- * días pasados sin entrenar como descanso y los que faltan vacíos (la sesión va por rotación, sin días fijos). Si hoy toca
- * un descanso obligatorio (`descansaHoy`) y aún no has entrenado, hoy también es descanso.
+ * Tu semana de lunes a domingo: lo entrenado, con ✓ y su sigla; los días pasados sin entrenar, como descanso. Con tu plan,
+ * desde el primer día sin entrenar se reparten las sesiones que tocan en su orden, con sus descansos obligatorios detrás
+ * (la rutina va por rotación: si un día no entrenas, todo se corre). Sin plan, lo que falta va vacío.
  */
-export function semanaDe(
-  entrenos: readonly Entreno[],
-  hoy: string,
-  toca: string,
-  descansaHoy = false,
-): DiaSemana[] {
+export function semanaDe(entrenos: readonly Entreno[], hoy: string, plan?: PlanSemana): DiaSemana[] {
   const t = Date.parse(`${hoy}T00:00:00Z`)
   const lunes = t - ((new Date(t).getUTCDay() + 6) % 7) * DIA
-  return LETRAS.map((letra, i) => {
+  let siguiente = plan?.siguiente ?? 0
+  let pendientes = plan?.pendientes ?? 0
+  const dias: Omit<DiaSemana, 'hoy'>[] = LETRAS.map((letra, i) => {
     const d = lunes + i * DIA
     const fecha = new Date(d).toISOString().slice(0, 10)
     const hecho = enOrden(entrenos).find((x) => x.fecha === fecha)
     const dia = new Date(d).getUTCDate()
     if (hecho) return { letra, dia, sigla: hecho.sigla, estado: 'hecho' }
-    if (d === t)
-      return descansaHoy
-        ? { letra, dia, sigla: '', estado: 'descanso' }
-        : { letra, dia, sigla: toca, estado: 'hoy' }
-    return { letra, dia, sigla: '', estado: d < t ? 'descanso' : 'pendiente' }
+    if (d < t) return { letra, dia, sigla: '', estado: 'descanso' }
+    if (!plan?.orden.length) return { letra, dia, sigla: '', estado: d === t ? 'hoy' : 'pendiente' }
+    if (pendientes > 0) {
+      pendientes -= 1
+      return { letra, dia, sigla: '', estado: 'descanso' }
+    }
+    const sigla = plan.orden[siguiente % plan.orden.length]
+    pendientes = plan.tras.filter((x) => x === (siguiente % plan.orden.length) + 1).length
+    siguiente += 1
+    return { letra, dia, sigla, estado: d === t ? 'hoy' : 'pendiente' }
   })
+  return dias.map((x, i) => ({ ...x, hoy: lunes + i * DIA === t }))
 }
 
 /** Series directas por músculo de una lista de ejercicios (una por serie, al músculo principal). */

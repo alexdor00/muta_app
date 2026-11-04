@@ -60,20 +60,43 @@ describe('historial', () => {
 })
 
 describe('tu semana', () => {
-  it('lo hecho, hoy con la que toca, lo pasado sin entrenar como descanso y lo que falta vacío', () => {
-    expect(semanaDe(ENTRENOS.slice(1), '2026-10-28', 'B1', true)[2]).toMatchObject({
-      sigla: '',
-      estado: 'descanso',
-    })
-    const semana = semanaDe(ENTRENOS.slice(1), '2026-10-28', 'B1')
+  it('sin plan: lo hecho, lo pasado sin entrenar como descanso y lo que falta vacío', () => {
+    const semana = semanaDe(ENTRENOS.slice(1), '2026-10-28')
     expect(semana.map((d) => [d.letra, d.dia, d.sigla, d.estado])).toEqual([
       ['L', 26, 'A1', 'hecho'],
       ['M', 27, '', 'descanso'],
-      ['X', 28, 'B1', 'hoy'],
+      ['X', 28, '', 'hoy'],
       ['J', 29, '', 'pendiente'],
       ['V', 30, '', 'pendiente'],
       ['S', 31, '', 'pendiente'],
       ['D', 1, '', 'pendiente'],
+    ])
+  })
+
+  it('con tu plan: desde hoy, las sesiones en su orden con sus descansos detrás', () => {
+    // A1 · B1 · descanso · A2 · B2 · descanso; hecha A1 el lunes, hoy (miércoles) toca B1
+    const plan = { orden: ['A1', 'B1', 'A2', 'B2'], siguiente: 1, tras: [2, 4], pendientes: 0 }
+    expect(semanaDe(ENTRENOS.slice(1), '2026-10-28', plan).map((d) => [d.letra, d.sigla, d.estado])).toEqual([
+      ['L', 'A1', 'hecho'],
+      ['M', '', 'descanso'],
+      ['X', 'B1', 'hoy'],
+      ['J', '', 'descanso'],
+      ['V', 'A2', 'pendiente'],
+      ['S', 'B2', 'pendiente'],
+      ['D', '', 'descanso'],
+    ])
+  })
+
+  it('si hoy toca descanso, hoy es descanso y la sesión que toca va después', () => {
+    const plan = { orden: ['A1', 'B1'], siguiente: 1, tras: [2], pendientes: 1 }
+    expect(
+      semanaDe([], '2026-10-28', plan)
+        .slice(2, 5)
+        .map((d) => [d.sigla, d.estado]),
+    ).toEqual([
+      ['', 'descanso'],
+      ['B1', 'pendiente'],
+      ['', 'descanso'],
     ])
   })
 

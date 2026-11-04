@@ -84,3 +84,21 @@ pendientes: Women's Specialization (en columnas de la tabla) y Comeback Bridge (
   serie pesada o de descarga) van en una sola ficha y los demás quedan como `alias`; un paréntesis con «o» es una alternativa y no se
   quita. El generador no escribe si queda un id, un nombre o un ejercicio repetido, también frente a los de MUTA. Revisado el
   2026-11-03: 194 ejercicios locales (14 con alias) y los 141 de MUTA sin duplicados.
+
+## Tu rutina desde un CSV
+
+En Elegir rutina, abajo, «Cargar desde CSV» (y «Descargar plantilla»). Una fila por ejercicio, en el orden en que haces la
+semana; la primera fila son los títulos (da igual mayúsculas y tildes; separados por `;` o `,`):
+
+| Columna      | Obligatoria | Ejemplo                                                                                 |
+| ------------ | ----------- | --------------------------------------------------------------------------------------- |
+| Sesión       | sí          | `Torso` (las filas seguidas con la misma sesión forman esa sesión)                      |
+| Ejercicio    | sí          | `Press banca` (si está en la biblioteca, con cualquiera de sus nombres, tiene su ficha) |
+| Series       | no          | `3`                                                                                     |
+| Repeticiones | no          | `6-10`, `8 a 12` o `5`                                                                  |
+| RIR          | no          | `2` (repeticiones antes del fallo, 0–9)                                                 |
+| Descanso     | no          | `3:00`, `90 s`, `2 min` o `180`                                                         |
+| Notas        | no          | texto libre                                                                             |
+
+Una fila con `Descanso` en la columna de la sesión es un día de descanso obligatorio en ese punto. Lo que no se rellena se
+pone por costumbre y sale como «sugerido». Se guarda en `programs` (id `mia:…`), solo en el móvil.

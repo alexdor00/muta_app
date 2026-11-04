@@ -7,8 +7,10 @@ import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { ScreenHeader } from '../../../../shared/ui/ScreenHeader.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
+import { CsvRoutineCard, CsvRoutineSheet } from '../../components/CsvRoutine.tsx'
 import { RoutineAbout } from '../../components/RoutineAbout.tsx'
 import { aboutOf, countLabel, routines, type About } from '../../state/routines.ts'
+import { empezarRutinaCsv, PLANTILLA_CSV, vistaCsv } from '../../use-cases/importRoutine.ts'
 import { loadRoutines } from '../../use-cases/loadRoutines.ts'
 import styles from './ElegirRutinaScreen.module.css'
 
@@ -17,7 +19,8 @@ const PHASE = { bulk: 'ganar músculo', cut: 'definición', maintenance: 'manten
 
 /**
  * Elige tu rutina: la mejor para ti arriba y, debajo, los tipos de entrenamiento.
- * Cada tipo abre su lista (con filtros); cada rutina, su detalle con «Adaptar a mí».
+ * Cada tipo abre su lista (con filtros); cada rutina, su detalle con «Adaptar a mí». Abajo, cargar tu propia rutina
+ * desde un CSV.
  */
 export function ElegirRutinaScreen() {
   const { route } = useLocation()
@@ -26,6 +29,8 @@ export function ElegirRutinaScreen() {
   const infoSheet = useSheet('info')
   /** La «!» abierta: la de un grupo o la de la rutina recomendada. */
   const [info, setInfo] = useState<{ title: string; about: About } | null>(null)
+  /** Tu rutina del CSV, leída: su nombre (el del archivo) y lo que se enseña. */
+  const [csv, setCsv] = useState<{ nombre: string; vista: ReturnType<typeof vistaCsv> } | null>(null)
   const infoButton = (title: string, about: About | null) =>
     about && (
       <RoundButton
@@ -111,6 +116,26 @@ export function ElegirRutinaScreen() {
           ))}
         </div>
       </section>
+
+      <section class={styles.section} aria-label="Tu propia rutina">
+        <CsvRoutineCard
+          plantilla={PLANTILLA_CSV}
+          onArchivo={(nombre, texto) => setCsv({ nombre, vista: vistaCsv(texto) })}
+        />
+      </section>
+
+      {csv && (
+        <CsvRoutineSheet
+          nombre={csv.nombre}
+          errores={csv.vista.errores}
+          dias={csv.vista.dias}
+          resumen={csv.vista.resumen}
+          onEmpezar={async (nombre) => {
+            if (await empezarRutinaCsv(nombre, csv.vista.programa)) route(paths.training)
+          }}
+          onClose={() => setCsv(null)}
+        />
+      )}
 
       {infoSheet.open && info && (
         <Sheet title={info.title} onClose={infoSheet.close}>

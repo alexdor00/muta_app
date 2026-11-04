@@ -2,8 +2,8 @@
 // terminados. Aquí solo se lee: nada se guarda desde el estado.
 import { computed, signal } from '@preact/signals'
 import type { Level } from '../domain/catalog.ts'
-import { hoyTocaDescanso } from '../domain/restDays.ts'
-import { ultimaVez, type Entreno } from '../domain/workoutHistory.ts'
+import { descansosPendientes, hoyTocaDescanso } from '../domain/restDays.ts'
+import { semanaDe, ultimaVez, type Entreno } from '../domain/workoutHistory.ts'
 import type { EjercicioPlan, Rotacion, SesionPlan } from '../domain/workoutPlan.ts'
 
 export type PlanListo = {
@@ -51,19 +51,40 @@ export const tocaHoy = computed<SesionPlan | null>(() => {
     : null
 })
 
-/**
- * ¿Hoy toca un descanso obligatorio? (`hoy`, «2026-11-03»). Cuenta desde tu último entreno de esta rutina: la sesión que
- * hiciste es la anterior a la que toca.
- */
+/** Tu última sesión hecha de esta rutina (su número en la semana) y cuántos días hace (null si aún no has entrenado). */
+function ultimoEntreno(hoy: string) {
+  const plan = tuPlan.value
+  if (plan.status !== 'ready') return { hecha: null, dias: null }
+  const fechas = entrenos.value.filter((x) => x.programId === plan.programId).map((x) => x.fecha)
+  if (!fechas.length) return { hecha: null, dias: null }
+  const ultima = fechas.reduce((x, y) => (x > y ? x : y))
+  const dias = Math.round((Date.parse(`${hoy}T00:00:00Z`) - Date.parse(`${ultima}T00:00:00Z`)) / 86_400_000)
+  // La que hiciste es la anterior a la que toca
+  return { hecha: plan.rotacion.siguiente === 0 ? plan.semana.length : plan.rotacion.siguiente, dias }
+}
+
+/** ¿Hoy toca un descanso obligatorio? (`hoy`, «2026-11-03»). Cuenta desde tu último entreno de esta rutina. */
 export function descansasHoy(hoy: string): boolean {
   const plan = tuPlan.value
   if (plan.status !== 'ready') return false
-  const fechas = entrenos.value.filter((x) => x.programId === plan.programId).map((x) => x.fecha)
-  if (!fechas.length) return false
-  const ultima = fechas.reduce((a, b) => (a > b ? a : b))
-  const dias = Math.round((Date.parse(`${hoy}T00:00:00Z`) - Date.parse(`${ultima}T00:00:00Z`)) / 86_400_000)
-  const hecha = plan.rotacion.siguiente === 0 ? plan.semana.length : plan.rotacion.siguiente
+  const { hecha, dias } = ultimoEntreno(hoy)
   return hoyTocaDescanso(plan.descansos, hecha, dias)
+}
+
+/**
+ * Tu semana de lunes a domingo: lo hecho con ✓ y, desde el primer día sin entrenar, las sesiones que tocan en su orden con
+ * sus descansos obligatorios.
+ */
+export function tuSemana(hoy: string) {
+  const plan = tuPlan.value
+  if (plan.status !== 'ready') return semanaDe(entrenos.value, hoy)
+  const { hecha, dias } = ultimoEntreno(hoy)
+  return semanaDe(entrenos.value, hoy, {
+    orden: plan.semana.map((x) => x.sigla),
+    siguiente: plan.rotacion.siguiente,
+    tras: plan.descansos,
+    pendientes: descansosPendientes(plan.descansos, hecha, dias),
+  })
 }
 
 /** Días de descanso que deja tu semana (7 menos sus sesiones), para la racha. */
