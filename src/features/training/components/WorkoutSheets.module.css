@@ -286,7 +286,7 @@
   height: var(--control-lg);
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--surface-2);
+  background: var(--surface);
   color: var(--critical-label);
   font: var(--text-headline);
   cursor: pointer;

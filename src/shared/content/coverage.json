@@ -1,0 +1,173 @@
+[
+  {
+    "musculo": "pecho",
+    "pide": "Un inclinado y trabajo horizontal",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta un inclinado",
+        "patron": "empuje_inc",
+        "ids": ["aperturas_inclinadas_con_mancuernas", "cruces_en_polea_baja_pecho_superior"],
+        "sugiere": ["press_inclinado_con_mancuernas", "press_banca_inclinado"]
+      },
+      {
+        "falta": "falta trabajo horizontal",
+        "patron": "empuje_h",
+        "primario": "pecho",
+        "ids": ["aperturas_en_maquina_contractora", "cruces_en_polea", "aperturas_con_mancuernas"],
+        "sugiere": ["press_plano_con_mancuernas", "press_banca"]
+      }
+    ]
+  },
+  {
+    "musculo": "dorsal",
+    "pide": "Dorsal vertical y trapecio (remo con apoyo, Kelso)",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta dorsal vertical",
+        "patron": "traccion_v",
+        "sugiere": ["jalon_al_pecho"]
+      },
+      {
+        "falta": "falta trapecio (remo con apoyo o Kelso)",
+        "ids": [
+          "remo_con_pecho_apoyado",
+          "remo_con_pecho_apoyado_codos_abiertos",
+          "remo_en_t_con_apoyo",
+          "encogimientos_kelso_pecho_apoyado"
+        ],
+        "sugiere": ["remo_en_t_con_apoyo", "encogimientos_kelso_pecho_apoyado"]
+      }
+    ]
+  },
+  {
+    "musculo": "hombro_lat",
+    "pide": "Elevaciones laterales",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "faltan elevaciones laterales",
+        "primario": "hombro_lat",
+        "sugiere": ["elevaciones_laterales_en_polea", "elevaciones_laterales_con_mancuernas"]
+      }
+    ]
+  },
+  {
+    "musculo": "biceps",
+    "pide": "Predicador y martillo",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta predicador",
+        "ids": ["curl_predicador_scott", "curl_predicador_a_una_mano", "curl_predicador_en_polea"],
+        "sugiere": ["curl_predicador_scott"]
+      },
+      {
+        "falta": "falta martillo",
+        "ids": ["curl_martillo"],
+        "sugiere": ["curl_martillo"]
+      }
+    ]
+  },
+  {
+    "musculo": "triceps",
+    "pide": "Extensión con hombro elevado",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta una extensión con el hombro elevado",
+        "ids": [
+          "extension_de_triceps_sobre_la_cabeza",
+          "extension_de_triceps_sobre_la_cabeza_con_mancuerna",
+          "extension_de_triceps_katana_en_polea"
+        ],
+        "sugiere": ["extension_de_triceps_katana_en_polea", "extension_de_triceps_sobre_la_cabeza"]
+      }
+    ]
+  },
+  {
+    "musculo": "cuadriceps",
+    "pide": "Recto femoral",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta recto femoral",
+        "ids": ["extension_de_cuadriceps", "sissy_squat", "nordico_inverso_con_goma"],
+        "sugiere": ["extension_de_cuadriceps", "sissy_squat", "nordico_inverso_con_goma"]
+      }
+    ]
+  },
+  {
+    "musculo": "femoral",
+    "pide": "Un curl, mejor sentado",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta un curl femoral",
+        "ids": [
+          "curl_femoral_sentado",
+          "curl_femoral_tumbado",
+          "curl_femoral_de_pie",
+          "curl_femoral_nordico"
+        ],
+        "sugiere": ["curl_femoral_sentado"]
+      }
+    ]
+  },
+  {
+    "musculo": "gluteo",
+    "pide": "Acortado, estirado y abducción",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta trabajo en acortado",
+        "patron": "empuje_cadera",
+        "sugiere": ["hip_thrust"]
+      },
+      {
+        "falta": "falta trabajo en estirado",
+        "ids": [
+          "peso_muerto_rumano",
+          "peso_muerto_rumano_con_mancuernas",
+          "peso_muerto_piernas_rigidas",
+          "sentadilla_bulgara"
+        ],
+        "sugiere": ["peso_muerto_rumano", "sentadilla_bulgara"]
+      },
+      {
+        "falta": "falta abducción",
+        "ids": ["abduccion_en_maquina", "abduccion_de_pie_en_polea"],
+        "sugiere": ["abduccion_en_maquina", "abduccion_de_pie_en_polea"]
+      }
+    ]
+  },
+  {
+    "musculo": "gemelo",
+    "pide": "Rodilla extendida",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta gemelo con la rodilla extendida",
+        "ids": [
+          "elevacion_de_talones_de_pie",
+          "elevacion_de_talones_en_prensa",
+          "elevacion_de_talones_a_una_pierna"
+        ],
+        "sugiere": ["elevacion_de_talones_en_prensa", "elevacion_de_talones_de_pie"]
+      }
+    ]
+  },
+  {
+    "musculo": "core",
+    "pide": "Dinámico progresable",
+    "fuente": "docs/conocimiento/02-reglas.md §7",
+    "partes": [
+      {
+        "falta": "falta un crunch con carga progresable",
+        "ids": ["crunch_en_polea", "crunch_en_maquina"],
+        "sugiere": ["crunch_en_polea", "crunch_en_maquina"]
+      }
+    ]
+  }
+]

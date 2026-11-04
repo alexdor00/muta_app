@@ -47,7 +47,7 @@ cambiar llevan `slot` (nunca se borran) y el resto del código decide qué hacer
 ## Flujo de datos: entrenar
 
 ```
-IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts`
+IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `userContent`: fotos de las sesiones y tus consejos)
         │
         ▼  use-cases/training.ts · cargarPlan()   (cada pantalla de Entreno, con screens/comun/usePlan)
    selectVariant → applyChoices → sesionesDeSemana(rotación, biblioteca)        domain/workoutPlan.ts

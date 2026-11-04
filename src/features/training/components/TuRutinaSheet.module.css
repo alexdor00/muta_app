@@ -25,21 +25,6 @@
   cursor: pointer;
 }
 
-/* Aún no existe: apagada y sin toque */
-.off {
-  color: var(--label-2);
-  cursor: default;
-}
-
-.off .icon {
-  color: var(--label-2);
-}
-
-.soon {
-  font: var(--text-footnote);
-  color: var(--label-2);
-}
-
 .icon {
   display: grid;
   place-items: center;

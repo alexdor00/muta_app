@@ -157,3 +157,12 @@ En Editar ejercicio las repeticiones se ponen a mano (mínimo y máximo, de 1 en
 entero. La ficha del ejercicio usaba la pauta de la biblioteca cuando el ejercicio no estaba en la semana que toca; ahora busca
 antes en toda tu rutina (las repeticiones y el esfuerzo que más se repiten) y dice de dónde salen: de tu plan, de tu rutina o
 típicas de ese ejercicio.
+
+## 2026-11-04 · Las cuatro filas «Pronto» de «Tu rutina»
+
+Aprobadas en `Desktop/MUTA-Entreno-lo-que-falta-minimalista.png`. Las fotos de las sesiones y tus consejos van en el almacén
+`userContent` (ya existía): las fotos, reducidas a 1200 px en JPEG para no llenar el móvil. La cobertura usa la tabla del método
+de docs/conocimiento tal cual, pasada a `shared/content/coverage.json` con los ejercicios de la biblioteca que cubren cada parte.
+«Rehacer el plan» no vuelve a la bienvenida: rehace el plan con la rutina y lo que elegiste al escogerla (y tu nivel), quita lo
+cambiado a mano y vuelve a la primera semana. El botón rojo de las hojas de confirmar pasa a `--surface`: sobre `--surface-2`
+el rojo daba 4,45:1 (axe pide 4,5:1).

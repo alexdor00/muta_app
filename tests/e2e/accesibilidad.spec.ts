@@ -177,3 +177,24 @@ test('Editar rutina y Editar ejercicio (con «Al terminar la serie» abierto)', 
   await ej.locator('summary', { hasText: 'Al terminar la serie' }).click()
   await sinFallos(page)
 })
+
+test('las hojas de «Tu rutina»: foto, cobertura, mis consejos y rehacer el plan', async ({ page }) => {
+  for (const fila of [
+    'Añadir foto a la sesión',
+    'Cobertura muscular',
+    'Mis consejos',
+    'Rehacer el plan con mis respuestas',
+  ]) {
+    await page.goto('/entreno')
+    await page.getByRole('button', { name: 'Tu rutina' }).click()
+    await page.getByRole('dialog', { name: 'Tu rutina' }).getByRole('button', { name: fila }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(1)
+    // La hoja sube con una animación: se mide cuando ha terminado (a medio subir, el gris aún no tiene su contraste)
+    await expect
+      .poll(() =>
+        page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length),
+      )
+      .toBe(0)
+    await sinFallos(page)
+  }
+})

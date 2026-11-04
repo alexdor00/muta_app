@@ -1,10 +1,8 @@
 import { useState } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { ChoiceList } from '../../../../shared/ui/Choice.tsx'
-import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { MuscleSheet } from '../../components/MuscleSheet.tsx'
 import { elegirModo, nivelDelPlan, rangoMusculo, rangoPropio } from '../../state/musculos.ts'
-import { anadir, nombresDeSesiones, sesiones } from '../../state/plan.ts'
+import { sesiones } from '../../state/plan.ts'
 import {
   barMax,
   muscleInPlan,
@@ -18,8 +16,8 @@ import {
   type MuscleId,
 } from '../../state/routines.ts'
 import { consejosDeMusculo, huecosDelPlan } from '../../use-cases/muscleSheet.ts'
-import { editarSesion } from '../../use-cases/training.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
+import { ElegirSesionHoja } from '../comun/ElegirSesionHoja.tsx'
 
 const HOMBROS: MuscleId[] = ['hombro_ant', 'hombro_lat', 'hombro_post']
 const MODOS: { id: Mode; label: string }[] = [
@@ -46,24 +44,12 @@ export function MusculoHoja(props: { musculo: MuscleId; onClose: () => void }) {
     return <BibliotecaHoja musculo={musculo} onElegir={setAnadiendo} onClose={() => setAnadiendo(null)} />
   }
   if (anadiendo) {
-    const ex = anadiendo
-    const titulos = nombresDeSesiones(sesiones.value)
     return (
-      <Sheet title={`¿En qué sesión va ${ex.name}?`} onClose={() => setAnadiendo(null)} large>
-        <ChoiceList
-          name="anadir-a"
-          legend="Sesión"
-          options={sesiones.value.map((s) => ({ value: s.sigla, label: titulos[s.sigla] }))}
-          value=""
-          onChange={(sigla) => {
-            const nombres =
-              sesiones.value.find((s) => s.sigla === sigla)?.ejercicios.map((e) => e.nombre) ?? []
-            const nuevo = { nombre: ex.name, series: 3, reps: ex.reps, rir: ex.rir, descanso: ex.restSec }
-            void editarSesion(sigla, (ed) => anadir(ed, nuevo, nombres))
-            setAnadiendo(null)
-          }}
-        />
-      </Sheet>
+      <ElegirSesionHoja
+        ejercicio={anadiendo}
+        onHecho={() => setAnadiendo(null)}
+        onClose={() => setAnadiendo(null)}
+      />
     )
   }
   return (
