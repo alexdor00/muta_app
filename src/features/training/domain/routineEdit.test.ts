@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { anadir, aplicarEdicion, cambiarPauta, claveDe, mover, pautaDe, quitar } from './routineEdit.ts'
-import { ejercicioDelPlan, type SesionPlan } from './workoutPlan.ts'
+import {
+  anadir,
+  aplicarEdicion,
+  cambiarPauta,
+  claveDe,
+  mover,
+  pautaDe,
+  quitar,
+  superserieDe,
+  superseries,
+  unirEnSuperserie,
+} from './routineEdit.ts'
+import { ejercicioDelPlan, type EjercicioPlan, type SesionPlan } from './workoutPlan.ts'
 
 const ej = (name: string, sets = 3, reps = '8-12', rpe = '8') =>
   ejercicioDelPlan({ name, sets, reps, rpe, rest: '~2 min' }, null)
@@ -51,5 +62,48 @@ describe('aplicarEdicion', () => {
 
   it('la pauta de un ejercicio, para editarla', () => {
     expect(pautaDe(B1.ejercicios[2])).toEqual({ series: 2, reps: [10, 15], rir: 1, salto: 2.5, nota: '' })
+  })
+})
+
+describe('superseries', () => {
+  const de = (nombre: string, extra: Partial<EjercicioPlan> = {}) =>
+    ({ ...ejercicioDelPlan({ name: nombre }, null), ...extra }) as EjercicioPlan
+  it('A1 y A2 seguidos, unidos; los demás, solos', () => {
+    const lista = [de('Sentadilla'), de('A1: Press francés'), de('A2: Curl'), de('Gemelo')]
+    expect(superseries(lista)).toEqual([null, [1, 2], [1, 2], null])
+  })
+  it('lo que eliges manda: separar (null) o unir con el de al lado', () => {
+    const a1 = de('A1: Press francés', { superserieCon: null })
+    expect(superseries([a1, de('A2: Curl')])).toEqual([null, null])
+    const solo = de('Gemelo', { superserieCon: 'Crunch' })
+    expect(superseries([solo, de('Crunch')])).toEqual([
+      [0, 1],
+      [0, 1],
+    ])
+  })
+})
+
+describe('superserieDe y unirEnSuperserie', () => {
+  const de = (nombre: string) => ejercicioDelPlan({ name: nombre }, null)
+  const lista = [de('Sentadilla'), de('A1: Press francés'), de('A2: Curl')]
+  it('las opciones son ninguno y los de al lado, y vale la que está unida', () => {
+    const s = superserieDe(lista, 1)
+    expect(s.opciones.map((o) => o.label)).toEqual(['Ninguno', 'Con Sentadilla', 'Con A2: Curl'])
+    expect(s.valor).toBe('siguiente')
+    expect(superserieDe(lista, 0).valor).toBe('ninguno')
+  })
+  it('unir con el anterior y volver a dejarlo solo', () => {
+    const unida = aplicarEdicion(
+      { sigla: 'S', nombre: 'S', minutos: 0, ejercicios: lista },
+      unirEnSuperserie({}, lista, 1, 'anterior'),
+      () => null,
+    ).ejercicios
+    expect(superseries(unida)[0]).toEqual([0, 1])
+    const sola = aplicarEdicion(
+      { sigla: 'S', nombre: 'S', minutos: 0, ejercicios: lista },
+      unirEnSuperserie({}, lista, 2, 'ninguno'),
+      () => null,
+    ).ejercicios
+    expect(superseries(sola)).toEqual([null, null, null])
   })
 })

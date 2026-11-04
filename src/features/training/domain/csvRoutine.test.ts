@@ -51,3 +51,12 @@ describe('segundosDeDescanso', () => {
     expect(segundosDeDescanso('nada')).toBeNull()
   })
 })
+
+describe('repeticiones serie a serie en el CSV', () => {
+  it('«4,6,8» vale: cada serie distinta', () => {
+    const r = leerRutinaCsv('sesion;ejercicio;series;repeticiones\nPierna;Sentadilla hack;3;4,6,8')
+    expect(r.errores).toEqual([])
+    const d = r.programa.blocks[0].weeks[0].days[0]
+    expect('exercises' in d ? d.exercises[0].reps : null).toBe('4,6,8')
+  })
+})

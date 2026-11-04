@@ -107,3 +107,37 @@
   text-align: justify;
   hyphens: auto;
 }
+
+/* Interruptor (Cada serie distinta): pista gris, negra si está encendido, con el círculo blanco */
+.switch {
+  position: relative;
+  flex: none;
+  width: calc(var(--tap-min) + var(--space-1));
+  height: calc(var(--tap-min) * 0.6);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--separator);
+  cursor: pointer;
+  transition: background var(--duration-tap);
+}
+
+.switch::after {
+  position: absolute;
+  top: calc(var(--space-1) / 2);
+  left: calc(var(--space-1) / 2);
+  width: calc(var(--tap-min) * 0.6 - var(--space-1));
+  height: calc(var(--tap-min) * 0.6 - var(--space-1));
+  border-radius: 50%;
+  background: var(--bg);
+  content: '';
+  transition: transform var(--duration-tap);
+}
+
+.switch[aria-checked='true'] {
+  background: var(--label);
+}
+
+.switch[aria-checked='true']::after {
+  transform: translateX(calc(var(--tap-min) * 0.4 + var(--space-1)));
+}

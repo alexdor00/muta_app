@@ -222,3 +222,16 @@
   text-align: justify;
   hyphens: auto;
 }
+
+/* Superserie: los ejercicios unidos llevan una línea negra a la izquierda; el primero, la etiqueta */
+.joined {
+  padding-left: var(--space-3);
+  border-left: var(--border) solid var(--label);
+}
+
+.ssLabel {
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+  color: var(--label-2);
+  text-transform: uppercase;
+}

@@ -8,7 +8,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   con «▶ Empezar», «Editar», Tu semana, Hoy descansas), Editar rutina, la sesión (teclado, dropsets, notas), Ver sesión y las
   fichas. Hasta ahora todo se ha visto solo en el móvil simulado. Después, PR a `main` con la CI en verde.
 - **Siguiente pantalla, con PNG aprobado antes** (regla de CLAUDE.md): de la propuesta
-  `Desktop/MUTA-Entreno-lo-que-falta-minimalista.png` quedan Tu rutina (A06), cada serie distinta y superserie (A14), el «···» de
+  `Desktop/MUTA-Entreno-lo-que-falta-minimalista.png` quedan Tu rutina (A06), el «···» de
   la ficha con tu material en el perfil y la imagen para compartir el resumen. C00 se propone no hacerla aparte.
 - **Datos**: sustituciones de Women's Specialization y Comeback Bridge (a mano, de sus PDF; ver [docs/datos.md](docs/datos.md));
   ficha para los nombres de las rutinas sin pareja en la biblioteca (`private/informes/ejercicios-sin-ficha.txt`), con datos
@@ -25,6 +25,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
     va por rotación, se guarda a cada serie y al terminar pasa a la siguiente.
   - Biblioteca: alias de 457 nombres, ejercicios originales de las rutinas (biblioteca local, sin duplicados, los de MUTA
     primero) con su explicación (traducida o, para 25, de una web con su fuente); sustituciones de los documentos.
+  - Cada serie distinta y superserie (A14): «4 · 6 · 8» con un interruptor por ejercicio; A1/A2 unidas en Editar rutina
+    («Superserie con») y alternas en la sesión, 20 s entre las dos.
   - Editar rutina (A11–A13), minimalista: «Tu semana» con sesiones y descansos, nombre y foto de cada sesión, ejercicios con
     − / + que se guardan solos, «Repeticiones antes del fallo», el entrenador (consejos y cobertura del método) en su hoja.
   - Tu plan: tarjetas a todo el ancho con «▶ Empezar», «Editar» en la cabecera, Tu semana con lo planeado y ✓, «Hoy
@@ -65,11 +67,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 1. Entreno: Tu rutina (A06) y lo que falta de la propuesta (ver «Tarea actual»), siempre con PNG aprobado.
 2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión y la sesión ya dicen «Sugerido»).
 3. Coach: usar las elecciones guardadas (prioridades, puntos débiles) y `adaptVolume`.
-4. Editar rutina: enlazar superseries y cada serie distinta (A14); reordenar, añadir y pauta ya están.
-5. Importar/exportar copia de seguridad en CSV/JSON desde Perfil.
-6. Áreas Hoy, Comida y Progreso (cuando haya diseño aprobado).
-7. Fotos de categoría y miniaturas de ejercicio.
-8. Quitar el número de días del nombre de otras rutinas (Esencial, Frecuencia alta, PPL, Vuelta al gimnasio) si se quiere el
+4. Importar/exportar copia de seguridad en CSV/JSON desde Perfil.
+5. Áreas Hoy, Comida y Progreso (cuando haya diseño aprobado).
+6. Fotos de categoría y miniaturas de ejercicio.
+7. Quitar el número de días del nombre de otras rutinas (Esencial, Frecuencia alta, PPL, Vuelta al gimnasio) si se quiere el
    mismo criterio que en Powerbuilding.
 
 ## Dudas abiertas

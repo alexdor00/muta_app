@@ -18,6 +18,10 @@ import {
   seriesDe,
   sesionesDeSemana,
   tecnicaDe,
+  letraSuperserie,
+  repsDeSerie,
+  repsPorSerie,
+  textoReps,
   siglaYNombre,
 } from './workoutPlan.ts'
 
@@ -297,5 +301,22 @@ describe('tecnicaDe', () => {
     expect(tecnicaDe({ name: 'Sentadilla', reps: '5', technique: 'Fallo' })).toBeNull()
     // «Serie de descarga» no es un dropset
     expect(tecnicaDe({ name: 'Serie de descarga: Sentadilla' })).toBeNull()
+  })
+})
+
+describe('cada serie distinta y superserie (A14)', () => {
+  it('repeticiones serie a serie: la lista, el rango de todas y el de cada serie', () => {
+    expect(repsPorSerie('4, 6, 8')).toEqual(['4', '6', '8'])
+    expect(repsPorSerie('5,4,3+')).toEqual(['5', '4', '3'])
+    expect(repsPorSerie('8-12')).toBeNull()
+    const e = ejercicioDelPlan({ name: 'Sentadilla hack', sets: 3, reps: '4, 6, 8' }, null)
+    expect([e.reps, e.repsSerie, textoReps(e)]).toEqual(['4–8', ['4', '6', '8'], '4 · 6 · 8'])
+    expect([repsDeSerie(e, 0), repsDeSerie(e, 2), repsDeSerie(e, 5)]).toEqual(['4', '8', '8'])
+  })
+  it('la letra de la superserie, por el nombre de la rutina', () => {
+    expect(letraSuperserie('A1: Press francés')).toBe('A')
+    expect(letraSuperserie('Superserie + B2: Curl')).toBe('B')
+    expect(letraSuperserie('Press francés')).toBeNull()
+    expect(ejercicioDelPlan({ name: 'A2: Curl con barra Z' }, null).superserie).toBe('A')
   })
 })

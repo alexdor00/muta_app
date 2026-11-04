@@ -12,13 +12,12 @@ import { WorkoutExerciseRow } from '../../components/WorkoutExerciseRow.tsx'
 import { WorkoutKeypad } from '../../components/WorkoutKeypad.tsx'
 import { TipsBanner } from '../../components/SessionTips.tsx'
 import { ConfirmSheet, FinishSheet } from '../../components/WorkoutSheets.tsx'
-import { notaSugerido, sesionDe, type SesionPlan } from '../../state/plan.ts'
+import { notaSugerido, sesionDe, type SesionPlan, textoReps } from '../../state/plan.ts'
 import {
   calentamientosHoy,
   consejosAlEmpezar,
   paraConsejos,
   primeroSinTerminar,
-  siguienteSinTerminar,
 } from '../../state/ordenHoy.ts'
 import {
   alternarPausa,
@@ -38,16 +37,13 @@ import {
   seriesVistas,
   pautaHoy,
   tecnicaHoy,
-  anadirExtra,
-  cambiarExtra,
-  quitarExtra,
   sesionEnCurso,
-  terminado,
   tomarPedido,
   textoSerie,
   type EjercicioEnCurso,
   type SerieEnCurso,
 } from '../../state/sesionEnCurso.ts'
+import { anadirExtra, cambiarExtra, enSuperserie, quitarExtra } from '../../state/seriesEspeciales.ts'
 import { effortLabel } from '../../state/routines.ts'
 import { guardarNota, notaDe } from '../../use-cases/exerciseNotes.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
@@ -60,7 +56,8 @@ import { useTeclado } from './useTeclado.ts'
 import { cambiarDesdeSesion, terminarEntreno } from '../../use-cases/training.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
-import { irAEjercicio, irASerie } from './desplazar.ts'
+import { irAEjercicio } from './desplazar.ts'
+import { trasMarcar } from './trasMarcar.ts'
 import styles from './SesionScreen.module.css'
 
 /**
@@ -158,30 +155,15 @@ export function SesionScreen(props: { sessionId: string }) {
       )
     }
 
-    guardarSesion(apunte.sesion)
-    const c = apunte.comparacion
-    avisar(c === 1 ? 'record' : c === 0 ? 'betterThanLast' : 'setLogged')
-    setDescanso(apunte.descanso === null ? null : { fin: ahora + apunte.descanso * 1000, avisado: false })
-    if (apunte.bajada) {
-      decir(`Bajaste de ${apunte.bajada.de} a ${apunte.bajada.a} reps. Descansa 1 minuto más.`)
-    }
-    // Con el teclado abierto sigue en los kilos de la serie siguiente
-    if (activa) {
-      const mas = j + 1 < en.ejercicios[ej].series.length
-      entrar(mas ? { ej, serie: j + 1, campo: 'kg' } : null)
-    }
-    if (apunte.ejercicioTerminado) {
-      // Ejercicio terminado: al segundo se pliega y se abre el siguiente que falte
-      setTimeout(() => {
-        const actual = sesionEnCurso.value
-        if (!actual || !terminado(actual.ejercicios[ej])) return
-        const otro = siguienteSinTerminar(actual, ej)
-        if (otro >= 0) abrir(otro)
-        else setAbierto(-1)
-      }, 1100)
-    } else {
-      irASerie(j + 2)
-    }
+    trasMarcar(apunte, ej, j, {
+      ahora,
+      activa: Boolean(activa),
+      setDescanso,
+      entrar,
+      decir,
+      abrir,
+      setAbierto,
+    })
   }
 
   return (
@@ -217,7 +199,7 @@ export function SesionScreen(props: { sessionId: string }) {
         )}
         {en.orden.map((i, pos) => {
           const e = ejercicios[i]
-          const pauta = `${e.series} series de ${e.reps} reps, ${effortLabel(e.rir)}`
+          const pauta = `${e.series} series de ${textoReps(e)} reps, ${effortLabel(e.rir)}`
           const x = en.ejercicios[i]
           const nombre = nombreHoy(e, x)
           if (i !== abierto) {
@@ -239,7 +221,7 @@ export function SesionScreen(props: { sessionId: string }) {
               key={`${i}-${e.nombre}`}
               numero={pos + 1}
               nombre={nombre}
-              pauta={pautaHoy(e, x)}
+              pauta={[...pautaHoy(e, x), ...(enSuperserie(en, i) ? ['Superserie'] : [])]}
               descanso={formatRest(descansoDe(e))}
               onDescanso={() => setHoja({ tipo: 'descanso', ejercicio: e, segundos: descansoDe(e) })}
               sugerido={x.cambiadoPor ? null : notaSugerido(e)}

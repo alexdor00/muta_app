@@ -233,3 +233,12 @@ La tira de píldoras con puntos y lunas no se entendía, y «descanso» servía 
 semana como una lista en orden: las sesiones numeradas y, debajo, los días de descanso como filas que lo dicen («Día de
 descanso · Quitar»); «+ Añadir un día de descanso» pregunta después de qué sesión. Tocar una sesión abre sus ejercicios. En
 cada ejercicio, el descanso se llama «Descanso entre series», con una línea que lo explica.
+
+## 2026-11-04 · Cada serie distinta y superserie (A14)
+
+Las repeticiones «4, 6, 8» de un documento o de un CSV se guardan serie a serie y se escriben «4 · 6 · 8»; en Editar rutina, el
+interruptor «Cada serie distinta» pone un desplegable por serie, y apagado vuelve al rango de siempre. La superserie sale de la
+letra del nombre (A1/A2) y se puede unir o separar con «Superserie con» (solo con el de al lado, para no reordenar). En la
+sesión no se abren los dos ejercicios a la vez: tras una serie del primero se descansan 20 s ([02-reglas.md](conocimiento/02-reglas.md))
+y se abre el otro con un aviso; tras el último, su descanso normal y vuelta al primero. Así la pantalla sigue con un solo
+ejercicio abierto y no estorba.

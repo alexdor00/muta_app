@@ -2,8 +2,12 @@ import { useState } from 'preact/hooks'
 import { formatRange, formatRest } from '../../../shared/lib/format.ts'
 import { ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
+import { ChoiceList } from '../../../shared/ui/Choice.tsx'
 import { Desplegable } from './Desplegable.tsx'
 import styles from './EditExerciseSheet.module.css'
+
+/** Superserie con el de al lado: ninguno, el anterior o el siguiente (el tipo vive en el dominio). */
+type Superserie = 'ninguno' | 'anterior' | 'siguiente'
 
 export type PautaEdicion = {
   series: number
@@ -54,7 +58,7 @@ function Contador(p: {
 }
 
 /**
- * Editar ejercicio (A12–A13): series, descanso entre series y repeticiones antes del fallo con − / + (cada uno con una
+ * Editar ejercicio (A12–A14): «Cada serie distinta» (un rango por serie) y «Superserie con» el de al lado, además de series, descanso entre series y repeticiones antes del fallo con − / + (cada uno con una
  * línea que lo explica);
  * repeticiones (mínimo y máximo) en un desplegable.
  * Cada toque se guarda solo. «Cambiar por otro» y «Quitar».
@@ -65,13 +69,25 @@ export function EditExerciseSheet(props: {
   sesion: string
   pauta: PautaEdicion
   onCambio: (p: PautaEdicion) => void
+  /** Cada serie distinta: el rango de cada una (null: todas iguales). */
+  seriesDistintas: [number, number][] | null
+  onSeriesDistintas: (s: [number, number][] | null) => void
+  /** Superserie con el de al lado: las opciones (ninguno, el anterior, el siguiente) y la elegida. */
+  superserie: { opciones: { value: Superserie; label: string }[]; valor: Superserie }
+  onSuperserie: (v: Superserie) => void
   onCambiar: () => void
   onQuitar: () => void
   onVolver: () => void
   onClose: () => void
 }) {
   const [p, setP] = useState(props.pauta)
-  const [abierto, setAbierto] = useState(false)
+  const [abierto, setAbierto] = useState<string | null>(null)
+  const [distintas, setDistintas] = useState(props.seriesDistintas)
+  const ponDistintas = (d: [number, number][] | null) => {
+    setDistintas(d)
+    props.onSeriesDistintas(d)
+  }
+  const abre = (k: string) => (a: boolean) => setAbierto(a ? k : null)
   const cambia = (c: Partial<PautaEdicion>) => {
     const nueva = { ...p, ...c }
     setP(nueva)
@@ -91,24 +107,75 @@ export function EditExerciseSheet(props: {
           texto={String(p.series)}
           puedeMenos={p.series > 1}
           puedeMas={p.series < 10}
-          onPaso={(paso) => cambia({ series: p.series + paso })}
+          onPaso={(paso) => {
+            const series = p.series + paso
+            cambia({ series })
+            // Con cada serie distinta, una más (como la última) o una menos
+            if (distintas)
+              ponDistintas(
+                Array.from({ length: series }, (_, k) => distintas[k] ?? distintas[distintas.length - 1]),
+              )
+          }}
         />
-        <Desplegable titulo="Repeticiones" valor={formatRange(p.reps)} abierto={abierto} onAbrir={setAbierto}>
-          <Contador
-            nombre="Mínimo de reps"
-            texto={String(min)}
-            puedeMenos={min > 1}
-            puedeMas={min < max}
-            onPaso={(paso) => cambia({ reps: [min + paso, max] })}
+        <div class={styles.line}>
+          <span>Cada serie distinta</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={Boolean(distintas)}
+            aria-label="Cada serie distinta"
+            class={styles.switch}
+            onClick={() => ponDistintas(distintas ? null : Array.from({ length: p.series }, () => p.reps))}
           />
-          <Contador
-            nombre="Máximo de reps"
-            texto={String(max)}
-            puedeMenos={max > min}
-            puedeMas={max < MAX_REPS}
-            onPaso={(paso) => cambia({ reps: [min, max + paso] })}
-          />
-        </Desplegable>
+        </div>
+        {distintas ? (
+          distintas.map((r, k) => (
+            <Desplegable
+              key={k}
+              titulo={`Serie ${k + 1}`}
+              valor={`${formatRange(r)} reps`}
+              abierto={abierto === `serie${k}`}
+              onAbrir={abre(`serie${k}`)}
+            >
+              <Contador
+                nombre={`Mínimo de reps de la serie ${k + 1}`}
+                texto={String(r[0])}
+                puedeMenos={r[0] > 1}
+                puedeMas={r[0] < r[1]}
+                onPaso={(paso) => ponDistintas(distintas.map((x, m) => (m === k ? [x[0] + paso, x[1]] : x)))}
+              />
+              <Contador
+                nombre={`Máximo de reps de la serie ${k + 1}`}
+                texto={String(r[1])}
+                puedeMenos={r[1] > r[0]}
+                puedeMas={r[1] < MAX_REPS}
+                onPaso={(paso) => ponDistintas(distintas.map((x, m) => (m === k ? [x[0], x[1] + paso] : x)))}
+              />
+            </Desplegable>
+          ))
+        ) : (
+          <Desplegable
+            titulo="Repeticiones"
+            valor={formatRange(p.reps)}
+            abierto={abierto === 'reps'}
+            onAbrir={abre('reps')}
+          >
+            <Contador
+              nombre="Mínimo de reps"
+              texto={String(min)}
+              puedeMenos={min > 1}
+              puedeMas={min < max}
+              onPaso={(paso) => cambia({ reps: [min + paso, max] })}
+            />
+            <Contador
+              nombre="Máximo de reps"
+              texto={String(max)}
+              puedeMenos={max > min}
+              puedeMas={max < MAX_REPS}
+              onPaso={(paso) => cambia({ reps: [min, max + paso] })}
+            />
+          </Desplegable>
+        )}
         <Contador
           nombre="Descanso entre series"
           texto={formatRest(p.descanso)}
@@ -124,6 +191,30 @@ export function EditExerciseSheet(props: {
           }
         />
         <small class={styles.hint}>Lo que paras entre una serie y la siguiente.</small>
+        {props.superserie.opciones.length > 1 && (
+          <Desplegable
+            titulo="Superserie con"
+            valor={
+              props.superserie.opciones.find((o) => o.value === props.superserie.valor)?.label ?? 'Ninguno'
+            }
+            abierto={abierto === 'superserie'}
+            onAbrir={abre('superserie')}
+          >
+            <small class={styles.hint}>
+              Se hacen alternos: 20 s entre los dos y el descanso al terminar la pareja.
+            </small>
+            <ChoiceList
+              name="superserie"
+              legend="Superserie con"
+              options={props.superserie.opciones}
+              value={props.superserie.valor}
+              onChange={(v) => {
+                props.onSuperserie(v)
+                setAbierto(null)
+              }}
+            />
+          </Desplegable>
+        )}
         <Contador
           nombre="Repeticiones antes del fallo"
           texto={String(p.rir)}

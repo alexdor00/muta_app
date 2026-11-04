@@ -1,12 +1,7 @@
 import { localDate, parseDecimal } from '../../../shared/lib/format.ts'
 import type { Entreno } from '../domain/workoutHistory.ts'
-import {
-  ejerciciosDe,
-  extrasHechos,
-  nombreHoy,
-  segundosSesion,
-  type SesionEnCurso,
-} from '../state/sesionEnCurso.ts'
+import { ejerciciosDe, nombreHoy, segundosSesion, type SesionEnCurso } from '../state/sesionEnCurso.ts'
+import { extrasHechos } from '../state/seriesEspeciales.ts'
 
 /** Lo hecho de una sesión, como se guarda: solo las series marcadas, en el orden de hoy. */
 export function entrenoDe(en: SesionEnCurso, programId: string, ahora: number): Entreno {

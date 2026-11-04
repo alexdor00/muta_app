@@ -10,6 +10,7 @@ import { METRICAS_SESION, SessionProgress, type Metrica } from '../../components
 import { SessionTipsCard } from '../../components/SessionTips.tsx'
 import {
   cambioDe,
+  textoReps,
   detalleSesion,
   entrenos,
   notaSugerido,
@@ -63,7 +64,7 @@ export function VerSesionScreen(props: { sessionId: string }) {
     const lib = porNombre(e.nombre)
     return {
       nombre: e.nombre,
-      detalle: `${e.series} series · ${e.reps} reps · ${effortLabel(e.rir)}`,
+      detalle: `${e.series} series · ${textoReps(e)} reps · ${effortLabel(e.rir)}`,
       sugerido:
         [e.enLugarDe ? 'En lugar de ' + e.enLugarDe + ' (cambiado en tu plan)' : null, notaSugerido(e)]
           .filter(Boolean)

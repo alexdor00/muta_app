@@ -18,6 +18,8 @@ export type FilaEditar = {
   detalle: string
   /** «En lugar de …» si lo cambiaste por otro, o «Añadido por ti». */
   nota: string | null
+  /** En superserie: el primero, uno de en medio o el último (null si va solo). */
+  superserie: 'inicio' | 'medio' | 'fin' | null
 }
 
 /**
@@ -129,8 +131,12 @@ export function EditRoutineSheet(props: {
         {orden.map((i) => {
           const f = props.filas[i]
           return (
-            <li key={f.nombre} class={arrastre?.de === i ? styles.lifted : ''}>
+            <li
+              key={f.nombre}
+              class={`${arrastre?.de === i ? styles.lifted : ''} ${f.superserie ? styles.joined : ''}`}
+            >
               <button type="button" class={styles.row} onClick={() => props.onAbrir(i)}>
+                {f.superserie === 'inicio' && <span class={styles.ssLabel}>Superserie</span>}
                 <span class={styles.name}>{f.nombre}</span>
                 <span class={styles.detail}>{f.detalle}</span>
                 {f.nota && <span class={styles.note}>{f.nota}</span>}

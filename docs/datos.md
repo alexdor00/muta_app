@@ -95,7 +95,7 @@ semana; la primera fila son los títulos (da igual mayúsculas y tildes; separad
 | Sesión       | sí          | `Torso` (las filas seguidas con la misma sesión forman esa sesión)                      |
 | Ejercicio    | sí          | `Press banca` (si está en la biblioteca, con cualquiera de sus nombres, tiene su ficha) |
 | Series       | no          | `3`                                                                                     |
-| Repeticiones | no          | `6-10`, `8 a 12` o `5`                                                                  |
+| Repeticiones | no          | `6-10`, `8 a 12`, `5` o una por serie: `4,6,8` (cada serie distinta)                    |
 | RIR          | no          | `2` (repeticiones antes del fallo, 0–9)                                                 |
 | Descanso     | no          | `3:00`, `90 s`, `2 min` o `180`                                                         |
 | Notas        | no          | texto libre                                                                             |

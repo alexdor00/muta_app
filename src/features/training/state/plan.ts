@@ -5,7 +5,7 @@ import type { Level } from '../domain/catalog.ts'
 import { descansosPendientes, hoyTocaDescanso } from '../domain/restDays.ts'
 import { cambioUltimaVez } from '../domain/exerciseProgress.ts'
 import { historialDe, semanaDe, ultimaVez, type Entreno } from '../domain/workoutHistory.ts'
-import type { EjercicioPlan, Rotacion, SesionPlan } from '../domain/workoutPlan.ts'
+import { rangoDe, type EjercicioPlan, type Rotacion, type SesionPlan } from '../domain/workoutPlan.ts'
 
 export type PlanListo = {
   status: 'ready'
@@ -121,9 +121,24 @@ export function enTuPlan(nombre: string): { sigla: string; indice: number; e: Ej
 }
 
 export type { EjercicioPlan, SesionPlan } from '../domain/workoutPlan.ts'
-export { desdeBiblioteca, nombresDeSesiones } from '../domain/workoutPlan.ts'
+export { desdeBiblioteca, nombresDeSesiones, textoReps } from '../domain/workoutPlan.ts'
 export { descansosPorSesion, trasDe } from '../domain/restDays.ts'
 export { progresoDeSesion, semanaDe, seriesPorMusculo } from '../domain/workoutHistory.ts'
 export { notaSugerido } from '../domain/workoutPlan.ts'
-export { anadir, cambiarPauta, claveDe, mover, pautaDe, quitar } from '../domain/routineEdit.ts'
+export {
+  anadir,
+  cambiarPauta,
+  claveDe,
+  mover,
+  pautaDe,
+  quitar,
+  superserieDe,
+  superseries,
+  unirEnSuperserie,
+} from '../domain/routineEdit.ts'
 export { EQUIPMENT_LABEL } from '../domain/exerciseLibrary.ts'
+
+/** Cada serie distinta: el rango de cada una para editarlo («6–8» → [6, 8]); null si todas son iguales. */
+export const rangosSerie = (e: EjercicioPlan): [number, number][] | null =>
+  e.repsSerie?.map((r) => rangoDe(r) ?? [parseInt(r, 10) || 1, parseInt(r, 10) || 1]) ?? null
+export type { Superserie } from '../domain/routineEdit.ts'

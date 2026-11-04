@@ -17,6 +17,11 @@ import {
   mover,
   nombresDeSesiones,
   pautaDe,
+  rangosSerie,
+  superserieDe,
+  superseries,
+  unirEnSuperserie,
+  textoReps,
   quitar,
   sesiones,
   tocaHoy,
@@ -80,6 +85,7 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   const titulos = nombresDeSesiones(lista)
   const porSesion = plan ? descansosPorSesion(plan.descansos, lista.length) : lista.map(() => 0)
   const consejos = consejosDelEntrenador(sesion, lista)
+  const grupos = superseries(sesion.ejercicios)
   const nombre = titulos[sesion.sigla]
   const e = abierto !== null ? (sesion.ejercicios[abierto] ?? null) : null
   const editar = (cambio: Parameters<typeof editarSesion>[1]) => void editarSesion(sesion.sigla, cambio)
@@ -289,6 +295,10 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
           editar((ed) => cambiarPauta(ed, claveDe(e), { series: n.series, reps: n.reps, rir: n.rir }))
           if (n.descanso !== descansoDe(e)) elegirDescanso(e.nombre, n.descanso)
         }}
+        seriesDistintas={rangosSerie(e)}
+        onSeriesDistintas={(s) => editar((ed) => cambiarPauta(ed, claveDe(e), { repsSerie: s }))}
+        superserie={superserieDe(sesion.ejercicios, abierto)}
+        onSuperserie={(v) => editar((ed) => unirEnSuperserie(ed, sesion.ejercicios, abierto, v))}
         onCambiar={() => setHoja('cambiar')}
         onQuitar={() => setHoja('quitar')}
         onVolver={aLista}
@@ -310,11 +320,23 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
         }}
         consejos={consejos.length}
         onConsejos={() => setHoja('consejos')}
-        filas={sesion.ejercicios.map((x) => ({
-          nombre: x.nombre,
-          detalle: `${x.series} × ${x.reps} · ${formatRest(descansoDe(x))}`,
-          nota: x.enLugarDe ? `En lugar de ${x.enLugarDe}` : x.anadido ? 'Añadido por ti' : null,
-        }))}
+        filas={sesion.ejercicios.map((x, i) => {
+          const g = grupos[i]
+          // En superserie, el primero «pasa al siguiente»; el último lleva el descanso de la pareja
+          const sigue = g && g[g.length - 1] !== i
+          return {
+            nombre: x.nombre,
+            detalle: `${x.series} × ${textoReps(x)} · ${sigue ? 'pasa al siguiente' : formatRest(descansoDe(x))}`,
+            superserie: g
+              ? g[0] === i
+                ? ('inicio' as const)
+                : sigue
+                  ? ('medio' as const)
+                  : ('fin' as const)
+              : null,
+            nota: x.enLugarDe ? `En lugar de ${x.enLugarDe}` : x.anadido ? 'Añadido por ti' : null,
+          }
+        })}
         onAbrir={(i) => {
           setAbierto(i)
           setHoja('ejercicio')

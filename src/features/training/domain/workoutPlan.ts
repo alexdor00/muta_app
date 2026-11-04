@@ -28,6 +28,26 @@ export function tecnicaDe(
   return null
 }
 
+/** «4, 6, 8» o «5,4,3+» → una por serie («3+» queda «3»); null si no son repeticiones serie a serie. */
+export function repsPorSerie(reps: Exercise['reps']): string[] | null {
+  const t = String(reps ?? '').trim()
+  if (!/^\d+\+?(\s*,\s*\d+\+?)+$/.test(t)) return null
+  return t.split(',').map((x) => x.trim().replace('+', ''))
+}
+
+/** La letra de la superserie por el nombre de la rutina: «A1: Press francés» → «A»; null si no va en superserie. */
+export function letraSuperserie(nombre: string): string | null {
+  return /^(?:Superserie \+ )?([A-E])\d+[.:]/.exec(nombre)?.[1] ?? null
+}
+
+/** El rango de repeticiones de la serie `i`: el suyo si cada serie es distinta; si no, el del ejercicio. */
+export function repsDeSerie(e: Pick<EjercicioPlan, 'reps' | 'repsSerie'>, i: number): string {
+  return e.repsSerie?.[Math.min(i, e.repsSerie.length - 1)] ?? e.reps
+}
+
+/** Las repeticiones para leer: «4 · 6 · 8» si cada serie es distinta; si no, «6–10». */
+export const textoReps = (e: Pick<EjercicioPlan, 'reps' | 'repsSerie'>) => e.repsSerie?.join(' · ') ?? e.reps
+
 export type Sugerido = 'series' | 'reps' | 'rir' | 'descanso' | 'musculo' | 'salto'
 
 /** Un ejercicio de una sesión: series, rango de repeticiones, esfuerzo, descanso y lo que pide el calentamiento. */
@@ -58,6 +78,12 @@ export type EjercicioPlan = {
   explicacion?: string
   /** Tu nota del ejercicio (Editar rutina). */
   nota?: string
+  /** Cada serie distinta: las repeticiones de cada una («4», «6–8»…); `reps` es entonces el rango de todas. */
+  repsSerie?: string[]
+  /** La letra de su superserie en la rutina («A» de «A1: …» y «A2: …»), si la lleva. */
+  superserie?: string
+  /** La superserie que elegiste en Editar rutina: con qué ejercicio (su clave) o con ninguno (null); sin elegir, undefined. */
+  superserieCon?: string | null
   /** Dropset o rest-pause: en la sesión se apuntan bajadas o mini-series dentro de cada serie. */
   tecnica?: Tecnica
   /** Lo añadiste tú en Editar rutina (no está en la rutina). */
@@ -122,6 +148,15 @@ export function descansoDe(rest: Exercise['rest']): number | null {
   return /\d/.test(rest ?? '') ? Math.round(restMinutes(rest) * 60) : null
 }
 
+/** Si la rutina da las repeticiones serie a serie: la lista y, como `reps`, el rango de todas («4–8»). */
+function serieASerie(e: Exercise): Partial<EjercicioPlan> {
+  const lista = repsPorSerie(e.reps)
+  if (!lista) return {}
+  const nums = lista.map(Number)
+  const [a, b] = [Math.min(...nums), Math.max(...nums)]
+  return { repsSerie: lista, reps: a === b ? String(a) : `${a}–${b}` }
+}
+
 /** Un ejercicio de la rutina con lo que pide la sesión: de la rutina, de la biblioteca o sugerido. */
 export function ejercicioDelPlan(e: Exercise, lib: LibraryExercise | null): EjercicioPlan {
   const sugeridos: Sugerido[] = []
@@ -152,6 +187,8 @@ export function ejercicioDelPlan(e: Exercise, lib: LibraryExercise | null): Ejer
     sustitutos: e.substitutions ?? [],
     ...(e.originalName && e.originalName !== e.name ? { original: e.originalName } : {}),
     ...(tecnicaDe(e) ? { tecnica: tecnicaDe(e) ?? undefined } : {}),
+    ...serieASerie(e),
+    ...(letraSuperserie(e.name) ? { superserie: letraSuperserie(e.name) ?? undefined } : {}),
     ...(e.tip ? { explicacion: e.tip } : {}),
     sugeridos,
   }
@@ -237,11 +274,13 @@ export function rangoDe(texto: string): Range | null {
 
 /** Lo que toca hoy en la serie `i` según el motor (doble progresión desde la última vez). */
 export function sugerenciaDe(e: EjercicioPlan, i = 0): Sugerencia {
-  const minimo = parseInt(e.reps, 10) || 1
+  // Cada serie con su rango si son distintas
+  const reps = repsDeSerie(e, i)
+  const minimo = parseInt(reps, 10) || 1
   return suggestFor(
     {
       ultima: e.ultima.map((s) => ({ ...s, rir: null })),
-      rango: rangoDe(e.reps) ?? [minimo, minimo],
+      rango: rangoDe(reps) ?? [minimo, minimo],
       rir: e.rir,
       salto: e.salto,
       pesoCorporal: e.pesoCorporal,
