@@ -17,7 +17,7 @@ import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { localDate } from '../../../../shared/lib/format.ts'
 import {
   descansasHoy,
-  detalleSesion,
+  detalleCorto,
   entrenos,
   seriesPorMusculo,
   sesiones as sesionesPlan,
@@ -67,7 +67,7 @@ function TuPlan({ siguiente }: { siguiente: number }) {
   const todas = sesionesPlan.value.map((s) => ({
     ...s,
     tono: tonoDe(s.sigla),
-    detalle: detalleSesion(s),
+    detalle: detalleCorto(s),
     estado: hechas.has(s.sigla)
       ? 'Hecha'
       : s.sigla === toca?.sigla

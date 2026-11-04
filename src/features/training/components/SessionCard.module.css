@@ -13,8 +13,8 @@
   justify-content: flex-end;
   height: calc(var(--photo-card-height) * 1.4); /* 269 */
   overflow: hidden;
-  /* Abajo, sitio para «▶ Empezar» debajo del texto */
-  padding: var(--space-4) var(--space-5) calc(var(--space-4) + var(--tap-min) + var(--space-3));
+  /* El texto abajo, a la altura de «▶ Empezar», con su sitio reservado a la derecha (un nombre largo pasa a dos líneas) */
+  padding: var(--space-4) calc(var(--tap-min) * 3 + var(--space-5) * 2) var(--space-4) var(--space-5);
   border-radius: var(--radius-card);
   color: var(--c-fg);
   text-decoration: none;
@@ -85,7 +85,7 @@
   object-fit: cover;
 }
 
-/* Empezar: una píldora blanca abajo a la derecha, bajo el título y los datos, con ▶ y su nombre, que flota sobre la tarjeta */
+/* Empezar: una píldora blanca abajo a la derecha, a la altura del texto, con ▶ y su nombre, que flota sobre la tarjeta */
 .play {
   position: absolute;
   right: var(--space-5);

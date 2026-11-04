@@ -108,6 +108,9 @@ export function detalleSesion(s: SesionPlan): string {
   return `${s.ejercicios.length} ejercicios · ${series} series · ${s.minutos} min`
 }
 
+/** Lo corto de una sesión para su tarjeta de Tu plan (al lado de «▶ Empezar»): «7 ejercicios · 55 min». */
+export const detalleCorto = (s: SesionPlan) => `${s.ejercicios.length} ejercicios · ${s.minutos} min`
+
 /** Dónde está un ejercicio en tu semana (la primera sesión que lo lleva), o null si no está. */
 export function enTuPlan(nombre: string): { sigla: string; indice: number; e: EjercicioPlan } | null {
   for (const s of sesiones.value) {
