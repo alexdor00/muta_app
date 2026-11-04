@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { avisoDeOrden, cambioDesdePrimera, progresoDe, type PuntoProgreso } from './exerciseProgress.ts'
+import {
+  avisoDeOrden,
+  cambioDesdePrimera,
+  progresoDe,
+  type PuntoProgreso,
+  cambioUltimaVez,
+} from './exerciseProgress.ts'
 
 describe('progresoDe', () => {
   it('máximo: el 1RM de la mejor serie (con el RIR del plan); volumen: kilos × reps', () => {
@@ -46,5 +52,20 @@ describe('avisoDeOrden', () => {
   it('sin saber el puesto, o con una sola vez, no avisa', () => {
     expect(avisoDeOrden([p(null), p(1)])).toBeNull()
     expect(avisoDeOrden([p(1)])).toBeNull()
+  })
+})
+
+describe('cambioUltimaVez', () => {
+  const vez = (fecha: string, kg: number | null, reps: number) => ({ fecha, series: [{ kg, reps }] })
+  it('la última frente a la anterior, por el máximo estimado; sin peso, por las repeticiones', () => {
+    expect(cambioUltimaVez([vez('a', 60, 10), vez('b', 60, 10)], 2)).toBe(0)
+    expect(cambioUltimaVez([vez('a', 50, 10), vez('b', 60, 10), vez('c', 62.5, 10)], 2)).toBeCloseTo(
+      0.0417,
+      3,
+    )
+    expect(cambioUltimaVez([vez('a', null, 10), vez('b', null, 12)], 2)).toBeCloseTo(0.2)
+  })
+  it('null con una sola vez', () => {
+    expect(cambioUltimaVez([vez('a', 60, 10)], 2)).toBeNull()
   })
 })

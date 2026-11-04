@@ -54,7 +54,8 @@ export function progresoDeSesion(entrenos: readonly Entreno[], sigla: string) {
   return enOrden(entrenos)
     .filter((x) => x.sigla === sigla)
     .map((x) => {
-      const series = x.ejercicios.flatMap((e) => e.series)
+      // Las bajadas y mini-series también suman al volumen
+      const series = x.ejercicios.flatMap((e) => e.series.flatMap((s) => [s, ...(s.extra ?? [])]))
       return {
         fecha: x.fecha,
         toneladas: Math.round(series.reduce((t, s) => t + (s.kg ?? 0) * s.reps, 0) / 100) / 10,

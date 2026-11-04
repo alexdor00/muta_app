@@ -11,7 +11,7 @@
 }
 
 .card {
-  flex: 0 0 calc(100% - var(--space-6));
+  flex: 0 0 100%;
   scroll-snap-align: start;
 }
 

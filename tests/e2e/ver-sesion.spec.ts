@@ -66,3 +66,16 @@ test('un ejercicio que en la biblioteca se llama de otra forma tiene su ficha y 
     '/entreno/ejercicio/elevaciones_laterales_en_polea',
   )
 })
+
+test('cada ejercicio dice a la derecha cuánto sube o baja frente a la vez anterior, y arriba cuántos suben', async ({
+  page,
+}) => {
+  await page.goto('/entreno/rutina/b1')
+  await expect(page.getByText(/^\d de \d suben$/)).toBeVisible()
+  // El rumano: 62,5 × 6 la última vez frente a 60 × 6 (y menos) hace 14 días
+  const rumano = page.getByRole('button', { name: /Peso muerto rumano/ })
+  await expect(rumano).toContainText('%')
+  await expect(rumano).toHaveAccessibleName(
+    /(Sube|Baja) [\d,]+ % frente a la vez anterior|Igual que la vez anterior/,
+  )
+})

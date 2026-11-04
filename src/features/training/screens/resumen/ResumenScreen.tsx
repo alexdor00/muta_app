@@ -100,8 +100,8 @@ export function ResumenScreen(props: { sessionId: string }) {
           }
         }}
         onVolver={() => {
-          void reabrirEntreno(en)
-          route(paths.session(sesion.sigla.toLowerCase()))
+          // Primero se deshace lo guardado y luego se vuelve a la sesión (si no, una recarga podría cortarlo)
+          void reabrirEntreno(en).then(() => route(paths.session(sesion.sigla.toLowerCase())))
         }}
       />
       <Toast message={aviso} />

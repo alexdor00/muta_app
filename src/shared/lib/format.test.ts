@@ -89,3 +89,11 @@ describe('formatRest', () => {
     expect(formatRest(0)).toBe('sin descanso')
   })
 })
+
+describe('formatChange con decimales', () => {
+  it('«+2,4 %» con uno; sin decimales, como siempre', () => {
+    expect(formatChange(0.0237, 1)).toBe('+2,4 %')
+    expect(formatChange(-0.031, 1)).toBe('−3,1 %')
+    expect(formatChange(0.0237)).toBe('+2 %')
+  })
+})

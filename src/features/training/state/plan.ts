@@ -3,7 +3,8 @@
 import { computed, signal } from '@preact/signals'
 import type { Level } from '../domain/catalog.ts'
 import { descansosPendientes, hoyTocaDescanso } from '../domain/restDays.ts'
-import { semanaDe, ultimaVez, type Entreno } from '../domain/workoutHistory.ts'
+import { cambioUltimaVez } from '../domain/exerciseProgress.ts'
+import { historialDe, semanaDe, ultimaVez, type Entreno } from '../domain/workoutHistory.ts'
 import type { EjercicioPlan, Rotacion, SesionPlan } from '../domain/workoutPlan.ts'
 
 export type PlanListo = {
@@ -86,6 +87,9 @@ export function tuSemana(hoy: string) {
     pendientes: descansosPendientes(plan.descansos, hecha, dias),
   })
 }
+
+/** Cuánto cambió un ejercicio la última vez frente a la anterior (máximo estimado o repeticiones); null si no hay dos. */
+export const cambioDe = (e: EjercicioPlan) => cambioUltimaVez(historialDe(entrenos.value, e.nombre), e.rir)
 
 /** Días de descanso que deja tu semana (7 menos sus sesiones), para la racha. */
 export const descansosPorSemana = computed(() => Math.max(0, 7 - sesiones.value.length))

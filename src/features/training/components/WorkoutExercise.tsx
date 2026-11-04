@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 import {
   CheckIcon,
-  ChevronRightIcon,
   DotsIcon,
   FlameIcon,
   PencilIcon,
   PlusIcon,
   StopwatchIcon,
 } from '../../../shared/ui/icons.tsx'
+import { SetExtras } from './SetExtras.tsx'
 import styles from './WorkoutExercise.module.css'
 
 export type CampoSerie = 'kg' | 'reps' | 'quedan'
@@ -24,6 +24,8 @@ export type SerieVista = {
   hecha: boolean
   /** Mejor que la misma serie de la vez anterior: estrella en vez de ✓. */
   record: boolean
+  /** Sus bajadas (dropset) o mini-series (rest-pause), con el peso en gris si es el mismo. */
+  extra: { kg: string; reps: string; kgGris: string }[]
 }
 
 type Props = {
@@ -49,11 +51,17 @@ type Props = {
   onFoco: (serie: number, campo: CampoSerie) => void
   onCambio: (serie: number, campo: CampoSerie, valor: string) => void
   onMarcar: (serie: number) => void
+  /** Dropset o rest-pause: debajo de cada serie hecha, «+ Bajada» o «+ Mini-serie». */
+  tecnica: 'dropset' | 'pausa' | null
+  onAnadirExtra: (serie: number) => void
+  onCambioExtra: (serie: number, n: number, campo: 'kg' | 'reps', valor: string) => void
+  onQuitarExtra: (serie: number, n: number) => void
   onEliminar: (serie: number) => void
   onAnadirSerie: () => void
 }
 
-function Estrella() {
+/** La estrella de una serie récord. */
+export function Estrella() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -190,52 +198,67 @@ function FilaSerie(props: {
   onCambio: Props['onCambio']
   onMarcar: Props['onMarcar']
   onEliminar: Props['onEliminar']
+  tecnica: Props['tecnica']
+  onAnadirExtra: Props['onAnadirExtra']
+  onCambioExtra: Props['onCambioExtra']
+  onQuitarExtra: Props['onQuitarExtra']
 }) {
   const { i, s } = props
   const fila = useDeslizar(props.abierta, props.onAbrir, () => props.onEliminar(i))
   return (
-    <div class={styles.swipe}>
-      <button
-        type="button"
-        class={styles.delete}
-        tabIndex={props.abierta ? 0 : -1}
-        aria-hidden={!props.abierta}
-        onClick={() => props.onEliminar(i)}
-      >
-        Eliminar
-      </button>
-      <div
-        ref={fila}
-        class={`${styles.set} ${s.hecha ? styles.doneRow : ''} ${props.abierta ? styles.swiped : ''}`}
-      >
-        <span class={styles.index}>{i + 1}</span>
-        {CAMPOS.map(({ campo, gris, nombre }) => (
-          <input
-            key={campo}
-            class={`${styles.cell} ${props.activa === campo ? styles.active : ''}`}
-            inputMode="none"
-            aria-label={`${nombre} de la serie ${i + 1}`}
-            value={s[campo]}
-            placeholder={s[gris]}
-            onClick={() => props.onFoco(i, campo)}
-            onFocus={(e) => {
-              // Con el teclado del ordenador (Tab) también sale; con el dedo, al tocar (así deslizar no lo abre)
-              if (e.currentTarget.matches(':focus-visible')) props.onFoco(i, campo)
-            }}
-            onInput={(e) => props.onCambio(i, campo, e.currentTarget.value)}
-          />
-        ))}
+    <>
+      <div class={styles.swipe}>
         <button
           type="button"
-          class={`${styles.check} ${s.hecha ? styles.done : ''}`}
-          aria-pressed={s.hecha}
-          aria-label={s.record ? `Serie ${i + 1} hecha, récord` : `Serie ${i + 1} hecha`}
-          onClick={() => props.onMarcar(i)}
+          class={styles.delete}
+          tabIndex={props.abierta ? 0 : -1}
+          aria-hidden={!props.abierta}
+          onClick={() => props.onEliminar(i)}
         >
-          {s.hecha && (s.record ? <Estrella /> : <CheckIcon />)}
+          Eliminar
         </button>
+        <div
+          ref={fila}
+          class={`${styles.set} ${s.hecha ? styles.doneRow : ''} ${props.abierta ? styles.swiped : ''}`}
+        >
+          <span class={styles.index}>{i + 1}</span>
+          {CAMPOS.map(({ campo, gris, nombre }) => (
+            <input
+              key={campo}
+              class={`${styles.cell} ${props.activa === campo ? styles.active : ''}`}
+              inputMode="none"
+              aria-label={`${nombre} de la serie ${i + 1}`}
+              value={s[campo]}
+              placeholder={s[gris]}
+              onClick={() => props.onFoco(i, campo)}
+              onFocus={(e) => {
+                // Con el teclado del ordenador (Tab) también sale; con el dedo, al tocar (así deslizar no lo abre)
+                if (e.currentTarget.matches(':focus-visible')) props.onFoco(i, campo)
+              }}
+              onInput={(e) => props.onCambio(i, campo, e.currentTarget.value)}
+            />
+          ))}
+          <button
+            type="button"
+            class={`${styles.check} ${s.hecha ? styles.done : ''}`}
+            aria-pressed={s.hecha}
+            aria-label={s.record ? `Serie ${i + 1} hecha, récord` : `Serie ${i + 1} hecha`}
+            onClick={() => props.onMarcar(i)}
+          >
+            {s.hecha && (s.record ? <Estrella /> : <CheckIcon />)}
+          </button>
+        </div>
       </div>
-    </div>
+      <SetExtras
+        serie={i}
+        extra={s.extra}
+        hecha={s.hecha}
+        tecnica={props.tecnica}
+        onAnadir={props.onAnadirExtra}
+        onCambio={props.onCambioExtra}
+        onQuitar={props.onQuitarExtra}
+      />
+    </>
   )
 }
 
@@ -344,6 +367,10 @@ export function WorkoutExercise(props: Props) {
               setAbierta(null)
               props.onEliminar(j)
             }}
+            tecnica={props.tecnica}
+            onAnadirExtra={props.onAnadirExtra}
+            onCambioExtra={props.onCambioExtra}
+            onQuitarExtra={props.onQuitarExtra}
           />
         ))}
       </div>
@@ -353,42 +380,5 @@ export function WorkoutExercise(props: Props) {
         Añadir serie
       </button>
     </section>
-  )
-}
-
-type RowProps = {
-  numero: number
-  nombre: string
-  /** «3 series de 8–12 reps, a 1 del fallo · 2:15». */
-  detalle: string
-  /** Pendiente: «Hoy 24 kg · antes 22 kg × 12». Terminado: lo hecho, con ★ en las series récord. */
-  resumen: string
-  estado: 'pendiente' | 'hecho' | 'record'
-  onAbrir: () => void
-}
-
-/** Un ejercicio que no se está haciendo: al tocarlo pasa a ser el abierto. Terminado, lleva ✓ o ★ (C22). */
-export function WorkoutExerciseRow({ numero, nombre, detalle, resumen, estado, onAbrir }: RowProps) {
-  return (
-    <button
-      type="button"
-      class={`${styles.exercise} ${styles.row} ${estado !== 'pendiente' ? styles.finished : ''}`}
-      onClick={onAbrir}
-    >
-      <span class={styles.badge} aria-hidden="true">
-        {estado === 'record' ? <Estrella /> : estado === 'hecho' ? <CheckIcon /> : numero}
-      </span>
-      <span class={styles.text}>
-        <span class={styles.name}>
-          {nombre}
-          {estado !== 'pendiente' && <span class={styles.hidden}>, terminado</span>}
-        </span>
-        <span class={styles.detail}>{detalle}</span>
-        <span class={`${styles.detail} ${estado !== 'pendiente' ? styles.summary : ''}`}>{resumen}</span>
-      </span>
-      <span class={styles.chevron} aria-hidden="true">
-        <ChevronRightIcon />
-      </span>
-    </button>
   )
 }

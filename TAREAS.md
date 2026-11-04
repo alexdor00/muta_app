@@ -6,7 +6,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 - **Hecho**: la hoja «Tu rutina» con tres filas (foto de la sesión y cobertura dentro de Editar rutina; ocultar consejos en
   «Consejos de hoy»); Editar rutina con «Tu semana» (sesiones y descansos), foto y nombre de cada sesión y el entrenador en
-  su hoja; «Tu semana» con lo planeado y ✓, «Hoy descansas» con «Entrenar igualmente», tu rutina desde un CSV; tus notas de cada ejercicio para siempre (sesión y ficha) y el «···» del ejercicio en cuadrícula.
+  su hoja; «Tu semana» con lo planeado y ✓, «Hoy descansas» con «Entrenar igualmente», tu rutina desde un CSV; dropsets y rest-pause en la sesión; el cambio de cada ejercicio en Ver sesión; tus notas de cada ejercicio para siempre (sesión y ficha) y el «···» del ejercicio en cuadrícula.
   **Falta** de la propuesta `Desktop/MUTA-Entreno-lo-que-falta-minimalista.png`: Tu rutina (A06), cada serie distinta y superserie
   (A14), «···» de la ficha y tu material, imagen para compartir; C00 se propone no hacerla aparte.
 - **Rama `pantalla/sesion`** (sale de `pantalla/ver-sesion`): commit 712da0d con la sesión en curso, el resumen, la biblioteca

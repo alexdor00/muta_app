@@ -419,3 +419,54 @@
   inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;
   content: '';
 }
+
+/* Dropset y rest-pause: cada bajada o mini-serie, una fila fina bajo su serie (con la misma rejilla), y «+ Bajada» */
+.extra {
+  min-height: var(--tap-min);
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.extraMark {
+  color: var(--label-2);
+  text-align: center;
+}
+
+.extraName {
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-align: center;
+}
+
+.extraRemove {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  margin: 0 auto;
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  cursor: pointer;
+}
+
+.extraRemove svg,
+.addExtra svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.addExtra {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  margin-left: var(--space-6);
+  padding: 0 var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}

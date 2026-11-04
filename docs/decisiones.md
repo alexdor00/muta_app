@@ -192,3 +192,12 @@ orden con sus descansos obligatorios (si un día no entrenas, todo se corre, por
 toca descanso, la tarjeta de la sesión deja paso a «Hoy descansas» con «Entrenar igualmente». El esfuerzo de un ejercicio
 se escribe como «Repeticiones antes del fallo» con − / +, en vez de una lista. El usuario pidió cargar su propia rutina
 desde un CSV: se guarda como un programa más (`programs`, id `mia:…`) y el plan la lee como las del catálogo.
+
+## 2026-11-04 · Dropsets y rest-pause en la sesión, y el cambio de cada ejercicio en Ver sesión
+
+Los ejercicios con dropset (bajar el peso y seguir) o rest-pause / myo-reps (pausa corta y más repeticiones con el mismo peso)
+se reconocen por lo que dice su documento. En la sesión, tras marcar una serie, se apuntan sus bajadas o mini-series como
+filas finas debajo; se guardan dentro de la serie y suman al volumen, pero la progresión sigue mirando la serie principal.
+En Ver sesión, como en la app anterior, cada ejercicio lleva a la derecha cuánto cambió su máximo estimado (o sus
+repeticiones, si va sin peso) frente a la vez anterior, y arriba cuántos suben. El «+» naranja del prototipo no tenía
+contraste suficiente como texto: va como flecha (↑ naranja, ↓ gris).

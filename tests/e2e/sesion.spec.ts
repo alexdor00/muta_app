@@ -355,6 +355,7 @@ test('lo apuntado se guarda: sigue al recargar y, al terminar, el entreno queda 
   await expect(page).toHaveURL('/entreno/sesion/b1/resumen')
   // «Me faltó un ejercicio» deshace el guardado: B1 sigue tocando
   await page.getByRole('button', { name: /Me faltó un ejercicio/ }).click()
+  await expect(page).toHaveURL('/entreno/sesion/b1')
   await page.goto('/entreno')
   await expect(page.getByRole('link', { name: 'Empezar B1' })).toBeVisible()
 

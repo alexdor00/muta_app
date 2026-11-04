@@ -18,6 +18,7 @@ import {
   rirDe,
   seriesDe,
   sesionesDeSemana,
+  tecnicaDe,
   siglaYNombre,
 } from './workoutPlan.ts'
 
@@ -303,5 +304,18 @@ describe('cortosDeSesiones', () => {
         { sigla: 'S2', nombre: 'Pierna 1' },
       ]),
     ).toEqual({ S1: 'T1', S2: 'P1' })
+  })
+})
+
+describe('tecnicaDe', () => {
+  it('dropset y rest-pause (o myo-reps), por la técnica, el nombre, las repeticiones o la explicación', () => {
+    expect(tecnicaDe({ name: 'Laterales', technique: 'Dropset' })).toBe('dropset')
+    expect(tecnicaDe({ name: 'Pájaros en polea (dropset mecánico)' })).toBe('dropset')
+    expect(tecnicaDe({ name: 'Curl', reps: '12-15 (dropset)' })).toBe('dropset')
+    expect(tecnicaDe({ name: 'Curl', technique: 'Myo-reps' })).toBe('pausa')
+    expect(tecnicaDe({ name: 'Press', tip: 'Haz un rest-pause en la última serie' })).toBe('pausa')
+    expect(tecnicaDe({ name: 'Sentadilla', reps: '5', technique: 'Fallo' })).toBeNull()
+    // «Serie de descarga» no es un dropset
+    expect(tecnicaDe({ name: 'Serie de descarga: Sentadilla' })).toBeNull()
   })
 })

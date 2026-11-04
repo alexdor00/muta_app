@@ -1,4 +1,4 @@
-import { ChevronRightIcon } from '../../../shared/ui/icons.tsx'
+import { ArrowDownIcon, ArrowUpIcon, ChevronRightIcon } from '../../../shared/ui/icons.tsx'
 import styles from './ExerciseList.module.css'
 
 type Ejercicio = {
@@ -11,6 +11,8 @@ type Ejercicio = {
   sugerido?: string | null
   /** La ficha completa (null si no está en la biblioteca). */
   href: string | null
+  /** Frente a la vez anterior: «2,4 %» y si sube (1), baja (−1) o se queda igual (0); null si no hay dos veces. */
+  cambio: { texto: string; sentido: 1 | 0 | -1 } | null
 }
 
 type Props = {
@@ -18,18 +20,23 @@ type Props = {
   /** Fila desplegada (su posición), o null. */
   abierto: number | null
   onAbrir: (i: number | null) => void
+  /** «6 de 7 suben»; null si ningún ejercicio tiene con qué compararse. */
+  suben: string | null
 }
 
 /**
- * «Ejercicios» de Ver sesión: una fila por ejercicio; al tocarla se despliega lo que hiciste la última vez y el enlace a
- * la ficha completa.
+ * «Ejercicios» de Ver sesión: una fila por ejercicio con su cambio frente a la vez anterior a la derecha (↑ naranja si
+ * sube, ↓ si baja) y, arriba, cuántos suben; al tocarla se despliega lo que hiciste la última vez y el enlace a la ficha.
  */
-export function ExerciseList({ ejercicios, abierto, onAbrir }: Props) {
+export function ExerciseList({ ejercicios, abierto, onAbrir, suben }: Props) {
   return (
     <section aria-labelledby="ejercicios">
-      <h2 id="ejercicios" class={styles.title}>
-        Ejercicios
-      </h2>
+      <div class={styles.head}>
+        <h2 id="ejercicios" class={styles.title}>
+          Ejercicios
+        </h2>
+        {suben && <span class={styles.count}>{suben}</span>}
+      </div>
       <ul class={styles.list}>
         {ejercicios.map((e, i) => {
           const open = abierto === i
@@ -47,6 +54,21 @@ export function ExerciseList({ ejercicios, abierto, onAbrir }: Props) {
                   <span class={styles.detail}>{e.detalle}</span>
                   {e.sugerido && <span class={styles.suggested}>{e.sugerido}</span>}
                 </span>
+                {e.cambio && (
+                  <span
+                    class={`${styles.change} ${e.cambio.sentido > 0 ? styles.up : e.cambio.sentido < 0 ? styles.down : ''}`}
+                    aria-label={
+                      e.cambio.sentido > 0
+                        ? `Sube ${e.cambio.texto} frente a la vez anterior`
+                        : e.cambio.sentido < 0
+                          ? `Baja ${e.cambio.texto} frente a la vez anterior`
+                          : 'Igual que la vez anterior'
+                    }
+                  >
+                    {e.cambio.sentido > 0 ? <ArrowUpIcon /> : e.cambio.sentido < 0 ? <ArrowDownIcon /> : null}
+                    <span aria-hidden="true">{e.cambio.texto}</span>
+                  </span>
+                )}
                 <span class={`${styles.chevron} ${open ? styles.open : ''}`}>
                   <ChevronRightIcon />
                 </span>

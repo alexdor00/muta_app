@@ -9,6 +9,7 @@ import { SessionHero } from '../../components/SessionHero.tsx'
 import { METRICAS_SESION, SessionProgress, type Metrica } from '../../components/SessionProgress.tsx'
 import { SessionTipsCard } from '../../components/SessionTips.tsx'
 import {
+  cambioDe,
   detalleSesion,
   entrenos,
   notaSugerido,
@@ -22,6 +23,13 @@ import { porNombre } from '../../use-cases/exerciseLibrary.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
 import styles from './VerSesionScreen.module.css'
+
+/** El cambio para enseñarlo: «2,4 %» con un decimal y si sube, baja o se queda igual (redondeado a 0,1 %). */
+function vistaCambio(c: number | null): { texto: string; sentido: 1 | 0 | -1 } | null {
+  if (c === null) return null
+  const sentido = Math.round(c * 1000) === 0 ? 0 : c > 0 ? 1 : -1
+  return { texto: formatChange(Math.abs(c), 1).replace(/^[+−]/, ''), sentido }
+}
 
 /**
  * Ver sesión (al tocar una tarjeta de Tu plan): cabecera con el color de la sesión, su progreso, los consejos para esta
@@ -61,9 +69,11 @@ export function VerSesionScreen(props: { sessionId: string }) {
           .filter(Boolean)
           .join(' · ') || null,
       href: lib ? paths.exercise(lib.id) : null,
+      cambio: vistaCambio(cambioDe(e)),
       ultima: e.ultima.map((u) => (u.kg != null ? `${formatDecimal(u.kg)} × ${u.reps}` : `${u.reps} reps`)),
     }
   })
+  const comparados = ejercicios.flatMap((e) => (e.cambio ? [e.cambio] : []))
   return (
     <div class={styles.page}>
       <SessionHero
@@ -94,7 +104,16 @@ export function VerSesionScreen(props: { sessionId: string }) {
         <SessionTipsCard
           consejos={consejosDeSesion(sesion.ejercicios).map((t) => ({ text: t.text, why: t.why }))}
         />
-        <ExerciseList ejercicios={ejercicios} abierto={abierto} onAbrir={setAbierto} />
+        <ExerciseList
+          ejercicios={ejercicios}
+          abierto={abierto}
+          onAbrir={setAbierto}
+          suben={
+            comparados.length
+              ? `${comparados.filter((c) => c.sentido > 0).length} de ${comparados.length} suben`
+              : null
+          }
+        />
       </div>
       <div class={styles.footer}>
         <Button href={paths.session(sesion.sigla.toLowerCase())}>

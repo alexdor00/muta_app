@@ -7,7 +7,8 @@ import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { RestBar } from '../../components/RestBar.tsx'
 import { WorkoutBar } from '../../components/WorkoutBar.tsx'
-import { WorkoutExercise, WorkoutExerciseRow } from '../../components/WorkoutExercise.tsx'
+import { WorkoutExercise } from '../../components/WorkoutExercise.tsx'
+import { WorkoutExerciseRow } from '../../components/WorkoutExerciseRow.tsx'
 import { WorkoutKeypad } from '../../components/WorkoutKeypad.tsx'
 import { TipsBanner } from '../../components/SessionTips.tsx'
 import { ConfirmSheet, FinishSheet } from '../../components/WorkoutSheets.tsx'
@@ -35,6 +36,11 @@ import {
   segundosSesion,
   SERIE_VACIA,
   seriesVistas,
+  pautaHoy,
+  tecnicaHoy,
+  anadirExtra,
+  cambiarExtra,
+  quitarExtra,
   sesionEnCurso,
   terminado,
   tomarPedido,
@@ -54,6 +60,7 @@ import { useTeclado } from './useTeclado.ts'
 import { cambiarDesdeSesion, terminarEntreno } from '../../use-cases/training.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
+import { irAEjercicio, irASerie } from './desplazar.ts'
 import styles from './SesionScreen.module.css'
 
 /**
@@ -130,12 +137,7 @@ export function SesionScreen(props: { sessionId: string }) {
   const abrir = (ej: number) => {
     setAbierto(ej)
     entrar(null)
-    requestAnimationFrame(() =>
-      document
-        .getElementById(`ejercicio-${(sesionEnCurso.value?.orden ?? []).indexOf(ej) + 1}`)
-        ?.closest('section')
-        ?.scrollIntoView({ block: 'start' }),
-    )
+    irAEjercicio((sesionEnCurso.value?.orden ?? []).indexOf(ej) + 1)
   }
 
   /** Marca (o desmarca) una serie; un toque apunta lo gris. */
@@ -178,11 +180,7 @@ export function SesionScreen(props: { sessionId: string }) {
         else setAbierto(-1)
       }, 1100)
     } else {
-      requestAnimationFrame(() =>
-        document
-          .querySelector(`[aria-label="Kilos de la serie ${j + 2}"]`)
-          ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }),
-      )
+      irASerie(j + 2)
     }
   }
 
@@ -241,7 +239,7 @@ export function SesionScreen(props: { sessionId: string }) {
               key={`${i}-${e.nombre}`}
               numero={pos + 1}
               nombre={nombre}
-              pauta={[`${e.series} series`, `${e.reps} reps`, effortLabel(e.rir)]}
+              pauta={pautaHoy(e, x)}
               descanso={formatRest(descansoDe(e))}
               onDescanso={() => setHoja({ tipo: 'descanso', ejercicio: e, segundos: descansoDe(e) })}
               sugerido={x.cambiadoPor ? null : notaSugerido(e)}
@@ -268,6 +266,10 @@ export function SesionScreen(props: { sessionId: string }) {
               }}
               onCambio={(serie, campo, valor) => cambiarSerie(i, serie, { [campo]: valor })}
               onMarcar={(j) => marcar(i, j)}
+              tecnica={tecnicaHoy(e, x)}
+              onAnadirExtra={(j) => guardar(i, (y) => anadirExtra(y, j))}
+              onCambioExtra={(j, n, campo, valor) => guardar(i, (y) => cambiarExtra(y, j, n, campo, valor))}
+              onQuitarExtra={(j, n) => guardar(i, (y) => quitarExtra(y, j, n))}
               onEliminar={(j) => {
                 if (x.series.length <= 1) return decir('El ejercicio necesita al menos una serie')
                 entrar(null)

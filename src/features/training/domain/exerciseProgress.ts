@@ -30,6 +30,22 @@ export function cambioDesdePrimera(valores: number[]): number | null {
 }
 
 /**
+ * Cuánto cambió la última vez frente a la anterior, en tanto por uno: el máximo (1RM estimado de la mejor serie) o, si se
+ * hace sin peso, las repeticiones de la mejor serie. null si hay menos de dos veces o la anterior es 0.
+ */
+export function cambioUltimaVez(veces: VezEjercicio[], rir: number): number | null {
+  const conReps = veces.filter((v) => v.series.some((s) => s.reps > 0))
+  if (conReps.length < 2) return null
+  const [antes, ahora] = conReps.slice(-2)
+  const conPeso = [antes, ahora].every((v) => v.series.some((s) => (s.kg ?? 0) > 0))
+  const valor = (v: VezEjercicio) =>
+    conPeso
+      ? Math.max(...v.series.map((s) => e1rm(s.kg, s.reps, rir)))
+      : Math.max(...v.series.map((s) => s.reps))
+  return valor(antes) > 0 ? valor(ahora) / valor(antes) - 1 : null
+}
+
+/**
  * Si la última vez y la anterior se hizo en distinto puesto de la sesión (con más o menos fatiga encima, la comparación
  * no es exacta): los dos puestos; null si fue en el mismo o no se sabe.
  */

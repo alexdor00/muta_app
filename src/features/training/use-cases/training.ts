@@ -1,7 +1,7 @@
 import { effect } from '@preact/signals'
 import { getDb } from '../../../shared/data/db.ts'
 import { WORKOUT_STATUS } from '../../../shared/data/schema.ts'
-import { localDate, parseDecimal } from '../../../shared/lib/format.ts'
+import { localDate } from '../../../shared/lib/format.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import { CATALOG, sourceOf, type Level } from '../domain/catalog.ts'
 import type { MuscleId } from '../domain/muscles.ts'
@@ -24,16 +24,10 @@ import { PREFIJO_MIA, type RutinaMia } from '../domain/csvRoutine.ts'
 import { descansosDeRutina } from '../domain/restDays.ts'
 import { elecciones, type EleccionMusculo } from '../state/musculos.ts'
 import { entrenos, tuPlan } from '../state/plan.ts'
-import {
-  descansosElegidos,
-  ejerciciosDe,
-  nombreHoy,
-  segundosSesion,
-  sesionEnCurso,
-  type SesionEnCurso,
-} from '../state/sesionEnCurso.ts'
+import { descansosElegidos, sesionEnCurso, type SesionEnCurso } from '../state/sesionEnCurso.ts'
 import { porNombre } from './exerciseLibrary.ts'
 import { cargarNotas } from './exerciseNotes.ts'
+import { entrenoDe } from './workoutRecord.ts'
 import { cargarMisConsejos } from './myTips.ts'
 import { cargarFotos } from './sessionPhotos.ts'
 import { LEVELS } from './loadRoutines.ts'
@@ -225,30 +219,6 @@ function guardarEnPlan(): Promise<void> {
   }
   cola = cola.then(escribir, escribir)
   return cola
-}
-
-/** Lo hecho de una sesión, como se guarda: solo las series marcadas, en el orden de hoy. */
-export function entrenoDe(en: SesionEnCurso, programId: string, ahora: number): Entreno {
-  const ejercicios = ejerciciosDe(en)
-  return {
-    id: crypto.randomUUID(),
-    fecha: localDate(new Date(en.inicio)),
-    inicio: en.inicio,
-    segundos: Math.round(segundosSesion({ ...en, terminada: ahora }, ahora)),
-    sigla: en.sigla,
-    nombre: en.nombre,
-    programId,
-    ejercicios: en.orden.flatMap((i, puesto) => {
-      const e = ejercicios[i]
-      const x = en.ejercicios[i]
-      const series = x.series
-        .filter((s) => s.hecha)
-        .map((s) => ({ kg: parseDecimal(s.kg), reps: parseDecimal(s.reps) ?? 0 }))
-      return series.length
-        ? [{ nombre: nombreHoy(e, x), musculo: e.musculo, series, puesto: puesto + 1 }]
-        : []
-    }),
-  }
 }
 
 /**

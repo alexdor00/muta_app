@@ -12,6 +12,22 @@ import { isSession, type Exercise, type ProgramData, type Session } from './prog
 import type { SerieHecha } from './workoutSet.ts'
 
 /** Lo que se rellena porque no viene ni en la rutina ni en la biblioteca. */
+/**
+ * Las técnicas que se apuntan con series de más dentro de una serie: «dropset» (bajas el peso y sigues, sin descanso) y
+ * «pausa» (rest-pause o myo-reps: unos segundos de pausa y más repeticiones con el mismo peso).
+ */
+export type Tecnica = 'dropset' | 'pausa'
+
+/** La técnica de un ejercicio, por lo que dice el documento (técnica, nombre, repeticiones o explicación); null si ninguna. */
+export function tecnicaDe(
+  e: Pick<Exercise, 'technique' | 'name' | 'reps' | 'notes' | 'tip'>,
+): Tecnica | null {
+  const texto = [e.technique, e.name, e.reps, e.notes, e.tip].filter(Boolean).join(' ').toLowerCase()
+  if (/drop ?set/.test(texto)) return 'dropset'
+  if (/myo-?reps|rest-?pause/.test(texto)) return 'pausa'
+  return null
+}
+
 export type Sugerido = 'series' | 'reps' | 'rir' | 'descanso' | 'musculo' | 'salto'
 
 /** Un ejercicio de una sesión: series, rango de repeticiones, esfuerzo, descanso y lo que pide el calentamiento. */
@@ -42,6 +58,8 @@ export type EjercicioPlan = {
   explicacion?: string
   /** Tu nota del ejercicio (Editar rutina). */
   nota?: string
+  /** Dropset o rest-pause: en la sesión se apuntan bajadas o mini-series dentro de cada serie. */
+  tecnica?: Tecnica
   /** Lo añadiste tú en Editar rutina (no está en la rutina). */
   anadido?: boolean
   /** Si en tu plan lo cambiaste por este: el de la rutina («En lugar de …»). */
@@ -133,6 +151,7 @@ export function ejercicioDelPlan(e: Exercise, lib: LibraryExercise | null): Ejer
     salto: o(null, lib?.stepKg, RELLENO.salto, 'salto'),
     sustitutos: e.substitutions ?? [],
     ...(e.originalName && e.originalName !== e.name ? { original: e.originalName } : {}),
+    ...(tecnicaDe(e) ? { tecnica: tecnicaDe(e) ?? undefined } : {}),
     ...(e.tip ? { explicacion: e.tip } : {}),
     sugeridos,
   }

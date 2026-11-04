@@ -54,11 +54,12 @@ export function formatTons(tons: number): string {
   return `${decimal.format(tons)} t`
 }
 
-/** Cambio en tanto por uno, con signo y sin decimales: −0.066 → «−7 %», 0.024 → «+2 %». */
-export function formatChange(ratio: number): string {
-  const pct = Math.round(ratio * 100)
+/** Cambio en tanto por uno, con signo y `cifras` decimales (ninguno de serie): −0.066 → «−7 %», 0.024 → «+2 %». */
+export function formatChange(ratio: number, cifras = 0): string {
+  const f = 10 ** cifras
+  const pct = Math.round(ratio * 100 * f) / f
   const sign = pct > 0 ? '+' : pct < 0 ? '−' : ''
-  return `${sign}${Math.abs(pct)} %`
+  return `${sign}${formatDecimal(Math.abs(pct))} %`
 }
 
 /** La fecha de un momento en hora local, como AAAA-MM-DD (la de hoy, sin argumento). */

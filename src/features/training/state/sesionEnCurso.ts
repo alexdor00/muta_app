@@ -2,13 +2,26 @@
 // sobrevive a recargar la app. Lleva una copia de los ejercicios con los que empezó (con la vez anterior).
 import { signal } from '@preact/signals'
 import { formatDecimal, parseDecimal } from '../../../shared/lib/format.ts'
+import { effortLabel } from '../domain/effort.ts'
 import { planCalentamiento } from '../domain/warmup.ts'
 import { kilosDeHoy, sugerenciaDe, type EjercicioPlan, type SesionPlan } from '../domain/workoutPlan.ts'
 import { compararConAntes, descansoTras, revisarNumeros, type SerieHecha } from '../domain/workoutSet.ts'
 import { resumenSesion } from '../domain/workoutSummary.ts'
 
-/** Lo escrito en una serie: kilos, repeticiones y las que quedaban, tal cual se teclean («62,5»). */
-export type SerieEnCurso = { kg: string; reps: string; quedan: string; hecha: boolean }
+/** Una bajada (dropset) o mini-serie (rest-pause) dentro de una serie, tal cual se teclea. */
+export type ExtraEnCurso = { kg: string; reps: string }
+
+/**
+ * Lo escrito en una serie: kilos, repeticiones y las que quedaban, tal cual se teclean («62,5»); `extra`, sus bajadas o
+ * mini-series si el ejercicio lleva dropset o rest-pause.
+ */
+export type SerieEnCurso = {
+  kg: string
+  reps: string
+  quedan: string
+  hecha: boolean
+  extra?: ExtraEnCurso[]
+}
 
 export type EjercicioEnCurso = {
   series: SerieEnCurso[]
@@ -43,7 +56,7 @@ export type SesionEnCurso = {
   aplicados: string[]
 }
 
-type Campo = keyof Omit<SerieEnCurso, 'hecha'>
+type Campo = keyof Omit<SerieEnCurso, 'hecha' | 'extra'>
 
 export const sesionEnCurso = signal<SesionEnCurso | null>(null)
 
@@ -198,11 +211,66 @@ export const terminado = (x: EjercicioEnCurso) => x.series.every((s) => s.hecha)
 export const esRecord = (e: EjercicioPlan, x: EjercicioEnCurso, j: number) =>
   x.series[j].hecha && compararConAntes(numeros(e, x, j), antesDe(e, x)[j] ?? null) === 1
 
-/** Cada serie del ejercicio abierto con lo gris de sus casillas y si es récord. */
+/**
+ * Cada serie del ejercicio abierto con lo gris de sus casillas, si es récord y sus bajadas o mini-series (en rest-pause, el
+ * peso de la serie sale en gris: es el mismo).
+ */
 export function seriesVistas(e: EjercicioPlan, x: EjercicioEnCurso) {
   return x.series.map((s, j) => {
     const g = grises(e, x, j)
-    return { ...s, kgGris: g.kg, repsGris: g.reps, quedanGris: g.quedan, record: esRecord(e, x, j) }
+    const extra = (s.extra ?? []).map((y) => ({ ...y, kgGris: e.tecnica === 'pausa' ? s.kg || g.kg : '' }))
+    return { ...s, kgGris: g.kg, repsGris: g.reps, quedanGris: g.quedan, record: esRecord(e, x, j), extra }
+  })
+}
+
+/** La técnica de hoy (dropset o rest-pause); null si no lleva o si hoy se hace otro ejercicio en su lugar. */
+export const tecnicaHoy = (e: EjercicioPlan, x: EjercicioEnCurso) =>
+  x.cambiadoPor ? null : (e.tecnica ?? null)
+
+/** La pauta del ejercicio en la sesión: «3 series», «8–12 reps», «a 2 del fallo» y, si la lleva, la técnica. */
+export function pautaHoy(e: EjercicioPlan, x: EjercicioEnCurso): string[] {
+  const tecnica = tecnicaHoy(e, x)
+  return [
+    `${e.series} series`,
+    `${e.reps} reps`,
+    effortLabel(e.rir),
+    ...(tecnica ? [tecnica === 'pausa' ? 'Rest-pause' : 'Dropset'] : []),
+  ]
+}
+
+/** Añade una bajada o mini-serie vacía al final de la serie `j`. */
+export const anadirExtra = (x: EjercicioEnCurso, j: number): EjercicioEnCurso => ({
+  ...x,
+  series: x.series.map((s, k) => (k === j ? { ...s, extra: [...(s.extra ?? []), { kg: '', reps: '' }] } : s)),
+})
+
+/** Escribe en la bajada o mini-serie `n` de la serie `j`. */
+export const cambiarExtra = (
+  x: EjercicioEnCurso,
+  j: number,
+  n: number,
+  campo: keyof ExtraEnCurso,
+  valor: string,
+): EjercicioEnCurso => ({
+  ...x,
+  series: x.series.map((s, k) =>
+    k === j ? { ...s, extra: (s.extra ?? []).map((y, m) => (m === n ? { ...y, [campo]: valor } : y)) } : s,
+  ),
+})
+
+/** Quita la bajada o mini-serie `n` de la serie `j`. */
+export const quitarExtra = (x: EjercicioEnCurso, j: number, n: number): EjercicioEnCurso => ({
+  ...x,
+  series: x.series.map((s, k) => (k === j ? { ...s, extra: (s.extra ?? []).filter((_, m) => m !== n) } : s)),
+})
+
+/** Lo hecho de las bajadas o mini-series de una serie: las que tienen repeticiones (en rest-pause, sin peso, el de la serie). */
+export function extrasHechos(e: EjercicioPlan, s: SerieEnCurso): { kg: number | null; reps: number }[] {
+  return (s.extra ?? []).flatMap((y) => {
+    const reps = parseDecimal(y.reps)
+    if (!reps) return []
+    const kg = parseDecimal(y.kg) ?? (e.tecnica === 'pausa' ? parseDecimal(s.kg) : null)
+    return [{ kg, reps }]
   })
 }
 
