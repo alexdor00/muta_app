@@ -226,3 +226,10 @@ lee mejor y vale para toda la app. Los textos en negro de los consejos, los tít
 las tarjetas de la ficha del ejercicio y los ejercicios de Ver sesión van a 15 px en seminegrita, todos iguales; la pauta de
 cada ejercicio de Ver sesión, a 13 px. En la ficha del músculo, «Dónde lo entrenas» a 15 px (las series, a 13) y «La clave»
 a 15 px sin negrita.
+
+## 2026-11-04 · Editar rutina, empezando por tu semana
+
+La tira de píldoras con puntos y lunas no se entendía, y «descanso» servía para dos cosas. Editar rutina se abre ahora con tu
+semana como una lista en orden: las sesiones numeradas y, debajo, los días de descanso como filas que lo dicen («Día de
+descanso · Quitar»); «+ Añadir un día de descanso» pregunta después de qué sesión. Tocar una sesión abre sus ejercicios. En
+cada ejercicio, el descanso se llama «Descanso entre series», con una línea que lo explica.

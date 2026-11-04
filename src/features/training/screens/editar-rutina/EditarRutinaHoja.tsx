@@ -6,6 +6,7 @@ import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { EditExerciseSheet, type PautaEdicion } from '../../components/EditExerciseSheet.tsx'
 import { CoachSheet } from '../../components/CoachSheet.tsx'
 import { EditRoutineSheet } from '../../components/EditRoutineSheet.tsx'
+import { EditWeekSheet, RestAfterSheet } from '../../components/EditWeekSheet.tsx'
 import { SwapSheet } from '../../components/SwapSheet.tsx'
 import { DangerSheet } from '../../components/WorkoutSheets.tsx'
 import {
@@ -14,7 +15,6 @@ import {
   claveDe,
   descansosPorSesion,
   mover,
-  cortosDeSesiones,
   nombresDeSesiones,
   pautaDe,
   quitar,
@@ -39,7 +39,18 @@ import {
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import styles from './EditarRutinaHoja.module.css'
 
-type Hoja = 'lista' | 'ejercicio' | 'cambiar' | 'biblioteca' | 'quitar' | 'volver' | 'foto' | 'consejos'
+type Hoja =
+  | 'semana'
+  | 'descansoTras'
+  | 'volverTodo'
+  | 'lista'
+  | 'ejercicio'
+  | 'cambiar'
+  | 'biblioteca'
+  | 'quitar'
+  | 'volver'
+  | 'foto'
+  | 'consejos'
 
 /** Lo que se pone al cambiar un ejercicio añadido por otro: su pauta de ahora. */
 const comoAnadido = (e: EjercicioPlan) => ({
@@ -51,22 +62,23 @@ const comoAnadido = (e: EjercicioPlan) => ({
 })
 
 /**
- * Editar rutina (A11–A13, desde «Tu rutina»): la lista de cada sesión (por su nombre), reordenar, añadir de la
- * biblioteca, editar la pauta de un ejercicio, cambiarlo por otro (los del programa y los que hacen lo mismo), quitarlo y
- * volver a la rutina. Todo se guarda en tu plan para todas las semanas. Arriba, tu semana (sesiones y descansos), la foto y
- * el nombre de la sesión; el entrenador (consejos de la sesión y cobertura del método) en una fila que abre su hoja.
+ * Editar rutina (A11–A13, desde «Tu rutina»): primero tu semana, en orden, con sus días de descanso (quitar y añadir
+ * «después de qué sesión»); tocar una sesión abre sus ejercicios: reordenar, añadir de la biblioteca, editar la pauta,
+ * cambiarlo por otro (los del programa y los que hacen lo mismo), quitarlo, su foto, su nombre y el entrenador (consejos y
+ * cobertura del método). Todo se guarda en tu plan para todas las semanas.
  */
 export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   const lista = sesiones.value
   const [sigla, setSigla] = useState(tocaHoy.value?.sigla ?? lista[0]?.sigla ?? '')
   const [abierto, setAbierto] = useState<number | null>(null)
-  const [hoja, setHoja] = useState<Hoja>('lista')
+  // Se abre con tu semana; tocar una sesión abre sus ejercicios
+  const [hoja, setHoja] = useState<Hoja>('semana')
   const [aviso, setAviso] = useState<string | null>(null)
   const sesion = lista.find((s) => s.sigla === sigla) ?? lista[0]
   const plan = tuPlan.value.status === 'ready' ? tuPlan.value : null
   if (!sesion) return null
   const titulos = nombresDeSesiones(lista)
-  const cortos = cortosDeSesiones(lista)
+  const porSesion = plan ? descansosPorSesion(plan.descansos, lista.length) : lista.map(() => 0)
   const consejos = consejosDelEntrenador(sesion, lista)
   const nombre = titulos[sesion.sigla]
   const e = abierto !== null ? (sesion.ejercicios[abierto] ?? null) : null
@@ -78,6 +90,76 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   const aLista = () => {
     setHoja('lista')
     setAbierto(null)
+  }
+
+  const semana = lista.map((x) => ({
+    sigla: x.sigla,
+    nombre: titulos[x.sigla],
+    ejercicios: x.ejercicios.length,
+  }))
+  const ponDescansos = (i: number, n: number) =>
+    void cambiarDescansos(trasDe(porSesion.map((x, j) => (j === i ? Math.max(0, n) : x))))
+
+  if (hoja === 'semana') {
+    return (
+      <>
+        <EditWeekSheet
+          sesiones={semana}
+          descansos={porSesion}
+          onSesion={(s) => {
+            setSigla(s)
+            setHoja('lista')
+          }}
+          onQuitarDescanso={(i) => {
+            ponDescansos(i, porSesion[i] - 1)
+            decir('Día de descanso quitado')
+          }}
+          onAnadirDescanso={() => setHoja('descansoTras')}
+          onVolver={() => setHoja('volverTodo')}
+          onClose={onClose}
+        />
+        <Toast message={aviso} />
+      </>
+    )
+  }
+
+  if (hoja === 'descansoTras') {
+    return (
+      <RestAfterSheet
+        sesiones={semana}
+        onElegir={(i) => {
+          ponDescansos(i, porSesion[i] + 1)
+          decir(`Día de descanso después de ${semana[i].nombre}`)
+          setHoja('semana')
+        }}
+        onClose={() => setHoja('semana')}
+      />
+    )
+  }
+
+  if (hoja === 'volverTodo') {
+    return (
+      <Sheet title="Volver a la rutina original" onClose={() => setHoja('semana')} large>
+        <p class={styles.lead}>
+          Todas las sesiones vuelven a como venían: su orden, sus ejercicios y su pauta, los ejercicios
+          cambiados, los días de descanso, sus nombres y lo elegido para cada músculo.
+        </p>
+        <div class={styles.pair}>
+          <Button variant="secondary" onClick={() => setHoja('semana')}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={() => {
+              void volverARutina(null)
+              decir('Toda la rutina vuelve a la original')
+              setHoja('semana')
+            }}
+          >
+            Volver a la original
+          </Button>
+        </div>
+      </Sheet>
+    )
   }
 
   if (hoja === 'biblioteca') {
@@ -175,30 +257,20 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
 
   if (hoja === 'volver') {
     return (
-      <Sheet title="Volver a la rutina original" onClose={() => setHoja('lista')} large>
-        <p class={styles.lead}>
-          Una sesión: su orden, sus ejercicios y su pauta. Todas: también los ejercicios cambiados, los
-          descansos y lo elegido para cada músculo.
-        </p>
+      <Sheet title={`¿Volver ${nombre} a la original?`} onClose={() => setHoja('lista')} large>
+        <p class={styles.lead}>Vuelve como venía: su orden, sus ejercicios, su pauta y su nombre.</p>
         <div class={styles.pair}>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              void volverARutina(sesion.sigla)
-              decir(`${nombre} vuelve a la rutina`)
-              setHoja('lista')
-            }}
-          >
-            Solo {nombre}
+          <Button variant="secondary" onClick={() => setHoja('lista')}>
+            Cancelar
           </Button>
           <Button
             onClick={() => {
-              void volverARutina(null)
-              decir('Toda la rutina vuelve a la original')
+              void volverARutina(sesion.sigla)
+              decir(`${nombre} vuelve a la original`)
               setHoja('lista')
             }}
           >
-            Todas las sesiones
+            Volver a la original
           </Button>
         </div>
       </Sheet>
@@ -228,11 +300,8 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   return (
     <>
       <EditRoutineSheet
-        sesiones={lista.map((s) => ({ value: s.sigla, label: titulos[s.sigla], corto: cortos[s.sigla] }))}
-        descansos={plan ? descansosPorSesion(plan.descansos, lista.length) : lista.map(() => 0)}
-        onDescansos={(n) => void cambiarDescansos(trasDe(n))}
-        sigla={sesion.sigla}
-        onSigla={setSigla}
+        nombre={nombre}
+        onSemana={() => setHoja('semana')}
         foto={fotosSesion.value[sesion.sigla] ?? null}
         onFoto={() => setHoja('foto')}
         onRenombrar={(n) => {

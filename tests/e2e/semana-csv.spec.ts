@@ -40,8 +40,14 @@ test('si hoy toca descanso, sale «Hoy descansas» y se puede entrenar igualment
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })
     .click()
-  await page.getByRole('button', { name: 'Descanso tras Cuádriceps y espalda: ninguno' }).click()
-  await expect(page.getByRole('button', { name: 'Descanso tras Cuádriceps y espalda: 1 día' })).toBeVisible()
+  await page.getByRole('button', { name: 'Añadir un día de descanso' }).click()
+  await page
+    .getByRole('dialog', { name: '¿Después de qué sesión?' })
+    .getByText('1. Cuádriceps y espalda', { exact: true })
+    .click()
+  await expect(
+    page.getByRole('button', { name: 'Quitar el día de descanso después de Cuádriceps y espalda' }),
+  ).toBeVisible()
   await page.goto('/entreno')
   await expect(page.getByRole('heading', { name: 'Hoy descansas' })).toBeVisible()
   await expect(page.getByText('La siguiente: B1 · Isquios, glúteo y pecho.')).toBeVisible()

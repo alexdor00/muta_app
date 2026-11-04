@@ -16,6 +16,11 @@ async function editar(page: import('@playwright/test').Page) {
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })
     .click()
+  // En tu semana, la sesión B1: ahí van su foto y su entrenador
+  await page
+    .getByRole('list', { name: 'Tu semana' })
+    .getByRole('button', { name: /^\d+ Isquios, glúteo y pecho/ })
+    .click()
   return page.getByRole('dialog', { name: 'Editar rutina' })
 }
 

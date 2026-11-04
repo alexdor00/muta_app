@@ -54,7 +54,8 @@ function Contador(p: {
 }
 
 /**
- * Editar ejercicio (A12–A13): series, descanso y repeticiones antes del fallo con − / + (con una línea que lo explica);
+ * Editar ejercicio (A12–A13): series, descanso entre series y repeticiones antes del fallo con − / + (cada uno con una
+ * línea que lo explica);
  * repeticiones (mínimo y máximo) en un desplegable.
  * Cada toque se guarda solo. «Cambiar por otro» y «Quitar».
  */
@@ -109,7 +110,7 @@ export function EditExerciseSheet(props: {
           />
         </Desplegable>
         <Contador
-          nombre="Descanso"
+          nombre="Descanso entre series"
           texto={formatRest(p.descanso)}
           puedeMenos={p.descanso > 0}
           puedeMas={p.descanso < MAX_DESCANSO}
@@ -122,6 +123,7 @@ export function EditExerciseSheet(props: {
             })
           }
         />
+        <small class={styles.hint}>Lo que paras entre una serie y la siguiente.</small>
         <Contador
           nombre="Repeticiones antes del fallo"
           texto={String(p.rir)}

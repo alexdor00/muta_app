@@ -3,9 +3,9 @@ import { Button } from '../../../shared/ui/Button.tsx'
 import {
   CameraIcon,
   ChatIcon,
+  ChevronLeftIcon,
   ChevronRightIcon,
   GripIcon,
-  MoonIcon,
   PencilIcon,
   PlusIcon,
 } from '../../../shared/ui/icons.tsx'
@@ -20,23 +20,16 @@ export type FilaEditar = {
   nota: string | null
 }
 
-/** Hasta cuántos días de descanso seguidos se pueden poner tras una sesión: el hueco va de 0 a esto y vuelve a 0. */
-const MAX_DESCANSOS = 2
-
 /**
- * Editar rutina (A11): arriba, «Tu semana» con las sesiones (tocar una la elige) y sus descansos (tocar el hueco de
- * después pone 1, 2 o ninguno). Debajo, la sesión elegida: su foto, su nombre (el lápiz lo cambia), los consejos del
- * entrenador en una fila que abre su hoja, y sus ejercicios (tocar uno lo edita; su asa, o las flechas sobre ella, lo
- * mueve). «Añadir ejercicio» y volver a la rutina original.
+ * Editar rutina (A11), una sesión: «‹ Tu semana» para volver, su foto, su nombre (el lápiz lo cambia), los consejos del
+ * entrenador en una fila que abre su hoja y sus ejercicios (tocar uno lo edita; su asa, o las flechas sobre ella, lo mueve).
+ * «Añadir ejercicio» y volver esta sesión a la original.
  */
 export function EditRoutineSheet(props: {
-  /** `label`: el nombre («Torso 1»); `corto`: lo que cabe en la tira («T1»). */
-  sesiones: { value: string; label: string; corto: string }[]
-  sigla: string
-  onSigla: (sigla: string) => void
-  /** Días de descanso tras cada sesión, en el orden de `sesiones`. */
-  descansos: number[]
-  onDescansos: (porSesion: number[]) => void
+  /** El nombre de la sesión («Torso 1»). */
+  nombre: string
+  /** «‹ Tu semana»: vuelve a la lista de la semana. */
+  onSemana: () => void
   foto: string | null
   onFoto: () => void
   onRenombrar: (nombre: string) => void
@@ -53,7 +46,7 @@ export function EditRoutineSheet(props: {
   const lista = useRef<HTMLOListElement>(null)
   const [arrastre, setArrastre] = useState<{ de: number; a: number } | null>(null)
   const [renombrando, setRenombrando] = useState<string | null>(null)
-  const nombre = props.sesiones.find((s) => s.value === props.sigla)?.label ?? props.sigla
+  const nombre = props.nombre
 
   // Mientras se arrastra, la lista se ve ya con el ejercicio en su sitio nuevo
   const orden = props.filas.map((_, i) => i)
@@ -79,48 +72,10 @@ export function EditRoutineSheet(props: {
 
   return (
     <Sheet title="Editar rutina" onClose={props.onClose} large>
-      <section class={styles.week} aria-labelledby="tu-semana-editar">
-        <h3 id="tu-semana-editar" class={styles.eyebrow}>
-          Tu semana
-        </h3>
-        <ol class={styles.strip}>
-          {props.sesiones.map((s, i) => {
-            const n = props.descansos[i] ?? 0
-            return (
-              <li key={s.value}>
-                <button
-                  type="button"
-                  class={`${styles.pill} ${s.value === props.sigla ? styles.on : ''}`}
-                  aria-pressed={s.value === props.sigla}
-                  aria-label={s.label}
-                  onClick={() => props.onSigla(s.value)}
-                >
-                  {s.corto}
-                </button>
-                <button
-                  type="button"
-                  class={`${styles.gap} ${n ? styles.rest : ''}`}
-                  aria-label={`Descanso tras ${s.label}: ${n === 0 ? 'ninguno' : n === 1 ? '1 día' : `${n} días`}`}
-                  onClick={() =>
-                    props.onDescansos(
-                      props.descansos.map((x, j) => (j === i ? (n + 1) % (MAX_DESCANSOS + 1) : x)),
-                    )
-                  }
-                >
-                  {n === 0 ? (
-                    <span class={styles.dot} />
-                  ) : (
-                    Array.from({ length: n }, (_, k) => <MoonIcon key={k} />)
-                  )}
-                </button>
-              </li>
-            )
-          })}
-        </ol>
-        <p class={styles.hint}>
-          Toca una sesión para editarla y el hueco de después para poner o quitar un descanso.
-        </p>
-      </section>
+      <button type="button" class={styles.back} onClick={props.onSemana}>
+        <ChevronLeftIcon />
+        Tu semana
+      </button>
 
       <div class={styles.head}>
         <button
@@ -218,7 +173,7 @@ export function EditRoutineSheet(props: {
         </Button>
       </div>
       <button type="button" class={styles.restore} onClick={props.onVolver}>
-        Volver a la rutina original
+        Volver esta sesión a la original
       </button>
     </Sheet>
   )

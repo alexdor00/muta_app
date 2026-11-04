@@ -5,7 +5,6 @@ import {
   avanzar,
   desdeBiblioteca,
   kilosDeHoy,
-  cortosDeSesiones,
   nombresDeSesiones,
   notaSugerido,
   pautaEnPrograma,
@@ -285,25 +284,6 @@ describe('pautaEnPrograma', () => {
   it('null si la rutina no lo lleva o no dice repeticiones', () => {
     expect(pautaEnPrograma(prog(['8-12']), (n) => n === 'Remo')).toBeNull()
     expect(pautaEnPrograma(prog([null]), (n) => n === 'Aperturas')).toBeNull()
-  })
-})
-
-describe('cortosDeSesiones', () => {
-  it('la sigla si la trae; si no, iniciales y número; si se repiten («Torso 1» y «Tirón #1»), su puesto', () => {
-    expect(
-      cortosDeSesiones([
-        { sigla: 'A1', nombre: 'Cuádriceps y espalda' },
-        { sigla: 'S2', nombre: 'Torso 1' },
-        { sigla: 'S3', nombre: 'Brazos y puntos débiles #1' },
-        { sigla: 'S4', nombre: 'Tirón #1 (dorsal)' },
-      ]),
-    ).toEqual({ A1: 'A1', S2: '2', S3: 'BP1', S4: '4' })
-    expect(
-      cortosDeSesiones([
-        { sigla: 'S1', nombre: 'Torso 1' },
-        { sigla: 'S2', nombre: 'Pierna 1' },
-      ]),
-    ).toEqual({ S1: 'T1', S2: 'P1' })
   })
 })
 

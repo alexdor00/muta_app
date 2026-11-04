@@ -181,7 +181,12 @@ test('Editar rutina, sus consejos del entrenador y Editar ejercicio (con las rep
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })
     .click()
-  await expect(page.getByRole('dialog', { name: 'Editar rutina' })).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Tu semana' })).toBeVisible()
+  await sinFallos(page)
+  await page
+    .getByRole('list', { name: 'Tu semana' })
+    .getByRole('button', { name: /^\d+ Isquios, glúteo y pecho/ })
+    .click()
   await sinFallos(page)
   await page.getByRole('button', { name: /^Peso muerto rumano/ }).click()
   const ej = page.getByRole('dialog', { name: 'Peso muerto rumano' })
@@ -195,6 +200,10 @@ test('foto de la sesión (desde Editar rutina) y el «···» de un ejercicio c
   await page
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })
+    .click()
+  await page
+    .getByRole('list', { name: 'Tu semana' })
+    .getByRole('button', { name: /^\d+ Isquios, glúteo y pecho/ })
     .click()
   await page.getByRole('button', { name: /foto (a|de) Isquios, glúteo y pecho/ }).click()
   await expect(page.getByRole('dialog', { name: 'Foto de la sesión' })).toBeVisible()
