@@ -17,7 +17,7 @@ type Props = {
 
 /**
  * Tarjeta de color de una sesión, con la sigla de fondo (o tu foto): al tocarla se abre Ver sesión; la píldora blanca
- * «▶ Empezar» de arriba a la derecha la empieza.
+ * «▶ Empezar» de abajo la empieza.
  */
 export function SessionCard({ sigla, nombre, detalle, estado, tono, foto }: Props) {
   return (
