@@ -27,20 +27,15 @@ import {
   tocaHoy,
   trasDe,
   tuPlan,
-  type EjercicioPlan,
 } from '../../state/plan.ts'
 import { descansoDe, elegirDescanso } from '../../state/sesionEnCurso.ts'
 import { equivalentesDe } from '../../use-cases/exerciseLibrary.ts'
 import { consejosDelEntrenador } from '../../use-cases/coverage.ts'
+import { fueraDeTuMaterial } from '../../use-cases/myEquipment.ts'
+import { cambiarEjercicioDelPlan } from '../../use-cases/changeExercise.ts'
 import { fotosSesion } from '../../state/fotos.ts'
 import { FotoSesionHoja } from '../foto-sesion/FotoSesionHoja.tsx'
-import {
-  cambiarDescansos,
-  cambiarEnPlan,
-  editarSesion,
-  renombrarSesion,
-  volverARutina,
-} from '../../use-cases/training.ts'
+import { cambiarDescansos, editarSesion, renombrarSesion, volverARutina } from '../../use-cases/training.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import styles from './EditarRutinaHoja.module.css'
 
@@ -56,15 +51,6 @@ type Hoja =
   | 'volver'
   | 'foto'
   | 'consejos'
-
-/** Lo que se pone al cambiar un ejercicio añadido por otro: su pauta de ahora. */
-const comoAnadido = (e: EjercicioPlan) => ({
-  nombre: e.nombre,
-  series: e.series,
-  reps: pautaDe(e).reps,
-  rir: e.rir,
-  descanso: descansoDe(e),
-})
 
 /**
  * Editar rutina (A11–A13, desde «Tu rutina»): primero tu semana, en orden, con sus días de descanso (quitar y añadir
@@ -175,9 +161,7 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
         onElegir={(ex) => {
           const nombres = sesion.ejercicios.map((x) => x.nombre)
           const nuevo = { nombre: ex.name, series: 3, reps: ex.reps, rir: ex.rir, descanso: ex.restSec }
-          if (e?.anadido)
-            editar((ed) => anadir(quitar(ed, e.nombre), { ...comoAnadido(e), nombre: ex.name }, nombres))
-          else if (e) void cambiarEnPlan(claveDe(e), ex.name === claveDe(e) ? null : ex.name)
+          if (e) cambiarEjercicioDelPlan(sesion.sigla, sesion.ejercicios, e, ex.name)
           else editar((ed) => anadir(ed, nuevo, nombres))
           decir(e ? `Cambiado por ${ex.name}` : `${ex.name} añadido a ${nombre}`)
           aLista()
@@ -189,10 +173,7 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
 
   if (hoja === 'cambiar' && e) {
     const elegir = (n: string) => {
-      if (e.anadido) {
-        const nombres = sesion.ejercicios.map((x) => x.nombre)
-        editar((ed) => anadir(quitar(ed, e.nombre), { ...comoAnadido(e), nombre: n }, nombres))
-      } else void cambiarEnPlan(claveDe(e), n === claveDe(e) ? null : n)
+      cambiarEjercicioDelPlan(sesion.sigla, sesion.ejercicios, e, n)
       decir(n === e.enLugarDe ? `Vuelves a ${n}` : `Cambiado por ${n}`)
       aLista()
     }
@@ -201,6 +182,7 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
         soloPlan
         equivalentes={equivalentesDe(e).map((q) => ({ nombre: q.ex.name, motivo: q.motivo }))}
         sustitutos={e.sustitutos}
+        noTienes={fueraDeTuMaterial([...equivalentesDe(e).map((q) => q.ex.name), ...e.sustitutos])}
         enLugarDe={e.enLugarDe ?? null}
         onElegir={elegir}
         onBiblioteca={() => setHoja('biblioteca')}

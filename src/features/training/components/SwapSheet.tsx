@@ -41,11 +41,22 @@ export function SwapSheet(props: {
   onElegir: (nombre: string, alcance: Alcance) => void
   /** «Elegir cualquier ejercicio»: la biblioteca, filtrada por su músculo (sesion-en-vivo.js · v7-swap-any). */
   onBiblioteca: (alcance: Alcance) => void
+  /** Los que no se hacen con tu material: van al final, aparte. */
+  noTienes?: readonly string[]
   /** Desde Editar rutina: siempre en tu plan, sin elegir. */
   soloPlan?: boolean
   onClose: () => void
 }) {
   const [alcance, setAlcance] = useState<Alcance>(props.soloPlan ? 'plan' : 'hoy')
+  const fuera = new Set(props.noTienes)
+  const equivalentes = props.equivalentes.filter((e) => !fuera.has(e.nombre))
+  const sustitutos = props.sustitutos.filter((n) => !fuera.has(n))
+  const lejos = [
+    ...props.equivalentes.filter((e) => fuera.has(e.nombre)),
+    ...props.sustitutos
+      .filter((n) => fuera.has(n) && !props.equivalentes.some((e) => e.nombre === n))
+      .map((n) => ({ nombre: n, motivo: undefined })),
+  ]
   return (
     <Sheet title="Cambiar ejercicio" onClose={props.onClose} large>
       {!props.soloPlan && (
@@ -71,11 +82,11 @@ export function SwapSheet(props: {
           />
         </ul>
       )}
-      {props.equivalentes.length > 0 && (
+      {equivalentes.length > 0 && (
         <>
           <h3 class={styles.label}>Hacen lo mismo</h3>
           <ul class={styles.options}>
-            {props.equivalentes.map((e) => (
+            {equivalentes.map((e) => (
               <FilaCambio
                 key={e.nombre}
                 titulo={e.nombre}
@@ -86,17 +97,32 @@ export function SwapSheet(props: {
           </ul>
         </>
       )}
-      {props.sustitutos.length > 0 && (
+      {sustitutos.length > 0 && (
         <>
           <h3 class={styles.label}>Los que da tu programa</h3>
           <ul class={styles.options}>
-            {props.sustitutos.map((s) => (
+            {sustitutos.map((s) => (
               <FilaCambio key={s} titulo={s} onClick={() => props.onElegir(s, alcance)} />
             ))}
           </ul>
         </>
       )}
-      {!props.equivalentes.length && !props.sustitutos.length && (
+      {lejos.length > 0 && (
+        <>
+          <h3 class={styles.label}>No está en tu material</h3>
+          <ul class={`${styles.options} ${styles.dim}`}>
+            {lejos.map((e) => (
+              <FilaCambio
+                key={e.nombre}
+                titulo={e.nombre}
+                detalle={e.motivo}
+                onClick={() => props.onElegir(e.nombre, alcance)}
+              />
+            ))}
+          </ul>
+        </>
+      )}
+      {!equivalentes.length && !sustitutos.length && !lejos.length && (
         <p class={styles.lead}>No hay otro que haga lo mismo: elige uno de la biblioteca.</p>
       )}
       <button type="button" class={styles.anyExercise} onClick={() => props.onBiblioteca(alcance)}>

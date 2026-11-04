@@ -11,8 +11,8 @@ type Props<M extends string> = {
   muscles: { id: M; label: string }[]
   muscle: M | null
   onMuscle: (id: M | null) => void
-  /** Ejercicios que coinciden: nombre y «Pecho, barra». */
-  rows: { id: string; name: string; line: string }[]
+  /** Ejercicios que coinciden: nombre y «Pecho, barra»; los que no se hacen con tu material van al final, en gris. */
+  rows: { id: string; name: string; line: string; noTienes?: boolean }[]
   /** Con `hrefOf`, cada fila lleva a su ficha (›); con `onPick`, se elige (+). */
   hrefOf?: (id: string) => string
   onPick?: (id: string) => void
@@ -44,6 +44,23 @@ export function ExerciseLibrarySheet<M extends string>({
       <span class={styles.chevron}>{onPick ? <PlusIcon /> : <ChevronRightIcon />}</span>
     </>
   )
+  const lista = (rs: Props<M>['rows'], clase = '') => (
+    <ul class={`${styles.list} ${clase}`}>
+      {rs.map((r) => (
+        <li key={r.id}>
+          {onPick ? (
+            <button type="button" class={styles.row} onClick={() => onPick(r.id)}>
+              {contenido(r)}
+            </button>
+          ) : (
+            <a class={styles.row} href={hrefOf?.(r.id)}>
+              {contenido(r)}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
   return (
     <Sheet title={title} onClose={onClose} large>
       <label class={styles.search}>
@@ -72,21 +89,18 @@ export function ExerciseLibrarySheet<M extends string>({
         ))}
       </div>
       {rows.length ? (
-        <ul class={styles.list}>
-          {rows.map((r) => (
-            <li key={r.id}>
-              {onPick ? (
-                <button type="button" class={styles.row} onClick={() => onPick(r.id)}>
-                  {contenido(r)}
-                </button>
-              ) : (
-                <a class={styles.row} href={hrefOf?.(r.id)}>
-                  {contenido(r)}
-                </a>
+        <>
+          {lista(rows.filter((r) => !r.noTienes))}
+          {rows.some((r) => r.noTienes) && (
+            <>
+              <h3 class={styles.section}>No está en tu material</h3>
+              {lista(
+                rows.filter((r) => r.noTienes),
+                styles.dim,
               )}
-            </li>
-          ))}
-        </ul>
+            </>
+          )}
+        </>
       ) : (
         <p class={styles.empty}>Sin resultados.</p>
       )}

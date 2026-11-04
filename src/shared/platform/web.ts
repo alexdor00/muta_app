@@ -103,6 +103,20 @@ export const webPlatform: Platform = {
     }
   },
 
+  async shareFile(title, file) {
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ title, files: [file] })
+        return 'shared'
+      }
+      await this.saveFile(file.name, file)
+      return 'saved'
+    } catch {
+      // Cancelado o sin permiso: no pasa nada
+      return 'none'
+    }
+  },
+
   async saveFile(fileName, contents) {
     const url = URL.createObjectURL(contents)
     const link = Object.assign(document.createElement('a'), { href: url, download: fileName })

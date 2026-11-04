@@ -14,6 +14,8 @@ export interface Platform {
   notify(title: string, body: string): Promise<void>
   /** Compartir un texto (hoja del sistema); si no hay, se copia. Dice cuál de las dos pasó. */
   share(title: string, text: string): Promise<'shared' | 'copied' | 'none'>
+  /** Compartir un archivo (la imagen del resumen); si no se puede, se guarda en el móvil. Dice cuál de las dos pasó. */
+  shareFile(title: string, file: File): Promise<'shared' | 'saved' | 'none'>
   saveFile(fileName: string, contents: Blob): Promise<void>
   pickFile(accept: string): Promise<File | null>
 }

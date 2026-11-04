@@ -47,7 +47,7 @@ cambiar llevan `slot` (nunca se borran) y el resto del código decide qué hacer
 ## Flujo de datos: entrenar
 
 ```
-IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `userContent`: fotos, notas y consejos ocultos)
+IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `userContent`: fotos, notas, consejos ocultos y tu material)
         │
         ▼  use-cases/training.ts · cargarPlan()   (cada pantalla de Entreno, con screens/comun/usePlan)
         │  la rutina: del catálogo o tuya (`programs`, id `mia:…`, cargada desde un CSV: use-cases/importRoutine.ts)
@@ -58,6 +58,9 @@ IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `use
         │  cada serie → state/sesionEnCurso.ts → efecto → IndexedDB `workouts/en-curso`
         ▼  «Terminar» → terminarEntreno: `workouts` (terminado) y la rotación avanza → `rotation/current`
 ```
+
+El Perfil (área `profile`) enseña «Tu material» con `TuMaterial`, que Entreno exporta en su `index.ts`: es la única
+pieza de un área que usa otra. Lo que eliges se guarda en `userContent/material` y Entreno lo lee al cargar el plan.
 
 Todo lo que se enseña de tus entrenos (la vez anterior, gráficas, tu semana, series por músculo, racha) se calcula
 desde `workouts`; no hay otra copia.

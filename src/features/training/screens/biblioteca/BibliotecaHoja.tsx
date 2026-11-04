@@ -9,6 +9,7 @@ import {
   type MuscleId,
 } from '../../state/routines.ts'
 import { buscarEjercicios, ejercicioDeBiblioteca } from '../../use-cases/exerciseLibrary.ts'
+import { segunTuMaterial } from '../../use-cases/myEquipment.ts'
 
 const FILTRO = MUSCLE_IDS.map((id) => ({ id, label: MUSCLES[id].label }))
 
@@ -24,7 +25,15 @@ type Props = {
 export function BibliotecaHoja({ onClose, onElegir, musculo = null }: Props) {
   const [query, setQuery] = useState('')
   const [muscle, setMuscle] = useState<MuscleId | null>(musculo)
-  const rows = buscarEjercicios(query, muscle).map((e) => ({ id: e.id, name: e.name, line: libraryLine(e) }))
+  // Lo que no se hace con tu material, al final y en gris (se puede elegir igual)
+  const { tienes, noTienes } = segunTuMaterial(buscarEjercicios(query, muscle), (e) => e.equipment)
+  const fila = (e: LibraryExercise, falta: boolean) => ({
+    id: e.id,
+    name: e.name,
+    line: libraryLine(e),
+    noTienes: falta,
+  })
+  const rows = [...tienes.map((e) => fila(e, false)), ...noTienes.map((e) => fila(e, true))]
   return (
     <ExerciseLibrarySheet
       title={onElegir ? 'Elegir ejercicio' : 'Biblioteca de ejercicios'}

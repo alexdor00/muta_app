@@ -1,0 +1,31 @@
+/* Perfil: barra con la flecha atrás y el título centrado, como la ficha del ejercicio. */
+
+.page {
+  padding: var(--safe-top) var(--gutter) var(--space-8);
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: var(--tap-min) 1fr var(--tap-min);
+  align-items: center;
+  min-height: var(--bar-height);
+}
+
+.back {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  margin-left: calc(-1 * var(--space-3));
+  color: var(--label);
+}
+
+.back svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.title {
+  font: var(--text-headline);
+  text-align: center;
+}

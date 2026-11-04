@@ -9,6 +9,7 @@ import { descansosPorSemana, entrenos, semanaDe, sesiones } from '../../state/pl
 import { guardarSesion, resumenDe, segundosSesion, sesionEnCurso } from '../../state/sesionEnCurso.ts'
 import { diasDeRacha } from '../../state/routines.ts'
 import { reabrirEntreno } from '../../use-cases/training.ts'
+import { compartirImagen } from '../../use-cases/shareImage.ts'
 import { compartir } from '../../use-cases/workoutFeedback.ts'
 import { usePlan } from '../comun/usePlan.ts'
 
@@ -89,6 +90,25 @@ export function ResumenScreen(props: { sessionId: string }) {
           route(paths.training)
         }}
         onCompartir={async () => {
+          // La imagen (C25); si el navegador no puede dibujarla, el texto de siempre
+          try {
+            const hecho = await compartirImagen(
+              {
+                fecha,
+                nombre: sesion.nombre,
+                racha,
+                volumenKg: r.volumen,
+                series: r.series,
+                minutos,
+                records: r.records,
+              },
+              `muta-${hoy}-${sesion.sigla.toLowerCase()}.png`,
+            )
+            if (hecho === 'saved') setAviso('Imagen guardada')
+            return
+          } catch {
+            // Sigue con el texto
+          }
           const texto = [
             `${sesion.sigla} ${sesion.nombre} · ${fecha}`,
             `🔥 ${racha} ${racha === 1 ? 'día' : 'días'} de racha`,

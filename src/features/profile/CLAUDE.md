@@ -2,7 +2,8 @@
 
 Bienvenida (A01–A04: objetivo, nivel y días por semana) y, más adelante, el perfil.
 
-- `screens/` — `bienvenida`, `onboarding` (pasos 1 y 2), `perfil` (pendiente).
+- `screens/` — `bienvenida`, `onboarding` (pasos 1 y 2), `perfil` (por ahora solo «Tu material», la pieza `TuMaterial` del
+  `index.ts` de Entreno; tus datos, rehacer el plan y la copia de seguridad, pendientes de diseño).
 - `components/` — `OnboardingLayout`, iconos de objetivo.
 - `state/onboarding.ts` — señales con las respuestas en curso.
 - `use-cases/completeOnboarding.ts` — guarda el perfil en el almacén `profile` (un solo registro).

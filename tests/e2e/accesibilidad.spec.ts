@@ -215,3 +215,13 @@ test('foto de la sesión (desde Editar rutina) y el «···» de un ejercicio c
   await page.getByRole('button', { name: /Tus notas/ }).click()
   await sinFallos(page)
 })
+
+test('Perfil · Tu material y el «···» de la ficha', async ({ page }) => {
+  await page.goto('/perfil')
+  await page.getByRole('switch', { name: 'Máquinas' }).click()
+  await sinFallos(page)
+  await page.goto('/entreno/ejercicio/peso_muerto_rumano')
+  await page.getByRole('button', { name: 'Más opciones' }).click()
+  await expect(page.getByRole('dialog', { name: 'Peso muerto rumano' })).toBeVisible()
+  await sinFallos(page)
+})

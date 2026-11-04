@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import {
   formatChange,
@@ -9,8 +9,9 @@ import {
 } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { ChevronLeftIcon, PlayIcon } from '../../../../shared/ui/icons.tsx'
+import { ChevronLeftIcon, DotsIcon, PlayIcon } from '../../../../shared/ui/icons.tsx'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
+import { Toast } from '../../../../shared/ui/Toast.tsx'
 import {
   FichaCabecera,
   FichaClave,
@@ -36,6 +37,7 @@ import { guardarNota, notaDe } from '../../use-cases/exerciseNotes.ts'
 import { pautaEnTuRutina } from '../../use-cases/training.ts'
 import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { usePlan } from '../comun/usePlan.ts'
+import { MasFichaHoja, type AvisoFicha } from './MasFichaHoja.tsx'
 import styles from './FichaEjercicioScreen.module.css'
 
 const NOMBRES = Object.fromEntries(MUSCLE_IDS.map((id) => [id, MUSCLES[id].label]))
@@ -58,6 +60,13 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
   const [eligiendo, setEligiendo] = useState(false)
   const [musculo, setMusculo] = useState<MuscleId | null>(null)
   const [escribiendo, setEscribiendo] = useState(false)
+  const [mas, setMas] = useState(false)
+  const [aviso, setAviso] = useState<AvisoFicha | null>(null)
+  useEffect(() => {
+    if (!aviso) return
+    const t = setTimeout(() => setAviso(null), 4000)
+    return () => clearTimeout(t)
+  }, [aviso])
   const ex = ejercicioDeBiblioteca(props.exerciseId)
   const atras = () => (window.history.length > 1 ? window.history.back() : route(paths.training))
   if (!ex) {
@@ -116,7 +125,9 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
           <ChevronLeftIcon />
         </button>
         <h1 class={styles.barTitle}>Ficha del ejercicio</h1>
-        <span />
+        <button type="button" class={styles.more} aria-label="Más opciones" onClick={() => setMas(true)}>
+          <DotsIcon />
+        </button>
       </header>
       <div class={styles.cards}>
         <FichaCabecera
@@ -209,6 +220,21 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
           </Button>
         </div>
       )}
+      {mas && <MasFichaHoja ejercicio={ex} onAviso={setAviso} onClose={() => setMas(false)} />}
+      <Toast
+        message={aviso?.texto ?? null}
+        action={
+          aviso?.deshacer
+            ? {
+                label: 'Deshacer',
+                onClick: () => {
+                  aviso.deshacer?.()
+                  setAviso({ texto: 'Deshecho' })
+                },
+              }
+            : null
+        }
+      />
       {musculo && <MusculoHoja musculo={musculo} onClose={() => setMusculo(null)} />}
       {escribiendo && (
         <NoteSheet

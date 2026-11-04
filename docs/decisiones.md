@@ -242,3 +242,17 @@ letra del nombre (A1/A2) y se puede unir o separar con «Superserie con» (solo 
 sesión no se abren los dos ejercicios a la vez: tras una serie del primero se descansan 20 s ([02-reglas.md](conocimiento/02-reglas.md))
 y se abre el otro con un aviso; tras el último, su descanso normal y vuelta al primero. Así la pantalla sigue con un solo
 ejercicio abierto y no estorba.
+
+## 2026-11-04 · Cierre de Entreno: «···» de la ficha, tu material, imagen para compartir
+
+- **«···» de la ficha**: solo lo que la ficha no hace ya. «Añadir a una sesión» y, si está en tu plan, «Cambiar en tu plan
+  por otro». Fuera «Mi nota» (la ficha ya tiene «Tus notas») y «Ocultar La clave» (no aporta). Cambiar un ejercicio de tu
+  plan tiene un solo caso de uso (`cambiarEjercicioDelPlan`) para la ficha y Editar rutina.
+- **Tu material**: se guarda lo que te **falta** (`userContent/material`), así que sin elegir lo tienes todo, como el
+  gimnasio completo de la bienvenida. Lo que no tienes no se esconde: baja al final, en gris, y se puede elegir (por si un
+  día entrenas en otro sitio). Vive en Entreno, que es quien lo usa; el Perfil lo enseña con `TuMaterial` del `index.ts`.
+- **Imagen para compartir (C25)**: dibujada en canvas a 1080 × 1920 (tamaño de historia), siempre oscura con los colores del
+  tema oscuro de `tokens.css`; se comparte como archivo o, si el navegador no deja, se descarga. Si falla, el texto de antes.
+- **Tu rutina (A06) y C00 no se hacen**: «Tu semana» de Tu plan y Editar rutina ya enseñan el ciclo con sus descansos, y
+  «Empezar» abre la sesión directamente con sus consejos.
+- El interruptor pasa a `shared/ui/Switch` (lo usan Editar rutina y el Perfil).

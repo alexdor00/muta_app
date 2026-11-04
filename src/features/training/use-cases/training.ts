@@ -28,6 +28,7 @@ import { descansosElegidos, sesionEnCurso, type SesionEnCurso } from '../state/s
 import { porNombre } from './exerciseLibrary.ts'
 import { cargarNotas } from './exerciseNotes.ts'
 import { entrenoDe } from './workoutRecord.ts'
+import { cargarMaterial } from './myEquipment.ts'
 import { cargarMisConsejos } from './myTips.ts'
 import { cargarFotos } from './sessionPhotos.ts'
 import { LEVELS } from './loadRoutines.ts'
@@ -75,9 +76,10 @@ let carga: Promise<void> | null = null
 /** El último entreno guardado y la rotación de antes, para «Me faltó un ejercicio». */
 let ultimoGuardado: { id: string; rotacion: Rotacion } | null = null
 
-/** Carga tu plan, tus entrenos, la sesión en curso, tus fotos y tus consejos (una vez; `forzar` tras cambiar de rutina). */
+/** Carga tu plan, tus entrenos, la sesión en curso, tus fotos, tus consejos y tu material (una vez; `forzar` tras cambiar de rutina). */
 export function cargarPlan(forzar = false): Promise<void> {
   void cargarMisConsejos()
+  void cargarMaterial()
   void cargarNotas()
   if (!carga || forzar) carga = leer()
   return carga

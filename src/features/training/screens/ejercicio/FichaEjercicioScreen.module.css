@@ -28,7 +28,22 @@
   cursor: pointer;
 }
 
-.back svg {
+/* «···» arriba a la derecha: lo que la ficha no hace ya (añadir a una sesión, cambiar en tu plan) */
+.more {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  margin-right: calc(-1 * var(--space-3));
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--label);
+  cursor: pointer;
+}
+
+.back svg,
+.more svg {
   width: var(--icon);
   height: var(--icon);
 }

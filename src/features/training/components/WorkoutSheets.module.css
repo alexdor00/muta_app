@@ -366,3 +366,8 @@
   color: var(--label-2);
   cursor: default;
 }
+
+/* Lo que no se hace con tu material: al final y en gris */
+.dim .title {
+  color: var(--label-2);
+}

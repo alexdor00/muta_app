@@ -126,3 +126,16 @@
   color: var(--label-2);
   text-align: center;
 }
+
+/* Lo que no se hace con tu material: al final, con su título y en gris */
+.section {
+  margin: var(--space-6) 0 0;
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.dim .name {
+  color: var(--label-2);
+}

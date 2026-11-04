@@ -1,0 +1,41 @@
+/* Tu material: título pequeño en mayúsculas, filas con su interruptor y la explicación en gris. */
+
+.section {
+  margin-top: var(--space-4);
+}
+
+.title {
+  margin: 0 0 var(--space-2);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: var(--control-lg);
+  font: var(--text-body);
+  color: var(--label);
+}
+
+.row + .row {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.hint {
+  margin: var(--space-3) 0 0;
+  font: var(--text-subhead);
+  color: var(--label-2);
+  text-align: justify;
+  hyphens: auto;
+}

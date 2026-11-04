@@ -3,6 +3,7 @@ import { formatRange, formatRest } from '../../../shared/lib/format.ts'
 import { ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import { ChoiceList } from '../../../shared/ui/Choice.tsx'
+import { Switch } from '../../../shared/ui/Switch.tsx'
 import { Desplegable } from './Desplegable.tsx'
 import styles from './EditExerciseSheet.module.css'
 
@@ -119,13 +120,10 @@ export function EditExerciseSheet(props: {
         />
         <div class={styles.line}>
           <span>Cada serie distinta</span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={Boolean(distintas)}
-            aria-label="Cada serie distinta"
-            class={styles.switch}
-            onClick={() => ponDistintas(distintas ? null : Array.from({ length: p.series }, () => p.reps))}
+          <Switch
+            checked={Boolean(distintas)}
+            label="Cada serie distinta"
+            onChange={(on) => ponDistintas(on ? Array.from({ length: p.series }, () => p.reps) : null)}
           />
         </div>
         {distintas ? (
