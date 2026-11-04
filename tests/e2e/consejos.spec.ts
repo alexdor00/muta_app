@@ -75,7 +75,7 @@ test('«Mostrar al empezar» abre la hoja sola en la próxima sesión', async ({
   await page.getByRole('button', { name: 'Listo' }).click()
   await page.getByRole('button', { name: 'Descartar sesión' }).click()
   await page.getByRole('dialog').getByRole('button', { name: 'Descartar' }).click()
-  await page.getByRole('link', { name: /^Empezar/ }).click()
+  await page.getByRole('link', { name: 'Empezar B1' }).click()
   await expect(page.getByRole('dialog', { name: 'Consejos de hoy' })).toBeVisible()
 })
 

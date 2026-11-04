@@ -2,15 +2,16 @@ import { expect, test } from './plan.ts'
 
 // Tu plan (pestaña Entreno) con los datos de prueba de state/muestra: carrusel, «Empezar», hoja y músculos.
 
-test('el carrusel cambia la sesión de «Empezar»', async ({ page }) => {
+test('cada tarjeta lleva su ▶ para empezarla y el carrusel se desliza a las demás', async ({ page }) => {
   await page.goto('/entreno')
-  const empezar = page.getByRole('link', { name: /^Empezar/ })
-  await expect(empezar).toHaveText('Empezar B1')
+  const b1 = page.getByRole('link', { name: 'Empezar B1' })
+  await expect(b1).toBeInViewport()
+  await expect(b1).toHaveAttribute('href', '/entreno/sesion/b1')
   await page
     .getByRole('group', { name: 'Sesiones de tu rutina' })
     .evaluate((rail) => rail.scrollTo({ left: rail.clientWidth * 3 }))
-  await expect(empezar).not.toHaveText('Empezar B1')
-  await expect(empezar).toHaveAttribute('href', /\/entreno\/sesion\/[ab]\d$/)
+  await expect(b1).not.toBeInViewport()
+  await expect(page.getByRole('link', { name: 'Empezar A1' })).toBeInViewport()
 })
 
 test.describe('con ratón (ordenador)', () => {
@@ -18,15 +19,14 @@ test.describe('con ratón (ordenador)', () => {
 
   test('arrastrar la tarjeta pasa a la siguiente sin abrirla', async ({ page }) => {
     await page.goto('/entreno')
-    const empezar = page.getByRole('link', { name: /^Empezar/ })
-    await expect(empezar).toHaveText('Empezar B1')
+    await expect(page.getByRole('link', { name: 'Empezar B1' })).toBeInViewport()
     const caja = (await page.getByRole('group', { name: 'Sesiones de tu rutina' }).boundingBox())!
     const y = caja.y + caja.height / 2
     await page.mouse.move(caja.x + caja.width * 0.8, y)
     await page.mouse.down()
     await page.mouse.move(caja.x + caja.width * 0.3, y, { steps: 8 })
     await page.mouse.up()
-    await expect(empezar).toHaveText('Empezar A2')
+    await expect(page.getByRole('link', { name: 'Empezar A2' })).toBeInViewport()
     await expect(page).toHaveURL('/entreno')
   })
 })
@@ -105,7 +105,7 @@ test('tocar un músculo enseña sus series y tocar fuera las quita', async ({ pa
 
 test('al bajar queda arriba una barra con «Entrenamiento»', async ({ page }) => {
   await page.goto('/entreno')
-  await expect(page.getByRole('link', { name: /^Empezar/ })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Empezar B1' })).toBeVisible()
   await page.evaluate(() => window.scrollTo(0, 600))
   await expect(page.getByText('Entrenamiento', { exact: true }).first()).toBeInViewport()
   await expect(page.getByRole('heading', { name: 'Entrenamiento', level: 1 })).not.toBeInViewport()

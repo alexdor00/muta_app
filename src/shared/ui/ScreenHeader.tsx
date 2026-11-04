@@ -8,7 +8,7 @@ type Props = {
   initials?: string
   /** A dónde lleva el avatar (perfil). */
   avatarHref: string
-  /** Botón o enlace de la derecha (icono). */
+  /** Botón o enlace de la derecha (icono); en la fila, a la izquierda del avatar. */
   action?: ComponentChildren
   /** El título (más pequeño, en negrita) y el avatar en la misma fila, el avatar a la derecha (Entrenamiento). */
   inline?: boolean
@@ -34,7 +34,10 @@ export function ScreenHeader({ title, intro, initials, avatarHref, action, inlin
     return (
       <header class={`${styles.header} ${styles.inline}`}>
         <h1 class={styles.inlineTitle}>{title}</h1>
-        {avatar}
+        <span class={styles.inlineEnd}>
+          {action}
+          {avatar}
+        </span>
       </header>
     )
   }

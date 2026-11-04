@@ -206,3 +206,9 @@ contraste suficiente como texto: va como flecha (↑ naranja, ↓ gris).
 
 El usuario pidió ver lo que mejora con dos gráficas en vez de una con pestañas: el 1RM estimado y el tonelaje total, una
 debajo de otra. El tonelaje cuenta las bajadas y mini-series y va en toneladas, la cifra y el eje igual.
+
+## 2026-11-04 · «Empezar» dentro de la tarjeta y «Tu rutina» en un botón de ajustes
+
+El botón «Empezar» ocupaba una franja entera. Ahora cada tarjeta de sesión lleva su ▶ (círculo blanco con sombra, abajo a la
+derecha) y «Tu rutina» se abre con un botón de ajustes ⚙ en la cabecera, junto al perfil. Nuevas variables de diseño:
+`--play` (56 px) y `--float-shadow`.

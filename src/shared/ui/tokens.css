@@ -55,6 +55,9 @@
   --on-session-light-soft: rgb(255 255 255 / 72%);
   --on-session-light-line: rgb(255 255 255 / 22%);
   --session-text-shadow: 0 2px 14px rgb(0 0 0 / 60%); /* letra sobre las rayas */
+  --float-shadow:
+    0 6px 18px rgb(0 0 0 / 28%), 0 1px 3px rgb(0 0 0 / 18%); /* botón que flota sobre una tarjeta (▶) */
+  --play: 3.5rem; /* 56: el ▶ de la tarjeta de una sesión */
   --photo-card-scrim: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 55%) 100%);
   --photo-card-height: 192px; /* tarjeta de rutina: proporción de la captura de referencia */
   --avatar: 40px;

@@ -2,7 +2,7 @@ import { MoonIcon } from '../../../shared/ui/icons.tsx'
 import styles from './RestDayCard.module.css'
 
 /** Tarjeta de Tu plan cuando hoy toca descanso obligatorio: del tamaño de las de las sesiones, con la que viene después. */
-export function RestDayCard(props: { siguiente: string | null }) {
+export function RestDayCard(props: { siguiente: string | null; onEntrenar: () => void }) {
   return (
     <section class={styles.card} aria-labelledby="hoy-descansas">
       <span class={styles.moon} aria-hidden="true">
@@ -20,6 +20,9 @@ export function RestDayCard(props: { siguiente: string | null }) {
           </>
         )}
       </p>
+      <button type="button" class={styles.train} onClick={props.onEntrenar}>
+        Entrenar igualmente
+      </button>
     </section>
   )
 }

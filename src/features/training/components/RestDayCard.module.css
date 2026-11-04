@@ -37,3 +37,18 @@
 .text b {
   color: var(--label);
 }
+
+/* «Entrenar igualmente»: discreto, en la propia tarjeta */
+.train {
+  align-self: flex-start;
+  min-height: var(--tap-min);
+  margin-top: var(--space-2);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}

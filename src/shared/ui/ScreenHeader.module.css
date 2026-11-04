@@ -62,3 +62,10 @@
 .inlineTitle {
   font: var(--text-title-tab);
 }
+
+/* En la fila: la acción (un botón redondo del tamaño del avatar) y el avatar */
+.inlineEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

@@ -1,8 +1,7 @@
 import { useRef, useState } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { Button } from '../../../../shared/ui/Button.tsx'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
-import { DotsIcon, PlayIcon } from '../../../../shared/ui/icons.tsx'
+import { GearIcon } from '../../../../shared/ui/icons.tsx'
 import { ScreenHeader } from '../../../../shared/ui/ScreenHeader.tsx'
 import { carouselStep, useDragScroll } from '../../../../shared/ui/useDragScroll.ts'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
@@ -80,8 +79,6 @@ function TuPlan({ siguiente }: { siguiente: number }) {
   // La primera tarjeta es la que toca; detrás, las que siguen en el ciclo
   const deHoy = Math.max(0, siguiente)
   const sesiones = [...todas.slice(deHoy), ...todas.slice(0, deHoy)]
-  // «Empezar» va con la sesión que se ve en el carrusel
-  const elegida = sesiones[visible]?.sigla ?? toca?.sigla ?? ''
   const series = seriesPorMusculo(entrenos.value, hoy, toca)[periodo]
   const trabajados = Object.entries(series).filter(([, n]) => n > 0)
   const actividad = {
@@ -93,33 +90,25 @@ function TuPlan({ siguiente }: { siguiente: number }) {
     <>
       <CompactBar title="Entrenamiento" watch={cabecera} />
       <div ref={cabecera}>
-        <ScreenHeader title="Entrenamiento" avatarHref={paths.profile} inline />
+        <ScreenHeader
+          title="Entrenamiento"
+          avatarHref={paths.profile}
+          inline
+          action={
+            <button type="button" class={styles.settings} aria-label="Tu rutina" onClick={sheet.show}>
+              <GearIcon />
+            </button>
+          }
+        />
       </div>
       {descansa && !entrenarIgual ? (
-        <RestDayCard siguiente={toca ? `${toca.sigla} · ${toca.nombre}` : null} />
+        <RestDayCard
+          siguiente={toca ? `${toca.sigla} · ${toca.nombre}` : null}
+          onEntrenar={() => setEntrenarIgual(true)}
+        />
       ) : (
         <Carrusel sesiones={sesiones} visible={visible} onVisible={setVisible} />
       )}
-
-      <div class={styles.actions}>
-        <div class={styles.start}>
-          {descansa && !entrenarIgual ? (
-            <Button variant="secondary" onClick={() => setEntrenarIgual(true)}>
-              Entrenar igualmente
-            </Button>
-          ) : (
-            <Button href={paths.session(elegida.toLowerCase())}>
-              <span class={styles.startLabel}>
-                <PlayIcon />
-                Empezar {elegida}
-              </span>
-            </Button>
-          )}
-        </div>
-        <button type="button" class={styles.more} aria-label="Tu rutina" onClick={sheet.show}>
-          <DotsIcon />
-        </button>
-      </div>
 
       <div class={styles.blocks}>
         <WeekCard dias={semana} total={sesionesPlan.value.length} />
