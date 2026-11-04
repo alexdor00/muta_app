@@ -302,8 +302,10 @@
   margin-top: 0;
 }
 
+/* La clave del músculo: 15 seminegrita, como los consejos */
 .key p {
-  font: var(--text-headline);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
 }
 
 /* «Añadir un ejercicio» de este músculo a tu plan */

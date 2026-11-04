@@ -218,3 +218,10 @@ y un ⚙; el usuario prefirió botones con texto, a juego). Nueva variable de di
 El usuario pidió los textos de información y consejos «como en Word»: justificados (rectos por los dos lados), con las
 palabras partidas en español para que no queden huecos grandes. Solo los párrafos; títulos, botones y cifras siguen igual.
 Las pruebas de accesibilidad tienen 90 s cada una: axe no cabía en 30 s con todas las pruebas a la vez.
+
+## 2026-11-04 · Gris más oscuro y textos de las fichas a 15 px
+
+El gris de los textos secundarios (`--label-2`) pasa de #6e6e73 a #48484a en claro (y de #98989f a #aeaeb2 en oscuro): se
+lee mejor y vale para toda la app. Los textos en negro de los consejos, «La clave» de la ficha del músculo, los títulos de
+las tarjetas de la ficha del ejercicio y los ejercicios de Ver sesión van a 15 px en seminegrita, todos iguales; la pauta de
+cada ejercicio de Ver sesión, a 13 px.

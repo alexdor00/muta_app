@@ -18,7 +18,7 @@
   --surface: #f4f4f5;
   --surface-2: #e9e9eb;
   --label: #111113;
-  --label-2: #6e6e73;
+  --label-2: #48484a; /* gris de los textos secundarios: más oscuro para que se lea mejor (decisión 2026-11-04) */
   --separator: #e3e3e6;
   --accent: #111113; /* sin color: el énfasis es negro en claro y blanco en oscuro */
   --on-accent: #ffffff; /* texto o icono sobre un fondo --accent */
@@ -163,7 +163,7 @@
     --surface: #1c1c1e;
     --surface-2: #2c2c2e;
     --label: #f2f2f7;
-    --label-2: #98989f;
+    --label-2: #aeaeb2;
     --separator: #38383a;
     --accent: #f2f2f7;
     --on-accent: #000000;
@@ -180,7 +180,7 @@
   --surface: #1c1c1e;
   --surface-2: #2c2c2e;
   --label: #f2f2f7;
-  --label-2: #98989f;
+  --label-2: #aeaeb2;
   --separator: #38383a;
   --accent: #f2f2f7;
   --on-accent: #000000;

@@ -93,8 +93,10 @@
   min-width: 0;
 }
 
+/* «La clave», «Tus notas», «Peso sugerido»…: 15 seminegrita, como los consejos de la ficha del músculo */
 .title {
-  font: var(--text-headline);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
 }
 
 .text {

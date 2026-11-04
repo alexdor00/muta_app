@@ -48,8 +48,10 @@
   gap: var(--space-1);
 }
 
+/* El consejo, en negro: 15 seminegrita (como los títulos de las fichas) */
 .text {
-  font: var(--text-headline);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
 }
 
 .why {

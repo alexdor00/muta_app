@@ -35,13 +35,14 @@
   gap: calc(var(--space-1) / 2);
 }
 
+/* El ejercicio: 15 seminegrita, del tamaño de los títulos de las fichas; debajo, su pauta en 13 */
 .name {
-  font: var(--text-body);
+  font: var(--text-subhead);
   font-weight: var(--weight-semibold);
 }
 
 .detail {
-  font: var(--text-subhead);
+  font: var(--text-footnote);
   color: var(--label-2);
 }
 
