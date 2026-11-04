@@ -201,3 +201,8 @@ filas finas debajo; se guardan dentro de la serie y suman al volumen, pero la pr
 En Ver sesión, como en la app anterior, cada ejercicio lleva a la derecha cuánto cambió su máximo estimado (o sus
 repeticiones, si va sin peso) frente a la vez anterior, y arriba cuántos suben. El «+» naranja del prototipo no tenía
 contraste suficiente como texto: va como flecha (↑ naranja, ↓ gris).
+
+## 2026-11-04 · La ficha del ejercicio, con dos gráficas
+
+El usuario pidió ver lo que mejora con dos gráficas en vez de una con pestañas: el 1RM estimado y el tonelaje total, una
+debajo de otra. El tonelaje cuenta las bajadas y mini-series y va en toneladas, la cifra y el eje igual.

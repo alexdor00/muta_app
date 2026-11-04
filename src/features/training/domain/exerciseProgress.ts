@@ -1,11 +1,11 @@
 // Progreso de un ejercicio a lo largo del tiempo (ficha-ejercicio.js · exProgressHtml del prototipo): el máximo
-// (1RM estimado de la mejor serie de cada vez) y el volumen (kilos × repeticiones de todas las series).
+// (1RM estimado de la mejor serie de cada vez) y el tonelaje (kilos × repeticiones de todas las series, bajadas incluidas).
 import { e1rm } from './e1rm.ts'
 
 /** Cada vez que se hizo: su fecha, sus series y en qué puesto de la sesión iba (1 = el primero), si se sabe. */
 export type VezEjercicio = {
   fecha: string
-  series: { kg: number | null; reps: number }[]
+  series: { kg: number | null; reps: number; extra?: { kg: number | null; reps: number }[] }[]
   puesto?: number
 }
 
@@ -18,7 +18,8 @@ export function progresoDe(veces: VezEjercicio[], rir: number): PuntoProgreso[] 
     .map((v) => ({
       fecha: v.fecha,
       maximo: Math.round(Math.max(...v.series.map((s) => e1rm(s.kg, s.reps, rir))) * 10) / 10,
-      volumen: v.series.reduce((t, s) => t + (s.kg ?? 0) * s.reps, 0),
+      // El tonelaje: kilos × repeticiones de todas las series, con sus bajadas o mini-series
+      volumen: v.series.flatMap((s) => [s, ...(s.extra ?? [])]).reduce((t, s) => t + (s.kg ?? 0) * s.reps, 0),
       puesto: v.puesto ?? null,
     }))
 }

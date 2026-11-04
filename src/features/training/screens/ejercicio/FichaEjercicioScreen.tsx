@@ -38,12 +38,6 @@ import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { usePlan } from '../comun/usePlan.ts'
 import styles from './FichaEjercicioScreen.module.css'
 
-const METRICAS = [
-  { value: 'maximo', label: 'Máximo' },
-  { value: 'volumen', label: 'Volumen' },
-] as const
-type MetricaEjercicio = (typeof METRICAS)[number]['value']
-
 const NOMBRES = Object.fromEntries(MUSCLE_IDS.map((id) => [id, MUSCLES[id].label]))
 
 /** De dónde salen las repeticiones de la ficha. */
@@ -61,7 +55,6 @@ const FUENTE = {
 export function FichaEjercicioScreen(props: { exerciseId: string }) {
   const { query, route } = useLocation()
   usePlan()
-  const [metrica, setMetrica] = useState<MetricaEjercicio>('maximo')
   const [eligiendo, setEligiendo] = useState(false)
   const [musculo, setMusculo] = useState<MuscleId | null>(null)
   const [escribiendo, setEscribiendo] = useState(false)
@@ -85,15 +78,29 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
   const descanso = f.plan ? descansoDe(f.plan.e) : ex.restSec
   const cambiar = (s: number) => f.plan && elegirDescanso(f.plan.e.nombre, Math.min(600, Math.max(15, s)))
 
-  const puntos = f.progreso.map((p) => ({ fecha: p.fecha, valor: p[metrica] }))
   const orden = avisoDeOrden(f.progreso)
   const puestoHoy = f.progreso.at(-1)?.puesto
-  const ultimo = puntos.at(-1)
-  const cambio = cambioDesdePrimera(puntos.map((p) => p.valor))
-  const texto = (v: number) =>
-    metrica === 'volumen'
-      ? `${formatDecimal(Math.round(v / 100) / 10)} t`
-      : `${formatDecimal(Math.round(v))} ${f.pesoCorporal ? 'reps' : 'kg'}`
+  /** Lo de cada gráfica: la cifra de la última vez, el cambio desde la primera, su fecha y sus puntos. */
+  const grafica = (m: 'maximo' | 'volumen') => {
+    // El tonelaje, en toneladas (la cifra y el eje igual)
+    const puntos = f.progreso.map((p) => ({
+      fecha: p.fecha,
+      valor: m === 'volumen' ? p.volumen / 1000 : p.maximo,
+    }))
+    const ultimo = puntos.at(-1)
+    const cambio = cambioDesdePrimera(puntos.map((p) => p.valor))
+    const texto = (v: number) =>
+      m === 'volumen'
+        ? `${formatDecimal(Math.round(v * 10) / 10)} t`
+        : `${formatDecimal(Math.round(v))} ${f.pesoCorporal ? 'reps' : 'kg'}`
+    return {
+      valor: ultimo ? texto(ultimo.valor) : null,
+      cambio:
+        cambio === null ? null : `${formatChange(cambio)} desde la primera vez (${puntos.length} veces)`,
+      fecha: ultimo ? formatDayDate(ultimo.fecha) : null,
+      puntos,
+    }
+  }
 
   const sesion = typeof query.sesion === 'string' ? query.sesion : null
   const indice = Number(query.ej)
@@ -148,23 +155,31 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
           porque={f.sugerencia.porque}
         />
         <SessionProgress
-          metricas={f.pesoCorporal ? METRICAS.slice(0, 1) : METRICAS}
+          titulo={f.pesoCorporal ? 'Mejor serie' : '1RM estimado'}
+          metricas={[{ value: 'maximo', label: f.pesoCorporal ? 'Mejor serie' : '1RM estimado' }]}
           etiqueta="Progreso del ejercicio"
           vacio="Aún no has hecho este ejercicio."
-          valor={ultimo ? texto(ultimo.valor) : null}
-          cambio={
-            cambio === null ? null : `${formatChange(cambio)} desde la primera vez (${puntos.length} veces)`
-          }
-          fecha={ultimo ? formatDayDate(ultimo.fecha) : null}
-          puntos={puntos}
-          metrica={metrica}
-          onMetrica={setMetrica}
+          {...grafica('maximo')}
+          metrica="maximo"
+          onMetrica={() => {}}
           otroPuesto={f.progreso.map((p) => p.puesto !== puestoHoy)}
           aviso={
             orden &&
             `⚠ La última vez lo hiciste en el puesto ${orden.ahora} de la sesión y la anterior en el ${orden.antes}: con otra fatiga encima, la comparación no es exacta.`
           }
         />
+        {/* El tonelaje, con peso y cuando ya lo has hecho (si no, basta con el aviso de la de arriba) */}
+        {!f.pesoCorporal && f.progreso.length > 0 && (
+          <SessionProgress
+            titulo="Tonelaje total"
+            metricas={[{ value: 'volumen', label: 'Tonelaje total' }]}
+            etiqueta="Tonelaje del ejercicio"
+            vacio="Aún no has hecho este ejercicio."
+            {...grafica('volumen')}
+            metrica="volumen"
+            onMetrica={() => {}}
+          />
+        )}
         <FichaMusculos
           principales={principales.map((id) => ({ id, label: MUSCLES[id].label }))}
           secundarios={secundarios.map((id) => ({ id, label: MUSCLES[id].label }))}

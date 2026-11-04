@@ -69,3 +69,11 @@ describe('cambioUltimaVez', () => {
     expect(cambioUltimaVez([vez('a', 60, 10)], 2)).toBeNull()
   })
 })
+
+describe('tonelaje con bajadas', () => {
+  it('las bajadas y mini-series suman al tonelaje, no al máximo', () => {
+    const [p] = progresoDe([{ fecha: 'a', series: [{ kg: 20, reps: 10, extra: [{ kg: 10, reps: 8 }] }] }], 0)
+    expect(p.volumen).toBe(280)
+    expect(progresoDe([{ fecha: 'a', series: [{ kg: 20, reps: 10 }] }], 0)[0].maximo).toBe(p.maximo)
+  })
+})

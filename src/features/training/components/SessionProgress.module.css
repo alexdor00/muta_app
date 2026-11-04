@@ -7,6 +7,14 @@
   background: var(--surface);
 }
 
+/* El título de la tarjeta cuando enseña una sola medida («1RM estimado»), pequeño y en gris */
+.title {
+  margin: 0 0 var(--space-2);
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
 /* Cada dato en una línea; si no caben los tres, la fecha baja */
 .head {
   display: flex;

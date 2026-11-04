@@ -27,8 +27,12 @@ test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos
   const progreso = page.getByRole('region', { name: 'Progreso del ejercicio' })
   await expect(progreso).toContainText('84 kg')
   await expect(progreso).toContainText('desde la primera vez')
-  await progreso.getByText('Volumen').click()
-  await expect(progreso).toContainText(' t')
+  await expect(progreso).toContainText('1RM estimado')
+  // Debajo, la del tonelaje total
+  const tonelaje = page.getByRole('region', { name: 'Tonelaje del ejercicio' })
+  await expect(tonelaje).toContainText('Tonelaje total')
+  await expect(tonelaje).toContainText(' t')
+  await expect(tonelaje.getByRole('img', { name: /de 3 entrenos/ })).toBeVisible()
 
   await expect(page.getByRole('region', { name: 'Músculos que trabaja' })).toContainText('Femoral')
 

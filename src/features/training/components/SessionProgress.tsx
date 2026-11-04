@@ -35,6 +35,8 @@ type Props<M extends string> = {
   otroPuesto?: boolean[]
   /** Advertencia bajo la cifra: «La última vez lo hiciste en otro puesto…». */
   aviso?: string | null
+  /** Título arriba («1RM estimado»), cuando la tarjeta enseña una sola medida. */
+  titulo?: string
 }
 
 /** Marcas del eje vertical: números redondos (1, 2, 5…) que abarcan todos los puntos, con dos tramos como poco. */
@@ -80,6 +82,7 @@ export function SessionProgress<M extends string>({
   onMetrica,
   otroPuesto = [],
   aviso = null,
+  titulo,
 }: Props<M>) {
   const degradado = useId()
   const nombre = metricas.find((m) => m.value === metrica)?.label ?? ''
@@ -92,6 +95,7 @@ export function SessionProgress<M extends string>({
   const ultimo = xy.at(-1)
   return (
     <section class={styles.card} aria-label={etiqueta}>
+      {titulo && <h3 class={styles.title}>{titulo}</h3>}
       <div class={styles.head}>
         <p class={styles.value}>{valor ?? '—'}</p>
         {cambio && <p class={styles.change}>{cambio}</p>}
@@ -150,15 +154,17 @@ export function SessionProgress<M extends string>({
       ) : (
         <p class={styles.empty}>{vacio}</p>
       )}
-      <div class={styles.metrics}>
-        <ChoiceSegmented
-          name="metrica"
-          legend="Qué enseña la gráfica"
-          options={[...metricas]}
-          value={metrica}
-          onChange={onMetrica}
-        />
-      </div>
+      {metricas.length > 1 && (
+        <div class={styles.metrics}>
+          <ChoiceSegmented
+            name="metrica"
+            legend="Qué enseña la gráfica"
+            options={[...metricas]}
+            value={metrica}
+            onChange={onMetrica}
+          />
+        </div>
+      )}
     </section>
   )
 }

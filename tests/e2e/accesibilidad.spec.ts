@@ -38,11 +38,10 @@ test('tu plan, con un músculo tocado y con la hoja Tu rutina abierta', async ({
   await sinFallos(page)
 })
 
-test('la ficha del ejercicio, desde la sesión y con el volumen', async ({ page }) => {
+test('la ficha del ejercicio, desde la sesión, con sus dos gráficas', async ({ page }) => {
   await page.goto('/entreno/ejercicio/peso_muerto_rumano?sesion=b1&ej=0')
   await expect(page.getByRole('button', { name: 'Empezar ejercicio' })).toBeVisible()
-  await sinFallos(page)
-  await page.getByRole('region', { name: 'Progreso del ejercicio' }).getByText('Volumen').click()
+  await expect(page.getByRole('region', { name: 'Tonelaje del ejercicio' })).toBeVisible()
   await sinFallos(page)
 })
 
