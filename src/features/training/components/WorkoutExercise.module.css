@@ -265,7 +265,8 @@
   grid-template-columns: var(--control-sm) repeat(3, minmax(0, 1fr)) var(--control);
   align-items: center;
   gap: var(--space-2);
-  background: var(--bg);
+  border-radius: var(--radius-control);
+  background: var(--surface);
   transition: transform var(--duration-sheet) var(--ease);
   touch-action: pan-y;
   user-select: none;
@@ -278,6 +279,7 @@
   color: var(--label-2);
   text-align: center;
   text-transform: uppercase;
+  background: none;
 }
 
 /* Deslizar a la izquierda descubre «Eliminar» */
@@ -329,7 +331,7 @@
   padding: 0;
   border: 0;
   border-radius: var(--radius-control);
-  background: var(--surface);
+  background: none;
   color: var(--label);
   caret-color: transparent;
 }
@@ -372,14 +374,9 @@
   background: var(--accent);
 }
 
-/* Una serie hecha: toda la fila en gris, para que se vea de un vistazo lo apuntado */
+/* Cada serie es una fila gris; la hecha, un tono más oscuro */
 .doneRow {
-  border-radius: var(--radius-control);
   background: var(--surface-2);
-}
-
-.doneRow .cell {
-  background: none;
 }
 
 .add {
