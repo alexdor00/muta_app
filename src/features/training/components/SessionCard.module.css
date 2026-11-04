@@ -85,11 +85,11 @@
   object-fit: cover;
 }
 
-/* Empezar: una píldora blanca abajo, bajo el título y los datos, con ▶ y su nombre, que flota sobre la tarjeta */
+/* Empezar: una píldora blanca abajo a la derecha, bajo el título y los datos, con ▶ y su nombre, que flota sobre la tarjeta */
 .play {
   position: absolute;
+  right: var(--space-5);
   bottom: var(--space-4);
-  left: var(--space-5);
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
