@@ -45,3 +45,11 @@
   background: var(--surface-2);
   font: var(--text-subhead);
 }
+
+/* Los textos de información y consejos, justificados (rectos por los dos lados) y con palabras partidas si hace falta */
+.text,
+.note,
+.list {
+  text-align: justify;
+  hyphens: auto;
+}

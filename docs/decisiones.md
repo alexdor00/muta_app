@@ -212,3 +212,9 @@ debajo de otra. El tonelaje cuenta las bajadas y mini-series y va en toneladas, 
 El botón «Empezar» ocupaba una franja entera. Ahora cada tarjeta de sesión lleva una píldora blanca «▶ Empezar» abajo a la
 derecha, a la altura del título y «Tu rutina» se abre con una píldora «✎ Editar» en la cabecera, junto al perfil (primero se probó un ▶ redondo
 y un ⚙; el usuario prefirió botones con texto, a juego). Nueva variable de diseño: `--float-shadow`.
+
+## 2026-11-04 · Textos de información y consejos, justificados
+
+El usuario pidió los textos de información y consejos «como en Word»: justificados (rectos por los dos lados), con las
+palabras partidas en español para que no queden huecos grandes. Solo los párrafos; títulos, botones y cifras siguen igual.
+Las pruebas de accesibilidad tienen 90 s cada una: axe no cabía en 30 s con todas las pruebas a la vez.

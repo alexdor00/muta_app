@@ -470,3 +470,10 @@
   font-weight: var(--weight-semibold);
   cursor: pointer;
 }
+
+/* Los textos de información y consejos, justificados (rectos por los dos lados) y con palabras partidas si hace falta */
+.suggested,
+.note {
+  text-align: justify;
+  hyphens: auto;
+}

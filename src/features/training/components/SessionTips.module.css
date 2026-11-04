@@ -280,3 +280,11 @@
 .showHidden {
   padding: 0;
 }
+
+/* Los textos de información y consejos, justificados (rectos por los dos lados) y con palabras partidas si hace falta */
+.text,
+.why,
+.checkText {
+  text-align: justify;
+  hyphens: auto;
+}

@@ -4,36 +4,15 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- **Hecho**: la hoja «Tu rutina» con tres filas (foto de la sesión y cobertura dentro de Editar rutina; ocultar consejos en
-  «Consejos de hoy»); Editar rutina con «Tu semana» (sesiones y descansos), foto y nombre de cada sesión y el entrenador en
-  su hoja; «Tu semana» con lo planeado y ✓, «Hoy descansas» con «Entrenar igualmente», tu rutina desde un CSV; dropsets y rest-pause en la sesión; el cambio de cada ejercicio en Ver sesión; tus notas de cada ejercicio para siempre (sesión y ficha) y el «···» del ejercicio en cuadrícula.
-  **Falta** de la propuesta `Desktop/MUTA-Entreno-lo-que-falta-minimalista.png`: Tu rutina (A06), cada serie distinta y superserie
-  (A14), «···» de la ficha y tu material, imagen para compartir; C00 se propone no hacerla aparte.
-- **Rama `pantalla/sesion`** (sale de `pantalla/ver-sesion`): commit 712da0d con la sesión en curso, el resumen, la biblioteca
-  (A16), las fichas del ejercicio y del músculo (A17–A21), los consejos de hoy (C10) y la hoja «Tu rutina» con «Cambiar de rutina»;
-  encima, **sin commit**, los **datos reales**: Tu plan, Ver sesión, la sesión, el resumen y las fichas leen la rutina guardada y tus
-  entrenos (`workouts`); la sesión que toca va por rotación, lo apuntado se guarda a cada serie y sigue al recargar, y al terminar
-  se guarda y pasa a la siguiente (decisión 2026-11-03). Ya no hay `state/muestra/`. Verificado: `npm run check` (243 tests) y e2e 65 de 65.
-  Unidos por alias 457 nombres de las rutinas con la biblioteca: el 76 % de los ejercicios tienen ficha (antes, el 22 %).
-  «Cambiar ejercicio» propone los que hacen lo mismo (músculo y zona: estirado, acortado…) y cambia solo hoy o en tu plan.
-  Ver sesión despliega cada ejercicio con su ficha en pequeño y lo sugerido se ve en gris («Sugerido, no lo dice la rutina: …»).
-  Falta verlo en un móvil real.
-- **Sustituciones de los documentos** (rutinas locales, rev 15): el 74 % de los ejercicios las traen (antes, el 48 %); ver
-  [docs/datos.md](docs/datos.md). Faltan Women's Specialization y Comeback Bridge.
-- **Explicaciones y biblioteca local**: las 1.140 explicaciones de los documentos traducidas (9.901 ejercicios las enseñan) y
-  208 ejercicios originales de las rutinas en la biblioteca local, con su explicación («Cómo hacerlo · Del documento de …»).
-- **Editar rutina (A11–A13)** hecha y simplificada: sesiones por su nombre, filas «3 × 6–10 · 3:00» con asa para mover, un ejercicio
-  con series, repeticiones y descanso que se guardan solos, «Al terminar la serie» en lista, cambiar por otro, quitar y volver a la
-  rutina original; el entrenador dice un consejo cada vez (nuevo: tope de ~8–11 series del mismo músculo por sesión). Los 194
-  ejercicios de la biblioteca local tienen explicación (25 de una web, con su fuente). Sesión y descansos obligatorios en desplegables:
-  los descansos se cambian tras cada sesión y Tu plan dice «Hoy toca descanso». Ver sesión despliega solo la última vez y «Ver ficha». Falta: superserie y «cada serie distinta» (A14), que piden cambiar la sesión y el
-  motor («Añadir un ejercicio» desde la ficha del músculo ya está). Verlo en el móvil real.
-- **Lo que falta de Entreno**: Tu rutina (A06) y Sesión: inicio (C00) siguen «pendientes»; el «···» de la ficha; «No está en tu material» (el perfil no guarda
-  el material); la imagen para compartir (hoy, texto);
-  ficha para los 235 nombres de las rutinas que no tienen pareja en la biblioteca (`private/informes/ejercicios-sin-ficha.txt`):
-  hay que añadirlos a la biblioteca con datos verificados.
-  Semana de descarga: solo si la rutina la pauta (decisión 2026-11-02).
-
+- **Probar la rama `pantalla/sesion` en un móvil real** con `npm run dev` (dirección «Network», mismo wifi): Tu plan (tarjetas
+  con «▶ Empezar», «Editar», Tu semana, Hoy descansas), Editar rutina, la sesión (teclado, dropsets, notas), Ver sesión y las
+  fichas. Hasta ahora todo se ha visto solo en el móvil simulado. Después, PR a `main` con la CI en verde.
+- **Siguiente pantalla, con PNG aprobado antes** (regla de CLAUDE.md): de la propuesta
+  `Desktop/MUTA-Entreno-lo-que-falta-minimalista.png` quedan Tu rutina (A06), cada serie distinta y superserie (A14), el «···» de
+  la ficha con tu material en el perfil y la imagen para compartir el resumen. C00 se propone no hacerla aparte.
+- **Datos**: sustituciones de Women's Specialization y Comeback Bridge (a mano, de sus PDF; ver [docs/datos.md](docs/datos.md));
+  ficha para los nombres de las rutinas sin pareja en la biblioteca (`private/informes/ejercicios-sin-ficha.txt`), con datos
+  verificados.
 - **Unir la rama `pantalla/estilo-blanco-negro` a `main`** (PR en GitHub, con la CI en verde): revisarla antes en un móvil real con
   `npm run dev` (grupos, selector de días, «!» de cada tarjeta, descansos). Hasta ahora solo se ha visto en el navegador simulado.
 - Después, **arreglar la galería de capturas** (`npm run galeria`): espera el texto «Recomendadas para ti», que ya no existe en la app.
@@ -41,6 +20,20 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- Rama `pantalla/sesion` (2026-11-03/04, sin unir; último commit en `git log`). Verificado: `npm run check` y los e2e.
+  - Datos reales en todo Entreno: Tu plan, Ver sesión, la sesión, el resumen y las fichas leen tu plan y tus entrenos; la sesión
+    va por rotación, se guarda a cada serie y al terminar pasa a la siguiente.
+  - Biblioteca: alias de 457 nombres, ejercicios originales de las rutinas (biblioteca local, sin duplicados, los de MUTA
+    primero) con su explicación (traducida o, para 25, de una web con su fuente); sustituciones de los documentos.
+  - Editar rutina (A11–A13), minimalista: «Tu semana» con sesiones y descansos, nombre y foto de cada sesión, ejercicios con
+    − / + que se guardan solos, «Repeticiones antes del fallo», el entrenador (consejos y cobertura del método) en su hoja.
+  - Tu plan: tarjetas a todo el ancho con «▶ Empezar», «Editar» en la cabecera, Tu semana con lo planeado y ✓, «Hoy
+    descansas» con «Entrenar igualmente»; tu rutina desde un CSV en Elegir rutina.
+  - Sesión: tus notas para siempre (también en la ficha), «···» en cuadrícula, dropsets y rest-pause, consejos que se ocultan.
+  - Ver sesión: el cambio de cada ejercicio frente a la vez anterior y «N de M suben». Ficha: gráficas de 1RM estimado y
+    tonelaje total; repeticiones de tu plan, tu rutina o típicas, diciendo de dónde salen.
+  - Decisiones con fecha en [docs/decisiones.md](docs/decisiones.md); detalle de cada pieza en
+    [src/features/training/CLAUDE.md](src/features/training/CLAUDE.md).
 - Rama `pantalla/tu-plan` (commit 3e6659b, sin unir): Tu plan con el nuevo diseño y datos de prueba; e2e 11 de 11.
 - Rama `pantalla/ver-sesion` (2026-11-02, sale de `pantalla/tu-plan`, sin unir): Ver sesión con datos de prueba: cabecera con el
   color de la sesión, gráfica del prototipo anterior con Tonelaje · Repeticiones · Duración, ejercicios sin foto que se despliegan con
@@ -69,10 +62,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Pendiente (por prioridad)
 
-1. Pantallas de Entreno sin diseño: Tu plan, Tu rutina, sesión (C00–C03, C07, C08, C24), ficha del ejercicio.
-2. Marcar en la app los datos rellenados o estimados (no vienen del original).
+1. Entreno: Tu rutina (A06) y lo que falta de la propuesta (ver «Tarea actual»), siempre con PNG aprobado.
+2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión y la sesión ya dicen «Sugerido»).
 3. Coach: usar las elecciones guardadas (prioridades, puntos débiles) y `adaptVolume`.
-4. Editor de rutina (reordenar, enlazar superseries, aplicar las reglas del documento).
+4. Editar rutina: enlazar superseries y cada serie distinta (A14); reordenar, añadir y pauta ya están.
 5. Importar/exportar copia de seguridad en CSV/JSON desde Perfil.
 6. Áreas Hoy, Comida y Progreso (cuando haya diseño aprobado).
 7. Fotos de categoría y miniaturas de ejercicio.

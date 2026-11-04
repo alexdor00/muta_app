@@ -47,9 +47,10 @@ cambiar llevan `slot` (nunca se borran) y el resto del código decide qué hacer
 ## Flujo de datos: entrenar
 
 ```
-IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `userContent`: fotos de las sesiones y tus consejos)
+IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `userContent`: fotos, notas y consejos ocultos)
         │
         ▼  use-cases/training.ts · cargarPlan()   (cada pantalla de Entreno, con screens/comun/usePlan)
+        │  la rutina: del catálogo o tuya (`programs`, id `mia:…`, cargada desde un CSV: use-cases/importRoutine.ts)
    selectVariant → applyChoices → sesionesDeSemana(rotación, biblioteca)        domain/workoutPlan.ts
         │
         ▼  state/plan.ts · `tuPlan`, `entrenos`; `sesiones` = la semana + la vez anterior (domain/workoutHistory.ts)
@@ -66,8 +67,8 @@ desde `workouts`; no hay otra copia.
 - **Esquema**: `shared/data/schema.ts` (13 almacenes); cada cambio de formato es una migración numerada con copia previa.
 - **Contenido** versionado en JSON, separado del código. Programas de MUTA en `src/shared/content/programs/`;
   los de terceros en `private/programs/` (fuera de git), con `_meta.json` (`rev`): al subirla se recargan todos.
-- Lo que elige el usuario (`plans/current`: `programId`, `variant`, `weakPoints`, `priorities`, `chosenAt`) se guarda
-  aparte del contenido.
+- Lo que elige el usuario (`plans/current`: `programId`, `variant`, `weakPoints`, `priorities`, `chosenAt` y lo que cambia
+  en su plan: `descansos`, `musculos`, `cambios`, `ediciones`, `descansosTras`, `nombres`) se guarda aparte del contenido.
 - Los e2e y la CI construyen sin `private/` (`VITE_NO_LOCAL_PROGRAMS=1`): solo salen las 2 rutinas de MUTA.
 
 ## Calidad

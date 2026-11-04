@@ -5,3 +5,9 @@
   font: var(--text-subhead);
   color: var(--label-2);
 }
+
+/* Los textos de información y consejos, justificados (rectos por los dos lados) y con palabras partidas si hace falta */
+.lead {
+  text-align: justify;
+  hyphens: auto;
+}

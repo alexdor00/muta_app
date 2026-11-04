@@ -3,6 +3,10 @@ import type { Page } from '@playwright/test'
 import { expect, test } from './plan.ts'
 
 // Accesibilidad de las pantallas (contraste, nombres de botones, foco). Falla ante cualquier fallo grave.
+
+// axe analiza toda la página y algunas pruebas lo pasan varias veces: con todas las pruebas a la vez no caben en 30 s
+test.describe.configure({ timeout: 90_000 })
+
 async function sinFallos(page: Page, sinContraste = false) {
   // Las hojas suben con una animación: a medio subir, los grises aún no tienen su contraste. Se mide al terminar
   await expect

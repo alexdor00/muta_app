@@ -74,6 +74,7 @@ resumen, ficha del ejercicio) existen como «pendientes» hasta tener diseño ap
   descanso, en `descansosElegidos`, y el cambio de ejercicio, en `cambios`. Todo el plan se escribe en cola con el estado completo.
 - **Dropset y rest-pause** (`tecnicaDe`: por la técnica, el nombre, las repeticiones o la explicación del documento): en la sesión, una pastilla «Dropset» o «Rest-pause» y, bajo cada serie hecha, «+ Bajada» o «+ Mini-serie»; cada una es una fila fina con la misma rejilla (↳, kilos, repeticiones, su nombre y ×; en rest-pause el peso de la serie en gris). Se guardan en la serie (`extra`) y suman al volumen.
 - **Tu rutina desde un CSV** (Elegir rutina, abajo: `CsvRoutineCard` y `CsvRoutineSheet`; `domain/csvRoutine.ts`, `use-cases/importRoutine.ts`): se lee, se enseña (o sus errores, con la fila) y se guarda en `programs` con id `mia:…`; `cargarPlan` la lee como las del catálogo. Formato en [docs/datos.md](../../../docs/datos.md).
+- Los textos de información y consejos (consejos y su porqué, «La clave», tus notas, la «!» de las rutinas, la ficha del músculo, las explicaciones en gris) van **justificados** con palabras partidas (`text-align: justify; hyphens: auto`, la página es `lang="es"`); títulos, botones y cifras, no.
 - Nada obligatorio: lo opcional, a elección del usuario; lo que viene del documento, con sus palabras.
 - Cada función de `domain/` lleva su prueba; un archivo que solo declara tipos no la necesita.
 
