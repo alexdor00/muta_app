@@ -1,0 +1,26 @@
+/* Los discos del gimnasio: círculos en fila; el que hay, relleno (como un chip elegido), el que no, gris. */
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.plate {
+  display: grid;
+  place-items: center;
+  width: var(--control);
+  height: var(--control);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label-2);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+.on {
+  background: var(--label);
+  color: var(--bg);
+}

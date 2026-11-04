@@ -10,7 +10,7 @@ Playwright en un iPhone 13 simulado, sobre la app construida **sin rutinas priva
 - `sesion.spec.ts` — sesión en curso: la vez anterior en gris, teclado, descanso, récord, números imposibles, calentamiento calculado, plegar al terminar, deslizar para eliminar (con ratón), «Terminar» sin series, «Esta sesión» y sus hojas, cambiar el descanso, el resumen, lo apuntado sigue al recargar y terminar guarda y pasa a la siguiente.
 - `superserie.spec.ts` — cada serie distinta y superserie con una rutina CSV: Editar rutina y la sesión.
 - `ficha-mas.spec.ts` — el «···» de la ficha (añadir a una sesión con «Deshacer», cambiar en tu plan), tu material en Perfil
-  (lo que no tienes, al final) y la imagen para compartir el resumen.
+  (lo que no tienes, al final; los discos del gimnasio en la calculadora) y la imagen para compartir el resumen.
 - `accesibilidad.spec.ts` — axe (WCAG 2 A y AA) en las pantallas reales y en `/dev/ui` (claro y oscuro). Falla ante fallos graves.
 - `sistema-diseno.spec.ts` — las piezas de `/dev/ui` miden lo que dicen los tokens.
 - `zz-galeria.spec.ts` — genera la galería de pantallas (solo local).

@@ -1,13 +1,15 @@
 import { getDb } from '../../../shared/data/db.ts'
+import { formatDecimal } from '../../../shared/lib/format.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import { cambiarMaterial, porMaterial } from '../domain/equipment.ts'
 import type { Equipment } from '../domain/exerciseLibrary.ts'
-import { materialQueFalta } from '../state/material.ts'
+import { DISCOS } from '../domain/workoutTools.ts'
+import { discosQueFaltan, materialQueFalta } from '../state/material.ts'
 import { porNombre } from './exerciseLibrary.ts'
 
-/** En `userContent`: el material que te falta. */
+/** En `userContent`: el material que te falta y los discos que no hay. */
 const ID = 'material'
-type Guardado = { id: typeof ID; target: 'material'; falta: Equipment[] }
+type Guardado = { id: typeof ID; target: 'material'; falta: Equipment[]; faltanDiscos?: number[] }
 
 let carga: Promise<void> | null = null
 
@@ -17,7 +19,10 @@ export function cargarMaterial(): Promise<void> {
     try {
       const db = await getDb()
       const g = (await db.get('userContent', ID)) as Guardado | undefined
-      if (g) materialQueFalta.value = g.falta ?? []
+      if (g) {
+        materialQueFalta.value = g.falta ?? []
+        discosQueFaltan.value = g.faltanDiscos ?? []
+      }
     } catch (error) {
       logError(error, 'cargar tu material')
     }
@@ -28,7 +33,27 @@ export function cargarMaterial(): Promise<void> {
 /** Dice si tienes un material y lo guarda. */
 export async function tenerMaterial(id: Equipment, tienes: boolean): Promise<void> {
   materialQueFalta.value = cambiarMaterial(materialQueFalta.value, id, tienes)
-  const fila: Guardado = { id: ID, target: 'material', falta: materialQueFalta.value }
+  await guardar()
+}
+
+/** Dice si en tu gimnasio hay discos de `kg` y lo guarda. */
+export async function tenerDisco(kg: number, hay: boolean): Promise<void> {
+  discosQueFaltan.value = cambiarMaterial(discosQueFaltan.value, kg, hay)
+  await guardar()
+}
+
+/** Los discos de un gimnasio normal, cada uno con si lo hay en el tuyo. */
+export function discosDelGimnasio(): { kg: number; label: string; hay: boolean }[] {
+  return DISCOS.map((kg) => ({ kg, label: formatDecimal(kg), hay: !discosQueFaltan.value.includes(kg) }))
+}
+
+async function guardar(): Promise<void> {
+  const fila: Guardado = {
+    id: ID,
+    target: 'material',
+    falta: materialQueFalta.value,
+    faltanDiscos: discosQueFaltan.value,
+  }
   try {
     await (await getDb()).put('userContent', fila)
   } catch (error) {

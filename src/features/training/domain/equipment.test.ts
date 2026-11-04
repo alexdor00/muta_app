@@ -25,5 +25,7 @@ describe('tu material', () => {
     expect(cambiarMaterial([], 'machine', false)).toEqual(['machine'])
     expect(cambiarMaterial(['machine', 'cable'], 'machine', true)).toEqual(['cable'])
     expect(cambiarMaterial(['machine'], 'machine', false)).toEqual(['machine'])
+    // Los discos del gimnasio, igual
+    expect(cambiarMaterial([5], 2.5, false)).toEqual([5, 2.5])
   })
 })

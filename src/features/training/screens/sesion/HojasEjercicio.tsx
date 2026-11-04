@@ -6,6 +6,7 @@ import { PlatesSheet } from '../../components/PlatesSheet.tsx'
 import { SwapSheet, type Alcance } from '../../components/SwapSheet.tsx'
 import { ExerciseOptionsSheet, NoteSheet } from '../../components/WorkoutSheets.tsx'
 import type { EjercicioPlan } from '../../state/plan.ts'
+import { discosQueFaltan } from '../../state/material.ts'
 import { hacerAhora } from '../../state/ordenHoy.ts'
 import {
   grises,
@@ -16,7 +17,7 @@ import {
 import { discosPorLado } from '../../state/routines.ts'
 import { equivalentesDe, idPorNombre } from '../../use-cases/exerciseLibrary.ts'
 import { notaDe } from '../../use-cases/exerciseNotes.ts'
-import { fueraDeTuMaterial } from '../../use-cases/myEquipment.ts'
+import { discosDelGimnasio, fueraDeTuMaterial, tenerDisco } from '../../use-cases/myEquipment.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import { useCronometro } from './useCronometro.ts'
 
@@ -97,7 +98,7 @@ export function HojasEjercicio(props: Props) {
   if (hoja === 'nota')
     return <NoteSheet nombre={nombre} nota={notaDe(nombre) || x.nota} onGuardar={onNota} onClose={onCerrar} />
   if (hoja === 'discos') {
-    const { discos, sobra } = discosPorLado(parseDecimal(total) ?? 0, Number(barra))
+    const { discos, sobra } = discosPorLado(parseDecimal(total) ?? 0, Number(barra), discosQueFaltan.value)
     return (
       <PlatesSheet
         total={total}
@@ -107,6 +108,8 @@ export function HojasEjercicio(props: Props) {
         discos={discos}
         porLado={discos.map(formatDecimal).join(' + ')}
         sobra={sobra > 0 ? formatDecimal(sobra) : null}
+        gimnasio={discosDelGimnasio()}
+        onDisco={(kg, hay) => void tenerDisco(kg, hay)}
         onClose={onCerrar}
       />
     )

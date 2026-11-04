@@ -1,9 +1,9 @@
 import { useEffect } from 'preact/hooks'
 import { EquipmentList } from '../../components/EquipmentList.tsx'
 import { MATERIALES, materialQueFalta } from '../../state/material.ts'
-import { cargarMaterial, tenerMaterial } from '../../use-cases/myEquipment.ts'
+import { cargarMaterial, discosDelGimnasio, tenerDisco, tenerMaterial } from '../../use-cases/myEquipment.ts'
 
-/** «Tu material» para el Perfil (sale por el index.ts de Entreno): lo carga y guarda cada cambio. */
+/** «Tu material» para el Perfil (sale por el index.ts de Entreno), con los discos si tienes barra: guarda cada cambio. */
 export function TuMaterial() {
   useEffect(() => {
     void cargarMaterial()
@@ -16,6 +16,8 @@ export function TuMaterial() {
         const m = MATERIALES.find((x) => x.id === id)
         if (m) void tenerMaterial(m.id, tienes)
       }}
+      discos={falta.includes('barbell') ? undefined : discosDelGimnasio()}
+      onDisco={(kg, hay) => void tenerDisco(kg, hay)}
     />
   )
 }

@@ -2,6 +2,7 @@ import { ChoiceSegmented } from '../../../shared/ui/Choice.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 // Comparte los estilos con las demás hojas de la sesión
 import styles from './WorkoutSheets.module.css'
+import { PlateToggles } from './PlateToggles.tsx'
 
 const BARRAS = [
   { value: '20', label: '20 kg' },
@@ -10,7 +11,10 @@ const BARRAS = [
   { value: '0', label: 'Sin barra' },
 ] as const
 
-/** Calculadora de discos (C14): peso total, barra y los discos de cada lado dibujados sobre la barra. */
+/**
+ * Calculadora de discos (C14): peso total, barra y los discos de cada lado dibujados sobre la barra, con los discos que
+ * hay en tu gimnasio (se cambian aquí mismo o en Tu material).
+ */
 export function PlatesSheet(props: {
   total: string
   onTotal: (total: string) => void
@@ -20,6 +24,8 @@ export function PlatesSheet(props: {
   /** «20 + 1,25». */
   porLado: string
   sobra: string | null
+  gimnasio: readonly { kg: number; label: string; hay: boolean }[]
+  onDisco: (kg: number, hay: boolean) => void
   onClose: () => void
 }) {
   return (
@@ -58,6 +64,8 @@ export function PlatesSheet(props: {
         Por lado: <b>{props.porLado || 'nada'}</b>
         {props.sobra && <span class={styles.lead}> (faltan {props.sobra} kg por lado con estos discos)</span>}
       </p>
+      <p class={styles.label}>Discos del gimnasio</p>
+      <PlateToggles discos={props.gimnasio} onCambio={props.onDisco} />
     </Sheet>
   )
 }

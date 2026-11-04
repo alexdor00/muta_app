@@ -28,8 +28,8 @@ export function porMaterial<T>(
   return { tienes, noTienes }
 }
 
-/** Pone o quita un material de lo que te falta. */
-export function cambiarMaterial(falta: readonly Equipment[], id: Equipment, tienes: boolean): Equipment[] {
+/** Pone o quita un material (o un disco) de lo que te falta. */
+export function cambiarMaterial<T>(falta: readonly T[], id: T, tienes: boolean): T[] {
   const resto = falta.filter((m) => m !== id)
   return tienes ? resto : [...resto, id]
 }

@@ -27,6 +27,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
     primero) con su explicación (traducida o, para 25, de una web con su fuente); sustituciones de los documentos.
   - Cada serie distinta y superserie (A14): «4 · 6 · 8» con un interruptor por ejercicio; A1/A2 unidas en Editar rutina
     («Superserie con») y alternas en la sesión, 20 s entre las dos.
+  - Los discos del gimnasio (en Tu material y en la calculadora): la calculadora solo usa los que hay.
   - Lo último de Entreno: el «···» de la ficha (añadir a una sesión con «Deshacer», cambiar en tu plan), «Tu material» en
     Perfil (lo que no tienes, al final y en gris en la biblioteca y al cambiar) y la imagen para compartir el resumen (C25).
     Tu rutina (A06) y C00 no se hacen (ver [decisiones](docs/decisiones.md)). Cada serie es una fila gris; la hecha, más oscura.

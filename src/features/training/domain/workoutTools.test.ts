@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { discosPorLado, faseCadencia } from './workoutTools.ts'
+import { DISCOS, discosPorLado, faseCadencia } from './workoutTools.ts'
 
 describe('discosPorLado', () => {
   it('reparte el peso que falta entre los dos lados, de mayor a menor', () => {
@@ -12,6 +12,14 @@ describe('discosPorLado', () => {
     expect(discosPorLado(20, 20)).toEqual({ discos: [], sobra: 0 })
     expect(discosPorLado(15, 20)).toEqual({ discos: [], sobra: 0 })
     expect(discosPorLado(21, 20)).toEqual({ discos: [], sobra: 0.5 })
+  })
+
+  it('solo con los discos que hay en tu gimnasio, los menos posibles', () => {
+    expect(discosPorLado(100, 20, [25])).toEqual({ discos: [20, 20], sobra: 0 })
+    // Sin 20, 10 ni 5: dos de 15 mejor que 25 + 2,5 + 2,5
+    expect(discosPorLado(80, 20, [20, 10, 5])).toEqual({ discos: [15, 15], sobra: 0 })
+    expect(discosPorLado(62.5, 20, [1.25])).toEqual({ discos: [20], sobra: 1.25 })
+    expect(discosPorLado(60, 20, [...DISCOS])).toEqual({ discos: [], sobra: 20 })
   })
 })
 

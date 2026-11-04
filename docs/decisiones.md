@@ -256,3 +256,12 @@ ejercicio abierto y no estorba.
 - **Tu rutina (A06) y C00 no se hacen**: «Tu semana» de Tu plan y Editar rutina ya enseñan el ciclo con sus descansos, y
   «Empezar» abre la sesión directamente con sus consejos.
 - El interruptor pasa a `shared/ui/Switch` (lo usan Editar rutina y el Perfil).
+
+## 2026-11-04 · Los discos del gimnasio
+
+- Dentro de **Tu material** (con barra): un círculo por disco de un gimnasio normal (25 a 1,25 kg), todos encendidos de
+  serie. Se guarda lo que **falta**, igual que el material, y se puede cambiar también desde la calculadora de discos, que
+  es donde se ve que falta uno.
+- Se da por hecho que de cada disco que hay, hay los que hagan falta. Con discos que faltan, el reparto voraz puede fallar
+  (sin 20, 10 ni 5, 30 kg por lado salía 25 + 2,5 + 2,5): `discosPorLado` busca la combinación con menos discos y, si
+  empatan, la de discos más grandes.

@@ -1,4 +1,4 @@
-/* Tu material: título pequeño en mayúsculas, filas con su interruptor y la explicación en gris. */
+/* Tu material: título pequeño en mayúsculas, filas con su interruptor, los discos y la explicación en gris. */
 
 .section {
   margin-top: var(--space-4);
@@ -30,6 +30,13 @@
 
 .row + .row {
   border-top: var(--hairline) solid var(--separator);
+}
+
+.sub {
+  margin: var(--space-4) 0 var(--space-2);
+  font: var(--text-subhead);
+  font-weight: var(--weight-regular);
+  color: var(--label-2);
 }
 
 .hint {
