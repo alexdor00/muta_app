@@ -222,6 +222,7 @@ Las pruebas de accesibilidad tienen 90 s cada una: axe no cabía en 30 s con tod
 ## 2026-11-04 · Gris más oscuro y textos de las fichas a 15 px
 
 El gris de los textos secundarios (`--label-2`) pasa de #6e6e73 a #48484a en claro (y de #98989f a #aeaeb2 en oscuro): se
-lee mejor y vale para toda la app. Los textos en negro de los consejos, «La clave» de la ficha del músculo, los títulos de
+lee mejor y vale para toda la app. Los textos en negro de los consejos, los títulos de
 las tarjetas de la ficha del ejercicio y los ejercicios de Ver sesión van a 15 px en seminegrita, todos iguales; la pauta de
-cada ejercicio de Ver sesión, a 13 px.
+cada ejercicio de Ver sesión, a 13 px. En la ficha del músculo, «Dónde lo entrenas» a 15 px (las series, a 13) y «La clave»
+a 15 px sin negrita.

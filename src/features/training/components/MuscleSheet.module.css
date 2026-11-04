@@ -150,7 +150,7 @@
 
 .fold summary {
   padding: 0;
-  font: var(--text-body);
+  font: var(--text-subhead);
   color: var(--label-2);
 }
 
@@ -257,7 +257,7 @@
 
 .rowName {
   flex: 1;
-  font: var(--text-body);
+  font: var(--text-subhead);
 }
 
 .rowName small {
@@ -267,7 +267,7 @@
 }
 
 .rowSets {
-  font: var(--text-subhead);
+  font: var(--text-footnote);
   color: var(--label-2);
 }
 
@@ -302,10 +302,9 @@
   margin-top: 0;
 }
 
-/* La clave del músculo: 15 seminegrita, como los consejos */
+/* La clave del músculo: 15, sin negrita (no compite con los consejos) */
 .key p {
   font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
 }
 
 /* «Añadir un ejercicio» de este músculo a tu plan */
