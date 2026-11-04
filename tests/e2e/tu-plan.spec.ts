@@ -33,7 +33,7 @@ test.describe('con ratón (ordenador)', () => {
 
 test('«···» abre la hoja Tu rutina y se cierra', async ({ page }) => {
   await page.goto('/entreno')
-  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
   const hoja = page.getByRole('dialog', { name: 'Tu rutina' })
   await expect(hoja.getByText('Biblioteca de ejercicios')).toBeVisible()
   await hoja.getByRole('button', { name: 'Cerrar' }).click()
@@ -42,7 +42,7 @@ test('«···» abre la hoja Tu rutina y se cierra', async ({ page }) => {
 
 test('la hoja Tu rutina tiene tres filas y «Cambiar de rutina» lleva al catálogo', async ({ page }) => {
   await page.goto('/entreno')
-  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
   const hoja = page.getByRole('dialog', { name: 'Tu rutina' })
   await expect(hoja.getByRole('listitem')).toHaveCount(3)
   await expect(hoja.getByRole('button', { name: /Mis consejos/ })).toHaveCount(0)
@@ -53,7 +53,7 @@ test('la hoja Tu rutina tiene tres filas y «Cambiar de rutina» lleva al catál
 
 test('la biblioteca busca, filtra por músculo y abre la ficha', async ({ page }) => {
   await page.goto('/entreno')
-  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
   await page.getByRole('button', { name: 'Biblioteca de ejercicios' }).click()
   const hoja = page.getByRole('dialog', { name: 'Biblioteca de ejercicios' })
   await expect(page.getByRole('dialog', { name: 'Tu rutina' })).toHaveCount(0)

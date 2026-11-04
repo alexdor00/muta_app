@@ -41,20 +41,23 @@
   padding: var(--gap-block) var(--gutter);
 }
 
-/* Ajustes (abre «Tu rutina»): un círculo gris del tamaño del avatar */
+/* «Editar» (abre «Tu rutina»): una píldora gris con el lápiz, de la altura del avatar */
 .settings {
-  display: grid;
-  place-items: center;
-  width: var(--avatar);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   height: var(--avatar);
+  padding: 0 var(--space-4);
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--surface-2);
   color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
 }
 
 .settings svg {
-  width: var(--icon);
-  height: var(--icon);
+  width: var(--icon-sm);
+  height: var(--icon-sm);
 }

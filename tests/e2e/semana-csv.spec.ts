@@ -35,7 +35,7 @@ test('si hoy toca descanso, sale «Hoy descansas» y se puede entrenar igualment
   const { fecha, inicio } = ayer()
   await prepararPlan(page, [...ENTRENOS, { ...ENTRENOS[2], id: 'prueba-ayer', date: fecha, fecha, inicio }])
   await page.goto('/entreno')
-  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
   await page
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })

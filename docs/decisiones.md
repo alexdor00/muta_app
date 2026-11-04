@@ -209,6 +209,6 @@ debajo de otra. El tonelaje cuenta las bajadas y mini-series y va en toneladas, 
 
 ## 2026-11-04 · «Empezar» dentro de la tarjeta y «Tu rutina» en un botón de ajustes
 
-El botón «Empezar» ocupaba una franja entera. Ahora cada tarjeta de sesión lleva su ▶ (círculo blanco con sombra, abajo a la
-derecha) y «Tu rutina» se abre con un botón de ajustes ⚙ en la cabecera, junto al perfil. Nuevas variables de diseño:
-`--play` (56 px) y `--float-shadow`.
+El botón «Empezar» ocupaba una franja entera. Ahora cada tarjeta de sesión lleva una píldora blanca «▶ Empezar» arriba a la
+derecha y «Tu rutina» se abre con una píldora «✎ Editar» en la cabecera, junto al perfil (primero se probó un ▶ redondo
+y un ⚙; el usuario prefirió botones con texto, a juego). Nueva variable de diseño: `--float-shadow`.

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
-import { GearIcon } from '../../../../shared/ui/icons.tsx'
+import { PencilIcon } from '../../../../shared/ui/icons.tsx'
 import { ScreenHeader } from '../../../../shared/ui/ScreenHeader.tsx'
 import { carouselStep, useDragScroll } from '../../../../shared/ui/useDragScroll.ts'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
@@ -95,8 +95,9 @@ function TuPlan({ siguiente }: { siguiente: number }) {
           avatarHref={paths.profile}
           inline
           action={
-            <button type="button" class={styles.settings} aria-label="Tu rutina" onClick={sheet.show}>
-              <GearIcon />
+            <button type="button" class={styles.settings} onClick={sheet.show}>
+              <PencilIcon />
+              Editar
             </button>
           }
         />

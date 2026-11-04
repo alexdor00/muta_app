@@ -11,7 +11,7 @@ const PNG = Buffer.from(
 
 async function editar(page: import('@playwright/test').Page) {
   await page.goto('/entreno')
-  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
   await page
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })

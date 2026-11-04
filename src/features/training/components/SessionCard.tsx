@@ -16,8 +16,8 @@ type Props = {
 }
 
 /**
- * Tarjeta de color de una sesión, con la sigla de fondo (o tu foto): al tocarla se abre Ver sesión; el ▶ de abajo a la
- * derecha la empieza.
+ * Tarjeta de color de una sesión, con la sigla de fondo (o tu foto): al tocarla se abre Ver sesión; la píldora blanca
+ * «▶ Empezar» de arriba a la derecha la empieza.
  */
 export function SessionCard({ sigla, nombre, detalle, estado, tono, foto }: Props) {
   return (
@@ -37,6 +37,7 @@ export function SessionCard({ sigla, nombre, detalle, estado, tono, foto }: Prop
       </a>
       <a class={styles.play} href={paths.session(sigla.toLowerCase())} aria-label={`Empezar ${sigla}`}>
         <PlayIcon />
+        Empezar
       </a>
     </div>
   )

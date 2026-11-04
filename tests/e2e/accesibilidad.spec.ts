@@ -33,7 +33,7 @@ test('tu plan, con un músculo tocado y con la hoja Tu rutina abierta', async ({
     .first()
     .click()
   await sinFallos(page)
-  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
   await expect(page.getByRole('dialog', { name: 'Tu rutina' })).toBeVisible()
   await sinFallos(page)
 })
@@ -172,7 +172,7 @@ test('Editar rutina, sus consejos del entrenador y Editar ejercicio (con las rep
   page,
 }) => {
   await page.goto('/entreno')
-  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
   await page
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })
@@ -187,7 +187,7 @@ test('Editar rutina, sus consejos del entrenador y Editar ejercicio (con las rep
 
 test('foto de la sesión (desde Editar rutina) y el «···» de un ejercicio con tus notas', async ({ page }) => {
   await page.goto('/entreno')
-  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
   await page
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })
