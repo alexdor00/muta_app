@@ -9,7 +9,7 @@ export type ConsejoVisto = {
   text: string
   why: string
   /** Se arregla con un toque, solo hoy («Invertir hoy»); `hecho` cuando ya se aplicó. */
-  accion?: { label: string; hecho: boolean; onClick: () => void } | null
+  accion?: { label: string; hecho: boolean; onClick: () => void; textoHecho?: string } | null
 }
 
 /** Los consejos numerados 01, 02… (desde `desde` + 1) con su porqué; con botón si se arreglan con un toque. */
@@ -28,7 +28,7 @@ export function TipList({ consejos, desde = 0 }: { consejos: ConsejoVisto[]; des
               (c.accion.hecho ? (
                 <p class={styles.done}>
                   <CheckIcon />
-                  Hecho, solo hoy
+                  {c.accion.textoHecho ?? 'Hecho, solo hoy'}
                 </p>
               ) : (
                 <button type="button" class={styles.fix} onClick={c.accion.onClick}>

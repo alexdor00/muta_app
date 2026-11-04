@@ -19,8 +19,8 @@ export async function chooseRoutine(
   await runTx(db, ['programs', 'plans'], async (tx) => {
     const builtIn = BUILT_IN[source]
     if (builtIn) await tx.objectStore('programs').put(builtIn)
-    // Si es la misma rutina, se conservan los descansos, músculos, ejercicios cambiados, ediciones y descansos obligatorios
-    // que ya elegiste
+    // Si es la misma rutina, se conservan los descansos, músculos, ejercicios cambiados, ediciones, descansos obligatorios
+    // y nombres de las sesiones que ya elegiste
     const antes = (await tx.objectStore('plans').get('current')) as
       | {
           programId?: string
@@ -29,6 +29,7 @@ export async function chooseRoutine(
           cambios?: unknown
           ediciones?: unknown
           descansosTras?: unknown
+          nombres?: unknown
         }
       | undefined
     const misma = antes?.programId === programId
@@ -40,6 +41,7 @@ export async function chooseRoutine(
             cambios: antes.cambios,
             ediciones: antes.ediciones,
             descansosTras: antes.descansosTras,
+            nombres: antes.nombres,
           }
         : {}),
       id: 'current',

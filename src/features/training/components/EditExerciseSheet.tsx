@@ -1,10 +1,9 @@
 import { useState } from 'preact/hooks'
-import { formatClock, formatRange } from '../../../shared/lib/format.ts'
+import { formatRange, formatRest } from '../../../shared/lib/format.ts'
 import { ChoiceList } from '../../../shared/ui/Choice.tsx'
 import { ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import { Desplegable } from './Desplegable.tsx'
-import { ConsejoEntrenador, type Consejo } from './EditRoutineSheet.tsx'
 import styles from './EditExerciseSheet.module.css'
 
 export type PautaEdicion = {
@@ -62,15 +61,13 @@ function Contador(p: {
 /**
  * Editar ejercicio (A12–A13): series y descanso con − / +; repeticiones (mínimo y máximo) y «Al terminar la serie»,
  * desplegables.
- * Cada toque se guarda solo. Un consejo del entrenador como mucho; «Cambiar por otro» y «Quitar».
+ * Cada toque se guarda solo. «Cambiar por otro» y «Quitar».
  */
 export function EditExerciseSheet(props: {
   nombre: string
   /** El nombre de la sesión, para volver a ella. */
   sesion: string
   pauta: PautaEdicion
-  consejo: Consejo | null
-  onVale: () => void
   onCambio: (p: PautaEdicion) => void
   onCambiar: () => void
   onQuitar: () => void
@@ -125,17 +122,14 @@ export function EditExerciseSheet(props: {
         </Desplegable>
         <Contador
           nombre="Descanso"
-          texto={formatClock(p.descanso)}
-          puedeMenos={p.descanso > PASO_DESCANSO}
+          texto={formatRest(p.descanso)}
+          puedeMenos={p.descanso > 0}
           puedeMas={p.descanso < MAX_DESCANSO}
           onPaso={(paso) =>
             cambia({
               descanso: Math.min(
                 MAX_DESCANSO,
-                Math.max(
-                  PASO_DESCANSO,
-                  Math.round(p.descanso / PASO_DESCANSO) * PASO_DESCANSO + paso * PASO_DESCANSO,
-                ),
+                Math.max(0, Math.round(p.descanso / PASO_DESCANSO) * PASO_DESCANSO + paso * PASO_DESCANSO),
               ),
             })
           }
@@ -156,8 +150,6 @@ export function EditExerciseSheet(props: {
           />
         </Desplegable>
       </section>
-
-      {props.consejo && <ConsejoEntrenador consejo={props.consejo} onVale={props.onVale} />}
 
       <div class={styles.links}>
         <button type="button" onClick={props.onCambiar}>

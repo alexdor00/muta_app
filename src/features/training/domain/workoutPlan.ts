@@ -283,3 +283,34 @@ export function pautaEnPrograma(
   const r = masUsado(rpe)
   return { reps: rango, rir: r ? rirDe(r) : null }
 }
+
+/**
+ * Lo que cabe de cada sesión en la tira de «Tu semana» de Editar rutina: su sigla si la trae («A1»); si no, las iniciales
+ * de su nombre y su número («Torso 1» → «T1», «Brazos y puntos débiles #1» → «BP1»). Si dos salen iguales, su puesto.
+ */
+export function cortosDeSesiones(lista: { sigla: string; nombre: string }[]): Record<string, string> {
+  const NO = new Set(['y', 'de', 'del', 'con', 'en', 'la', 'el', 'a'])
+  const corto = (s: { sigla: string; nombre: string }) => {
+    if (!/^S\d+$/.test(s.sigla)) return s.sigla
+    const sinParentesis = s.nombre.replace(/\([^)]*\)/g, ' ')
+    const palabras = sinParentesis
+      .split(/[\s·]+/)
+      .filter((p) => /^\p{L}/u.test(p) && !NO.has(p.toLowerCase()))
+    const numero = /\d+/.exec(sinParentesis)?.[0] ?? ''
+    return (
+      (
+        palabras
+          .slice(0, 2)
+          .map((p) => p[0].toUpperCase())
+          .join('') + numero
+      ).slice(0, 4) || s.sigla
+    )
+  }
+  const cortos = lista.map(corto)
+  return Object.fromEntries(
+    lista.map((s, i) => [
+      s.sigla,
+      cortos.indexOf(cortos[i]) === cortos.lastIndexOf(cortos[i]) ? cortos[i] : String(i + 1),
+    ]),
+  )
+}

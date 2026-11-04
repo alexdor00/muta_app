@@ -176,3 +176,11 @@ Editar rutina (con «Añadir …» a esa sesión); «Rehacer el plan» desaparec
 (sin editar ni escribir los tuyos). Las notas de un ejercicio, que antes solo vivían en la sesión en curso, se guardan para
 siempre por ejercicio («Tus notas») y salen en la sesión y en su ficha. La prueba de accesibilidad espera a que acaben las
 animaciones antes de medir el contraste.
+
+## 2026-11-04 · Editar rutina: «Tu semana» arriba, nombre propio de cada sesión y el entrenador en su hoja
+
+El usuario vio raros los desplegables de sesión y descansos y los consejos sueltos. La sesión se elige en una tira de
+píldoras («Tu semana») y el descanso tras cada una se pone tocando el hueco de después (1, 2 o ninguno). Cada sesión puede
+llevar el nombre que quieras (se guarda en el plan y sale en todas partes). Los consejos van en una fila que abre su hoja,
+numerados como en la ficha del músculo. Un descanso de 0 en el documento (pasar directamente al siguiente) se enseña como
+«sin descanso», sin cambiar el dato.

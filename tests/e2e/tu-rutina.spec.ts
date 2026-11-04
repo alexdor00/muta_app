@@ -23,7 +23,7 @@ test('foto de la sesión (en Editar rutina): se pone, sale en la tarjeta, sigue 
   page,
 }) => {
   const hoja = await editar(page)
-  await hoja.getByRole('button', { name: /Foto de la sesión/ }).click()
+  await hoja.getByRole('button', { name: /foto (a|de) Isquios, glúteo y pecho/ }).click()
   const foto = page.getByRole('dialog', { name: 'Foto de la sesión' })
   await expect(foto.locator('summary', { hasText: 'Sesión' })).toContainText('Isquios, glúteo y pecho')
   await foto.getByText('Elegir de la galería').locator('input').setInputFiles({
@@ -35,34 +35,32 @@ test('foto de la sesión (en Editar rutina): se pone, sale en la tarjeta, sigue 
   await expect(foto.getByRole('img', { name: 'Tu foto de Isquios, glúteo y pecho' })).toBeVisible()
   await foto.getByRole('button', { name: 'Cerrar' }).click()
   await expect(
-    page.getByRole('dialog', { name: 'Editar rutina' }).getByRole('button', { name: /Foto de la sesión/ }),
-  ).toContainText('Cambiar')
+    page
+      .getByRole('dialog', { name: 'Editar rutina' })
+      .getByRole('button', { name: 'Cambiar la foto de Isquios, glúteo y pecho' }),
+  ).toBeVisible()
   await page.goto('/entreno')
   await expect(page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img')).toHaveCount(1)
   await page.reload()
   await expect(page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img')).toHaveCount(1)
 
-  await (await editar(page)).getByRole('button', { name: /Foto de la sesión/ }).click()
+  await (await editar(page)).getByRole('button', { name: /foto (a|de) Isquios, glúteo y pecho/ }).click()
   await page.getByRole('button', { name: 'Quitar la foto' }).click()
   await expect(page.getByText('Foto quitada')).toBeVisible()
   await page.goto('/entreno')
   await expect(page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img')).toHaveCount(0)
 })
 
-test('la cobertura del método la dice el entrenador en Editar rutina, con «Añadir…» a esta sesión', async ({
-  page,
-}) => {
+test('la cobertura del método la dice el entrenador, con «Añadir…» a esta sesión', async ({ page }) => {
   const hoja = await editar(page)
-  const consejo = hoja.getByRole('note', { name: 'Consejo del entrenador' })
-  // Los de la sesión primero: «Vale» hasta llegar al de la cobertura (glúteo, abducción)
-  for (let i = 0; i < 6 && !(await consejo.textContent())?.includes('El método pide'); i++)
-    await consejo.getByRole('button', { name: 'Vale' }).click()
-  await expect(consejo).toContainText(
-    'Glúteo: falta abducción. El método pide acortado, estirado y abducción.',
-  )
-  await consejo.getByRole('button', { name: /^Añadir abducción en máquina/ }).click()
+  await hoja.getByRole('button', { name: /consejos? del entrenador/ }).click()
+  const consejos = page.getByRole('dialog', { name: 'Consejos del entrenador' })
+  const gluteo = consejos.getByRole('listitem').filter({ hasText: 'Glúteo: falta abducción.' })
+  await expect(gluteo).toContainText('El método pide acortado, estirado y abducción.')
+  await gluteo.getByRole('button', { name: 'Añadir abducción en máquina' }).click()
   await expect(page.getByText('Abducción en máquina añadido a Isquios, glúteo y pecho')).toBeVisible()
-  await expect(hoja.getByRole('list', { name: 'Ejercicios de Isquios, glúteo y pecho' })).toContainText(
+  await consejos.getByRole('button', { name: 'Cerrar' }).click()
+  await expect(page.getByRole('list', { name: 'Ejercicios de Isquios, glúteo y pecho' })).toContainText(
     'Abducción en máquina',
   )
 })

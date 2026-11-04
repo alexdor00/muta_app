@@ -4,6 +4,7 @@ import {
   formatRange,
   localDate,
   formatClock,
+  formatRest,
   formatDayDate,
   formatDecimal,
   formatShortDate,
@@ -79,5 +80,12 @@ describe('formatRange', () => {
   it('con raya, o un solo número si son iguales', () => {
     expect(formatRange([6, 10])).toBe('6–10')
     expect(formatRange([15, 15])).toBe('15')
+  })
+})
+
+describe('formatRest', () => {
+  it('el descanso como reloj; 0, «sin descanso»', () => {
+    expect(formatRest(150)).toBe('2:30')
+    expect(formatRest(0)).toBe('sin descanso')
   })
 })

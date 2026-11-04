@@ -169,7 +169,9 @@ test('elegir rutina y detalle de una rutina de MUTA', async ({ page }) => {
   await sinFallos(page)
 })
 
-test('Editar rutina y Editar ejercicio (con «Al terminar la serie» abierto)', async ({ page }) => {
+test('Editar rutina, sus consejos del entrenador y Editar ejercicio (con «Al terminar la serie» abierto)', async ({
+  page,
+}) => {
   await page.goto('/entreno')
   await page.getByRole('button', { name: 'Tu rutina' }).click()
   await page
@@ -191,7 +193,7 @@ test('foto de la sesión (desde Editar rutina) y el «···» de un ejercicio c
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })
     .click()
-  await page.getByRole('button', { name: /Foto de la sesión/ }).click()
+  await page.getByRole('button', { name: /foto (a|de) Isquios, glúteo y pecho/ }).click()
   await expect(page.getByRole('dialog', { name: 'Foto de la sesión' })).toBeVisible()
   await sinFallos(page)
   await page.goto('/entreno/sesion/b1')

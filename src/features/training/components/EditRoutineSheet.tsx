@@ -1,9 +1,15 @@
 import { useRef, useState } from 'preact/hooks'
 import { Button } from '../../../shared/ui/Button.tsx'
-import { ChoiceList } from '../../../shared/ui/Choice.tsx'
-import { ChevronRightIcon, GripIcon, MinusIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
+import {
+  CameraIcon,
+  ChatIcon,
+  ChevronRightIcon,
+  GripIcon,
+  MoonIcon,
+  PencilIcon,
+  PlusIcon,
+} from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
-import { Desplegable } from './Desplegable.tsx'
 import styles from './EditRoutineSheet.module.css'
 
 export type FilaEditar = {
@@ -14,57 +20,30 @@ export type FilaEditar = {
   nota: string | null
 }
 
-/** Lo que dice el entrenador: uno cada vez, en gris; «Vale» lo oculta. Si se arregla con un toque, con su botón. */
-export type Consejo = { texto: string; accion?: { label: string; onClick: () => void } }
-
-export function ConsejoEntrenador(props: { consejo: Consejo; onVale: () => void }) {
-  const { texto, accion } = props.consejo
-  return (
-    <div class={styles.tip} role="note" aria-label="Consejo del entrenador">
-      <p>{texto}</p>
-      <span class={styles.tipActions}>
-        {accion && (
-          <button type="button" class={styles.tipFix} onClick={accion.onClick}>
-            {accion.label}
-          </button>
-        )}
-        <button type="button" onClick={props.onVale}>
-          Vale
-        </button>
-      </span>
-    </div>
-  )
-}
-
-/** Hasta cuántos días de descanso seguidos se pueden poner tras una sesión. */
+/** Hasta cuántos días de descanso seguidos se pueden poner tras una sesión: el hueco va de 0 a esto y vuelve a 0. */
 const MAX_DESCANSOS = 2
 
-/** «2 a la semana», «Ninguno». */
-const textoDescansos = (n: number) => (n === 0 ? 'Ninguno' : `${n} a la semana`)
-
 /**
- * Editar rutina (A11): las sesiones por su nombre (desplegable), los descansos obligatorios tras cada sesión
- * (desplegable) y la elegida con sus ejercicios (nombre y pauta). Tocar uno lo edita;
- * arrastrar su asa (o, con el teclado, flechas sobre ella) lo cambia de sitio. Un consejo del entrenador como mucho,
- * «Añadir ejercicio» y volver a la rutina original.
+ * Editar rutina (A11): arriba, «Tu semana» con las sesiones (tocar una la elige) y sus descansos (tocar el hueco de
+ * después pone 1, 2 o ninguno). Debajo, la sesión elegida: su foto, su nombre (el lápiz lo cambia), los consejos del
+ * entrenador en una fila que abre su hoja, y sus ejercicios (tocar uno lo edita; su asa, o las flechas sobre ella, lo
+ * mueve). «Añadir ejercicio» y volver a la rutina original.
  */
 export function EditRoutineSheet(props: {
-  /** `label`: el nombre de la sesión («Tirón #1 (dorsal)»). */
-  sesiones: { value: string; label: string }[]
+  /** `label`: el nombre («Torso 1»); `corto`: lo que cabe en la tira («T1»). */
+  sesiones: { value: string; label: string; corto: string }[]
   sigla: string
   onSigla: (sigla: string) => void
-  filas: FilaEditar[]
   /** Días de descanso tras cada sesión, en el orden de `sesiones`. */
   descansos: number[]
-  /** ¿Son otros que los de la rutina? */
-  descansosCambiados: boolean
   onDescansos: (porSesion: number[]) => void
-  onDescansosRutina: () => void
-  consejo: Consejo | null
-  onVale: () => void
-  /** La foto de la sesión elegida: ¿tiene?, y abrir su hoja. */
-  tieneFoto: boolean
+  foto: string | null
   onFoto: () => void
+  onRenombrar: (nombre: string) => void
+  /** Cuántos consejos tiene el entrenador para esta sesión (0: no sale la fila). */
+  consejos: number
+  onConsejos: () => void
+  filas: FilaEditar[]
   onAbrir: (i: number) => void
   onMover: (de: number, a: number) => void
   onAnadir: () => void
@@ -73,10 +52,7 @@ export function EditRoutineSheet(props: {
 }) {
   const lista = useRef<HTMLOListElement>(null)
   const [arrastre, setArrastre] = useState<{ de: number; a: number } | null>(null)
-  const [abierto, setAbierto] = useState<'sesion' | 'descansos' | null>(null)
-  const total = props.descansos.reduce((n, x) => n + x, 0)
-  const ponDescansos = (i: number, n: number) =>
-    props.onDescansos(props.descansos.map((x, j) => (j === i ? n : x)))
+  const [renombrando, setRenombrando] = useState<string | null>(null)
   const nombre = props.sesiones.find((s) => s.value === props.sigla)?.label ?? props.sigla
 
   // Mientras se arrastra, la lista se ve ya con el ejercicio en su sitio nuevo
@@ -95,78 +71,105 @@ export function EditRoutineSheet(props: {
     return i < 0 ? filas.length - 1 : i
   }
 
+  const guardarNombre = () => {
+    if (renombrando !== null && renombrando.trim() && renombrando.trim() !== nombre)
+      props.onRenombrar(renombrando.trim())
+    setRenombrando(null)
+  }
+
   return (
     <Sheet title="Editar rutina" onClose={props.onClose} large>
-      <Desplegable
-        titulo="Sesión"
-        valor={nombre}
-        abierto={abierto === 'sesion'}
-        onAbrir={(a) => setAbierto(a ? 'sesion' : null)}
-      >
-        <ChoiceList
-          name="sesion-editar"
-          legend="Sesión"
-          options={props.sesiones}
-          value={props.sigla}
-          onChange={(s) => {
-            props.onSigla(s)
-            setAbierto(null)
-          }}
-        />
-      </Desplegable>
-      <Desplegable
-        titulo="Descansos"
-        valor={textoDescansos(total)}
-        abierto={abierto === 'descansos'}
-        onAbrir={(a) => setAbierto(a ? 'descansos' : null)}
-      >
-        <p class={styles.hint}>
-          Días de descanso después de cada sesión:{' '}
-          {props.descansosCambiados ? 'los has cambiado tú.' : 'los obligatorios de tu rutina.'}
-        </p>
-        <ul class={styles.rests} aria-label="Descansos tras cada sesión">
+      <section class={styles.week} aria-labelledby="tu-semana-editar">
+        <h3 id="tu-semana-editar" class={styles.eyebrow}>
+          Tu semana
+        </h3>
+        <ol class={styles.strip}>
           {props.sesiones.map((s, i) => {
             const n = props.descansos[i] ?? 0
             return (
               <li key={s.value}>
-                <span>Tras {s.label}</span>
-                <span class={styles.counter}>
-                  <button
-                    type="button"
-                    aria-label={`Descansos tras ${s.label}: menos`}
-                    disabled={n <= 0}
-                    onClick={() => ponDescansos(i, n - 1)}
-                  >
-                    <MinusIcon />
-                  </button>
-                  <b aria-label={`Descansos tras ${s.label}`}>{n}</b>
-                  <button
-                    type="button"
-                    aria-label={`Descansos tras ${s.label}: más`}
-                    disabled={n >= MAX_DESCANSOS}
-                    onClick={() => ponDescansos(i, n + 1)}
-                  >
-                    <PlusIcon />
-                  </button>
-                </span>
+                <button
+                  type="button"
+                  class={`${styles.pill} ${s.value === props.sigla ? styles.on : ''}`}
+                  aria-pressed={s.value === props.sigla}
+                  aria-label={s.label}
+                  onClick={() => props.onSigla(s.value)}
+                >
+                  {s.corto}
+                </button>
+                <button
+                  type="button"
+                  class={`${styles.gap} ${n ? styles.rest : ''}`}
+                  aria-label={`Descanso tras ${s.label}: ${n === 0 ? 'ninguno' : n === 1 ? '1 día' : `${n} días`}`}
+                  onClick={() =>
+                    props.onDescansos(
+                      props.descansos.map((x, j) => (j === i ? (n + 1) % (MAX_DESCANSOS + 1) : x)),
+                    )
+                  }
+                >
+                  {n === 0 ? (
+                    <span class={styles.dot} />
+                  ) : (
+                    Array.from({ length: n }, (_, k) => <MoonIcon key={k} />)
+                  )}
+                </button>
               </li>
             )
           })}
-        </ul>
-        {props.descansosCambiados && (
-          <button type="button" class={styles.restore} onClick={props.onDescansosRutina}>
-            Volver a los de la rutina
-          </button>
+        </ol>
+        <p class={styles.hint}>
+          Toca una sesión para editarla y el hueco de después para poner o quitar un descanso.
+        </p>
+      </section>
+
+      <div class={styles.head}>
+        <button
+          type="button"
+          class={styles.thumb}
+          aria-label={props.foto ? `Cambiar la foto de ${nombre}` : `Añadir una foto a ${nombre}`}
+          onClick={props.onFoto}
+        >
+          {props.foto ? <img src={props.foto} alt="" /> : <CameraIcon />}
+        </button>
+        {renombrando !== null ? (
+          <input
+            class={styles.nameInput}
+            aria-label="Nombre de la sesión"
+            value={renombrando}
+            maxLength={40}
+            ref={(el) => el?.focus()}
+            onInput={(e) => setRenombrando(e.currentTarget.value)}
+            onBlur={guardarNombre}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') guardarNombre()
+              if (e.key === 'Escape') setRenombrando(null)
+            }}
+          />
+        ) : (
+          <>
+            <h3 class={styles.title}>{nombre}</h3>
+            <button
+              type="button"
+              class={styles.rename}
+              aria-label={`Cambiar el nombre de ${nombre}`}
+              onClick={() => setRenombrando(nombre)}
+            >
+              <PencilIcon />
+            </button>
+          </>
         )}
-      </Desplegable>
-      <button type="button" class={styles.photoRow} onClick={props.onFoto}>
-        <span>Foto de la sesión</span>
-        <span class={styles.photoValue}>
-          {props.tieneFoto ? 'Cambiar' : 'Añadir'}
+      </div>
+
+      {props.consejos > 0 && (
+        <button type="button" class={styles.coach} onClick={props.onConsejos}>
+          <ChatIcon />
+          <span>
+            {props.consejos === 1 ? '1 consejo del entrenador' : `${props.consejos} consejos del entrenador`}
+          </span>
           <ChevronRightIcon />
-        </span>
-      </button>
-      {props.consejo && <ConsejoEntrenador consejo={props.consejo} onVale={props.onVale} />}
+        </button>
+      )}
+
       <ol ref={lista} class={styles.list} aria-label={`Ejercicios de ${nombre}`}>
         {orden.map((i) => {
           const f = props.filas[i]

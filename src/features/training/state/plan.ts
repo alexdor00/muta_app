@@ -19,8 +19,6 @@ export type PlanListo = {
   semana: SesionPlan[]
   /** Tras qué sesiones (1 = la primera) va un descanso obligatorio: los de la rutina o los que cambiaste. */
   descansos: number[]
-  /** ¿Los cambiaste en Editar rutina? */
-  descansosCambiados: boolean
 }
 
 export type EstadoPlan = { status: 'loading' } | { status: 'none' } | PlanListo
@@ -95,7 +93,7 @@ export function enTuPlan(nombre: string): { sigla: string; indice: number; e: Ej
 }
 
 export type { EjercicioPlan, SesionPlan } from '../domain/workoutPlan.ts'
-export { desdeBiblioteca, nombresDeSesiones } from '../domain/workoutPlan.ts'
+export { cortosDeSesiones, desdeBiblioteca, nombresDeSesiones } from '../domain/workoutPlan.ts'
 export { descansosPorSesion, trasDe } from '../domain/restDays.ts'
 export { progresoDeSesion, semanaDe, seriesPorMusculo } from '../domain/workoutHistory.ts'
 export { notaSugerido } from '../domain/workoutPlan.ts'

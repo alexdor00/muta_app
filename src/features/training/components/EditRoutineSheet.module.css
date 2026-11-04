@@ -1,4 +1,4 @@
-/* Editar rutina (A11): sesión y descansos desplegables, la lista con su asa para moverla, un consejo y añadir. */
+/* Editar rutina (A11): «Tu semana» (sesiones y descansos), la cabecera de la sesión, el entrenador y la lista. */
 
 .list {
   margin: var(--space-3) 0 0;
@@ -70,42 +70,6 @@
   height: var(--icon-sm);
 }
 
-/* El entrenador: pequeño, en gris, y se va con «Vale» */
-.tip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-3);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-control);
-  background: var(--surface);
-}
-
-.tip p {
-  flex: 1;
-  margin: 0;
-  font: var(--text-footnote);
-  color: var(--label-2);
-}
-
-.tipActions {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.tip button {
-  flex: none;
-  min-height: var(--tap-min);
-  border: 0;
-  background: none;
-  color: var(--label);
-  font: var(--text-footnote);
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-}
-
 .add {
   margin-top: var(--space-4);
 }
@@ -139,92 +103,171 @@
   color: var(--label-2);
 }
 
-/* Descansos: una fila por sesión con − n + */
-.rests {
+/* «Tu semana»: cada sesión en una píldora (la elegida, en negro) y, detrás, el hueco de su descanso */
+.week {
+  padding-bottom: var(--space-3);
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.rests li {
+.strip li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  min-height: var(--row);
-  font: var(--text-subhead);
 }
 
-.rests li + li {
-  border-top: var(--hairline) solid var(--separator);
-}
-
-.counter {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--space-1);
+.pill {
+  min-width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: var(--border) solid var(--separator);
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
 }
 
-.counter b {
-  min-width: 2ch;
-  font: var(--text-headline);
-  text-align: center;
+.pill.on {
+  border-color: var(--label);
+  background: var(--label);
+  color: var(--bg);
 }
 
-.counter button {
+/* El hueco: un punto si no hay descanso; una luna por día si lo hay */
+.gap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  cursor: pointer;
+}
+
+.gap svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.rest {
+  color: var(--label);
+}
+
+.dot {
+  width: var(--space-1);
+  height: var(--space-1);
+  border-radius: 50%;
+  background: var(--separator);
+}
+
+/* La sesión elegida: su foto en pequeño, su nombre y el lápiz */
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.thumb {
   display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control);
+  height: var(--control);
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--label-2);
+  cursor: pointer;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb svg,
+.rename svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.title {
+  min-width: 0;
+  margin: 0;
+  font: var(--text-title-2);
+}
+
+.rename {
+  display: grid;
+  flex: none;
   place-items: center;
   width: var(--tap-min);
   height: var(--tap-min);
   border: 0;
-  border-radius: var(--radius-pill);
   background: none;
-  color: var(--label);
+  color: var(--label-2);
   cursor: pointer;
 }
 
-.counter button:disabled {
-  color: var(--label-2);
-  cursor: default;
+.nameInput {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-headline);
 }
 
-.counter svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-}
-
-/* El botón que lo arregla («Añadir abducción en máquina») */
-.tip .tipFix {
-  text-align: right;
-}
-
-/* «Foto de la sesión», con la misma fila que los desplegables */
-.photoRow {
+/* «3 consejos del entrenador ›»: una fila gris que abre su hoja */
+.coach {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-2);
   width: 100%;
-  min-height: var(--row);
-  padding: 0;
+  min-height: var(--tap-min);
+  margin-top: var(--space-2);
+  padding: 0 var(--space-3);
   border: 0;
-  border-bottom: var(--hairline) solid var(--separator);
-  background: none;
+  border-radius: var(--radius-control);
+  background: var(--surface);
   color: var(--label);
-  font: var(--text-body);
+  font: var(--text-subhead);
+  text-align: left;
   cursor: pointer;
 }
 
-.photoValue {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  color: var(--label-2);
+.coach span {
+  flex: 1;
 }
 
-.photoValue svg {
+.coach svg {
   width: var(--icon-sm);
   height: var(--icon-sm);
+  color: var(--label-2);
 }

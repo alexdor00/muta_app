@@ -52,6 +52,8 @@ type PlanGuardado = {
   cambios?: Record<string, string>
   /** Lo que cambias en cada sesión desde Editar rutina (orden, quitar, añadir y pauta), por sigla. */
   ediciones?: Ediciones
+  /** El nombre que le pusiste a cada sesión en Editar rutina, por sigla. */
+  nombres?: Record<string, string>
   /** Descansos obligatorios cambiados en Editar rutina: tras qué sesiones van (sin esto, los de la rutina). */
   descansosTras?: number[]
 }
@@ -70,6 +72,8 @@ let programa: ProgramData | null = null
 let cambios: Record<string, string> = {}
 /** Lo que editaste en cada sesión (se aplica al montar la semana). */
 let ediciones: Ediciones = {}
+/** Los nombres que pusiste a tus sesiones. */
+let nombresPropios: Record<string, string> = {}
 /** Los descansos obligatorios que cambiaste (null: los de la rutina). */
 let descansosTras: number[] | null = null
 let carga: Promise<void> | null = null
@@ -115,6 +119,7 @@ async function leer(): Promise<void> {
     elecciones.value = plan.musculos ?? {}
     cambios = plan.cambios ?? {}
     ediciones = plan.ediciones ?? {}
+    nombresPropios = plan.nombres ?? {}
     descansosTras = plan.descansosTras ?? null
     ponerPlan(plan.programId, entry.title, nivel, rotacion)
     void cargarFotos(plan.programId)
@@ -143,9 +148,9 @@ function aEntreno(f: Entreno): Entreno {
 
 function ponerPlan(programId: string, rutina: string, nivel: Level, rotacion: Rotacion) {
   if (!programa) return
-  const semana = sesionesDeSemana(programa, rotacion, porNombre, cambios).map((s) =>
-    aplicarEdicion(s, ediciones[s.sigla], porNombre),
-  )
+  const semana = sesionesDeSemana(programa, rotacion, porNombre, cambios)
+    .map((s) => aplicarEdicion(s, ediciones[s.sigla], porNombre))
+    .map((s) => (nombresPropios[s.sigla] ? { ...s, nombre: nombresPropios[s.sigla] } : s))
   const dias = programa.blocks[rotacion.bloque]?.weeks[rotacion.semana]?.days ?? []
   const musculos = semana.map((s) => s.ejercicios.flatMap((e) => (e.musculo ? [e.musculo] : [])))
   tuPlan.value = {
@@ -157,7 +162,6 @@ function ponerPlan(programId: string, rutina: string, nivel: Level, rotacion: Ro
     donde: dondeVas(programa, rotacion),
     semana,
     descansos: descansosTras ?? descansosDeRutina(dias, musculos, programa.restRules, rotacion.bloque),
-    descansosCambiados: descansosTras !== null,
   }
 }
 
@@ -207,6 +211,7 @@ function guardarEnPlan(): Promise<void> {
       musculos: elecciones.value,
       cambios,
       ediciones,
+      nombres: nombresPropios,
       descansosTras: descansosTras ?? undefined,
     })
   }
@@ -345,15 +350,31 @@ export async function cambiarDescansos(tras: number[] | null): Promise<void> {
   }
 }
 
+/** Cambia el nombre de una sesión de tu plan (sale en todas partes) y lo guarda. */
+export async function renombrarSesion(sigla: string, nombre: string): Promise<void> {
+  const plan = tuPlan.value
+  if (plan.status !== 'ready' || !nombre.trim()) return
+  nombresPropios = { ...nombresPropios, [sigla]: nombre.trim() }
+  ponerPlan(plan.programId, plan.rutina, plan.nivel, plan.rotacion)
+  try {
+    await guardarEnPlan()
+  } catch (error) {
+    logError(error, 'cambiar el nombre de la sesión')
+  }
+}
+
 /**
- * Vuelve a la rutina original: una sesión (quita lo que editaste en ella) o todas (`null`: también los ejercicios
+ * Vuelve a la rutina original: una sesión (quita lo que editaste en ella y su nombre) o todas (`null`: también los ejercicios
  * cambiados por otros, los descansos y lo elegido en la ficha de cada músculo).
  */
 export async function volverARutina(sigla: string | null): Promise<void> {
   const plan = tuPlan.value
   if (plan.status !== 'ready') return
-  if (sigla) ediciones = Object.fromEntries(Object.entries(ediciones).filter(([k]) => k !== sigla))
-  else {
+  if (sigla) {
+    ediciones = Object.fromEntries(Object.entries(ediciones).filter(([k]) => k !== sigla))
+    nombresPropios = Object.fromEntries(Object.entries(nombresPropios).filter(([k]) => k !== sigla))
+  } else {
+    nombresPropios = {}
     ediciones = {}
     cambios = {}
     descansosTras = null

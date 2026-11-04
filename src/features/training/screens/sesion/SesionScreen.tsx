@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
-import { formatClock, formatDecimal } from '../../../../shared/lib/format.ts'
+import { formatClock, formatDecimal, formatRest } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { PlusIcon } from '../../../../shared/ui/icons.tsx'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
@@ -228,7 +228,7 @@ export function SesionScreen(props: { sessionId: string }) {
                 key={`${i}-${e.nombre}`}
                 numero={pos + 1}
                 nombre={nombre}
-                detalle={`${pauta} · ${formatClock(descansoDe(e))}`}
+                detalle={`${pauta} · ${formatRest(descansoDe(e))}`}
                 {...filaCerrada(e, x)}
                 onAbrir={() => abrir(i)}
               />
@@ -242,7 +242,7 @@ export function SesionScreen(props: { sessionId: string }) {
               numero={pos + 1}
               nombre={nombre}
               pauta={[`${e.series} series`, `${e.reps} reps`, effortLabel(e.rir)]}
-              descanso={formatClock(descansoDe(e))}
+              descanso={formatRest(descansoDe(e))}
               onDescanso={() => setHoja({ tipo: 'descanso', ejercicio: e, segundos: descansoDe(e) })}
               sugerido={x.cambiadoPor ? null : notaSugerido(e)}
               nota={notaDe(nombre) || x.nota}

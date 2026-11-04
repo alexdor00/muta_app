@@ -1,0 +1,7 @@
+/* Consejos del entrenador: una línea gris arriba y la lista numerada de los consejos. */
+
+.lead {
+  margin: 0 0 var(--space-3);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}

@@ -27,6 +27,11 @@ export function formatClock(seconds: number): string {
   return h ? `${h}:${dos(m)}:${dos(s % 60)}` : `${m}:${dos(s % 60)}`
 }
 
+/** Descanso entre series: «2:30»; 0 → «sin descanso» (la rutina pide pasar directamente al siguiente). */
+export function formatRest(seconds: number): string {
+  return seconds > 0 ? formatClock(seconds) : 'sin descanso'
+}
+
 /** Fecha corta (AAAA-MM-DD): «2026-09-18» → «18 sep». */
 export function formatShortDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00Z`)

@@ -23,30 +23,37 @@ async function abrir(page: import('@playwright/test').Page) {
 const filas = (page: import('@playwright/test').Page, sesion = B1) =>
   page.getByRole('list', { name: `Ejercicios de ${sesion}` }).getByRole('listitem')
 
-test('se abre con la sesión que toca, por su nombre en un desplegable, y cada ejercicio con su pauta corta', async ({
-  page,
-}) => {
+test('«Tu semana» arriba: se abre con la sesión que toca y tocar otra la elige', async ({ page }) => {
   const hoja = await abrir(page)
-  const sesion = hoja.locator('summary', { hasText: 'Sesión' })
-  await expect(sesion).toContainText(B1)
+  await expect(hoja.getByRole('button', { name: B1, exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(hoja.getByRole('heading', { name: B1 })).toBeVisible()
   await expect(filas(page).first()).toContainText('Peso muerto rumano')
   await expect(filas(page).first()).toContainText('3 × 6–10 · 3:00')
-  await sesion.click()
-  await expect(hoja.getByRole('radio', { name: B1 })).toBeChecked()
-  await hoja.getByText('Espalda y cuádriceps', { exact: true }).click()
-  await expect(sesion).toContainText('Espalda y cuádriceps')
+  await hoja.getByRole('button', { name: 'Espalda y cuádriceps', exact: true }).click()
+  await expect(hoja.getByRole('heading', { name: 'Espalda y cuádriceps' })).toBeVisible()
   await expect(page.getByRole('list', { name: 'Ejercicios de Espalda y cuádriceps' })).toContainText(
     'Remo en polea baja',
   )
 })
 
-test('el entrenador dice un consejo cada vez y «Vale» lo quita', async ({ page }) => {
+test('el entrenador va en una fila que abre su hoja, con los consejos numerados', async ({ page }) => {
   const hoja = await abrir(page)
-  const consejo = hoja.getByRole('note', { name: 'Consejo del entrenador' })
-  await expect(consejo).toHaveCount(1)
-  const antes = await consejo.textContent()
-  await consejo.getByRole('button', { name: 'Vale' }).click()
-  await expect(hoja.getByRole('note', { name: 'Consejo del entrenador' })).not.toHaveText(antes ?? '')
+  await hoja.getByRole('button', { name: /consejos? del entrenador/ }).click()
+  const consejos = page.getByRole('dialog', { name: 'Consejos del entrenador' })
+  await expect(consejos).toContainText(`Para ${B1}`)
+  await expect(consejos.getByRole('listitem').first()).toBeVisible()
+})
+
+test('el nombre de la sesión se cambia con el lápiz y sale en Tu plan', async ({ page }) => {
+  const hoja = await abrir(page)
+  await hoja.getByRole('button', { name: `Cambiar el nombre de ${B1}` }).click()
+  const campo = hoja.getByRole('textbox', { name: 'Nombre de la sesión' })
+  await campo.fill('Piernas y pecho')
+  await campo.press('Enter')
+  await expect(page.getByText('Ahora se llama «Piernas y pecho»')).toBeVisible()
+  await expect(hoja.getByRole('heading', { name: 'Piernas y pecho' })).toBeVisible()
+  await page.goto('/entreno')
+  await expect(page.getByRole('link', { name: /Piernas y pecho/ })).toBeVisible()
 })
 
 test('editar la pauta se guarda sola y se ve en Ver sesión', async ({ page }) => {
@@ -142,22 +149,17 @@ test('cambiar por otro que hace lo mismo, en tu plan', async ({ page }) => {
   await expect(filas(page).first()).toContainText('En lugar de Peso muerto rumano')
 })
 
-test('los descansos obligatorios se cambian tras cada sesión y se vuelve a los de la rutina', async ({
+test('los descansos: tocar el hueco tras una sesión pone uno, dos o ninguno, y se guarda', async ({
   page,
 }) => {
   const hoja = await abrir(page)
-  const descansos = hoja.locator('summary', { hasText: 'Descansos' })
-  await expect(descansos).toContainText('2 a la semana')
-  await descansos.click()
-  await expect(hoja.getByText('los obligatorios de tu rutina', { exact: false })).toBeVisible()
-  await hoja.getByRole('button', { name: `Descansos tras ${B1}: menos` }).click()
-  await expect(descansos).toContainText('1 a la semana')
-  await expect(hoja.getByLabel(`Descansos tras ${B1}`, { exact: true })).toHaveText('0')
-  // Se guarda en el plan: al volver a abrir sigue igual, y se puede volver a los de la rutina
+  const hueco = (n: string) => hoja.getByRole('button', { name: `Descanso tras ${B1}: ${n}` })
+  await expect(hueco('1 día')).toBeVisible()
+  await hueco('1 día').click()
+  await expect(hueco('2 días')).toBeVisible()
+  await hueco('2 días').click()
+  await expect(hueco('ninguno')).toBeVisible()
+  // Se guarda en el plan: al volver a abrir sigue igual
   const otra = await abrir(page)
-  const deNuevo = otra.locator('summary', { hasText: 'Descansos' })
-  await expect(deNuevo).toContainText('1 a la semana')
-  await deNuevo.click()
-  await otra.getByRole('button', { name: 'Volver a los de la rutina' }).click()
-  await expect(deNuevo).toContainText('2 a la semana')
+  await expect(otra.getByRole('button', { name: `Descanso tras ${B1}: ninguno` })).toBeVisible()
 })
