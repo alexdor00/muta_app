@@ -372,10 +372,14 @@
   background: var(--accent);
 }
 
-/* Una serie hecha: sus casillas se apagan y destaca lo que falta */
+/* Una serie hecha: toda la fila en gris, para que se vea de un vistazo lo apuntado */
+.doneRow {
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+}
+
 .doneRow .cell {
   background: none;
-  box-shadow: inset 0 0 0 var(--hairline) var(--separator);
 }
 
 .add {
