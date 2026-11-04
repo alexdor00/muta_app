@@ -4,7 +4,7 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { EditExerciseSheet, type PautaEdicion } from '../../components/EditExerciseSheet.tsx'
-import { EditRoutineSheet } from '../../components/EditRoutineSheet.tsx'
+import { EditRoutineSheet, type Consejo } from '../../components/EditRoutineSheet.tsx'
 import { SwapSheet } from '../../components/SwapSheet.tsx'
 import { DangerSheet } from '../../components/WorkoutSheets.tsx'
 import {
@@ -24,12 +24,16 @@ import {
 } from '../../state/plan.ts'
 import { descansoDe, elegirDescanso } from '../../state/sesionEnCurso.ts'
 import { equivalentesDe } from '../../use-cases/exerciseLibrary.ts'
+import { coberturaDelPlan } from '../../use-cases/coverage.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
+import { fotosSesion } from '../../state/fotos.ts'
+import { MUSCLES } from '../../state/routines.ts'
+import { FotoSesionHoja } from '../foto-sesion/FotoSesionHoja.tsx'
 import { cambiarDescansos, cambiarEnPlan, editarSesion, volverARutina } from '../../use-cases/training.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import styles from './EditarRutinaHoja.module.css'
 
-type Hoja = 'lista' | 'ejercicio' | 'cambiar' | 'biblioteca' | 'quitar' | 'volver'
+type Hoja = 'lista' | 'ejercicio' | 'cambiar' | 'biblioteca' | 'quitar' | 'volver' | 'foto'
 
 /** Lo que se pone al cambiar un ejercicio añadido por otro: su pauta de ahora. */
 const comoAnadido = (e: EjercicioPlan) => ({
@@ -58,8 +62,36 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
   if (!sesion) return null
   const titulos = nombresDeSesiones(lista)
   const nombre = titulos[sesion.sigla]
-  const consejo = consejosDeSesion(sesion.ejercicios).find((t) => !vistos.includes(t.text))?.text ?? null
-  const vale = () => consejo && setVistos([...vistos, consejo])
+  // El entrenador: primero los consejos de esta sesión; después, lo que le falta a tu plan según el método (cobertura), con
+  // su «Añadir …» a esta sesión
+  const enFrase = (s: string) => s.charAt(0).toLowerCase() + s.slice(1)
+  const consejos: Consejo[] = [
+    ...consejosDeSesion(sesion.ejercicios).map((t) => ({ texto: t.text })),
+    ...coberturaDelPlan(lista).porRevisar.flatMap((r) =>
+      r.faltan.map((p) => {
+        const ex = p.sugiere[0]
+        return {
+          texto: `${MUSCLES[r.musculo].label}: ${p.falta}. El método pide ${enFrase(r.pide)}.`,
+          accion: ex && {
+            label: `Añadir ${ex.name.charAt(0).toLowerCase()}${ex.name.slice(1)}`,
+            onClick: () => {
+              const nombres = sesion.ejercicios.map((x) => x.nombre)
+              editar((ed) =>
+                anadir(
+                  ed,
+                  { nombre: ex.name, series: 3, reps: ex.reps, rir: ex.rir, descanso: ex.restSec },
+                  nombres,
+                ),
+              )
+              decir(`${ex.name} añadido a ${nombre}`)
+            },
+          },
+        }
+      }),
+    ),
+  ]
+  const consejo = consejos.find((t) => !vistos.includes(t.texto)) ?? null
+  const vale = () => consejo && setVistos([...vistos, consejo.texto])
   const e = abierto !== null ? (sesion.ejercicios[abierto] ?? null) : null
   const editar = (cambio: Parameters<typeof editarSesion>[1]) => void editarSesion(sesion.sigla, cambio)
   const decir = (texto: string) => {
@@ -128,10 +160,15 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
     )
   }
 
+  if (hoja === 'foto') return <FotoSesionHoja sigla={sesion.sigla} onClose={() => setHoja('lista')} />
+
   if (hoja === 'volver') {
     return (
       <Sheet title="Volver a la rutina original" onClose={() => setHoja('lista')} large>
-        <p class={styles.lead}>Se quita lo que cambiaste: el orden, los ejercicios y su pauta.</p>
+        <p class={styles.lead}>
+          Una sesión: su orden, sus ejercicios y su pauta. Todas: también los ejercicios cambiados, los
+          descansos y lo elegido para cada músculo.
+        </p>
         <div class={styles.pair}>
           <Button
             variant="secondary"
@@ -197,6 +234,8 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
         onSigla={setSigla}
         consejo={consejo}
         onVale={vale}
+        tieneFoto={Boolean(fotosSesion.value[sesion.sigla])}
+        onFoto={() => setHoja('foto')}
         filas={sesion.ejercicios.map((x) => ({
           nombre: x.nombre,
           detalle: `${x.series} × ${x.reps} · ${formatClock(descansoDe(x))}`,

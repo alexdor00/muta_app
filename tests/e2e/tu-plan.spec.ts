@@ -40,14 +40,12 @@ test('«···» abre la hoja Tu rutina y se cierra', async ({ page }) => {
   await expect(hoja).toHaveCount(0)
 })
 
-test('en la hoja Tu rutina ya no queda nada «Pronto» y «Cambiar de rutina» lleva al catálogo', async ({
-  page,
-}) => {
+test('la hoja Tu rutina tiene tres filas y «Cambiar de rutina» lleva al catálogo', async ({ page }) => {
   await page.goto('/entreno')
   await page.getByRole('button', { name: 'Tu rutina' }).click()
   const hoja = page.getByRole('dialog', { name: 'Tu rutina' })
-  await expect(hoja.getByText('Pronto')).toHaveCount(0)
-  await expect(hoja.getByRole('button', { name: /Mis consejos/ })).toBeVisible()
+  await expect(hoja.getByRole('listitem')).toHaveCount(3)
+  await expect(hoja.getByRole('button', { name: /Mis consejos/ })).toHaveCount(0)
   await hoja.getByRole('link', { name: 'Cambiar de rutina' }).click()
   await expect(page).toHaveURL(/\/entreno\/rutinas$/)
   await expect(page.getByRole('heading', { name: 'Elige tu rutina' })).toBeVisible()

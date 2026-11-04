@@ -4,6 +4,7 @@ import {
   ChevronRightIcon,
   DotsIcon,
   FlameIcon,
+  PencilIcon,
   PlusIcon,
   StopwatchIcon,
 } from '../../../shared/ui/icons.tsx'
@@ -34,7 +35,7 @@ type Props = {
   descanso: string
   /** Lo que no dice la rutina y se ha puesto por costumbre, o null. */
   sugerido: string | null
-  /** Nota de técnica que escribió (vacía si no hay). */
+  /** Tus notas de este ejercicio (vacía si no hay): se guardan en su ficha. */
   nota: string
   onOpciones: () => void
   /** Tocar el descanso lo cambia (C18). */
@@ -272,7 +273,15 @@ export function WorkoutExercise(props: Props) {
             </li>
           </ul>
           {props.sugerido && <p class={styles.suggested}>{props.sugerido}</p>}
-          {props.nota && <p class={styles.note}>{props.nota}</p>}
+          {props.nota && (
+            <p class={styles.note}>
+              <PencilIcon />
+              <span>
+                <span class={styles.hidden}>Tus notas: </span>
+                {props.nota}
+              </span>
+            </p>
+          )}
         </div>
         <button
           type="button"

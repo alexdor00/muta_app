@@ -4,7 +4,7 @@ import { ChoiceList } from '../../../shared/ui/Choice.tsx'
 import { ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import { Desplegable } from './Desplegable.tsx'
-import { ConsejoEntrenador } from './EditRoutineSheet.tsx'
+import { ConsejoEntrenador, type Consejo } from './EditRoutineSheet.tsx'
 import styles from './EditExerciseSheet.module.css'
 
 export type PautaEdicion = {
@@ -69,7 +69,7 @@ export function EditExerciseSheet(props: {
   /** El nombre de la sesión, para volver a ella. */
   sesion: string
   pauta: PautaEdicion
-  consejo: string | null
+  consejo: Consejo | null
   onVale: () => void
   onCambio: (p: PautaEdicion) => void
   onCambiar: () => void
@@ -157,7 +157,7 @@ export function EditExerciseSheet(props: {
         </Desplegable>
       </section>
 
-      {props.consejo && <ConsejoEntrenador texto={props.consejo} onVale={props.onVale} />}
+      {props.consejo && <ConsejoEntrenador consejo={props.consejo} onVale={props.onVale} />}
 
       <div class={styles.links}>
         <button type="button" onClick={props.onCambiar}>

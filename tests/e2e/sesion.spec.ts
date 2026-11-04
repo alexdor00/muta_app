@@ -171,25 +171,34 @@ test('tocar el tiempo lo para y lo vuelve a poner en marcha', async ({ page }) =
   await expect(page.getByText('B1 · 0 de 17 series')).toBeVisible()
 })
 
-test('«···»: nota, cambiar ejercicio solo hoy y discos por lado', async ({ page }) => {
+test('«···»: tus notas (para siempre, en la sesión y en la ficha), cambiar ejercicio solo hoy y discos por lado', async ({
+  page,
+}) => {
   await page.goto('/entreno/sesion/b1')
   const opciones = page.getByRole('button', { name: 'Opciones de Peso muerto rumano' })
 
   await opciones.click()
-  await page.getByRole('button', { name: /Nota de técnica/ }).click()
-  await page.getByLabel('Nota de técnica').fill('Agarre mixto')
-  await page.getByRole('button', { name: 'Guardar nota' }).click()
+  await page.getByRole('button', { name: /Tus notas/ }).click()
+  await page.getByRole('textbox', { name: 'Tus notas' }).fill('Agarre mixto')
+  await page.getByRole('button', { name: 'Guardar' }).click()
+  await expect(page.getByText('Nota guardada en su ficha')).toBeVisible()
   await expect(page.getByText('Agarre mixto')).toBeVisible()
+  // Sigue al recargar y sale en la ficha del ejercicio
+  await page.reload()
+  await expect(page.getByText('Agarre mixto')).toBeVisible()
+  await page.goto('/entreno/ejercicio/peso_muerto_rumano')
+  await expect(page.getByRole('region', { name: 'Tus notas' })).toContainText('Agarre mixto')
+  await page.goto('/entreno/sesion/b1')
 
   await opciones.click()
-  await page.getByRole('button', { name: /Calculadora de discos/ }).click()
+  await page.getByRole('button', { name: 'Discos' }).click()
   const hoja = page.getByRole('dialog', { name: 'Discos por lado' })
   await hoja.getByLabel('Peso total').fill('62,5')
   await expect(hoja).toContainText('Por lado: 20 + 1,25')
   await hoja.getByRole('button', { name: 'Cerrar' }).click()
 
   await opciones.click()
-  await page.getByRole('button', { name: /Cambiar ejercicio/ }).click()
+  await page.getByRole('button', { name: 'Cambiar', exact: true }).click()
   await page.getByRole('button', { name: 'Hiperextensión' }).click()
   await expect(page.getByRole('heading', { name: 'Hiperextensión' })).toBeVisible()
   // Sin vez anterior: los kilos salen vacíos
@@ -199,7 +208,7 @@ test('«···»: nota, cambiar ejercicio solo hoy y discos por lado', async ({ 
 test('el cronómetro de serie cuenta y guarda el tiempo', async ({ page }) => {
   await page.goto('/entreno/sesion/b1')
   await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
-  await page.getByRole('button', { name: /Cronómetro de serie/ }).click()
+  await page.getByRole('button', { name: 'Cronómetro' }).click()
   const crono = page.getByRole('dialog', { name: 'Cronómetro de la serie' })
   await expect(crono).toContainText('Serie 1 de 3')
   await crono.getByRole('button', { name: 'Empezar en 3' }).click()
@@ -318,7 +327,7 @@ test('«Cambiar ejercicio» deja elegir cualquiera de la biblioteca, filtrada po
 }) => {
   await page.goto('/entreno/sesion/b1')
   await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
-  await page.getByRole('button', { name: /Cambiar ejercicio/ }).click()
+  await page.getByRole('button', { name: 'Cambiar', exact: true }).click()
   await page.getByRole('button', { name: 'Elegir cualquier ejercicio' }).click()
   const hoja = page.getByRole('dialog', { name: 'Elegir ejercicio' })
   await expect(hoja.getByRole('button', { name: 'Femoral', exact: true })).toHaveAttribute(
@@ -370,7 +379,7 @@ test('«Cambiar ejercicio» propone los que hacen lo mismo y, en tu plan, lo cam
 }) => {
   await page.goto('/entreno/sesion/b1')
   await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
-  await page.getByRole('button', { name: /Cambiar ejercicio/ }).click()
+  await page.getByRole('button', { name: 'Cambiar', exact: true }).click()
   const hoja = page.getByRole('dialog', { name: 'Cambiar ejercicio' })
   // El rumano trabaja el femoral estirado (bisagra): los que se proponen, también
   await expect(hoja.getByRole('heading', { name: 'Hacen lo mismo' })).toBeVisible()
@@ -399,7 +408,7 @@ test('«Cambiar ejercicio» propone los que hacen lo mismo y, en tu plan, lo cam
     .click()
   await page.goto('/entreno/sesion/b1')
   await page.getByRole('button', { name: 'Opciones de Peso muerto piernas rígidas' }).click()
-  await page.getByRole('button', { name: /Cambiar ejercicio/ }).click()
+  await page.getByRole('button', { name: 'Cambiar', exact: true }).click()
   await page.getByRole('dialog', { name: 'Cambiar ejercicio' }).getByText('En mi plan').click()
   await page.getByRole('button', { name: /^Volver a Peso muerto rumano/ }).click()
   await expect(page.getByText('Vuelves a Peso muerto rumano en tu plan')).toBeVisible()

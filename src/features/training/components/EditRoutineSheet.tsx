@@ -1,7 +1,7 @@
 import { useRef, useState } from 'preact/hooks'
 import { Button } from '../../../shared/ui/Button.tsx'
 import { ChoiceList } from '../../../shared/ui/Choice.tsx'
-import { GripIcon, MinusIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
+import { ChevronRightIcon, GripIcon, MinusIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import { Desplegable } from './Desplegable.tsx'
 import styles from './EditRoutineSheet.module.css'
@@ -14,14 +14,24 @@ export type FilaEditar = {
   nota: string | null
 }
 
-/** Lo que dice el entrenador: uno cada vez, en gris; «Vale» lo oculta. */
-export function ConsejoEntrenador(props: { texto: string; onVale: () => void }) {
+/** Lo que dice el entrenador: uno cada vez, en gris; «Vale» lo oculta. Si se arregla con un toque, con su botón. */
+export type Consejo = { texto: string; accion?: { label: string; onClick: () => void } }
+
+export function ConsejoEntrenador(props: { consejo: Consejo; onVale: () => void }) {
+  const { texto, accion } = props.consejo
   return (
     <div class={styles.tip} role="note" aria-label="Consejo del entrenador">
-      <p>{props.texto}</p>
-      <button type="button" onClick={props.onVale}>
-        Vale
-      </button>
+      <p>{texto}</p>
+      <span class={styles.tipActions}>
+        {accion && (
+          <button type="button" class={styles.tipFix} onClick={accion.onClick}>
+            {accion.label}
+          </button>
+        )}
+        <button type="button" onClick={props.onVale}>
+          Vale
+        </button>
+      </span>
     </div>
   )
 }
@@ -50,8 +60,11 @@ export function EditRoutineSheet(props: {
   descansosCambiados: boolean
   onDescansos: (porSesion: number[]) => void
   onDescansosRutina: () => void
-  consejo: string | null
+  consejo: Consejo | null
   onVale: () => void
+  /** La foto de la sesión elegida: ¿tiene?, y abrir su hoja. */
+  tieneFoto: boolean
+  onFoto: () => void
   onAbrir: (i: number) => void
   onMover: (de: number, a: number) => void
   onAnadir: () => void
@@ -146,7 +159,14 @@ export function EditRoutineSheet(props: {
           </button>
         )}
       </Desplegable>
-      {props.consejo && <ConsejoEntrenador texto={props.consejo} onVale={props.onVale} />}
+      <button type="button" class={styles.photoRow} onClick={props.onFoto}>
+        <span>Foto de la sesión</span>
+        <span class={styles.photoValue}>
+          {props.tieneFoto ? 'Cambiar' : 'Añadir'}
+          <ChevronRightIcon />
+        </span>
+      </button>
+      {props.consejo && <ConsejoEntrenador consejo={props.consejo} onVale={props.onVale} />}
       <ol ref={lista} class={styles.list} aria-label={`Ejercicios de ${nombre}`}>
         {orden.map((i) => {
           const f = props.filas[i]

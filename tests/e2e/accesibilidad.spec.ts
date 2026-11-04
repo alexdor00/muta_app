@@ -4,6 +4,10 @@ import { expect, test } from './plan.ts'
 
 // Accesibilidad de las pantallas (contraste, nombres de botones, foco). Falla ante cualquier fallo grave.
 async function sinFallos(page: Page, sinContraste = false) {
+  // Las hojas suben con una animación: a medio subir, los grises aún no tienen su contraste. Se mide al terminar
+  await expect
+    .poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length))
+    .toBe(0)
   const axe = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa'])
   // La página /dev/ui enseña muestras de color y la etiqueta naranja de una celda: el contraste se mide en las pantallas reales
   if (sinContraste) axe.disableRules(['color-contrast'])
@@ -78,6 +82,8 @@ test('la biblioteca de ejercicios, con un músculo elegido', async ({ page }) =>
   test.slow()
   await page.goto('/entreno?hoja=biblioteca')
   const hoja = page.getByRole('dialog', { name: 'Biblioteca de ejercicios' })
+  // La hoja sale cuando se ha cargado el plan: hasta que se ve, no hay animación que esperar
+  await expect(hoja).toBeVisible()
   await sinFallos(page)
   await hoja.getByRole('button', { name: 'Dorsal' }).click()
   await sinFallos(page)
@@ -178,23 +184,20 @@ test('Editar rutina y Editar ejercicio (con «Al terminar la serie» abierto)', 
   await sinFallos(page)
 })
 
-test('las hojas de «Tu rutina»: foto, cobertura, mis consejos y rehacer el plan', async ({ page }) => {
-  for (const fila of [
-    'Añadir foto a la sesión',
-    'Cobertura muscular',
-    'Mis consejos',
-    'Rehacer el plan con mis respuestas',
-  ]) {
-    await page.goto('/entreno')
-    await page.getByRole('button', { name: 'Tu rutina' }).click()
-    await page.getByRole('dialog', { name: 'Tu rutina' }).getByRole('button', { name: fila }).click()
-    await expect(page.getByRole('dialog')).toHaveCount(1)
-    // La hoja sube con una animación: se mide cuando ha terminado (a medio subir, el gris aún no tiene su contraste)
-    await expect
-      .poll(() =>
-        page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length),
-      )
-      .toBe(0)
-    await sinFallos(page)
-  }
+test('foto de la sesión (desde Editar rutina) y el «···» de un ejercicio con tus notas', async ({ page }) => {
+  await page.goto('/entreno')
+  await page.getByRole('button', { name: 'Tu rutina' }).click()
+  await page
+    .getByRole('dialog', { name: 'Tu rutina' })
+    .getByRole('button', { name: /Editar rutina/ })
+    .click()
+  await page.getByRole('button', { name: /Foto de la sesión/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Foto de la sesión' })).toBeVisible()
+  await sinFallos(page)
+  await page.goto('/entreno/sesion/b1')
+  await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
+  await expect(page.getByRole('dialog', { name: 'Peso muerto rumano' })).toBeVisible()
+  await sinFallos(page)
+  await page.getByRole('button', { name: /Tus notas/ }).click()
+  await sinFallos(page)
 })

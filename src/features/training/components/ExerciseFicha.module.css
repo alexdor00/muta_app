@@ -204,3 +204,21 @@
   font: var(--text-footnote);
   color: var(--label-2);
 }
+
+/* Tus notas: tu texto en negro; «Escribir» o «Cambiar» debajo */
+.myNote {
+  font: var(--text-subhead);
+  color: var(--label);
+  white-space: pre-line;
+}
+
+.write {
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}

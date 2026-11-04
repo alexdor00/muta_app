@@ -3,7 +3,6 @@ import { getDb } from '../../../shared/data/db.ts'
 import { WORKOUT_STATUS } from '../../../shared/data/schema.ts'
 import { localDate, parseDecimal } from '../../../shared/lib/format.ts'
 import { logError } from '../../../shared/lib/logger.ts'
-import { sinClaves } from '../../../shared/lib/object.ts'
 import { CATALOG, sourceOf, type Level } from '../domain/catalog.ts'
 import type { MuscleId } from '../domain/muscles.ts'
 import { applyChoices } from '../domain/planProgram.ts'
@@ -33,6 +32,7 @@ import {
   type SesionEnCurso,
 } from '../state/sesionEnCurso.ts'
 import { porNombre } from './exerciseLibrary.ts'
+import { cargarNotas } from './exerciseNotes.ts'
 import { cargarMisConsejos } from './myTips.ts'
 import { cargarFotos } from './sessionPhotos.ts'
 import { LEVELS } from './loadRoutines.ts'
@@ -79,6 +79,7 @@ let ultimoGuardado: { id: string; rotacion: Rotacion } | null = null
 /** Carga tu plan, tus entrenos, la sesión en curso, tus fotos y tus consejos (una vez; `forzar` tras cambiar de rutina). */
 export function cargarPlan(forzar = false): Promise<void> {
   void cargarMisConsejos()
+  void cargarNotas()
   if (!carga || forzar) carga = leer()
   return carga
 }
@@ -346,34 +347,22 @@ export async function cambiarDescansos(tras: number[] | null): Promise<void> {
 
 /**
  * Vuelve a la rutina original: una sesión (quita lo que editaste en ella) o todas (`null`: también los ejercicios
- * cambiados por otros y los descansos).
+ * cambiados por otros, los descansos y lo elegido en la ficha de cada músculo).
  */
 export async function volverARutina(sigla: string | null): Promise<void> {
   const plan = tuPlan.value
   if (plan.status !== 'ready') return
   if (sigla) ediciones = Object.fromEntries(Object.entries(ediciones).filter(([k]) => k !== sigla))
-  else [ediciones, cambios, descansosTras] = [{}, {}, null]
+  else {
+    ediciones = {}
+    cambios = {}
+    descansosTras = null
+    elecciones.value = {}
+  }
   ponerPlan(plan.programId, plan.rutina, plan.nivel, plan.rotacion)
   try {
     await guardarEnPlan()
   } catch (error) {
     logError(error, 'volver a la rutina')
-  }
-}
-
-/**
- * Rehacer el plan: vuelve a montarlo desde tu rutina y tus respuestas (tu nivel y lo que elegiste al escogerla). Quita lo
- * que cambiaste a mano (ejercicios, pauta, descansos, músculos) y empieza por la primera semana. Tus entrenos se quedan.
- */
-export async function rehacerPlan(): Promise<void> {
-  try {
-    const db = await getDb()
-    const plan = (await db.get('plans', 'current')) as PlanGuardado | undefined
-    if (!plan) return
-    await db.put('plans', sinClaves(plan, ['descansos', 'musculos', 'cambios', 'ediciones', 'descansosTras']))
-    await db.delete('rotation', 'current')
-    await cargarPlan(true)
-  } catch (error) {
-    logError(error, 'rehacer el plan')
   }
 }

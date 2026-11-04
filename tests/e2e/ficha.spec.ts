@@ -66,7 +66,7 @@ test('desde la sesión, «Empezar ejercicio» vuelve con ese ejercicio abierto',
   await page.goto('/entreno/sesion/b1')
   await page.getByRole('button', { name: /Press inclinado con mancuernas/ }).click()
   await page.getByRole('button', { name: 'Opciones de Press inclinado con mancuernas' }).click()
-  await page.getByRole('link', { name: /Ver ficha del ejercicio/ }).click()
+  await page.getByRole('link', { name: 'Ficha', exact: true }).click()
   await expect(page).toHaveURL(/\/entreno\/ejercicio\/press_inclinado_con_mancuernas\?sesion=b1&ej=1/)
   // Cerrar el ejercicio en la sesión no importa: se pide el de la ficha
   await page.getByRole('button', { name: 'Empezar ejercicio' }).click()

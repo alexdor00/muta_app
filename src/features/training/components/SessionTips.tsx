@@ -78,6 +78,11 @@ export function TodayTipsSheet(props: {
   consejos: ConsejoVisto[]
   antes: { text: string; why: string; hecho: boolean }[]
   onMarcar: (k: number) => void
+  /** Ocultar uno de antes de empezar (para siempre; se puede volver a enseñar). */
+  onOcultar: (k: number) => void
+  /** Cuántos ocultaste y volver a enseñarlos. */
+  ocultos: number
+  onMostrarOcultos: () => void
   alEmpezar: boolean
   onAlEmpezar: () => void
   onClose: () => void
@@ -128,7 +133,7 @@ export function TodayTipsSheet(props: {
         </div>
         <ul class={styles.checks}>
           {props.antes.map((a, k) => (
-            <li key={a.text}>
+            <li key={a.text} class={styles.checkRow}>
               <button
                 type="button"
                 class={`${styles.check} ${a.hecho ? styles.on : ''}`}
@@ -143,9 +148,22 @@ export function TodayTipsSheet(props: {
                   <small>{a.why}</small>
                 </span>
               </button>
+              <button
+                type="button"
+                class={styles.hide}
+                aria-label={`Ocultar: ${a.text}`}
+                onClick={() => props.onOcultar(k)}
+              >
+                Ocultar
+              </button>
             </li>
           ))}
         </ul>
+        {props.ocultos > 0 && (
+          <button type="button" class={styles.showHidden} onClick={props.onMostrarOcultos}>
+            {props.ocultos === 1 ? '1 oculto' : `${props.ocultos} ocultos`} · Volver a enseñar
+          </button>
+        )}
       </section>
     </Sheet>
   )

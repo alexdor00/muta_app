@@ -5,6 +5,7 @@ import {
   ClockIcon,
   DumbbellIcon,
   InfoIcon,
+  PencilIcon,
   RepeatIcon,
   StopwatchIcon,
 } from '../../../shared/ui/icons.tsx'
@@ -81,6 +82,22 @@ export function FichaClave(props: { texto: string; fuente?: string | null; web?:
             {web ? `Explicación de ${web} · sale en: ${fuente}` : `Del documento de: ${fuente}`}
           </p>
         )}
+      </>
+    </Fila>
+  )
+}
+
+/** «Tus notas» del ejercicio: las tuyas (se escriben aquí o en la sesión) y el botón para escribirlas o cambiarlas. */
+export function FichaNotas(props: { texto: string; onEscribir: () => void }) {
+  return (
+    <Fila icono={<PencilIcon />} titulo="Tus notas">
+      <>
+        <p class={props.texto ? styles.myNote : styles.text}>
+          {props.texto || 'Aún no tienes notas de este ejercicio: agujero, agarre, sensaciones…'}
+        </p>
+        <button type="button" class={styles.write} onClick={props.onEscribir}>
+          {props.texto ? 'Cambiar' : 'Escribir'}
+        </button>
       </>
     </Fila>
   )

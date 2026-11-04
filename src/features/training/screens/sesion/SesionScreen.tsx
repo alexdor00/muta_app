@@ -43,6 +43,7 @@ import {
   type SerieEnCurso,
 } from '../../state/sesionEnCurso.ts'
 import { effortLabel } from '../../state/routines.ts'
+import { guardarNota, notaDe } from '../../use-cases/exerciseNotes.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
 import { avisar } from '../../use-cases/workoutFeedback.ts'
 import { HojasEjercicio } from './HojasEjercicio.tsx'
@@ -244,7 +245,7 @@ export function SesionScreen(props: { sessionId: string }) {
               descanso={formatClock(descansoDe(e))}
               onDescanso={() => setHoja({ tipo: 'descanso', ejercicio: e, segundos: descansoDe(e) })}
               sugerido={x.cambiadoPor ? null : notaSugerido(e)}
-              nota={x.nota}
+              nota={notaDe(nombre) || x.nota}
               onOpciones={() => setHojaDe(i)}
               calentamiento={calienta.map((c, k) => ({
                 kilos: formatDecimal(c.kilos),
@@ -361,7 +362,10 @@ export function SesionScreen(props: { sessionId: string }) {
             setHojaDe(null)
           }}
           onNota={(nota) => {
-            guardar(hojaDe, (y) => ({ ...y, nota }))
+            // Tus notas se guardan para siempre en el ejercicio (la de la sesión, de antes, se vacía)
+            void guardarNota(nombreHoy(ejercicios[hojaDe], en.ejercicios[hojaDe]), nota)
+            guardar(hojaDe, (y) => ({ ...y, nota: '' }))
+            decir(nota ? 'Nota guardada en su ficha' : 'Nota borrada')
             setHojaDe(null)
           }}
           onCronometro={(serie, r) => {

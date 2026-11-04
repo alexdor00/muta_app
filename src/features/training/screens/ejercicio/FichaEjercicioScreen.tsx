@@ -14,12 +14,13 @@ import { Pending } from '../../../../shared/ui/Pending.tsx'
 import {
   FichaCabecera,
   FichaClave,
+  FichaNotas,
   FichaDescanso,
   FichaMusculos,
   FichaSugerencia,
 } from '../../components/ExerciseFicha.tsx'
 import { SessionProgress } from '../../components/SessionProgress.tsx'
-import { RestChoiceSheet } from '../../components/WorkoutSheets.tsx'
+import { RestChoiceSheet, NoteSheet } from '../../components/WorkoutSheets.tsx'
 import { fichaDe } from '../../state/ficha.ts'
 import { descansoDe, elegirDescanso, pedirEjercicio } from '../../state/sesionEnCurso.ts'
 import {
@@ -31,6 +32,7 @@ import {
   type MuscleId,
 } from '../../state/routines.ts'
 import { ejercicioDeBiblioteca } from '../../use-cases/exerciseLibrary.ts'
+import { guardarNota, notaDe } from '../../use-cases/exerciseNotes.ts'
 import { pautaEnTuRutina } from '../../use-cases/training.ts'
 import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { usePlan } from '../comun/usePlan.ts'
@@ -62,6 +64,7 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
   const [metrica, setMetrica] = useState<MetricaEjercicio>('maximo')
   const [eligiendo, setEligiendo] = useState(false)
   const [musculo, setMusculo] = useState<MuscleId | null>(null)
+  const [escribiendo, setEscribiendo] = useState(false)
   const ex = ejercicioDeBiblioteca(props.exerciseId)
   const atras = () => (window.history.length > 1 ? window.history.back() : route(paths.training))
   if (!ex) {
@@ -138,6 +141,7 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
         {ex.key && (
           <FichaClave texto={plainEffort(ex.key)} fuente={ex.deRutina ? ex.source : null} web={ex.keyWeb} />
         )}
+        <FichaNotas texto={notaDe(ex.name)} onEscribir={() => setEscribiendo(true)} />
         <FichaSugerencia
           etiqueta={f.sugerencia.etiqueta}
           valor={f.sugerencia.valor}
@@ -191,6 +195,17 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
         </div>
       )}
       {musculo && <MusculoHoja musculo={musculo} onClose={() => setMusculo(null)} />}
+      {escribiendo && (
+        <NoteSheet
+          nombre={ex.name}
+          nota={notaDe(ex.name)}
+          onGuardar={(t) => {
+            void guardarNota(ex.name, t)
+            setEscribiendo(false)
+          }}
+          onClose={() => setEscribiendo(false)}
+        />
+      )}
       {eligiendo && f.plan && (
         <RestChoiceSheet
           nombre={ex.name}

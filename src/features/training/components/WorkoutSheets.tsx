@@ -65,7 +65,10 @@ function Opciones(props: { opciones: Opcion[] }) {
   )
 }
 
-/** «···» de un ejercicio en la sesión (C11): ficha, cambiarlo hoy, nota, discos y cronómetro de la serie. */
+/**
+ * «···» de un ejercicio en la sesión (C11): arriba, tus notas de ese ejercicio (se tocan para escribirlas); debajo, en
+ * cuadrícula, la ficha, hacerlo ahora, cambiarlo (hoy o en tu plan), los discos y el cronómetro de la serie.
+ */
 export function ExerciseOptionsSheet(props: {
   nombre: string
   fichaHref: string
@@ -78,67 +81,74 @@ export function ExerciseOptionsSheet(props: {
   onCronometro: () => void
   onClose: () => void
 }) {
+  const tiles: { label: string; icono: ComponentChildren; href?: string; onClick?: (() => void) | null }[] = [
+    { label: 'Ficha', icono: <InfoIcon />, href: props.fichaHref },
+    {
+      label: 'Hacer ahora',
+      icono: <ArrowUpIcon />,
+      onClick: props.onAhora,
+    },
+    { label: 'Cambiar', icono: <SwapIcon />, onClick: props.onCambiar },
+    { label: 'Discos', icono: <PlatesIcon />, onClick: props.onDiscos },
+    { label: 'Cronómetro', icono: <StopwatchIcon />, onClick: props.onCronometro },
+  ]
   return (
     <Sheet title={props.nombre} onClose={props.onClose} large>
-      <Opciones
-        opciones={[
-          {
-            titulo: 'Ver ficha del ejercicio',
-            detalle: 'Técnica, consejos, historial y récords',
-            icono: <InfoIcon />,
-            href: props.fichaHref,
-          },
-          {
-            titulo: 'Hacer ahora',
-            detalle: props.onAhora ? 'Lo pasa delante y lo abre, solo hoy' : 'Ya es el siguiente',
-            icono: <ArrowUpIcon />,
-            onClick: props.onAhora ?? undefined,
-            deshabilitado: !props.onAhora,
-          },
-          {
-            titulo: 'Cambiar ejercicio',
-            detalle: 'Solo para hoy: tu plan no cambia',
-            icono: <SwapIcon />,
-            onClick: props.onCambiar,
-          },
-          {
-            titulo: 'Nota de técnica',
-            detalle: props.nota || 'Agujero, agarre, sensaciones…',
-            icono: <PencilIcon />,
-            onClick: props.onNota,
-          },
-          {
-            titulo: 'Calculadora de discos',
-            detalle: 'Qué discos poner a cada lado',
-            icono: <PlatesIcon />,
-            onClick: props.onDiscos,
-          },
-          {
-            titulo: 'Cronómetro de serie',
-            detalle: 'Cuenta atrás, cadencia o tiempo',
-            icono: <StopwatchIcon />,
-            onClick: props.onCronometro,
-          },
-        ]}
-      />
+      <button type="button" class={styles.myNote} onClick={props.onNota}>
+        <span class={styles.myNoteHead}>
+          <PencilIcon />
+          Tus notas
+        </span>
+        <span class={props.nota ? styles.myNoteText : styles.myNoteEmpty}>
+          {props.nota || 'Agujero, agarre, sensaciones… Se quedan en la ficha y salen cada vez que lo hagas.'}
+        </span>
+      </button>
+      <ul class={styles.tiles}>
+        {tiles.map((t) => (
+          <li key={t.label}>
+            {t.href ? (
+              <a class={styles.tile} href={t.href}>
+                {t.icono}
+                {t.label}
+              </a>
+            ) : (
+              <button
+                type="button"
+                class={styles.tile}
+                disabled={!t.onClick}
+                onClick={t.onClick ?? undefined}
+              >
+                {t.icono}
+                {t.label}
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
     </Sheet>
   )
 }
 
-/** Nota de técnica del ejercicio (C13). */
-export function NoteSheet(props: { nota: string; onGuardar: (nota: string) => void; onClose: () => void }) {
+/** Tus notas de un ejercicio (C13): se guardan en su ficha para siempre y salen en la sesión cada vez que lo hagas. */
+export function NoteSheet(props: {
+  nombre: string
+  nota: string
+  onGuardar: (nota: string) => void
+  onClose: () => void
+}) {
   const [texto, setTexto] = useState(props.nota)
   return (
-    <Sheet title="Nota" onClose={props.onClose} large>
+    <Sheet title="Tus notas" onClose={props.onClose} large>
+      <p class={styles.lead}>De {props.nombre}. Se quedan en su ficha y las verás cada vez que lo hagas.</p>
       <textarea
         class={styles.note}
-        aria-label="Nota de técnica"
-        placeholder="Agujero 11, agarre neutro…"
+        aria-label="Tus notas"
+        placeholder="Agujero 11, agarre neutro, apoyar bien la espalda…"
         value={texto}
         onInput={(e) => setTexto(e.currentTarget.value)}
       />
       <div class={styles.actions}>
-        <Button onClick={() => props.onGuardar(texto.trim())}>Guardar nota</Button>
+        <Button onClick={() => props.onGuardar(texto.trim())}>Guardar</Button>
       </div>
     </Sheet>
   )

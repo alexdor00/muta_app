@@ -4,9 +4,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- **Hecho de la propuesta** (`Desktop/MUTA-Entreno-lo-que-falta-minimalista.png`): las cuatro filas de «Tu rutina» (foto de la
-  sesión, cobertura muscular, rehacer el plan y mis consejos). **Falta de esa propuesta**: Tu rutina (A06), cada serie distinta y
-  superserie (A14), «···» de la ficha y tu material, imagen para compartir; C00 se propone no hacerla aparte.
+- **Hecho**: la hoja «Tu rutina» con tres filas (foto de la sesión y cobertura dentro de Editar rutina; ocultar consejos en
+  «Consejos de hoy»), tus notas de cada ejercicio para siempre (sesión y ficha) y el «···» del ejercicio en cuadrícula.
+  **Falta** de la propuesta `Desktop/MUTA-Entreno-lo-que-falta-minimalista.png`: Tu rutina (A06), cada serie distinta y superserie
+  (A14), «···» de la ficha y tu material, imagen para compartir; C00 se propone no hacerla aparte.
 - **Rama `pantalla/sesion`** (sale de `pantalla/ver-sesion`): commit 712da0d con la sesión en curso, el resumen, la biblioteca
   (A16), las fichas del ejercicio y del músculo (A17–A21), los consejos de hoy (C10) y la hoja «Tu rutina» con «Cambiar de rutina»;
   encima, **sin commit**, los **datos reales**: Tu plan, Ver sesión, la sesión, el resumen y las fichas leen la rutina guardada y tus

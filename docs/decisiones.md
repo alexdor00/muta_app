@@ -166,3 +166,13 @@ de docs/conocimiento tal cual, pasada a `shared/content/coverage.json` con los e
 «Rehacer el plan» no vuelve a la bienvenida: rehace el plan con la rutina y lo que elegiste al escogerla (y tu nivel), quita lo
 cambiado a mano y vuelve a la primera semana. El botón rojo de las hojas de confirmar pasa a `--surface`: sobre `--surface-2`
 el rojo daba 4,45:1 (axe pide 4,5:1).
+
+## 2026-11-04 · La hoja «Tu rutina», con menos filas, y tus notas para siempre
+
+El usuario vio la hoja «Mis consejos» recargada y pidió revisar si hacía falta todo lo del «···». Quedan tres filas (Editar
+rutina, Cambiar de rutina, Biblioteca). La foto de la sesión pasa a Editar rutina; la cobertura del método, al entrenador de
+Editar rutina (con «Añadir …» a esa sesión); «Rehacer el plan» desaparece porque repetía «Volver a la rutina original · Todas»
+(que ahora repone también los descansos y los músculos); «Mis consejos» se queda en ocultar un consejo desde «Consejos de hoy»
+(sin editar ni escribir los tuyos). Las notas de un ejercicio, que antes solo vivían en la sesión en curso, se guardan para
+siempre por ejercicio («Tus notas») y salen en la sesión y en su ficha. La prueba de accesibilidad espera a que acaben las
+animaciones antes de medir el contraste.

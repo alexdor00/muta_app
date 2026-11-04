@@ -9,13 +9,18 @@ import {
 } from '../../state/ordenHoy.ts'
 import { guardarSesion, type SesionEnCurso } from '../../state/sesionEnCurso.ts'
 import type { SessionTip } from '../../state/routines.ts'
-import { consejosAntesVisibles } from '../../use-cases/myTips.ts'
+import {
+  consejosAntesVisibles,
+  consejosOcultos,
+  mostrarConsejos,
+  ocultarConsejo,
+} from '../../use-cases/myTips.ts'
 
 const ETIQUETA = { invertir: 'Invertir hoy', subir: 'Subirlo hoy' } as const
 
 /**
  * «Consejos de hoy» (C10) en la sesión: los de esta sesión (los que se arreglan con un toque cambian el orden solo hoy)
- * y «Antes de la primera serie» (con tus cambios de «Mis consejos»), con lo marcado guardado en la sesión.
+ * y «Antes de la primera serie» (sin los que ocultaste), con lo marcado guardado en la sesión.
  */
 export function HojaConsejos(props: {
   sesion: SesionPlan
@@ -52,6 +57,13 @@ export function HojaConsejos(props: {
         hecho: Boolean(en.marcados[k]),
       }))}
       onMarcar={(k) => guardarSesion(marcarConsejo(en, k))}
+      onOcultar={(k) => {
+        const c = consejosAntesVisibles.value[k]
+        if (c) ocultarConsejo(c.clave)
+        props.onAviso('Consejo oculto')
+      }}
+      ocultos={consejosOcultos.value}
+      onMostrarOcultos={mostrarConsejos}
       alEmpezar={consejosAlEmpezar.value}
       onAlEmpezar={alternarConsejosAlEmpezar}
       onClose={props.onClose}

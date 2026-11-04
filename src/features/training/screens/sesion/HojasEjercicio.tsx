@@ -15,6 +15,7 @@ import {
 } from '../../state/sesionEnCurso.ts'
 import { discosPorLado } from '../../state/routines.ts'
 import { equivalentesDe, idPorNombre } from '../../use-cases/exerciseLibrary.ts'
+import { notaDe } from '../../use-cases/exerciseNotes.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import { useCronometro } from './useCronometro.ts'
 
@@ -91,7 +92,8 @@ export function HojasEjercicio(props: Props) {
       <BibliotecaHoja musculo={e.musculo} onElegir={(ex) => onCambiar(ex.name, alcance)} onClose={onCerrar} />
     )
   }
-  if (hoja === 'nota') return <NoteSheet nota={x.nota} onGuardar={onNota} onClose={onCerrar} />
+  if (hoja === 'nota')
+    return <NoteSheet nombre={nombre} nota={notaDe(nombre) || x.nota} onGuardar={onNota} onClose={onCerrar} />
   if (hoja === 'discos') {
     const { discos, sobra } = discosPorLado(parseDecimal(total) ?? 0, Number(barra))
     return (
@@ -124,7 +126,7 @@ export function HojasEjercicio(props: Props) {
     <ExerciseOptionsSheet
       nombre={nombre}
       fichaHref={paths.exercise(idPorNombre(nombre) ?? encodeURIComponent(nombre), desde)}
-      nota={x.nota}
+      nota={notaDe(nombre) || x.nota}
       onAhora={ahora}
       onCambiar={() => setHoja('cambiar')}
       onNota={() => setHoja('nota')}

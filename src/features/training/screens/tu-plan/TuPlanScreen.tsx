@@ -11,13 +11,8 @@ import { SessionCard } from '../../components/SessionCard.tsx'
 import { TuRutinaSheet } from '../../components/TuRutinaSheet.tsx'
 import { WeekCard } from '../../components/WeekCard.tsx'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
-import { DangerSheet } from '../../components/WorkoutSheets.tsx'
 import { fotosSesion } from '../../state/fotos.ts'
-import { rehacerPlan } from '../../use-cases/training.ts'
-import { CoberturaHoja } from '../cobertura/CoberturaHoja.tsx'
 import { EditarRutinaHoja } from '../editar-rutina/EditarRutinaHoja.tsx'
-import { FotoSesionHoja } from '../foto-sesion/FotoSesionHoja.tsx'
-import { MisConsejosHoja } from '../mis-consejos/MisConsejosHoja.tsx'
 import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { localDate } from '../../../../shared/lib/format.ts'
 import {
@@ -52,10 +47,6 @@ function TuPlan({ siguiente }: { siguiente: number }) {
   const sheet = useSheet('rutina')
   const biblioteca = useSheet('biblioteca')
   const editar = useSheet('editar')
-  const foto = useSheet('foto')
-  const cobertura = useSheet('cobertura')
-  const rehacer = useSheet('rehacer')
-  const consejos = useSheet('consejos')
   // Al bajar, la cabecera grande se va y arriba queda una barra con el título (como en las listas de rutinas)
   const cabecera = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(0)
@@ -175,26 +166,7 @@ function TuPlan({ siguiente }: { siguiente: number }) {
           acciones={{
             biblioteca: biblioteca.showInstead,
             editar: editar.showInstead,
-            foto: foto.showInstead,
-            cobertura: cobertura.showInstead,
-            rehacer: rehacer.showInstead,
-            consejos: consejos.showInstead,
           }}
-        />
-      )}
-      {foto.open && <FotoSesionHoja sigla={elegida} onClose={foto.close} />}
-      {cobertura.open && <CoberturaHoja onClose={cobertura.close} />}
-      {consejos.open && <MisConsejosHoja onClose={consejos.close} />}
-      {rehacer.open && (
-        <DangerSheet
-          titulo="¿Rehacer el plan?"
-          texto="Se vuelve a montar desde tu rutina y tus respuestas: se quita lo que cambiaste a mano (ejercicios, pauta, descansos y músculos) y empiezas por la primera semana. Tus entrenos y tus fotos se quedan."
-          accion="Rehacer el plan"
-          onSi={() => {
-            rehacer.close()
-            void rehacerPlan()
-          }}
-          onClose={rehacer.close}
         />
       )}
       {biblioteca.open && <BibliotecaHoja onClose={biblioteca.close} />}

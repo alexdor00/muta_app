@@ -1,32 +1,22 @@
 import type { JSX } from 'preact'
 import { paths } from '../../../shared/lib/paths.ts'
-import {
-  BodyIcon,
-  BookIcon,
-  CameraIcon,
-  ChatIcon,
-  ChevronRightIcon,
-  PencilIcon,
-  SparkIcon,
-  SwapIcon,
-} from '../../../shared/ui/icons.tsx'
+import { BookIcon, ChevronRightIcon, PencilIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import styles from './TuRutinaSheet.module.css'
 
-type Accion = 'biblioteca' | 'editar' | 'foto' | 'cobertura' | 'rehacer' | 'consejos'
+type Accion = 'biblioteca' | 'editar'
 
 /** Cada fila abre su hoja (`accion`) o lleva a otra pantalla (`href`). */
 const ROWS: ({ label: string; Icon: () => JSX.Element } & ({ accion: Accion } | { href: string }))[] = [
   { label: 'Editar rutina', Icon: PencilIcon, accion: 'editar' },
   { label: 'Cambiar de rutina', Icon: SwapIcon, href: paths.chooseRoutine },
   { label: 'Biblioteca de ejercicios', Icon: BookIcon, accion: 'biblioteca' },
-  { label: 'Añadir foto a la sesión', Icon: CameraIcon, accion: 'foto' },
-  { label: 'Cobertura muscular', Icon: BodyIcon, accion: 'cobertura' },
-  { label: 'Rehacer el plan con mis respuestas', Icon: SparkIcon, accion: 'rehacer' },
-  { label: 'Mis consejos', Icon: ChatIcon, accion: 'consejos' },
 ]
 
-/** Hoja «Tu rutina»: las opciones de la rutina; cada una abre su hoja (`acciones`) o lleva a su pantalla. */
+/**
+ * Hoja «Tu rutina» (el «···» de Tu plan): editar la rutina, cambiarla y la biblioteca. La foto de cada sesión y volver a la
+ * rutina original van dentro de Editar rutina; la cobertura, en los consejos del entrenador.
+ */
 export function TuRutinaSheet({
   onClose,
   acciones,

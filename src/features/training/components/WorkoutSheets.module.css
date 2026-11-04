@@ -291,3 +291,78 @@
   font: var(--text-headline);
   cursor: pointer;
 }
+
+/* «···» de un ejercicio: tus notas arriba, en una tarjeta gris que se toca para escribir */
+.myNote {
+  display: grid;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.myNoteHead {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.myNoteHead svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.myNoteText {
+  font: var(--text-body);
+  white-space: pre-line;
+}
+
+.myNoteEmpty {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+/* El resto, en una cuadrícula de iconos con su nombre corto */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  display: grid;
+  gap: var(--space-2);
+  place-items: center;
+  width: 100%;
+  min-height: calc(var(--control) * 1.8);
+  padding: var(--space-3) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tile svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.tile:disabled {
+  color: var(--label-2);
+  cursor: default;
+}
