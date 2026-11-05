@@ -79,24 +79,6 @@ export const SERIE_VACIA: SerieEnCurso = { kg: '', reps: '', quedan: '', hecha: 
 /** Los ejercicios de hoy: los de la sesión del plan y los añadidos. */
 export const ejerciciosDe = (en: SesionEnCurso): EjercicioPlan[] => [...en.base, ...en.anadidos]
 
-/** Añade un ejercicio al final, solo para hoy: sus series vacías y, sin vez anterior, sin calentamiento. */
-export function anadirEjercicio(en: SesionEnCurso, e: EjercicioPlan): SesionEnCurso {
-  return {
-    ...en,
-    anadidos: [...en.anadidos, e],
-    orden: [...en.orden, en.ejercicios.length],
-    ejercicios: [
-      ...en.ejercicios,
-      {
-        series: Array.from({ length: e.series }, () => ({ ...SERIE_VACIA })),
-        calentamiento: [],
-        nota: '',
-        cambiadoPor: null,
-      },
-    ],
-  }
-}
-
 /** El calentamiento de cada ejercicio, calculado con el peso de hoy de su primera serie (el que propone el motor). */
 export function calentamientos(ejercicios: readonly EjercicioPlan[]) {
   return planCalentamiento(

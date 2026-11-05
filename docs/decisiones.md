@@ -281,3 +281,11 @@ cuatro: dropset (bajadas), dropset mecánico (cambios de variante con el mismo p
 (mini-series con el mismo peso) y parciales en estiramiento. Las demás se hacen dentro de la serie y no llevan filas. La
 explicación de cada una sale de las notas de las rutinas. En Editar rutina, el desplegable «Técnica» (al final de la
 pauta, cerrado: no molesta) pone cualquiera a cualquier ejercicio o quita la de la rutina.
+
+## 2026-11-05 · Sin «Añadir ejercicio» en la sesión, y filas de la sesión más marcadas
+
+- **Añadir ejercicio, solo en Editar rutina.** El usuario lo quiere fuera de la pantalla en la que apunta los pesos, para
+  que no estorbe. Se quitan el botón de abajo y la fila de «Esta sesión» (C19).
+- **Las filas de las series**, un gris más fuerte (`--surface-2`), y la hecha un tono más (`--surface-3`, nuevo).
+- **Consejo de la técnica de intensidad** (Editar rutina), del usuario: mejor en la última serie del último ejercicio de
+  un músculo. Si hay tiempo, rinde más una serie normal de más, siempre que sigas ganando fuerza.

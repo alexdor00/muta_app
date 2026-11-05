@@ -35,6 +35,7 @@ const COLORS = [
   '--bg',
   '--surface',
   '--surface-2',
+  '--surface-3',
   '--label',
   '--label-2',
   '--separator',

@@ -38,28 +38,6 @@
   padding: 0 var(--gutter);
 }
 
-.addExercise {
-  display: flex;
-  align-self: center;
-  align-items: center;
-  gap: var(--space-1);
-  height: var(--control-sm);
-  margin-top: var(--gap-block);
-  padding: 0 var(--space-4);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--label);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-}
-
-.addExercise svg {
-  width: var(--icon-xs);
-  height: var(--icon-xs);
-}
-
 .discard {
   align-self: center;
   min-height: var(--tap-min);
@@ -73,12 +51,3 @@
 }
 
 /* Se ve pequeño, pero la zona de toque sigue siendo de 44 */
-.addExercise {
-  position: relative;
-}
-
-.addExercise::after {
-  position: absolute;
-  inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;
-  content: '';
-}

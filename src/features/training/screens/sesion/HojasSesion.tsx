@@ -5,10 +5,9 @@ import {
   SessionSheet,
   SessionTimeSheet,
 } from '../../components/WorkoutSheets.tsx'
-import { desdeBiblioteca, type EjercicioPlan, type SesionPlan } from '../../state/plan.ts'
+import type { EjercicioPlan, SesionPlan } from '../../state/plan.ts'
 import {
   alternarPausa,
-  anadirEjercicio,
   contarDesdeAhora,
   cuentaSeries,
   elegirDescanso,
@@ -17,7 +16,6 @@ import {
   type SesionEnCurso,
 } from '../../state/sesionEnCurso.ts'
 import type { SessionTip } from '../../state/routines.ts'
-import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import { HojaConsejos } from './HojaConsejos.tsx'
 
 export type HojaSesion =
@@ -25,7 +23,6 @@ export type HojaSesion =
   | { tipo: 'tiempo' }
   | { tipo: 'cambiar' }
   | { tipo: 'descartar' }
-  | { tipo: 'anadir' }
   | { tipo: 'consejos' }
   | { tipo: 'descanso'; ejercicio: EjercicioPlan; segundos: number }
 
@@ -41,7 +38,6 @@ type Props = {
   onSalir: () => void
   onAviso: (texto: string) => void
   /** Se añadió un ejercicio (C19): su número, para abrirlo. */
-  onAnadido: (indice: number) => void
 }
 
 /**
@@ -107,19 +103,6 @@ export function HojasSesion(props: Props) {
       />
     )
   }
-  if (hoja.tipo === 'anadir') {
-    return (
-      <BibliotecaHoja
-        onElegir={(ex) => {
-          guardarSesion(anadirEjercicio(en, desdeBiblioteca(ex)))
-          props.onAviso(`${ex.name} añadido, solo para hoy`)
-          props.onAnadido(en.ejercicios.length)
-          cerrar()
-        }}
-        onClose={cerrar}
-      />
-    )
-  }
   if (hoja.tipo === 'descanso') {
     return (
       <RestChoiceSheet
@@ -141,7 +124,6 @@ export function HojasSesion(props: Props) {
       // Sin series apuntadas no se pierde nada: se cambia sin preguntar
       onCambiar={() => (hechas ? onHoja({ tipo: 'cambiar' }) : props.onSalir())}
       onConsejos={() => onHoja({ tipo: 'consejos' })}
-      onAnadir={() => onHoja({ tipo: 'anadir' })}
       onDescartar={() => onHoja({ tipo: 'descartar' })}
       onClose={cerrar}
     />

@@ -17,6 +17,7 @@
   --bg: #ffffff;
   --surface: #f4f4f5;
   --surface-2: #e9e9eb;
+  --surface-3: #dcdcdf; /* un tono más: la serie hecha sobre las filas de la sesión */
   --label: #111113;
   --label-2: #48484a; /* gris de los textos secundarios: más oscuro para que se lea mejor (decisión 2026-11-04) */
   --separator: #e3e3e6;
@@ -162,6 +163,7 @@
     --bg: #000000;
     --surface: #1c1c1e;
     --surface-2: #2c2c2e;
+    --surface-3: #3a3a3c;
     --label: #f2f2f7;
     --label-2: #aeaeb2;
     --separator: #38383a;
@@ -179,6 +181,7 @@
   --bg: #000000;
   --surface: #1c1c1e;
   --surface-2: #2c2c2e;
+  --surface-3: #3a3a3c;
   --label: #f2f2f7;
   --label-2: #aeaeb2;
   --separator: #38383a;

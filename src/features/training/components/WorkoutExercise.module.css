@@ -266,7 +266,7 @@
   align-items: center;
   gap: var(--space-2);
   border-radius: var(--radius-control);
-  background: var(--surface);
+  background: var(--surface-2);
   transition: transform var(--duration-sheet) var(--ease);
   touch-action: pan-y;
   user-select: none;
@@ -376,7 +376,7 @@
 
 /* Cada serie es una fila gris; la hecha, un tono más oscuro */
 .doneRow {
-  background: var(--surface-2);
+  background: var(--surface-3);
 }
 
 .add {

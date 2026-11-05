@@ -243,7 +243,8 @@ test('«Esta sesión»: tiempo (pausar y contar desde ahora)', async ({ page }) 
   await page.getByRole('button', { name: /^Esta sesión/ }).click()
   const hoja = page.getByRole('dialog', { name: 'Esta sesión' })
   await expect(hoja.getByRole('button', { name: /Consejos de hoy/ })).toBeEnabled()
-  await expect(hoja.getByRole('button', { name: /Añadir un ejercicio/ })).toBeEnabled()
+  // Añadir ejercicios va en Editar rutina, no en la sesión
+  await expect(hoja.getByRole('button', { name: /Añadir un ejercicio/ })).toHaveCount(0)
 
   await hoja.getByRole('button', { name: /Tiempo de la sesión/ }).click()
   await page
@@ -296,30 +297,10 @@ test('descartar la sesión borra lo apuntado', async ({ page }) => {
   await expect(page.getByRole('button', { name: /^Tiempo de la sesión/ })).toHaveText(/^0:0[01]$/)
 })
 
-test('«Añadir ejercicio» elige uno de la biblioteca y lo abre al final, solo para hoy', async ({ page }) => {
+test('en la sesión no se añaden ejercicios: eso va en Editar rutina', async ({ page }) => {
   await page.goto('/entreno/sesion/b1')
-  await page.getByRole('button', { name: 'Añadir ejercicio' }).click()
-  const hoja = page.getByRole('dialog', { name: 'Elegir ejercicio' })
-  await hoja.getByRole('searchbox', { name: 'Buscar ejercicio' }).fill('hip thrust')
-  await hoja.getByRole('button', { name: /^Hip thrust Glúteo/ }).click()
-  await expect(hoja).toHaveCount(0)
-  await expect(page.getByText('Hip thrust añadido, solo para hoy')).toBeVisible()
-  // Abierto, el octavo, con 3 series y sin vez anterior
-  await expect(page.getByRole('heading', { name: 'Hip thrust' })).toBeVisible()
-  await expect(page.getByLabel('Kilos de la serie 3')).toBeVisible()
-  await expect(page.getByLabel('Kilos de la serie 1')).toHaveAttribute('placeholder', '')
-  await expect(page.getByText('B1 · 0 de 20 series')).toBeVisible()
-})
-
-test('desde «Esta sesión» también se añade un ejercicio', async ({ page }) => {
-  await page.goto('/entreno/sesion/b1')
-  await page.getByRole('button', { name: /^Esta sesión/ }).click()
-  await page.getByRole('button', { name: /Añadir un ejercicio/ }).click()
-  await page
-    .getByRole('dialog', { name: 'Elegir ejercicio' })
-    .getByRole('button', { name: /^Face pull/ })
-    .click()
-  await expect(page.getByRole('heading', { name: 'Face pull' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Descartar sesión' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Añadir ejercicio' })).toHaveCount(0)
 })
 
 test('«Cambiar ejercicio» deja elegir cualquiera de la biblioteca, filtrada por su músculo', async ({

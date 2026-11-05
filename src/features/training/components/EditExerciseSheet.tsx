@@ -236,8 +236,9 @@ export function EditExerciseSheet(props: {
           onAbrir={abre('tecnica')}
         >
           <small class={styles.hint}>
-            {props.tecnica.explica ?? 'Una técnica de intensidad para alargar cada serie.'} En la sesión se
-            apunta debajo de cada serie.
+            {props.tecnica.explica && `${props.tecnica.explica} `}
+            Mejor en la última serie del último ejercicio de un músculo. Si tienes tiempo, rinde más una serie
+            normal de más, siempre que sigas ganando fuerza.
           </small>
           <ChoiceList
             name="tecnica"

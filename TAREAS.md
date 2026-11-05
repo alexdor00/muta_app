@@ -30,6 +30,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   - Los discos del gimnasio (en Tu material y en la calculadora): la calculadora solo usa los que hay.
   - Técnicas de intensidad (dropset, mecánico, rest-pause, parciales): cada serie trae su fila para apuntarla desde el
     principio, y en Editar rutina se pone o quita en el desplegable «Técnica».
+  - Sin «Añadir ejercicio» en la sesión (solo en Editar rutina); filas de las series en un gris más fuerte.
   - Lo último de Entreno: el «···» de la ficha (añadir a una sesión con «Deshacer», cambiar en tu plan), «Tu material» en
     Perfil (lo que no tienes, al final y en gris en la biblioteca y al cambiar) y la imagen para compartir el resumen (C25).
     Tu rutina (A06) y C00 no se hacen (ver [decisiones](docs/decisiones.md)). Cada serie es una fila gris; la hecha, más oscura.

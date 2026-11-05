@@ -14,7 +14,7 @@ respuesta inmediata (imagen, sonido, vibración) · pensada para el gimnasio (ac
 
 ## Sistema de diseño (todo sale de `tokens.css`)
 
-- **Color** (claro/oscuro): `--bg` #FFF/#000 · `--surface` #F4F4F5/#1C1C1E · `--surface-2` #E9E9EB/#2C2C2E · `--label` #111113/#F2F2F7 ·
+- **Color** (claro/oscuro): `--bg` #FFF/#000 · `--surface` #F4F4F5/#1C1C1E · `--surface-2` #E9E9EB/#2C2C2E · `--surface-3` #DCDCDF/#3A3A3C · `--label` #111113/#F2F2F7 ·
   `--label-2` #6E6E73/#98989F · `--separator` #E3E3E6/#38383A · `--accent` #111113/#F2F2F7 con `--on-accent` #FFF/#000 · estados
   `--good/--warning/--critical`. **Sin naranja** (decisión 2026-10-29): el documento original usaba #FF5A12/#FF6A2A como acento; donde este
   resumen diga «naranja» (descanso, check…), se usa el acento neutro: blanco y negro, y el énfasis por tamaño, peso y contraste.

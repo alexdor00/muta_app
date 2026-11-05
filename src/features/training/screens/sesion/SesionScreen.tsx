@@ -2,7 +2,6 @@ import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import { formatClock, formatDecimal, formatRest } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { PlusIcon } from '../../../../shared/ui/icons.tsx'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { RestBar } from '../../components/RestBar.tsx'
@@ -270,10 +269,6 @@ export function SesionScreen(props: { sessionId: string }) {
             />
           )
         })}
-        <button type="button" class={styles.addExercise} onClick={() => setHoja({ tipo: 'anadir' })}>
-          <PlusIcon />
-          Añadir ejercicio
-        </button>
         <button type="button" class={styles.discard} onClick={() => setHoja({ tipo: 'descartar' })}>
           Descartar sesión
         </button>
@@ -324,7 +319,6 @@ export function SesionScreen(props: { sessionId: string }) {
           ahora={ahora}
           onSalir={salirSinGuardar}
           onAviso={decir}
-          onAnadido={abrir}
         />
       )}
 

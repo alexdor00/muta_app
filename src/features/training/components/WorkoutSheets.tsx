@@ -8,7 +8,6 @@ import {
   InfoIcon,
   PauseIcon,
   PlayIcon,
-  PlusIcon,
   RepeatIcon,
   TrashIcon,
   PencilIcon,
@@ -169,12 +168,11 @@ export function ConfirmSheet(props: { texto: string; onSi: () => void; onClose: 
   )
 }
 
-/** «Esta sesión» (C08): tiempo, consejos de hoy, cambiar de sesión, añadir un ejercicio y descartarla. */
+/** «Esta sesión» (C08): tiempo, consejos de hoy, cambiar de sesión y descartarla (añadir ejercicios, en Editar rutina). */
 export function SessionSheet(props: {
   onTiempo: () => void
   onConsejos: () => void
   onCambiar: () => void
-  onAnadir: () => void
   onDescartar: () => void
   onClose: () => void
 }) {
@@ -195,12 +193,6 @@ export function SessionSheet(props: {
             onClick: props.onConsejos,
           },
           { titulo: 'Cambiar de sesión', icono: <RepeatIcon />, onClick: props.onCambiar },
-          {
-            titulo: 'Añadir un ejercicio',
-            detalle: 'De la biblioteca, solo para hoy',
-            icono: <PlusIcon />,
-            onClick: props.onAnadir,
-          },
           { titulo: 'Descartar la sesión', icono: <TrashIcon />, onClick: props.onDescartar, peligro: true },
         ]}
       />

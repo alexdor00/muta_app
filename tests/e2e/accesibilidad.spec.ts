@@ -73,9 +73,14 @@ test('la ficha del músculo, en Resumen (con el rango a mano abierto) y en Conse
   await sinFallos(page)
 })
 
-test('«Elegir ejercicio» en la sesión (C19)', async ({ page }) => {
+test('«Elegir ejercicio» al cambiar uno en la sesión (C19)', async ({ page }) => {
   await page.goto('/entreno/sesion/b1')
-  await page.getByRole('button', { name: 'Añadir ejercicio' }).click()
+  await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
+  await page.getByRole('button', { name: 'Cambiar', exact: true }).click()
+  await page
+    .getByRole('dialog', { name: 'Cambiar ejercicio' })
+    .getByRole('button', { name: /Elegir cualquier/ })
+    .click()
   await expect(page.getByRole('dialog', { name: 'Elegir ejercicio' })).toBeVisible()
   await sinFallos(page)
 })
