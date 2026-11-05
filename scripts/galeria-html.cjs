@@ -8,18 +8,10 @@ const LOGIC = `
 <h2>Lógica: qué ve cada usuario</h2>
 <ol>
   <li><b>Abrir la app.</b> Sin perfil guardado → Bienvenida. Con perfil → Hoy.</li>
-  <li><b>Objetivo (1/2).</b> Marca la fase: ganar músculo = volumen, perder grasa = definición, sentirte mejor = mantenimiento (calorías y coach).</li>
-  <li><b>Nivel y días (2/2).</b> Principiante: de 2 a 5 días. Intermedio y avanzado: de 2 a 6. Si pasas a principiante con 6 marcado, baja a 5.</li>
-  <li><b>Elige tu rutina.</b>
-    <ul>
-      <li><b>Recomendadas para ti</b>: rutinas de tus días y tu nivel. Si no hay de esos días exactos, las del número de días más cercano.</li>
-      <li><b>Principiante que pide más de 4 días</b>: se le recomiendan de 4 con el aviso «más días no es mejor», y aparte «Si prefieres 5 días». Nunca una solo de 6.</li>
-      <li><b>Principiante</b>: además de las de su nivel, ve las de intermedio con la etiqueta «Ajustada a tu nivel». Al elegirlas, series ×0,7 (mínimo 1) y RPE 7 en compuestos pesados / 8 en el resto; los valores originales se guardan.</li>
-      <li><b>Orden</b>: primero las de su nivel (las de MUTA delante), al final las ajustadas.</li>
-      <li><b>Ver rutinas de otros días</b>: el resto, escondido detrás de un botón.</li>
-      <li>Al tocar una tarjeta se guarda como plan actual y se va a Entreno; la elegida lleva «Tu rutina».</li>
-    </ul>
-  </li>
+  <li><b>Objetivo (1/2).</b> Marca la fase: ganar músculo = volumen, perder grasa = definición, sentirte mejor = mantenimiento.</li>
+  <li><b>Nivel y días (2/2).</b> Principiante: de 2 a 5 días. Intermedio y avanzado: de 2 a 6.</li>
+  <li><b>Elige tu rutina.</b> «Para ti» con las que encajan con tus días y tu nivel; los tipos de entrenamiento, con filtros; o tu rutina desde un CSV.</li>
+  <li><b>Entreno.</b> Tu plan → Ver sesión → la sesión en curso → el resumen. Editar rutina cambia tu plan para todas las semanas sin tocar la rutina original; los ejercicios se añaden ahí, no en la sesión.</li>
   <li><b>Pestañas.</b> Se ocultan en la bienvenida, la sesión en curso y el resumen (pantalla completa).</li>
 </ol>`
 

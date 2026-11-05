@@ -4,6 +4,10 @@ import { muscleOf } from './muscleOf.ts'
 describe('músculo de cada ejercicio', () => {
   it('resuelve los casos que se confunden por el orden', () => {
     expect(muscleOf({ name: 'Seated Leg Curl' })).toBe('femoral')
+    // Curl femoral con fitball en tres partes (su documento: «estiramiento del femoral al bajar»)
+    expect(muscleOf({ name: 'Triple threat con fitball', originalName: 'SWISS BALL TRIPLE THREAT' })).toBe(
+      'femoral',
+    )
     expect(muscleOf({ name: 'Hammer Curl' })).toBe('biceps')
     expect(muscleOf({ name: 'Leg Press' })).toBe('cuadriceps')
     expect(muscleOf({ name: 'Leg Press Toe Press' })).toBe('gemelo')

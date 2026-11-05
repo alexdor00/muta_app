@@ -32,9 +32,11 @@ export function buscarEjercicios(query: string, muscle: MuscleId | null): Librar
  */
 const ALIAS = aliases as Record<string, string>
 
-/** Sin el prefijo de superserie ni de serie top o de descarga («A1: Curl araña» → «Curl araña»). */
+/**
+ * Sin el prefijo de superserie ni de serie top o de descarga, ni «(a elegir)» detrás («A1: Curl araña» → «Curl araña»).
+ */
 const sinPrefijo = (n: string) =>
-  n.replace(/^(Superserie \+ )?[A-E]\d+[.:]\s*|^Serie (top|de descarga):\s*/, '')
+  n.replace(/^(Superserie \+ )?[A-E]\d+[.:]\s*|^Serie (top|de descarga):\s*|\s*\(a elegir\)$/g, '')
 
 /** Un ejercicio de la biblioteca por su nombre (sin mirar mayúsculas ni el prefijo de superserie) o su alias, o null. */
 export function porNombre(nombre: string): LibraryExercise | null {

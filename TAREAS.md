@@ -10,12 +10,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 - **Entreno está completo.** Siguiente área, en el orden del documento de rediseño (Entreno → Bienvenida → **Hoy** →
   Progreso → Comida): **Hoy**. Primero el PNG con sus funcionalidades y las capturas del prototipo que le corresponden, y
   esperar a que se apruebe (regla de CLAUDE.md); después, su rama `pantalla/hoy`.
-- **Datos**: sustituciones de Women's Specialization y Comeback Bridge (a mano, de sus PDF; ver [docs/datos.md](docs/datos.md));
-  ficha para los nombres de las rutinas sin pareja en la biblioteca (`private/informes/ejercicios-sin-ficha.txt`), con datos
-  verificados.
 - **Unir la rama `pantalla/estilo-blanco-negro` a `main`** (PR en GitHub, con la CI en verde): revisarla antes en un móvil real con
   `npm run dev` (grupos, selector de días, «!» de cada tarjeta, descansos). Hasta ahora solo se ha visto en el navegador simulado.
-- Después, **arreglar la galería de capturas** (`npm run galeria`): espera el texto «Recomendadas para ti», que ya no existe en la app.
 - Proteger la rama `main` en GitHub (Settings → Branches → exigir que la CI pase, job `check`). La hace el dueño del repositorio.
 
 ## Hecho
@@ -30,6 +26,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   - Los discos del gimnasio (en Tu material y en la calculadora): la calculadora solo usa los que hay.
   - Técnicas de intensidad (dropset, mecánico, rest-pause, parciales): cada serie trae su fila para apuntarla desde el
     principio, y en Editar rutina se pone o quita en el desplegable «Técnica».
+  - Datos: sustituciones de Women's Specialization y Comeback Bridge (rev 17); ejercicios sin ficha revisados (solo quedan
+    huecos y estiramientos). Galería de capturas rehecha con las pantallas de hoy (`npm run galeria`, 27).
   - Sin «Añadir ejercicio» en la sesión (solo en Editar rutina); filas de las series en un gris más fuerte.
   - Lo último de Entreno: el «···» de la ficha (añadir a una sesión con «Deshacer», cambiar en tu plan), «Tu material» en
     Perfil (lo que no tienes, al final y en gris en la biblioteca y al cambiar) y la imagen para compartir el resumen (C25).

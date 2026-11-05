@@ -64,7 +64,16 @@ las tienen en la lista «Exercise Substitutions» del final del documento: `priv
 excéntrica, top set…), traduce con `translate.cjs` y corrige con `sustituciones-es.tsv` (traducciones revisadas a mano; vacío =
 resto de un corte, no es un ejercicio). Solo rellena donde no hay nada. Rev 15 de `_meta.json`: el 74 % de los ejercicios
 tienen sustituciones del documento. Sin lista en el documento: Women's Foundation, Optimization, Glute Hypertrophy y At-Home;
-pendientes: Women's Specialization (en columnas de la tabla) y Comeback Bridge (la página es una imagen).
+Women's Specialization y Comeback Bridge, con `private/herramientas/sustituciones-columna.cjs` (rev 17, 2026-11-05): la primera
+las trae en la columna «Alternate exercise» de cada tabla (`alternas-columna.mjs` las empareja con su fila por la altura en
+el PDF); la segunda, en una lista de texto con el título mal escrito («Exercise Subtitutions», páginas 38-39), copiada en
+`alternas-comeback.json`. Sin sustitutos porque el documento no los da: Dominada y Elevaciones laterales con mancuernas
+(Comeback).
+
+**Ejercicios sin ficha** (`private/informes/ejercicios-sin-ficha.txt`, rehecho el 2026-11-05): solo quedan huecos para elegir
+(«Ejercicio de punto débil», «… (a elegir)»), estiramientos de 30 s y «Sacar la barra de sentadilla (sin bajar)»: no son series de
+trabajo. «(a elegir)» detrás de un ejercicio ya no impide encontrar su ficha, y «Triple threat con fitball» tiene la suya
+(femoral, por su documento).
 
 ## Explicaciones de los documentos y biblioteca local (2026-11-03)
 

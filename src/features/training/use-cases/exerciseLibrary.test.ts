@@ -35,6 +35,8 @@ describe('biblioteca de ejercicios', () => {
     // El prefijo de superserie o de serie top no cambia el ejercicio
     expect(porNombre('A1: Curl araña')?.id).toBe('curl_arana')
     expect(porNombre('Serie top: Sentadilla trasera')?.id).toBe('sentadilla')
+    // «(a elegir)» detrás tampoco
+    expect(porNombre('Sentadilla trasera (a elegir)')?.id).toBe('sentadilla')
     const ids = new Set(LIBRARY.map((e) => e.id))
     expect(Object.values(aliases).filter((id) => !ids.has(id))).toEqual([])
   })

@@ -1,218 +1,251 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test as base, type Page } from '@playwright/test'
 import fs from 'node:fs'
+import { test as conPlan } from './plan.ts'
 
-// Recorre todas las pantallas y estados y guarda una captura de cada una con su explicación.
+// Recorre las pantallas de hoy y guarda una captura de cada una con su explicación (npm run galeria). Primero la
+// bienvenida y Elige tu rutina (sin perfil); después Entreno con el plan de prueba de plan.ts (toca B1, con historial).
 const OUT = 'tests/e2e/capturas/galeria'
 const shots: { file: string; title: string; why: string }[] = []
 
 async function shot(page: Page, file: string, title: string, why: string) {
+  // Tras un toque, la transición entre pantallas termina antes de mirar nada
+  await page.waitForTimeout(500)
+  // Las imágenes ya decodificadas (una de fuera de la pantalla puede no decodificarse nunca: como mucho 2 s)
   for (const img of await page.locator('img').all())
-    await img.evaluate((el: HTMLImageElement) => el.decode()).catch(() => {})
+    await img
+      .evaluate((el: HTMLImageElement) =>
+        Promise.race([el.decode(), new Promise((r) => setTimeout(r, 2000))]),
+      )
+      .catch(() => {})
   await page.evaluate(() => document.getAnimations().forEach((a) => a.finish()))
-  await page.screenshot({ path: `${OUT}/${file}.png`, fullPage: true })
+  // Con una hoja abierta, solo la pantalla: la página entera mezclaría la hoja con lo de detrás
+  const hoja = await page.getByRole('dialog').count()
+  await page.screenshot({ path: `${OUT}/${file}.png`, fullPage: hoja === 0 })
   shots.push({ file, title, why })
 }
 
-const LEVEL = { beginner: 'Principiante', intermediate: 'Intermedio', advanced: 'Avanzado' } as const
-
-/** Hace la bienvenida con unas respuestas y deja la app en «Elige tu rutina». */
-async function onboard(page: Page, goal: string, level: keyof typeof LEVEL, days: number) {
-  await page.goto('/bienvenida/1')
-  await page.getByText(goal).click()
-  await page.getByRole('link', { name: 'Siguiente' }).click()
-  await page.getByText(LEVEL[level], { exact: true }).click()
-  await page.getByText(String(days), { exact: true }).click()
-  await page.getByRole('button', { name: 'Siguiente' }).click()
-  await expect(page).toHaveURL('/entreno/rutinas')
-  await expect(page.getByText('Recomendadas para ti')).toBeVisible()
+/** Espera a que la pantalla esté pintada (sin animaciones a medias). */
+async function lista(page: Page) {
+  await page.locator('main').first().waitFor()
+  await page.waitForTimeout(400)
 }
 
-test.describe.configure({ mode: 'serial' })
+base.describe.configure({ mode: 'serial' })
 // Solo con npm run galeria (no en la CI ni en npm run e2e)
-test.skip(!process.env.GALERIA, 'galería: usa npm run galeria')
+base.skip(!process.env.GALERIA, 'galería: usa npm run galeria')
 
-test('galería de pantallas', async ({ browser }) => {
-  test.setTimeout(420_000)
+// Sin capturas de antes: cada vez, solo las pantallas de ahora
+base.beforeAll(() => {
+  fs.rmSync(OUT, { recursive: true, force: true })
   fs.mkdirSync(OUT, { recursive: true })
-  const fresh = async () => (await browser.newContext({ ...test.info().project.use })).newPage()
+})
+base.afterAll(() => fs.writeFileSync(`${OUT}/galeria.json`, JSON.stringify(shots, null, 2)))
 
-  // 1. Primera vez
-  let page = await fresh()
+base('galería · bienvenida y elegir rutina', async ({ page }) => {
+  base.setTimeout(180_000)
   await page.goto('/')
   await expect(page).toHaveURL('/bienvenida')
   await shot(
     page,
     '01-bienvenida',
     'A01 · Bienvenida',
-    'Se ve al abrir la app cuando todavía no hay perfil guardado. Con perfil, la app abre en Hoy.',
+    'Al abrir la app sin perfil guardado. Con perfil, abre en Hoy.',
   )
   await page.getByRole('link', { name: 'Comenzar' }).click()
+  await expect(page).toHaveURL('/bienvenida/1')
   await shot(
     page,
     '02-objetivo',
     'A03 · Define tu objetivo (1/2)',
-    'Viene marcado «Ganar músculo». El objetivo decide la fase: ganar músculo = volumen, perder grasa = definición, sentirte mejor = mantenimiento.',
+    'Viene marcado «Ganar músculo». El objetivo decide la fase: volumen, definición o mantenimiento.',
   )
   await page.getByRole('link', { name: 'Siguiente' }).click()
+  await expect(page).toHaveURL('/bienvenida/2')
   await shot(
     page,
-    '03-plan-principiante',
-    'A04 · Personaliza tu plan (2/2) · principiante',
-    'Viene marcado Principiante y 3 días. Con Principiante solo se puede elegir de 2 a 5 días: el 6 no aparece.',
+    '03-nivel-y-dias',
+    'A04 · Personaliza tu plan (2/2)',
+    'Nivel y días por semana. Con Principiante, de 2 a 5 días; con Intermedio o Avanzado, también 6.',
   )
   await page.getByText('Intermedio', { exact: true }).click()
+  await page.getByText('4', { exact: true }).click()
+  await page.getByRole('button', { name: 'Siguiente' }).click()
+  await expect(page).toHaveURL('/entreno/rutinas')
+  await expect(page.getByRole('region', { name: 'Para ti' })).toBeVisible()
   await shot(
     page,
-    '04-plan-intermedio',
-    'A04 · Personaliza tu plan · intermedio o avanzado',
-    'Con Intermedio o Avanzado aparece el 6. Si tenías 6 y vuelves a Principiante, baja a 5.',
+    '04-elegir-rutina',
+    'Elige tu rutina',
+    'Arriba «Para ti» (las que encajan con tus días y tu nivel), debajo los tipos de entrenamiento y cargar tu rutina desde un CSV.',
   )
-  await page.close()
+  await page
+    .getByRole('region', { name: 'Tipos de entrenamiento' })
+    .getByRole('button', { name: /^Hipertrofia/ })
+    .click()
+  await expect(page).toHaveURL('/entreno/rutinas/hipertrofia')
+  await shot(
+    page,
+    '05-tipo',
+    'Tipo de entrenamiento',
+    'Cabecera con foto, cuántas rutinas hay, filtros y la lista.',
+  )
+  await page.goto('/entreno/programa/muta-cuerpo-completo-4d')
+  await lista(page)
+  await shot(
+    page,
+    '06-rutina',
+    'Detalle de la rutina',
+    'La rutina tal cual, por sesiones; los ejercicios opcionales en gris. «Empezar esta rutina» la guarda como tu plan.',
+  )
+})
 
-  // 2. Elige tu rutina según las respuestas
-  const cases: [string, keyof typeof LEVEL, number, string, string][] = [
+conPlan('galería · Entreno con tu plan', async ({ page }) => {
+  conPlan.setTimeout(300_000)
+  await page.goto('/entreno')
+  await lista(page)
+  await shot(
+    page,
+    '10-tu-plan',
+    'Tu plan',
+    'Carrusel de sesiones con «Empezar», tu semana con los descansos y la biblioteca. «Editar» abre Tu rutina.',
+  )
+  await page.getByRole('button', { name: 'Editar', exact: true }).click()
+  await shot(page, '11-tu-rutina', 'Tu rutina', 'Editar rutina, cambiarla, el coach y volver a la original.')
+  await page
+    .getByRole('dialog', { name: 'Tu rutina' })
+    .getByRole('button', { name: /Editar rutina/ })
+    .click()
+  const editar = page.getByRole('dialog', { name: 'Editar rutina' })
+  await expect(editar.getByRole('list', { name: 'Tu semana' })).toBeVisible()
+  await shot(
+    page,
+    '12-editar-rutina',
+    'Editar rutina',
+    'Tu semana con los días de descanso; se toca una sesión.',
+  )
+  await editar
+    .getByRole('list', { name: 'Tu semana' })
+    .getByRole('button', { name: /^\d+ Isquios, glúteo y pecho/ })
+    .click()
+  await shot(
+    page,
+    '13-editar-sesion',
+    'Editar rutina · una sesión',
+    'Orden, quitar, añadir ejercicios (solo aquí, no en la sesión), superseries y foto.',
+  )
+  await page
+    .getByRole('button', { name: /^Peso muerto rumano/ })
+    .first()
+    .click()
+  const ej = page.getByRole('dialog', { name: 'Peso muerto rumano' })
+  await ej.locator('summary', { hasText: 'Técnica' }).click()
+  await shot(
+    page,
+    '14-editar-ejercicio',
+    'Editar ejercicio',
+    'Series, repeticiones (o cada serie distinta), descanso, superserie, RIR y la técnica de intensidad.',
+  )
+
+  await page.goto('/entreno/rutina/b1')
+  await lista(page)
+  await shot(
+    page,
+    '15-ver-sesion',
+    'Ver sesión',
+    'La gráfica de la sesión y cada ejercicio con su cambio frente a la última vez.',
+  )
+
+  await page.goto('/entreno/sesion/b1')
+  await lista(page)
+  await shot(
+    page,
+    '16-sesion',
+    'Sesión en curso',
+    'Pantalla completa. La vez anterior en gris; teclado propio, descanso abajo y ★ si mejoras.',
+  )
+  await page.getByRole('button', { name: /^Esta sesión/ }).click()
+  await shot(
+    page,
+    '17-esta-sesion',
+    'Esta sesión',
+    'Tiempo, consejos de hoy, cambiar de sesión y descartarla.',
+  )
+  await page.getByRole('button', { name: 'Cerrar' }).click()
+  await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
+  await shot(
+    page,
+    '18-opciones-ejercicio',
+    '«···» de un ejercicio',
+    'Tus notas, la ficha, hacer ahora, cambiar, discos y cronómetro.',
+  )
+  await page.getByRole('button', { name: 'Discos' }).click()
+  await page.getByLabel('Peso total').fill('62,5')
+  await shot(
+    page,
+    '19-discos',
+    'Discos por lado',
+    'Con los discos que hay en tu gimnasio (se eligen aquí o en el Perfil).',
+  )
+  await page.getByRole('button', { name: 'Cerrar' }).click()
+  for (let n = 1; n <= 3; n++) await page.getByRole('button', { name: `Serie ${n} hecha` }).click()
+  await page.getByRole('button', { name: 'Terminar' }).click()
+  await page
+    .getByRole('dialog', { name: '¿Terminar con tan poco?' })
+    .getByRole('button', { name: 'Terminar' })
+    .click()
+  await expect(page).toHaveURL('/entreno/sesion/b1/resumen')
+  await lista(page)
+  await shot(
+    page,
+    '20-resumen',
+    'Resumen',
+    'Racha, semana, cifras y frente a la última vez; se puede compartir como imagen.',
+  )
+
+  await page.goto('/entreno/ejercicio/peso_muerto_rumano')
+  await lista(page)
+  await shot(
+    page,
+    '21-ficha',
+    'Ficha del ejercicio',
+    'Explicación, músculos, tus notas y las dos gráficas. «···» lo añade o cambia en tu plan.',
+  )
+  await page
+    .getByRole('region', { name: 'Músculos que trabaja' })
+    .getByRole('button', { name: 'Femoral' })
+    .click()
+  await shot(
+    page,
+    '22-musculo',
+    'Ficha del músculo',
+    'Series por semana frente a tu rango, objetivo y dónde lo entrenas.',
+  )
+
+  const resto: [string, string, string, string][] = [
     [
-      'Ganar músculo',
-      'beginner',
-      3,
-      '05-rutinas-principiante-3',
-      'Principiante, 3 días: recomienda las rutinas de 3 días pensadas para su nivel (la propia de MUTA primero) y, al final, las de intermedio marcadas «Ajustada a tu nivel».',
+      '/entreno?hoja=biblioteca',
+      '23-biblioteca',
+      'Biblioteca de ejercicios',
+      'Buscar y filtrar por músculo.',
     ],
-    [
-      'Perder grasa',
-      'beginner',
-      5,
-      '06-rutinas-principiante-5',
-      'Principiante que pide 5 días: se le recomiendan de 4 con el aviso «más días no es mejor», y debajo «Si prefieres 5 días» con las de 5. Nunca se le ofrece una solo de 6.',
-    ],
-    [
-      'Ganar músculo',
-      'intermediate',
-      4,
-      '07-rutinas-intermedio-4',
-      'Intermedio, 4 días: todas las de 4 días para su nivel, sin aviso ni ajustes.',
-    ],
-    [
-      'Sentirte mejor',
-      'advanced',
-      6,
-      '08-rutinas-avanzado-6',
-      'Avanzado, 6 días: las de 6 días, con Empuje, tirón y pierna de MUTA primero.',
-    ],
-    [
-      'Ganar músculo',
-      'intermediate',
-      2,
-      '09-rutinas-intermedio-2',
-      'Intermedio, 2 días: solo hay una rutina de 2 días (Esencial 45 min).',
-    ],
+    ['/perfil', '24-perfil', 'Perfil · Tu material', 'Tu material y los discos del gimnasio.'],
+    ['/hoy', '25-hoy', 'Hoy (pendiente)', 'La siguiente área por diseñar.'],
+    ['/comida', '26-comida', 'Comida (pendiente)', 'Pendiente de diseño.'],
+    ['/progreso', '27-progreso', 'Progreso (pendiente)', 'Pendiente de diseño.'],
+    ['/no-existe', '28-404', 'Pantalla que no existe', 'Cualquier dirección desconocida.'],
   ]
-  for (const [goal, level, days, file, why] of cases) {
-    page = await fresh()
-    await onboard(page, goal, level, days)
-    await shot(page, file, `Elige tu rutina · ${LEVEL[level].toLowerCase()} · ${days} días`, why)
-    if (file === '07-rutinas-intermedio-4') {
-      await page.getByRole('button', { name: 'Ver rutinas de otros días' }).click()
-      await shot(
-        page,
-        '10-rutinas-otras',
-        'Elige tu rutina · otras rutinas desplegadas',
-        'Lo que no es de tus días queda escondido detrás de «Ver rutinas de otros días».',
-      )
-      await page
-        .getByRole('region', { name: 'Recomendadas para ti' })
-        .getByRole('button', { name: /^Hipertrofia/ })
-        .click()
-      await expect(page).toHaveURL(/\/entreno\/rutinas\/hipertrofia/)
-      await shot(
-        page,
-        '10b-familia-muta',
-        'Tipo de rutina · Hipertrofia',
-        'Al tocar una familia: arriba «Para ti» (las versiones que encajan con tus días y nivel) y debajo «Más de este tipo». Se puede elegir cualquiera.',
-      )
-    }
-    if (file === '09-rutinas-intermedio-2') {
-      // Con una rutina elegida: etiqueta «Tu rutina» y la app ya abre en Hoy
-      await page
-        .getByRole('button', { name: /Esencial 45 min/ })
-        .first()
-        .click()
-      await expect(page).toHaveURL('/entreno')
-      await shot(
-        page,
-        '11-tu-plan',
-        'A05 · Tu plan (provisional)',
-        'Tras elegir rutina se va a Entreno. Pendiente de diseño: aquí irá la portada con la sesión que toca.',
-      )
-      await page.goto('/entreno/rutinas')
-      await expect(page.getByText('Tu rutina', { exact: true })).toBeVisible()
-      await shot(
-        page,
-        '12-rutinas-con-elegida',
-        'Elige tu rutina · con una ya elegida',
-        'La rutina actual lleva la etiqueta «Tu rutina». Se entra desde «Cambiar rutina» en Tu plan.',
-      )
-      const rest: [string, string, string, string][] = [
-        ['/', '13-hoy', 'Hoy (provisional)', 'Con perfil guardado, la app abre aquí. Pendiente de diseño.'],
-        ['/entreno/rutina', '14-tu-rutina', 'A06 · Tu rutina (provisional)', 'Pendiente de diseño.'],
-        [
-          '/entreno/sesion/a1/inicio',
-          '15-sesion-inicio',
-          'C00 · Sesión antes de empezar (provisional)',
-          'Lleva pestañas: todavía no estás entrenando.',
-        ],
-        [
-          '/entreno/sesion/a1',
-          '16-sesion',
-          'C01–C03 · Sesión en curso (provisional)',
-          'Pantalla completa, sin pestañas, para no salir por error.',
-        ],
-        [
-          '/entreno/sesion/a1?hoja=esta-sesion',
-          '17-hoja',
-          'C08 · Hoja «Esta sesión» (provisional)',
-          'Las hojas van en la dirección (?hoja=…): el gesto atrás del móvil cierra la hoja.',
-        ],
-        [
-          '/entreno/sesion/a1/resumen',
-          '18-resumen',
-          'C24 · Resumen (provisional)',
-          'Pantalla completa, sin pestañas.',
-        ],
-        [
-          '/entreno/ejercicio/press_banca',
-          '19-ficha',
-          'Ficha de ejercicio (propuesta)',
-          'Pendiente de diseño.',
-        ],
-        ['/comida', '20-comida', 'Comida (provisional)', 'Pendiente de diseño.'],
-        ['/progreso', '21-progreso', 'Progreso (provisional)', 'Pendiente de diseño.'],
-        ['/perfil', '22-perfil', 'Perfil (propuesta)', 'Se abre desde el avatar. No marca ninguna pestaña.'],
-        ['/no-existe', '23-404', 'Pantalla que no existe', 'Cualquier dirección desconocida.'],
-      ]
-      for (const [url, f, title, w] of rest) {
-        await page.goto(url)
-        await page.locator('main').waitFor()
-        await page.waitForTimeout(400)
-        await shot(page, f, title, w)
-      }
-      await page.goto('/dev/ui')
-      await shot(
-        page,
-        '24-dev-ui-claro',
-        '/dev/ui · sistema de diseño (claro)',
-        'Todas las piezas comunes. Una prueba mide que cumplen los tokens.',
-      )
-      await page.getByRole('button', { name: 'Oscuro' }).click()
-      await shot(
-        page,
-        '25-dev-ui-oscuro',
-        '/dev/ui · sistema de diseño (oscuro)',
-        'Mismas piezas en modo oscuro.',
-      )
-    }
-    await page.close()
+  for (const [url, f, title, why] of resto) {
+    await page.goto(url)
+    await lista(page)
+    await shot(page, f, title, why)
   }
-
-  fs.writeFileSync(`${OUT}/galeria.json`, JSON.stringify(shots, null, 2))
+  await page.goto('/dev/ui')
+  await shot(
+    page,
+    '29-dev-ui-claro',
+    '/dev/ui · sistema de diseño (claro)',
+    'Las piezas comunes; una prueba mide que cumplen los tokens.',
+  )
+  await page.getByRole('button', { name: 'Oscuro' }).click()
+  await shot(page, '30-dev-ui-oscuro', '/dev/ui · sistema de diseño (oscuro)', 'Las mismas piezas en oscuro.')
 })
