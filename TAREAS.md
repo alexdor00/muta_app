@@ -10,9 +10,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 - **Entreno está completo.** Siguiente área, en el orden del documento de rediseño (Entreno → Bienvenida → **Hoy** →
   Progreso → Comida): **Hoy**. Primero el PNG con sus funcionalidades y las capturas del prototipo que le corresponden, y
   esperar a que se apruebe (regla de CLAUDE.md); después, su rama `pantalla/hoy`.
-- **Unir la rama `pantalla/estilo-blanco-negro` a `main`** (PR en GitHub, con la CI en verde): revisarla antes en un móvil real con
-  `npm run dev` (grupos, selector de días, «!» de cada tarjeta, descansos). Hasta ahora solo se ha visto en el navegador simulado.
-- Proteger la rama `main` en GitHub (Settings → Branches → exigir que la CI pase, job `check`). La hace el dueño del repositorio.
+- **Unir `pantalla/estilo-blanco-negro` a `main`**: comprobada (check y e2e en verde, 2026-11-05) y subida; `main` solo acepta
+  PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
 ## Hecho
 
