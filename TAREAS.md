@@ -4,17 +4,29 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
+- **Probar Comida (rama `pantalla/comida`, sale de `pantalla/sesion`) en un móvil real**: calcular tu objetivo, añadir con
+  la ración, Semana, «+ Pesarme» y, con unas semanas de datos, la sugerencia del entrenador. Después, PR a `main` (detrás del
+  de `pantalla/sesion`).
 - **Probar la rama `pantalla/sesion` en un móvil real** con `npm run dev` (dirección «Network», mismo wifi): Tu plan (tarjetas
   con «▶ Empezar», «Editar», Tu semana, Hoy descansas), Editar rutina, la sesión (teclado, dropsets, notas), Ver sesión y las
   fichas. Hasta ahora todo se ha visto solo en el móvil simulado. Después, PR a `main` con la CI en verde.
-- **Entreno está completo.** Siguiente área, en el orden del documento de rediseño (Entreno → Bienvenida → **Hoy** →
-  Progreso → Comida): **Hoy**. Primero el PNG con sus funcionalidades y las capturas del prototipo que le corresponden, y
-  esperar a que se apruebe (regla de CLAUDE.md); después, su rama `pantalla/hoy`.
+- **Entreno y Comida están hechas.** Siguiente área: **Hoy** (luego Progreso). Primero el PNG con sus funcionalidades y las
+  capturas del prototipo que le corresponden, y esperar a que se apruebe (regla de CLAUDE.md); después, su rama `pantalla/hoy`.
+  Hoy se quedará con el peso de cada día (ahora se apunta en Comida · Semana) y leerá `bodyLog`.
 - **Unir `pantalla/estilo-blanco-negro` a `main`**: comprobada (check y e2e en verde, 2026-11-05) y subida; `main` solo acepta
   PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
 ## Hecho
 
+- Rama `pantalla/comida` (2026-11-05, sin unir; Comida antes que Hoy por decisión del usuario). Verificado: `npm run check` y
+  los e2e de Comida (7 de 7, con axe).
+  - Diseño aprobado `Desktop/MUTA-Comida-diseno.png`: Hoy (tarjeta lima con lo que te queda, aviso del entrenador, comidas),
+    Añadir (buscador por palabras, repetir lo de ayer, solo kcal y proteína, recientes, guardadas, tus alimentos, 16
+    categorías), la ración (raciones o gramos, «Así queda tu día»), Semana (media, proteína, peso), Tu objetivo (cómo sale,
+    revisión semanal, historial con «Deshacer») y la sugerencia (−150 / +150 kcal con sus comprobaciones).
+  - **El entrenador propone, no aplica**: «Aplicar desde mañana» o «Ahora no». Reglas de `docs/conocimiento/02-reglas.md` § 8.
+  - Base de 1.493 alimentos (`shared/content/foods.json`, del prototipo), descargada aparte. Detalle en
+    [src/features/nutrition/CLAUDE.md](src/features/nutrition/CLAUDE.md).
 - Rama `pantalla/sesion` (2026-11-03/04, sin unir; último commit en `git log`). Verificado: `npm run check` y los e2e.
   - Datos reales en todo Entreno: Tu plan, Ver sesión, la sesión, el resumen y las fichas leen tu plan y tus entrenos; la sesión
     va por rotación, se guarda a cada serie y al terminar pasa a la siguiente.
@@ -68,7 +80,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Pendiente (por prioridad)
 
-1. Hoy, Progreso y Comida, en ese orden (cada una con su PNG aprobado antes).
+1. Hoy y Progreso, en ese orden (cada una con su PNG aprobado antes). Comida versión 2 (dieta cargada, compra) y 3 (escáner).
 2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión y la sesión ya dicen «Sugerido»).
 3. Coach: usar las elecciones guardadas (prioridades, puntos débiles) y `adaptVolume`.
 4. Importar/exportar copia de seguridad en CSV/JSON desde Perfil.

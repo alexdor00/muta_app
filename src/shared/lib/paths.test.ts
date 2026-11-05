@@ -31,6 +31,14 @@ describe('isFullScreen', () => {
   })
 })
 
+describe('Comida', () => {
+  it('«Tu objetivo» va a pantalla completa y marca la pestaña Comida; Comida lleva pestañas', () => {
+    expect(isFullScreen(paths.nutritionTarget)).toBe(true)
+    expect(isFullScreen(paths.nutrition)).toBe(false)
+    expect(tabOf(paths.nutritionTarget)).toBe('nutrition')
+  })
+})
+
 describe('tabOf', () => {
   it('cada ruta marca su pestaña', () => {
     expect(tabOf(paths.today)).toBe('today')

@@ -1,0 +1,49 @@
+/* Comida: cabecera con «Objetivo», el control Hoy · Semana y el estado sin objetivo. */
+
+.target {
+  display: inline-flex;
+  align-items: center;
+  height: var(--avatar);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.segment {
+  padding: 0 var(--gutter) var(--space-3);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-2) var(--gutter);
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--food-hero);
+  color: var(--on-food-hero);
+}
+
+.emptyTitle {
+  font: var(--text-title-2);
+}
+
+.emptyText {
+  font: var(--text-subhead);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.emptyButton {
+  min-height: var(--control-lg);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--on-food-hero);
+  color: var(--food-hero);
+  font: var(--text-headline);
+  cursor: pointer;
+}

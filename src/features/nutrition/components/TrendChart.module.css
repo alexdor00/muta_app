@@ -1,0 +1,40 @@
+/* Tendencia del peso: línea negra, pesajes en gris y la banda de lo previsto. */
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--separator);
+  stroke-width: var(--hairline);
+}
+
+.axis {
+  font: var(--text-chart-axis);
+  fill: var(--label-2);
+}
+
+.band {
+  fill: var(--surface-3);
+}
+
+.dot {
+  fill: var(--label-2);
+  opacity: 0.6;
+}
+
+.line {
+  fill: none;
+  stroke: var(--label);
+  stroke-width: var(--border);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.last {
+  fill: var(--label);
+}

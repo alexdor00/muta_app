@@ -1,6 +1,6 @@
 # Arquitectura y flujo de datos
 
-La app se organiza por **áreas** (Entreno, Perfil, y las pendientes Hoy, Comida y Progreso) y, dentro de cada
+La app se organiza por **áreas** (Entreno, Comida, Perfil, y las pendientes Hoy y Progreso) y, dentro de cada
 una, por **capas**. Lo común vive en `shared/`. Las fronteras no dependen de la disciplina: el linter rechaza un
 import prohibido (`eslint.config.js`, tabla «Quién puede usar a quién» del documento de rediseño).
 
@@ -65,6 +65,20 @@ pieza de un área que usa otra. Lo que eliges se guarda en `userContent/material
 Todo lo que se enseña de tus entrenos (la vez anterior, gráficas, tu semana, series por músculo, racha) se calcula
 desde `workouts`; no hay otra copia.
 
+## Flujo de datos: Comida
+
+```n IndexedDB `userContent/nutricion` (tus datos y tu objetivo) + `foodLog` (por día) + `bodyLog` (pesajes) + `coach` (cambios)
+│
+▼ use-cases/nutritionStore.ts · cargarComida() → state/comida.ts (objetivo del día, semana, tendencia del peso)
+│ cada 7 días: domain/review.ts · revisar() → una sugerencia «pendiente» en `coach` (nunca se aplica sola)
+▼
+Comida (Hoy · Semana) · Tu objetivo (solo pintan)
+│ añadir / quitar → use-cases/foodLog.ts → `foodLog`; la base (shared/content/foods.json) se descarga al abrir «Añadir»
+▼ «Aplicar desde mañana» → use-cases/target.ts → `userContent/nutricion` (kcal desde mañana) y `coach` (aplicado)
+
+```n
+Comida lee de Perfil solo su objetivo y sus días de entreno (`phaseOf` de su `index.ts`) para el primer cálculo.
+
 ## Datos y contenido
 
 - **Esquema**: `shared/data/schema.ts` (13 almacenes); cada cambio de formato es una migración numerada con copia previa.
@@ -78,3 +92,4 @@ desde `workouts`; no hay otra copia.
 
 CI (`.github/workflows/ci.yml`): formato → linter con fronteras → CSS con tokens → tipos → pruebas → build →
 tamaño (`size-limit`) → guardas del proyecto → recorridos y accesibilidad (Playwright + axe) → Lighthouse.
+```

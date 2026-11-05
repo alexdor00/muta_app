@@ -1,0 +1,229 @@
+/* Tu objetivo: barra con atrás, la tarjeta negra, «Cómo sale», la revisión y el historial. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-block);
+  padding: calc(var(--safe-top) + var(--space-2)) var(--gutter) calc(var(--gap-block) + var(--safe-bottom));
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: var(--tap-min) 1fr var(--tap-min);
+  align-items: center;
+  margin: 0 calc(var(--space-3) * -1);
+}
+
+.barTitle {
+  font: var(--text-headline);
+  text-align: center;
+}
+
+.title {
+  font: var(--text-title-2);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list > li {
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.list > li:last-child {
+  border-bottom: 0;
+}
+
+.row,
+.rowButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  padding: var(--space-2) 0;
+}
+
+.rowButton {
+  width: 100%;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.rowText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  font: var(--text-body);
+}
+
+.row b,
+.rowButton b {
+  font: var(--text-headline);
+}
+
+.strong {
+  font: var(--text-headline);
+}
+
+.foot {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.sub {
+  font: var(--text-subhead);
+  color: var(--label-2);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.note {
+  margin-top: var(--space-2);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.link {
+  min-height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.reviewHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.reviewTitle {
+  font: var(--text-headline);
+}
+
+.badge {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+}
+
+.see {
+  align-self: flex-start;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.mark svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.markOn {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.markOff {
+  border: var(--border) solid var(--separator);
+  background: var(--bg);
+}
+
+.undo {
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.next {
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  font: var(--text-subhead);
+}
+
+/* La sugerencia */
+.suggestionTitle {
+  margin-top: var(--space-1);
+  font: var(--text-title-2);
+}
+
+.change {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  font: var(--text-title-2);
+}
+
+.from {
+  font: var(--text-food-number);
+  color: var(--label-2);
+}
+
+.to {
+  font: var(--text-food-number);
+}
+
+.checks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font: var(--text-subhead);
+}
+
+.checks li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}

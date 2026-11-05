@@ -1,0 +1,117 @@
+/* Las comidas del día, como la lista de ejercicios de Ver sesión. */
+
+.block {
+  padding: 0 var(--gutter);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title {
+  font: var(--text-title-2);
+}
+
+.count {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: var(--row);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.open > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font: var(--text-headline);
+}
+
+.items {
+  overflow: hidden;
+  font: var(--text-subhead);
+  color: var(--label-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.numbers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.kcal {
+  font: var(--text-body);
+}
+
+.protein {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.add {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.add svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* La siguiente comida que falta: «+» en negro */
+.next {
+  background: var(--accent);
+  color: var(--on-accent);
+}

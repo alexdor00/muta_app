@@ -24,6 +24,8 @@ export const paths = {
   exercise: (exerciseId: string, desde?: { sesion: string; ejercicio: number }) =>
     `/entreno/ejercicio/${exerciseId}${desde ? `?sesion=${desde.sesion}&ej=${desde.ejercicio}` : ''}`,
   nutrition: '/comida',
+  /** Tu objetivo de comida: cómo sale, la revisión semanal del entrenador y el historial. */
+  nutritionTarget: '/comida/objetivo',
   progress: '/progreso',
   profile: '/perfil',
 } as const
@@ -58,11 +60,12 @@ export function tabOf(path: string): Tab | null {
 
 /**
  * Pantalla completa, sin barra de pestañas: la bienvenida, ver una sesión (lleva «Empezar» fijo abajo), la ficha de un
- * ejercicio (lleva su propia flecha atrás) y entrenar
+ * ejercicio y «Tu objetivo» de Comida (llevan su propia flecha atrás) y entrenar
  * (sesión en curso y resumen), para no salir por error. La sesión antes de empezar (inicio) sí lleva pestañas.
  */
 export function isFullScreen(path: string): boolean {
   if (path === paths.welcome || path.startsWith(`${paths.welcome}/`)) return true
   if (path.startsWith(`${paths.routine}/`) || path.startsWith('/entreno/ejercicio/')) return true
+  if (path === paths.nutritionTarget) return true
   return /^\/entreno\/sesion\/[^/]+(\/resumen)?\/?$/.test(path)
 }

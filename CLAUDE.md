@@ -1,7 +1,7 @@
 # MUTA
 
 App de entrenamiento instalable (PWA) en español. Se construye pantalla a pantalla siguiendo el documento
-de rediseño; hoy está hecha el área **Entreno** (elegir rutina y ver su detalle) y la **bienvenida**.
+de rediseño; hoy están hechas las áreas **Entreno** y **Comida** y la **bienvenida**.
 Repositorio público: `alexdor00/muta_app`. Cómo trabajar con ella: ver «Reglas globales».
 
 ## Stack
@@ -29,7 +29,8 @@ Los e2e se construyen sin las rutinas privadas (`VITE_NO_LOCAL_PROGRAMS=1`), igu
 - `src/app/` — arranque, rutas, pestañas, pantalla de error, actualizaciones → [CLAUDE.md](src/app/CLAUDE.md)
 - `src/features/training/` — **Entreno**: catálogo, detalle de rutina, elecciones → [CLAUDE.md](src/features/training/CLAUDE.md)
 - `src/features/profile/` — bienvenida y perfil → [CLAUDE.md](src/features/profile/CLAUDE.md)
-- `src/features/today|nutrition|progress/` — Hoy, Comida, Progreso: solo pantallas «pendientes» todavía
+- `src/features/nutrition/` — **Comida**: apuntar, la semana, tu objetivo y el entrenador (propone, no aplica) → [CLAUDE.md](src/features/nutrition/CLAUDE.md)
+- `src/features/today|progress/` — Hoy y Progreso: solo pantallas «pendientes» todavía
 - `src/shared/` — lo común: `ui`, `data`, `content`, `platform`, `lib` → [CLAUDE.md](src/shared/CLAUDE.md)
 - `tests/e2e/` — recorridos, accesibilidad y capturas → [CLAUDE.md](tests/e2e/CLAUDE.md)
 - `scripts/` — generadores de contenido y documentos (no forman parte de la app)

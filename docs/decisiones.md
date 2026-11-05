@@ -289,3 +289,19 @@ pauta, cerrado: no molesta) pone cualquiera a cualquier ejercicio o quita la de 
 - **Las filas de las series**, un gris más fuerte (`--surface-2`), y la hecha un tono más (`--surface-3`, nuevo).
 - **Consejo de la técnica de intensidad** (Editar rutina), del usuario: mejor en la última serie del último ejercicio de
   un músculo. Si hay tiempo, rinde más una serie normal de más, siempre que sigas ganando fuerza.
+
+## 2026-11-05 · Comida antes que Hoy, y el entrenador solo propone
+
+- **Comida se hace antes que Hoy**, por decisión del usuario (el documento de rediseño ponía Hoy → Progreso → Comida). Diseño
+  aprobado: `Desktop/MUTA-Comida-diseno.png` (versión 1: Hoy, Añadir, la ración, Semana, Tu objetivo y la sugerencia).
+- **El entrenador propone, nunca aplica.** El prototipo tenía «Ajuste automático»; el usuario quiere sugerencias: la revisión
+  semanal enseña qué cambia, por qué y lo que ha comprobado, y solo cambia con «Aplicar desde mañana» (con «Deshacer» e
+  historial). Por lo mismo, el objetivo **se guarda** al calcularlo: bajar de peso no lo recalcula solo; se recalcula si cambias
+  tu fase o tus datos.
+- **El peso se apunta en Comida** (Semana · «+ Pesarme») hasta que exista la pestaña Hoy; va a `bodyLog`, donde la leerán Hoy
+  y Progreso.
+- **El buscador busca cada palabra** en el nombre («salmon plancha» encuentra «Salmón a la plancha»); el prototipo exigía la
+  frase entera.
+- **La base de alimentos** (1.493, BEDCA y USDA) va en `shared/content/foods.json` y se descarga aparte al abrir «Añadir»:
+  no pesa al abrir la app. Su prueba admite, nombrándolas, las kcal que no cuadran con 4P + 4H + 9G por fibra, alcohol,
+  polioles o vinagre.

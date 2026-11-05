@@ -56,6 +56,17 @@
   --on-session-light-soft: rgb(255 255 255 / 72%);
   --on-session-light-line: rgb(255 255 255 / 22%);
   --session-text-shadow: 0 2px 14px rgb(0 0 0 / 60%); /* letra sobre las rayas */
+  /* Comida: la tarjeta de lo que te queda (lima, como la primera de Tu plan) y la de tu objetivo (negra) */
+  --food-hero: var(--session-1);
+  --on-food-hero: var(--on-session-dark);
+  --on-food-hero-soft: var(--on-session-dark-soft);
+  --food-hero-track: var(--on-session-dark-line);
+  --target-hero: var(--session-4);
+  --on-target-hero: var(--on-session-light);
+  --on-target-hero-soft: var(--on-session-light-soft);
+  --target-hero-step: var(--rest-step);
+  --target-chip: var(--session-1);
+  --goal-line: var(--streak); /* la raya del objetivo en las barras de la semana */
   --float-shadow:
     0 6px 18px rgb(0 0 0 / 28%), 0 1px 3px rgb(0 0 0 / 18%); /* botón que flota sobre una tarjeta («▶ Empezar») */
   --photo-card-scrim: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 55%) 100%);
@@ -94,6 +105,9 @@
   --text-chart-axis: 500 0.8125rem / 1 var(--font); /* 13: números y fechas de los ejes de una gráfica */
   --text-session-ghost: italic 900 11.875rem / 0.8 var(--font-condensed); /* 190: sigla de fondo, solo contorno */
   --text-brand: 800 4rem / 1 var(--font); /* 64: solo el logotipo MUTA de la bienvenida */
+  --text-food-hero: italic 900 4.25rem / 0.9 var(--font-condensed); /* 68: kcal por comer y tu objetivo */
+  --text-food-number: italic 900 2.75rem / 0.95 var(--font-condensed); /* 44: media de la semana, peso, la sugerencia */
+  --text-food-tile: italic 900 1.75rem / 1 var(--font-condensed); /* 28: cifras de la ración */
 
   /* Espacio: múltiplos de 4 */
   --space-1: 4px;

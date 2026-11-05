@@ -3,6 +3,8 @@
 const decimal = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 })
 // Los kilos llevan hasta dos decimales (discos de 1,25)
 const decimales = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 })
+// «2.260»: en español Intl no separa los miles de 4 cifras, y las kcal se leen mejor con el punto
+const entero = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0, useGrouping: 'always' })
 // A mano y no con Intl: según el navegador, Intl escribe «sept» o «sep.»; el diseño lleva «sep»
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
@@ -65,6 +67,23 @@ export function formatChange(ratio: number, cifras = 0): string {
 /** La fecha de un momento en hora local, como AAAA-MM-DD (la de hoy, sin argumento). */
 export function localDate(at = new Date()): string {
   return new Date(at.getTime() - at.getTimezoneOffset() * 60_000).toISOString().slice(0, 10)
+}
+
+/** Una fecha AAAA-MM-DD movida `days` días: («2026-11-05», −1) → «2026-11-04». */
+export function addDays(iso: string, days: number): string {
+  const d = new Date(`${iso}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+
+/** Días de una fecha AAAA-MM-DD a otra: («2026-11-01», «2026-11-05») → 4. */
+export function daysBetween(from: string, to: string): number {
+  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000)
+}
+
+/** Número entero con punto de miles: 2260 → «2.260». */
+export function formatInt(value: number): string {
+  return entero.format(Math.round(value))
 }
 
 /** Un rango de números: «6–10», o «15» si los dos son iguales. */

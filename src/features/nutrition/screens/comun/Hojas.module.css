@@ -1,0 +1,346 @@
+/* Lo común de las hojas de Comida: campos, filas de alimento, cifras y el − / +. */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sub {
+  font: var(--text-subhead);
+  color: var(--label-2);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.figures {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.figures b {
+  color: var(--label);
+}
+
+.foot {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.eyebrow {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+/* Buscador */
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label-2);
+}
+
+.search svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  outline: none;
+}
+
+/* Dos atajos en tarjeta gris */
+.quick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.quickItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: var(--row);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.quickTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.quickTitle svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Filtros que se deslizan de lado */
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 0 var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chip {
+  flex: none;
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-subhead);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chipOn {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: var(--weight-semibold);
+}
+
+/* Filas de alimentos */
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.rowMain {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: var(--row);
+  justify-content: center;
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.rowTitle {
+  font: var(--text-headline);
+}
+
+.rowDetail {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.rowKcal {
+  font: var(--text-body);
+  white-space: nowrap;
+}
+
+.round {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.round svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.textButton {
+  min-height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+/* El − / + de la ración */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.stepper .round {
+  width: var(--control-lg);
+  height: var(--control-lg);
+}
+
+.amount {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.amount input {
+  width: 100%;
+  max-width: calc(var(--control-lg) * 3);
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-food-hero);
+  text-align: center;
+}
+
+/* Cuatro cifras en tarjeta */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+
+.tileValue {
+  font: var(--text-food-tile);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font: var(--text-body);
+}
+
+.line > :first-child {
+  flex: 1;
+}
+
+.track {
+  height: var(--space-1);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+}
+
+.track i {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--label);
+}
+
+.warn {
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: var(--text-footnote);
+}
+
+/* Campos */
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.field input {
+  height: var(--control);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-body);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.check svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}

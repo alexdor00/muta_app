@@ -2,13 +2,13 @@
 
 Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared/` **nunca** importa de un área.
 
-| Carpeta     | Qué es                                                                                                   | Puede usar        |
-| ----------- | -------------------------------------------------------------------------------------------------------- | ----------------- |
-| `ui/`       | `tokens.css`, `base.css` y componentes (Button, Choice, Sheet, Switch, Toast, ListRow, Tiles…)           | `ui`, `lib`       |
-| `data/`     | IndexedDB: `db.ts`, `schema.ts` (almacenes), `migrations/`, copia de seguridad, programas locales        | `data`, `lib`     |
-| `content/`  | JSON versionado: programas de MUTA, consejos, `program-info.json`                                        | `content`, `lib`  |
-| `platform/` | Vibración, avisos, wake lock, archivos, compartir texto o imagen (versión web)                           | `platform`, `lib` |
-| `lib/`      | Utilidades puras: rutas (`paths.ts`), números y fechas (`format.ts`), `sinClaves` (`object.ts`), errores | `lib`             |
+| Carpeta     | Qué es                                                                                                                             | Puede usar        |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| `ui/`       | `tokens.css`, `base.css` y componentes (Button, Choice, Sheet, Switch, Toast, ListRow, Tiles…)                                     | `ui`, `lib`       |
+| `data/`     | IndexedDB: `db.ts`, `schema.ts` (almacenes), `migrations/`, copia de seguridad, programas locales                                  | `data`, `lib`     |
+| `content/`  | JSON versionado: programas de MUTA, consejos, `program-info.json`                                                                  | `content`, `lib`  |
+| `platform/` | Vibración, avisos, wake lock, archivos, compartir texto o imagen (versión web)                                                     | `platform`, `lib` |
+| `lib/`      | Utilidades puras: rutas (`paths.ts`), números y fechas (`format.ts`: `addDays`, `daysBetween`, `formatInt`…), `sinClaves`, errores | `lib`             |
 
 ## Convenciones
 
@@ -28,4 +28,7 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
   explicación de su documento; ver [docs/datos.md](../../docs/datos.md)) y `usos.json` (cuántas veces sale cada ejercicio en tus rutinas: la
   biblioteca enseña primero los más típicos); como las rutinas locales, no se carga con `VITE_NO_LOCAL_PROGRAMS`
   (e2e, CI y Vitest).
+- `foods.json` es la base de alimentos de Comida (1.493 por 100 g, BEDCA y USDA): sale del prototipo con
+  `node scripts/foods-from-prototype.cjs`; no se edita a mano. Comida la importa aparte (no pesa al abrir la app).
+- `tokens.css` lleva los de Comida (`--food-hero`, `--target-hero`, `--text-food-*`…): alias de los colores de Entreno.
 - `programs.ts` guarda los programas locales (`private/programs/*.json`, rev en `_meta.json`: subirla al cambiar un archivo).

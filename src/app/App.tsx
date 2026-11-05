@@ -58,6 +58,9 @@ const Hoy = screen(() => import('../features/today/screens/hoy/HoyScreen.tsx').t
 const Comida = screen(() =>
   import('../features/nutrition/screens/comida/ComidaScreen.tsx').then((m) => m.ComidaScreen),
 )
+const ObjetivoComida = screen(() =>
+  import('../features/nutrition/screens/objetivo/ObjetivoScreen.tsx').then((m) => m.ObjetivoScreen),
+)
 const Progreso = screen(() =>
   import('../features/progress/screens/progreso/ProgresoScreen.tsx').then((m) => m.ProgresoScreen),
 )
@@ -136,6 +139,7 @@ function Layout() {
             <Route path={patterns.session} component={Sesion} />
             <Route path={patterns.exercise} component={FichaEjercicio} />
             <Route path={paths.nutrition} component={Comida} />
+            <Route path={paths.nutritionTarget} component={ObjetivoComida} />
             <Route path={paths.progress} component={Progreso} />
             <Route path={paths.profile} component={Perfil} />
             <Route path={paths.welcome} component={Bienvenida} />

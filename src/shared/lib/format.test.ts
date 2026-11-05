@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  addDays,
+  daysBetween,
+  formatInt,
   formatChange,
   formatRange,
   localDate,
@@ -95,5 +98,23 @@ describe('formatChange con decimales', () => {
     expect(formatChange(0.0237, 1)).toBe('+2,4 %')
     expect(formatChange(-0.031, 1)).toBe('−3,1 %')
     expect(formatChange(0.0237)).toBe('+2 %')
+  })
+})
+
+describe('addDays y daysBetween', () => {
+  it('mueve una fecha, también entre meses, y cuenta los días', () => {
+    expect(addDays('2026-11-05', -1)).toBe('2026-11-04')
+    expect(addDays('2026-10-31', 1)).toBe('2026-11-01')
+    expect(addDays('2026-03-28', 2)).toBe('2026-03-30')
+    expect(daysBetween('2026-10-23', '2026-11-05')).toBe(13)
+    expect(daysBetween('2026-11-05', '2026-11-05')).toBe(0)
+  })
+})
+
+describe('formatInt', () => {
+  it('redondea y separa los miles con punto, también con 4 cifras', () => {
+    expect(formatInt(2260)).toBe('2.260')
+    expect(formatInt(891.4)).toBe('891')
+    expect(formatInt(12500)).toBe('12.500')
   })
 })

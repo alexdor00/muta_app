@@ -11,6 +11,9 @@ Playwright en un iPhone 13 simulado, sobre la app construida **sin rutinas priva
 - `superserie.spec.ts` — cada serie distinta, superserie y técnica de intensidad con una rutina CSV: Editar rutina y la sesión.
 - `ficha-mas.spec.ts` — el «···» de la ficha (añadir a una sesión con «Deshacer», cambiar en tu plan), tu material en Perfil
   (lo que no tienes, al final; los discos del gimnasio en la calculadora) y la imagen para compartir el resumen.
+- `comida.spec.ts` — Comida con datos de prueba escritos a mano: calcular tu objetivo, añadir con su ración y «Deshacer»,
+  solo kcal y proteína, repetir lo de ayer, la semana y tu peso, la sugerencia del entrenador (aplicar, deshacer, «Ahora no»)
+  y axe en sus pantallas y hojas (con capturas en `capturas/`).
 - `accesibilidad.spec.ts` — axe (WCAG 2 A y AA) en las pantallas reales y en `/dev/ui` (claro y oscuro). Falla ante fallos graves.
 - `sistema-diseno.spec.ts` — las piezas de `/dev/ui` miden lo que dicen los tokens.
 - `zz-galeria.spec.ts` — genera la galería de pantallas (solo local).
