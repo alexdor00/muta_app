@@ -132,4 +132,24 @@ export const webPlatform: Platform = {
       input.click()
     })
   },
+
+  async startCamera(video) {
+    if (!navigator.mediaDevices?.getUserMedia) return null
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+        audio: false,
+      })
+      video.srcObject = stream
+      video.setAttribute('playsinline', '')
+      await video.play()
+      return () => {
+        for (const track of stream.getTracks()) track.stop()
+        video.srcObject = null
+      }
+    } catch {
+      // Sin permiso o sin cámara: se escribe el código a mano.
+      return null
+    }
+  },
 }

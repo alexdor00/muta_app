@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
 import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
-import { BoltIcon, PlusIcon, RepeatIcon, SearchIcon, TrashIcon } from '../../../../shared/ui/icons.tsx'
+import {
+  BarcodeIcon,
+  BoltIcon,
+  PlusIcon,
+  RepeatIcon,
+  SearchIcon,
+  TrashIcon,
+} from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import {
   base,
@@ -39,13 +46,24 @@ type Props = {
   onElegir: (a: Alimento) => void
   onRapido: () => void
   onCrear: () => void
+  /** Leer un código de barras (Open Food Facts). */
+  onEscanear: () => void
   avisar: (texto: string, accion?: Aviso['accion']) => void
 }
 
 const comidaDe = (c: ComidaId) => COMIDAS.find((x) => x.id === c) ?? COMIDAS[0]
 
-/** Añadir: la comida, el buscador, lo rápido (repetir ayer, solo kcal y proteína), tus recientes y la base. */
-export function AnadirHoja({ comida, onComida, onClose, onElegir, onRapido, onCrear, avisar }: Props) {
+/** Añadir: la comida, el buscador y el escáner, lo rápido (repetir ayer, solo kcal y proteína), tus recientes y la base. */
+export function AnadirHoja({
+  comida,
+  onComida,
+  onClose,
+  onElegir,
+  onRapido,
+  onCrear,
+  onEscanear,
+  avisar,
+}: Props) {
   const [texto, setTexto] = useState('')
   const [filtro, setFiltro] = useState<Filtro>('recientes')
   useEffect(() => {
@@ -78,17 +96,27 @@ export function AnadirHoja({ comida, onComida, onClose, onElegir, onRapido, onCr
           value={comida}
           onChange={onComida}
         />
-        <label class={h.search}>
-          <SearchIcon />
-          <input
-            type="search"
-            value={texto}
-            placeholder="Buscar: arroz, pollo, yogur…"
-            aria-label="Buscar un alimento"
-            enterKeyHint="search"
-            onInput={(e) => setTexto(e.currentTarget.value)}
-          />
-        </label>
+        <div class={h.searchRow}>
+          <label class={h.search}>
+            <SearchIcon />
+            <input
+              type="search"
+              value={texto}
+              placeholder="Buscar: arroz, pollo, yogur…"
+              aria-label="Buscar un alimento"
+              enterKeyHint="search"
+              onInput={(e) => setTexto(e.currentTarget.value)}
+            />
+          </label>
+          <button
+            type="button"
+            class={h.round}
+            aria-label="Escanear un código de barras"
+            onClick={onEscanear}
+          >
+            <BarcodeIcon />
+          </button>
+        </div>
         {!texto.trim() && (
           <div class={h.quick}>
             {ayer && (

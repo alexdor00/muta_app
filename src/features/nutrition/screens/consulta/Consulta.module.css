@@ -1,0 +1,119 @@
+/* La consulta: los tres pasos arriba, la tarjeta negra del nutricionista y las escalas del 1 al 10. */
+
+.pasos {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pasos li {
+  flex: 1;
+  padding-top: var(--space-2);
+  border-top: var(--space-1) solid var(--surface-2);
+  color: var(--label-2);
+  font: var(--text-caption);
+  text-align: center;
+}
+
+.pasos .hecho {
+  border-top-color: var(--label);
+  color: var(--label);
+  font-weight: var(--weight-semibold);
+}
+
+.nutri {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--target-hero);
+  color: var(--on-target-hero);
+}
+
+.eyebrow {
+  font: var(--text-caption);
+  color: var(--on-target-hero-soft);
+  text-transform: uppercase;
+}
+
+.titulo {
+  font: var(--text-title-2);
+}
+
+.detalle {
+  font: var(--text-subhead);
+  color: var(--on-target-hero-soft);
+}
+
+.metricas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 0;
+}
+
+.metricas dt {
+  font: var(--text-footnote);
+  color: var(--on-target-hero-soft);
+}
+
+.metricas dd {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.propuesta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.consejos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-5);
+  font: var(--text-subhead);
+}
+
+.escala {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.leyenda {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: var(--space-2);
+  font: var(--text-subhead);
+}
+
+.numeros {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: var(--space-1);
+}
+
+.numero {
+  min-height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.on {
+  background: var(--accent);
+  color: var(--on-accent);
+}

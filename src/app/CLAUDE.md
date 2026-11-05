@@ -6,7 +6,8 @@ Es la única parte que puede usar todo lo demás.
 - `App.tsx` — rutas (`preact-iso`, cada pantalla con `lazy`) y la barra de pestañas (`TabBar.tsx`).
 - `ScreenErrorBoundary.tsx` — si una pantalla falla se ve un aviso con «Volver» y el resto sigue.
 - `updates.ts`, `updatePolicy.ts` — la versión nueva se descarga sola y se aplica al abrir, **nunca durante un entreno**.
-- Comida: `/comida` (pestaña) y `/comida/objetivo` (Tu objetivo, a pantalla completa como la ficha del ejercicio).
+- Comida: `/comida` (pestaña, con `?vista=semana` o `?vista=dieta`) y, a pantalla completa como la ficha del ejercicio,
+  todo lo que cuelga de ella: `/comida/objetivo`, `/comida/receta/:id`, `/comida/compra`, `/comida/cocina` y `/comida/consulta`.
 - `dev/` — páginas solo para desarrollo (`/dev/ui` con todos los componentes en claro y oscuro).
 
 Convenciones: las rutas y sus patrones salen de `shared/lib/paths.ts`; no escribir rutas a mano. Una pantalla

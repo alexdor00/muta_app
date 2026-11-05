@@ -345,6 +345,15 @@ export function ArrowLeftIcon() {
   )
 }
 
+/** Código de barras en su marco: escanear un producto. */
+export function BarcodeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M3 7V4h3M18 4h3v3M21 17v3h-3M6 20H3v-3M7 8v8M10 8v8M13 8v8M16 8v8" />
+    </svg>
+  )
+}
+
 /** Asa para arrastrar (≡). */
 export function GripIcon() {
   return (

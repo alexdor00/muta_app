@@ -18,4 +18,9 @@ export interface Platform {
   shareFile(title: string, file: File): Promise<'shared' | 'saved' | 'none'>
   saveFile(fileName: string, contents: Blob): Promise<void>
   pickFile(accept: string): Promise<File | null>
+  /**
+   * La cámara de atrás en un <video> (escanear un código de barras). Devuelve cómo apagarla, o null si no hay cámara o
+   * no se da permiso.
+   */
+  startCamera(video: HTMLVideoElement): Promise<(() => void) | null>
 }

@@ -14,6 +14,8 @@ export type Alimento = {
   fat: number
   servingG: number
   servingLabel: string
+  /** Su código de barras, si lo escaneaste (solo los tuyos). */
+  codigo?: string
 }
 
 export type Macros = { kcal: number; protein: number; carbs: number; fat: number }
@@ -38,6 +40,8 @@ export type Apunte = Macros & {
   /** En raciones (1,5 filetes); null si se apuntó en gramos. */
   raciones: number | null
   racion: string | null
+  /** La receta de tu dieta, si se apuntó desde el menú. */
+  receta?: string
 }
 
 /** Cómo se escribe la cantidad: en raciones del alimento o en gramos. */

@@ -2,7 +2,7 @@ import { formatInt } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChevronRightIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
-import { alimentoPorId, comidasHoy, type Alimento, type Apunte, type ComidaId } from '../../state/comida.ts'
+import { alimentoPorId, comidasDia, type Alimento, type Apunte, type ComidaId } from '../../state/comida.ts'
 import { cargarAlimentos, guardarComida, textoCantidad } from '../../use-cases/foodLog.ts'
 import type { Aviso } from '../comun/useAviso.ts'
 import h from '../comun/Hojas.module.css'
@@ -15,9 +15,9 @@ type Props = {
   avisar: (texto: string, accion?: Aviso['accion']) => void
 }
 
-/** Una comida de hoy: lo apuntado (tocar para cambiar o quitar), «Añadir» y «★ Guardar» para repetirla otro día. */
+/** Una comida del día: lo apuntado (tocar para cambiar o quitar), «Añadir» y «★ Guardar» para repetirla otro día. */
 export function ComidaDelDiaHoja({ comida, onClose, onAnadir, onEditar, avisar }: Props) {
-  const c = comidasHoy.value.find((x) => x.id === comida)
+  const c = comidasDia.value.find((x) => x.id === comida)
   if (!c) return null
   return (
     <Sheet

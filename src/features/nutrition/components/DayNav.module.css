@@ -1,0 +1,37 @@
+/* ‹ Hoy ›: píldora gris a todo el ancho con las flechas a los lados. */
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 var(--gutter);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.arrow {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--label);
+  cursor: pointer;
+}
+
+.arrow:disabled {
+  color: var(--surface-3);
+  cursor: default;
+}
+
+.arrow svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.title {
+  font: var(--text-headline);
+}

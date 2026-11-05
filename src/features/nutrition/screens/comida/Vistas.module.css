@@ -127,3 +127,110 @@
   font: var(--text-caption);
   font-weight: var(--weight-bold);
 }
+
+/* Dieta */
+.pad {
+  padding: 0 var(--gutter);
+}
+
+.cardTitle,
+.sectionTitle {
+  font: var(--text-title-2);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: var(--row);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--label);
+  text-decoration: none;
+}
+
+.tileTitle {
+  font: var(--text-headline);
+}
+
+.rows {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows > li {
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.rowLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  padding: var(--space-2) 0;
+  color: var(--label);
+  text-decoration: none;
+}
+
+.rowLink > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.rowText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rowTitle {
+  font: var(--text-headline);
+}
+
+.textButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.textButton svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.link {
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}

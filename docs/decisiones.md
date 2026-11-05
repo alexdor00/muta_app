@@ -313,3 +313,33 @@ pauta, cerrado: no molesta) pone cualquiera a cualquier ejercicio o quita la de 
   (`--text-food-hero` 68, `--text-food-number` 44, `--text-food-tile` 28): «por comer», tu objetivo y la ración usan la cifra
   protagonista de Entreno (40) y la media, el peso, la sugerencia y las cifras de la ración, la de tarjeta (30). Las kcal de
   cada fila pasan a 15 y los rótulos en mayúsculas, sin negrita, como «Tu semana».
+
+## 2026-11-05 · Comida versiones 2 y 3: dieta, recetas, compra, cocina, consulta y escáner
+
+El usuario pidió «todas las funcionalidades de Comida» sin contestar aún las dudas del PNG
+(`Desktop/MUTA-Comida-v2-funcionalidades.png`); se toma lo más prudente en cada una y queda dicho aquí:
+
+- **Sin lima y con el estilo de su captura**: la tarjeta del día es gris, con un anillo de kcal («1.560 kcal de 2.500») y
+  las barras de cada macro con su porcentaje; las comidas, en tarjetas con miniatura redonda (sin fotos aún: el icono de
+  Comida) y ‹ Hoy › para ver y apuntar en otros días. La etiqueta de la tarjeta negra pasa de lima a blanco y la raya del
+  objetivo de Semana, de naranja a gris (la decisión del 2026-10-29: sin naranja).
+- **No se inventa una dieta.** `Entrenamiento/Dieta/Dieta Alexandru.docx` son notas (recetas sueltas y una lista de compra),
+  no una dieta con menús de entreno y descanso. La app permite **cargar un archivo**, **crear la tuya** con tus recetas
+  (desde cero) o **probar la de ejemplo del prototipo** (marcada siempre «de ejemplo, no pautada para ti»).
+- **Formato propio `muta-dieta` v1 (JSON)**, el que guarda «Guardar como archivo»: claves en español y validado entero al
+  leerlo. No se lee el `muta-diet` del prototipo: no hay ningún archivo así en el equipo. Recetas anidadas con dos versiones
+  no caben bien en un CSV como el de las rutinas.
+- **Las cifras de la dieta salen de sus recetas** (una sola fuente): el objetivo de un día es lo que suman las de ese día;
+  sin recetas, vale tu objetivo de kcal. Con dieta no corre la revisión de kcal de la versión 1: manda la consulta.
+- **Entreno o descanso** sale de tu rotación de Entreno (su `index.ts`, en diferido), como Tu semana; sin rutina, tus días
+  repartidos (regla del prototipo, «sugerido»); cada día se puede cambiar a mano.
+- **La consulta semanal va en Comida** (Hoy aún no existe); lo que apuntas (cintura, sueño, escalas) va a `bodyLog` tipo
+  `checkin`, donde Hoy y Progreso lo podrán leer. Sigue las reglas 1–8 de la sección 8 y **solo propone**: «Aplicar desde
+  mañana» (un ajuste de kcal, pasos o fase) o «Ahora no»; lo aplicado se deshace. La regla 6 (proteína hacia 1,9 g/kg) se
+  da como consejo: los gramos los pones tú en tus recetas. «1.000 pasos menos que el plan» no se usa: la app no cuenta pasos.
+- **Intercambios**: la regla del prototipo, quitando además lo cocinado (al horno, asado, frito, a la plancha), las harinas,
+  los cereales de desayuno y el mismo alimento (también su harina o bebida): salían «Harina de arroz» o «Corn flakes».
+- **El escáner** usa `barcode-detector` (MIT) con el lector zxing (`zxing-wasm`, MIT): el `.wasm` (unos 950 kB) lo sirve la
+  app y se descarga solo al abrir el escáner; por defecto la librería lo bajaba de un CDN. Open Food Facts es lo único que
+  sale a internet; lo encontrado se guarda en «Mis alimentos» con su código y la próxima vez no hace falta red. La cámara,
+  por `shared/platform` (`startCamera`).

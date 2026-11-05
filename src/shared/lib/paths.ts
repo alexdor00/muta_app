@@ -26,6 +26,14 @@ export const paths = {
   nutrition: '/comida',
   /** Tu objetivo de comida: cómo sale, la revisión semanal del entrenador y el historial. */
   nutritionTarget: '/comida/objetivo',
+  /** Una receta de tu dieta (`tipo`: la versión de entreno o la de descanso). */
+  recipe: (id: string, tipo?: 'entreno' | 'descanso') => `/comida/receta/${id}${tipo ? `?tipo=${tipo}` : ''}`,
+  /** La lista de la compra de tu dieta. */
+  shopping: '/comida/compra',
+  /** Cocina: el arroz, repartir una olla y calcular un plato. */
+  kitchen: '/comida/cocina',
+  /** La consulta semanal con tu dieta. */
+  checkIn: '/comida/consulta',
   progress: '/progreso',
   profile: '/perfil',
 } as const
@@ -41,6 +49,7 @@ export const patterns = {
   session: '/entreno/sesion/:sessionId',
   summary: '/entreno/sesion/:sessionId/resumen',
   exercise: '/entreno/ejercicio/:exerciseId',
+  recipe: '/comida/receta/:id',
 } as const
 
 export type Tab = 'today' | 'training' | 'nutrition' | 'progress'
@@ -60,12 +69,13 @@ export function tabOf(path: string): Tab | null {
 
 /**
  * Pantalla completa, sin barra de pestañas: la bienvenida, ver una sesión (lleva «Empezar» fijo abajo), la ficha de un
- * ejercicio y «Tu objetivo» de Comida (llevan su propia flecha atrás) y entrenar
+ * ejercicio y las pantallas de Comida que salen de la pestaña (Tu objetivo, una receta, la compra, la cocina y la consulta:
+ * llevan su propia flecha atrás) y entrenar
  * (sesión en curso y resumen), para no salir por error. La sesión antes de empezar (inicio) sí lleva pestañas.
  */
 export function isFullScreen(path: string): boolean {
   if (path === paths.welcome || path.startsWith(`${paths.welcome}/`)) return true
   if (path.startsWith(`${paths.routine}/`) || path.startsWith('/entreno/ejercicio/')) return true
-  if (path === paths.nutritionTarget) return true
+  if (path.startsWith(`${paths.nutrition}/`)) return true
   return /^\/entreno\/sesion\/[^/]+(\/resumen)?\/?$/.test(path)
 }

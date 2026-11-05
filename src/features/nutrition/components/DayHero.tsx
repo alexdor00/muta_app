@@ -4,51 +4,60 @@ import styles from './DayHero.module.css'
 type Macro = { nombre: string; hecho: number; objetivo: number }
 
 type Props = {
-  /** «Jueves 5 nov». */
-  fecha: string
   comidas: number
   objetivo: number
   macros: Macro[]
 }
 
-const parte = (hecho: number, objetivo: number) =>
-  `${Math.min(100, objetivo ? (hecho / objetivo) * 100 : 0)}%`
+const pct = (hecho: number, objetivo: number) => Math.round(objetivo ? (hecho / objetivo) * 100 : 0)
 
-/** La tarjeta de color de Comida: lo que te queda por comer hoy, en grande, y cómo vas de proteína, hidratos y grasa. */
-export function DayHero({ fecha, comidas, objetivo, macros }: Props) {
+/** La tarjeta del día: el anillo con lo que llevas de tus kcal y, al lado, cómo vas de proteína, hidratos y grasa. */
+export function DayHero({ comidas, objetivo, macros }: Props) {
+  const lleno = Math.min(100, pct(comidas, objetivo))
   const quedan = objetivo - comidas
   return (
     <section class={styles.hero} aria-label="Lo que llevas hoy">
-      <div class={styles.top}>
-        <span class={styles.date}>{fecha}</span>
-        <span class={styles.soft}>
-          {formatInt(comidas)} de {formatInt(objetivo)} kcal
+      <div class={styles.ring} role="img" aria-label={`${formatInt(comidas)} de ${formatInt(objetivo)} kcal`}>
+        <svg viewBox="0 0 132 132" aria-hidden="true">
+          <circle class={styles.base} cx="66" cy="66" r="58" pathLength={100} />
+          {lleno > 0 && (
+            <circle
+              class={styles.arc}
+              cx="66"
+              cy="66"
+              r="58"
+              pathLength={100}
+              style={{ strokeDasharray: `${lleno} 100` }}
+            />
+          )}
+        </svg>
+        <span class={styles.center} aria-hidden="true">
+          <span class={styles.number}>{formatInt(comidas)}</span>
+          <span class={styles.unit}>kcal</span>
+          <span class={styles.of}>de {formatInt(objetivo)}</span>
         </span>
       </div>
-      <p class={styles.left}>
-        <span class={styles.number}>{formatInt(Math.abs(quedan))}</span>
-        <span class={styles.unit}>
-          kcal
-          <br />
-          {quedan >= 0 ? 'por comer' : 'de más'}
-        </span>
-      </p>
-      <div class={styles.track} aria-hidden="true">
-        <i style={{ width: parte(comidas, objetivo) }} />
+      <div class={styles.side}>
+        <dl class={styles.macros}>
+          {macros.map((m) => (
+            <div key={m.nombre} class={styles.macro}>
+              <dt class={styles.name}>
+                {m.nombre}
+                <span class={styles.pct}>{pct(m.hecho, m.objetivo)} %</span>
+              </dt>
+              <dd class={styles.track} aria-hidden="true">
+                <i style={{ width: `${Math.min(100, pct(m.hecho, m.objetivo))}%` }} />
+              </dd>
+              <dd class={styles.grams}>
+                {formatInt(m.hecho)} / {formatInt(m.objetivo)} g
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p class={styles.left}>
+          {quedan >= 0 ? `Te quedan ${formatInt(quedan)} kcal` : `${formatInt(-quedan)} kcal de más`}
+        </p>
       </div>
-      <dl class={styles.macros}>
-        {macros.map((m) => (
-          <div key={m.nombre} class={styles.macro}>
-            <dt>{m.nombre}</dt>
-            <dd>
-              <b>{formatInt(m.hecho)}</b> / {formatInt(m.objetivo)} g
-            </dd>
-            <dd class={styles.track} aria-hidden="true">
-              <i style={{ width: parte(m.hecho, m.objetivo) }} />
-            </dd>
-          </div>
-        ))}
-      </dl>
     </section>
   )
 }

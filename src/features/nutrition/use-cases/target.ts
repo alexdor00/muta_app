@@ -158,10 +158,13 @@ export async function deshacerCambio(id: string): Promise<void> {
   await marcarCambio(id, 'deshecho')
 }
 
+/** Lo que cambió tu objetivo de kcal tú mismo (no «sin cambios», ni empezar o dejar una dieta). */
+const esDeTuObjetivo = (c: Cambio) => c.tipo !== 'sin-cambios' && c.tipo !== 'dieta'
+
 /** El último cambio aceptado que aún se puede deshacer (solo el más reciente, y si nada lo ha pisado después). */
 export function deshacible(): Cambio | null {
   const ordenados = [...cambios.value]
-    .filter((c) => c.status === 'aplicado' || (c.status === 'hecho' && c.tipo !== 'sin-cambios'))
+    .filter((c) => c.status === 'aplicado' || (c.status === 'hecho' && esDeTuObjetivo(c)))
     .sort((x, y) => y.updatedAt.localeCompare(x.updatedAt))
   return ordenados[0]?.status === 'aplicado' ? ordenados[0] : null
 }
@@ -174,7 +177,7 @@ export function macrosCon(kcal: number) {
 
 /** Lo que han movido tu objetivo las sugerencias aceptadas desde el último cálculo (fase, a mano o tus datos). */
 export function aceptadosDesdeElCalculo(): number {
-  const tuyos = cambios.value.filter((c) => c.status === 'hecho' && c.tipo !== 'sin-cambios')
+  const tuyos = cambios.value.filter((c) => c.status === 'hecho' && esDeTuObjetivo(c))
   const desde =
     tuyos
       .map((c) => c.createdAt)

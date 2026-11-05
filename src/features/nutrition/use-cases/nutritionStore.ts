@@ -1,28 +1,40 @@
-// Cargar y guardar Comida en IndexedDB: tus ajustes (`userContent`), lo apuntado (`foodLog`), tus pesajes (`bodyLog`)
-// y los cambios de tu objetivo (`coach`). Al cargar, la revisión semanal deja su sugerencia si toca (nunca la aplica).
+// Cargar y guardar Comida en IndexedDB: tus ajustes, tu dieta y tu compra (`userContent`), lo apuntado (`foodLog`), tus
+// pesajes y tus consultas (`bodyLog`) y los cambios de tu objetivo y de tu dieta (`coach`). Al cargar, la revisión semanal
+// deja su sugerencia si toca (nunca la aplica); con dieta, manda la consulta semanal.
 import { getDb } from '../../../shared/data/db.ts'
 import { addDays, daysBetween, localDate } from '../../../shared/lib/format.ts'
 import { logError } from '../../../shared/lib/logger.ts'
+import type { Revision } from '../domain/consult.ts'
+import type { DietaActiva } from '../domain/diet.ts'
 import type { Alimento, Apunte } from '../domain/food.ts'
+import { tiposDeDia } from '../../training/index.ts'
 import { tituloCambio } from '../domain/review.ts'
 import {
   ajustes,
   cambios,
+  diaVisto,
   dias,
+  dieta,
   estado,
   guardadas,
   hoy,
   pesajes,
   propios,
   revisionDeHoy,
+  tiposEntreno,
   type Ajustes,
   type Cambio,
   type ComidaGuardada,
 } from '../state/comida.ts'
+import { compra, consultas, revisiones, type Compra, type Consulta } from '../state/dieta.ts'
 
 export const ID_AJUSTES = 'nutricion'
 export const ID_PROPIOS = 'alimentos-propios'
 export const ID_GUARDADAS = 'comidas-guardadas'
+export const ID_DIETA = 'dieta'
+export const ID_COMPRA = 'compra'
+/** Tipo de lo que apuntas en la consulta en `bodyLog`. */
+export const REVISION = 'checkin'
 /** Tipo de los pesajes en `bodyLog`. */
 export const PESO = 'weight'
 /** Cada cuántos días revisa el entrenador. */
@@ -30,6 +42,12 @@ const CADA = 7
 
 type DiaGuardado = { date: string; apuntes: Apunte[]; createdAt: string; updatedAt: string }
 type PesajeGuardado = { date: string; type: typeof PESO; kg: number; createdAt: string; updatedAt: string }
+type RevisionGuardada = Revision & {
+  date: string
+  type: typeof REVISION
+  createdAt: string
+  updatedAt: string
+}
 
 let carga: Promise<void> | null = null
 
@@ -39,19 +57,41 @@ export function cargarComida(): Promise<void> {
     try {
       const db = await getDb()
       hoy.value = localDate()
+      diaVisto.value = hoy.value
       const desde = addDays(hoy.value, -35)
-      const [a, log, cuerpo, coach, mios, comidas] = await Promise.all([
+      const [a, log, cuerpo, coach, mios, comidas, activa, lista, checkins] = await Promise.all([
         db.get('userContent', ID_AJUSTES) as Promise<Ajustes | undefined>,
         db.getAll('foodLog', IDBKeyRange.lowerBound(desde)) as Promise<DiaGuardado[]>,
         db.getAllFromIndex('bodyLog', 'type', PESO) as Promise<PesajeGuardado[]>,
         db.getAll('coach') as Promise<Cambio[]>,
         db.get('userContent', ID_PROPIOS) as Promise<{ alimentos: Alimento[] } | undefined>,
         db.get('userContent', ID_GUARDADAS) as Promise<{ comidas: ComidaGuardada[] } | undefined>,
+        db.get('userContent', ID_DIETA) as Promise<DietaActiva | undefined>,
+        db.get('userContent', ID_COMPRA) as Promise<Compra | undefined>,
+        db.getAllFromIndex('bodyLog', 'type', REVISION) as Promise<RevisionGuardada[]>,
       ])
       ajustes.value = a ?? null
       dias.value = Object.fromEntries(log.map((d) => [d.date, d.apuntes]))
       pesajes.value = cuerpo.map((p) => ({ date: p.date, kg: p.kg }))
       cambios.value = coach.filter((c) => c.area === 'nutricion')
+      consultas.value = (coach as unknown[] as Consulta[]).filter((c) => c.area === 'dieta')
+      dieta.value = activa ? { ...activa, originales: activa.originales ?? {} } : null
+      compra.value = lista ?? null
+      revisiones.value = checkins
+        .map(({ fecha, cintura, sueno, hambre, energia, fatiga, dolor, ganas, estres, nota }) => ({
+          fecha,
+          cintura,
+          sueno,
+          hambre,
+          energia,
+          fatiga,
+          dolor,
+          ganas,
+          estres,
+          nota,
+        }))
+        .sort((x, y) => x.fecha.localeCompare(y.fecha))
+      void cargarTipos()
       propios.value = mios?.alimentos ?? []
       guardadas.value = comidas?.comidas ?? []
       await revisarSemana()
@@ -71,9 +111,10 @@ export function cargarComida(): Promise<void> {
 async function revisarSemana(): Promise<void> {
   const a = ajustes.value
   const r = revisionDeHoy.value
+  if (dieta.value) return
   if (!a || !r || (r.tipo !== 'cambio' && r.tipo !== 'bien')) return
-  const revisiones = cambios.value.filter((c) => c.tipo === 'sugerencia' || c.tipo === 'sin-cambios')
-  const ultima = revisiones
+  const previas = cambios.value.filter((c) => c.tipo === 'sugerencia' || c.tipo === 'sin-cambios')
+  const ultima = previas
     .map((c) => c.fecha)
     .sort()
     .at(-1)
@@ -158,6 +199,51 @@ export async function guardarPropios(alimentos: Alimento[]): Promise<void> {
 export async function guardarGuardadas(comidas: ComidaGuardada[]): Promise<void> {
   guardadas.value = comidas
   await (await getDb()).put('userContent', { id: ID_GUARDADAS, target: 'nutricion', comidas })
+}
+
+/** Qué días son de entreno según tu rutina (4 semanas atrás y 3 adelante: la consulta, el menú y la compra). */
+export async function cargarTipos(): Promise<void> {
+  try {
+    tiposEntreno.value = await tiposDeDia(hoy.value, addDays(hoy.value, -28), 49)
+  } catch (error) {
+    logError(error, 'leer tus días de entreno')
+  }
+}
+
+export async function guardarDieta(activa: DietaActiva | null): Promise<void> {
+  dieta.value = activa
+  const db = await getDb()
+  if (activa) await db.put('userContent', activa)
+  else await db.delete('userContent', ID_DIETA)
+}
+
+export async function guardarCompra(lista: Compra): Promise<void> {
+  compra.value = lista
+  await (await getDb()).put('userContent', lista)
+}
+
+/** Guarda lo que apuntas en la consulta de un día (si ya había, lo cambia). */
+export async function guardarRevision(r: Revision): Promise<void> {
+  revisiones.value = [...revisiones.value.filter((x) => x.fecha !== r.fecha), r].sort((x, y) =>
+    x.fecha.localeCompare(y.fecha),
+  )
+  const db = await getDb()
+  const antes = (await db.get('bodyLog', [r.fecha, REVISION])) as RevisionGuardada | undefined
+  const at = new Date().toISOString()
+  const fila: RevisionGuardada = {
+    ...r,
+    date: r.fecha,
+    type: REVISION,
+    createdAt: antes?.createdAt ?? at,
+    updatedAt: at,
+  }
+  await db.put('bodyLog', fila)
+}
+
+/** Guarda una consulta (nueva o cambiada). */
+export async function guardarConsulta(c: Consulta): Promise<void> {
+  consultas.value = [...consultas.value.filter((x) => x.id !== c.id), c]
+  await (await getDb()).put('coach', c)
 }
 
 /** Para las pruebas: vuelve a cargar desde la base de datos. */

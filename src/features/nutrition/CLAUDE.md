@@ -1,48 +1,54 @@
 # Comida (`src/features/nutrition`)
 
-Apuntar lo que comes, tu semana y tu objetivo de kcal, con la revisión semanal del entrenador. Diseño aprobado el
-2026-11-05 (`Desktop/MUTA-Comida-diseno.png`, versión 1). Las capas y sus límites son los de [Entreno](../training/CLAUDE.md):
-las pantallas no importan el dominio; lo que necesitan de él lo reexporta `state/comida.ts`.
+Apuntar lo que comes, tu semana, tu objetivo de kcal y, si quieres, una dieta con menús, recetas, compra, cocina y consulta
+semanal; y el escáner de códigos. Diseños: versión 1 aprobada el 2026-11-05 (`Desktop/MUTA-Comida-diseno.png`) y versiones
+2 y 3 (`Desktop/MUTA-Comida-v2-funcionalidades.png`), con el estilo que pidió el usuario: tarjeta del día gris con anillo
+(sin lima), comidas en tarjetas con miniatura y ‹ Hoy › para cambiar de día. Capas y límites, los de
+[Entreno](../training/CLAUDE.md): las pantallas no importan el dominio; lo que necesitan lo reexportan `state/comida.ts` y
+`state/dieta.ts`.
 
-## Regla de oro: el entrenador **propone**, nunca cambia nada solo
+## Regla de oro: el entrenador y el nutricionista **proponen**, nunca cambian nada solos
 
-Tu objetivo se calcula una vez (con tus datos) y se **guarda**. Después solo cambia si tú lo cambias (fase, a mano, tus datos)
-o si aceptas una sugerencia («Aplicar desde mañana»; «Ahora no» la deja en el historial). La última aceptada se deshace.
-Ni bajar de peso mueve el objetivo por sí solo (decisión 2026-11-05).
+Tu objetivo se calcula una vez y se **guarda**; solo cambia si tú lo cambias o aceptas una sugerencia («Aplicar desde
+mañana»; «Ahora no» la deja en el historial; la última aceptada se deshace). Con dieta pasa lo mismo con la consulta: sus
+propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si las aplicas, y se deshacen.
 
 ## Dónde está cada cosa
 
-- `domain/food.ts` — alimentos (por 100 g) y apuntes: `macrosDe`, `sumar`, comidas del día (`COMIDAS`, nombres sugeridos,
-  con su artículo: «a la cena»), comida por la hora, raciones o gramos, buscador (cada palabra en el nombre; lo cocinado antes
-  que lo crudo) y recientes. Reglas del prototipo (`js/comida/comida.js`).
-- `domain/targets.ts` — objetivo: Mifflin-St Jeor, factor de actividad, suelo, déficit y superávit, macros por kilo
-  (proteína 1,5 y grasa 0,6 de serie; hidratos, lo que queda). `docs/conocimiento/02-reglas.md` · sección 8.
-- `domain/weight.ts` — tendencia del peso (0,15), ritmo semanal (regresión de 14 días), gasto medido.
-- `domain/review.ts` — la revisión: faltan datos (10 pesajes en 14 días, 12 días de comida en 4 semanas) → cumplir
-  (85–115 %) → ritmo frente al previsto (±0,2 % definición, ±0,15 el resto) → 10 días entre cambios → en definición, antes
-  10.000 pasos → ±150 kcal (nunca bajo el suelo). Devuelve qué pasa y las comprobaciones que se enseñan.
-- `domain/week.ts` — los 7 últimos días: media sin hoy, días con la proteína hecha.
-- `state/comida.ts` — señales (`ajustes`, `dias`, `pesajes`, `cambios`, `propios`, `guardadas`, `base`) y lo calculado:
-  objetivo del día (`objetivoDe`: una sugerencia aplicada vale desde `desde`), semana, `revisionDeHoy`, `pendiente`, `gastoReal`.
-- `use-cases/nutritionStore.ts` — carga y guarda; al cargar, cada 7 días la revisión deja su sugerencia (`pendiente`) o
-  «sin cambios». `use-cases/target.ts` — tus datos, fase, a mano, aplicar, «Ahora no» y deshacer.
-  `use-cases/foodLog.ts` — añadir, cambiar, quitar (con «Deshacer»), repetir lo de ayer, comidas guardadas, tus alimentos y
-  la base (`cargarAlimentos`, descarga aparte la primera vez que se abre «Añadir»).
-- `components/` — `DayHero` (tarjeta lima: lo que te queda), `CoachCard` (aviso negro del entrenador), `MealList`,
-  `WeekBars`, `TrendChart` (tendencia, pesajes y banda de lo previsto), `TargetHero` (tarjeta negra de tu objetivo).
-  La letra es la de Entreno, un tamaño por papel (cifra protagonista 40, de tarjeta 30): sin tamaños propios de Comida.
-- `screens/comida` — Comida (pestaña): Hoy · Semana y sus hojas (añadir, ración, solo kcal y proteína, crear alimento, la
-  comida del día, tu peso, tus datos). `screens/objetivo` — Tu objetivo (`/comida/objetivo`, pantalla completa): cómo sale,
-  revisión semanal, historial; hojas de fase, a mano y la sugerencia.
+- `domain/food.ts` — alimentos (por 100 g, con `codigo` si lo escaneaste) y apuntes (`receta` si salió del menú):
+  `macrosDe`, `sumar`, `COMIDAS` (nombres sugeridos), comida por la hora, raciones o gramos, buscador y recientes.
+- `domain/targets.ts`, `weight.ts`, `review.ts`, `week.ts` — objetivo (Mifflin-St Jeor…), tendencia y ritmo del peso, la
+  revisión semanal sin dieta y la semana. `docs/conocimiento/02-reglas.md` · sección 8.
+- `domain/diet.ts` — la dieta: menús en un ciclo de 7 días, recetas con gramos de entreno y de descanso, la receta que
+  «ajusta» (absorbe las kcal de la consulta y de la fase, de 5 en 5 g), el día con tu dieta (`diaDeDieta`), el reparto sin
+  rutina y el archivo (`leerDieta` / `aArchivo`, formato `muta-dieta` v1). `dietSample.ts`, la dieta de ejemplo del prototipo.
+- `domain/swaps.ts` (intercambios: mismos gramos del macro principal), `shopping.ts` (la compra por secciones; nombres de
+  sección sugeridos), `kitchen.ts` (arroz y su factor, repartir una olla, un plato por 100 g), `barcode.ts` (variantes
+  EAN/UPC y Open Food Facts), `consult.ts` (la consulta con dieta, reglas 1–8 de la sección 8, y las señales de la sección 5).
+- `state/comida.ts` — señales y lo calculado; `diaVisto` (el día de ‹ ›: lo apuntado va a ese día), `dieta`, `tiposEntreno`,
+  `tipoDe(fecha)` (lo que eliges → tu rutina → tus días repartidos) y `objetivoDelDia` (con dieta, lo que suman sus recetas).
+- `state/dieta.ts` — el menú del día que ves, tu semana con la dieta, cifras, `recetaComoToca`, la compra y las consultas.
+- `use-cases/nutritionStore.ts` — carga y guarda todo; con dieta no hace la revisión de kcal. `cargarTipos()` pide a Entreno
+  (por su `index.ts`, en diferido) qué días son de entreno. `target.ts`, `foodLog.ts` como en la versión 1.
+- `use-cases/diet.ts` (empezar, dejar, archivo, apuntar una receta, editar recetas y menús, intercambios), `shopping.ts`,
+  `kitchen.ts`, `consult.ts` (preparar el informe; aplicar, «Ahora no», deshacer; la fuerza la da Entreno) y `scanner.ts`
+  (lector zxing con su `.wasm` servido por la app, nunca de un CDN; Open Food Facts; guardar con su código).
+- `components/` — `DayHero` (tarjeta gris con anillo y macros), `DayNav` (‹ Hoy ›), `MealList` y `MenuList` (tarjetas con
+  miniatura; aún sin fotos: el icono de Comida), `DietWeek` (como Tu semana), `CoachCard`, `WeekBars`, `TrendChart`,
+  `TargetHero`. La letra es la de Entreno, un tamaño por papel: sin tamaños propios.
+- `screens/comida` — la pestaña: Hoy · Semana · Dieta (`?vista=`) y sus hojas (añadir, escáner, ración, solo kcal, crear,
+  comida del día, peso, datos, empezar dieta, día de la dieta, tu dieta, receta nueva). Pantallas completas: `objetivo`,
+  `receta` (`/comida/receta/:id`, con intercambios y editar), `compra`, `cocina` y `consulta`. Lo común en `screens/comun`.
 
 ## Datos
 
-- `userContent`: `nutricion` (tus datos y tu objetivo), `alimentos-propios`, `comidas-guardadas`.
-- `foodLog` (por fecha: los apuntes del día), `bodyLog` (`[fecha, 'weight']`: tus pesajes; hasta que exista Hoy, el peso se
-  apunta en Semana), `coach` (`area: 'nutricion'`: cada cambio del objetivo y cada sugerencia, con su estado).
-- La base de alimentos es `shared/content/foods.json` (sale del prototipo con `node scripts/foods-from-prototype.cjs`).
+- `userContent`: `nutricion`, `alimentos-propios`, `comidas-guardadas`, `dieta` (la que sigues: dieta, inicio, ajustes,
+  días elegidos, factor del arroz y recetas originales) y `compra`.
+- `foodLog` (por fecha), `bodyLog` (`weight`: pesajes; `checkin`: lo que apuntas en la consulta), `coach` (`area:
+'nutricion'`: cambios del objetivo; `area: 'dieta'`: cada consulta con sus propuestas y su estado).
+- La base de alimentos es `shared/content/foods.json` (`node scripts/foods-from-prototype.cjs`).
 
-## Para después (versión 2 y 3, fuera de este diseño)
+## Pendiente
 
-Dieta cargada (menú según entreno o descanso, recetas, lista de la compra) y la consulta semanal; escáner de códigos y Open
-Food Facts; calcular un plato cocinado.
+Fotos de cada comida (la miniatura lleva un icono hasta que las haya). Con una dieta de verdad, comprobar la consulta en el
+móvil durante unas semanas.

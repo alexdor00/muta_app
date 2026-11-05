@@ -14,7 +14,7 @@ import {
   type Macros,
   type Modo,
 } from '../domain/food.ts'
-import { alimentoPorId, base, deAyer, dias, guardadas, hoy, propios } from '../state/comida.ts'
+import { alimentoPorId, base, deAyer, diaVisto, dias, guardadas, propios } from '../state/comida.ts'
 import { guardarDia, guardarGuardadas, guardarPropios } from './nutritionStore.ts'
 
 /** Categoría de lo que creas tú. */
@@ -56,8 +56,8 @@ export function apunteDe(
   }
 }
 
-/** Añade a hoy. Devuelve el id (para «Deshacer»). */
-export async function anadir(apunte: Omit<Apunte, 'id'>, date = hoy.value): Promise<string> {
+/** Añade al día que ves (o a `date`). Devuelve el id (para «Deshacer»). */
+export async function anadir(apunte: Omit<Apunte, 'id'>, date = diaVisto.value): Promise<string> {
   const id = crypto.randomUUID()
   await guardarDia(date, [...(dias.value[date] ?? []), { ...apunte, id }])
   return id
@@ -67,7 +67,7 @@ export async function anadir(apunte: Omit<Apunte, 'id'>, date = hoy.value): Prom
 export async function anadirVarios(
   apuntes: readonly Apunte[],
   comida: ComidaId,
-  date = hoy.value,
+  date = diaVisto.value,
 ): Promise<string[]> {
   const nuevos = apuntes.map((a) => ({ ...a, comida, id: crypto.randomUUID() }))
   await guardarDia(date, [...(dias.value[date] ?? []), ...nuevos])
@@ -75,7 +75,7 @@ export async function anadirVarios(
 }
 
 /** Cambia un apunte (cantidad, comida). */
-export async function cambiar(apunte: Apunte, date = hoy.value): Promise<void> {
+export async function cambiar(apunte: Apunte, date = diaVisto.value): Promise<void> {
   await guardarDia(
     date,
     (dias.value[date] ?? []).map((a) => (a.id === apunte.id ? apunte : a)),
@@ -83,7 +83,7 @@ export async function cambiar(apunte: Apunte, date = hoy.value): Promise<void> {
 }
 
 /** Quita unos apuntes. Devuelve lo quitado, para poder volver a ponerlo. */
-export async function quitar(ids: readonly string[], date = hoy.value): Promise<Apunte[]> {
+export async function quitar(ids: readonly string[], date = diaVisto.value): Promise<Apunte[]> {
   const antes = dias.value[date] ?? []
   await guardarDia(
     date,
@@ -93,7 +93,7 @@ export async function quitar(ids: readonly string[], date = hoy.value): Promise<
 }
 
 /** Vuelve a poner lo quitado («Deshacer»). */
-export async function devolver(apuntes: readonly Apunte[], date = hoy.value): Promise<void> {
+export async function devolver(apuntes: readonly Apunte[], date = diaVisto.value): Promise<void> {
   const ids = new Set((dias.value[date] ?? []).map((a) => a.id))
   await guardarDia(date, [...(dias.value[date] ?? []), ...apuntes.filter((a) => !ids.has(a.id))])
 }
@@ -123,9 +123,9 @@ export function apunteRapido(nombre: string, m: Macros, comida: ComidaId): Omit<
   }
 }
 
-/** Guarda una comida de hoy para repetirla otro día (★). */
+/** Guarda una comida del día que ves para repetirla otro día (★). */
 export async function guardarComida(nombre: string, comida: ComidaId): Promise<void> {
-  const apuntes = (dias.value[hoy.value] ?? []).filter((a) => a.comida === comida)
+  const apuntes = (dias.value[diaVisto.value] ?? []).filter((a) => a.comida === comida)
   if (!apuntes.length) return
   await guardarGuardadas([
     { id: crypto.randomUUID(), nombre: nombre.trim() || 'Mi comida', apuntes },

@@ -2,6 +2,7 @@
 // use-cases/nutritionStore.ts; aquí no se guarda nada.
 import { computed, signal } from '@preact/signals'
 import { addDays, localDate } from '../../../shared/lib/format.ts'
+import { diaDeDieta, repartoSinRutina, type DietaActiva, type TipoDia } from '../domain/diet.ts'
 import { porComida, sumar, type Alimento, type Apunte, type Macros } from '../domain/food.ts'
 import { revisar, type Revision } from '../domain/review.ts'
 import {
@@ -63,7 +64,7 @@ export type Cambio = {
   area: 'nutricion'
   /** pendiente → aplicado o descartado; aplicado → deshecho. Lo que haces tú: hecho. */
   status: 'pendiente' | 'aplicado' | 'descartado' | 'deshecho' | 'hecho'
-  tipo: 'inicio' | 'fase' | 'mano' | 'datos' | 'sugerencia' | 'sin-cambios'
+  tipo: 'inicio' | 'fase' | 'mano' | 'datos' | 'sugerencia' | 'sin-cambios' | 'dieta'
   fecha: string
   de: number | null
   a: number
@@ -90,6 +91,8 @@ export const base = signal<Alimento[] | null>(null)
 export const estado = signal<'cargando' | 'listo'>('cargando')
 
 export const hoy = signal(localDate())
+/** El día que ves en Comida · Hoy (con ‹ › se ven otros); lo que apuntas va a ese día. */
+export const diaVisto = signal(localDate())
 
 /** El objetivo de un día (con su fecha de inicio: una sugerencia aplicada vale desde mañana). */
 export function objetivoDe(a: Ajustes, fecha: string): Macros {
@@ -97,9 +100,32 @@ export function objetivoDe(a: Ajustes, fecha: string): Macros {
   return macrosObjetivo(kcal, a.cuerpo.pesoKg, a.proteinaGKg, a.grasaGKg)
 }
 
-export const objetivoHoy = computed(() => (ajustes.value ? objetivoDe(ajustes.value, hoy.value) : null))
-export const apuntesHoy = computed(() => dias.value[hoy.value] ?? [])
-export const totalHoy = computed(() => sumar(apuntesHoy.value))
+/** La dieta que sigues (null si no sigues ninguna). */
+export const dieta = signal<DietaActiva | null>(null)
+/** Qué días son de entreno según tu rutina de Entreno (null si no tienes rutina). */
+export const tiposEntreno = signal<Record<string, TipoDia> | null>(null)
+
+/** Si un día es de entreno o de descanso: lo que elegiste, lo de tu rutina o, sin rutina, tus días repartidos. */
+export function tipoDe(fecha: string): TipoDia {
+  return (
+    dieta.value?.tipoElegido[fecha] ??
+    tiposEntreno.value?.[fecha] ??
+    repartoSinRutina(fecha, ajustes.value?.diasEntreno ?? 4)
+  )
+}
+
+/** El objetivo de un día: con dieta, lo que suman sus recetas (si ya tiene); si no, tu objetivo de kcal. */
+export function objetivoDelDia(fecha: string): Macros | null {
+  const conDieta = dieta.value ? diaDeDieta(dieta.value, fecha, tipoDe(fecha)).total : null
+  if (conDieta && conDieta.kcal > 0) return conDieta
+  return ajustes.value ? objetivoDe(ajustes.value, fecha) : null
+}
+
+export const objetivoHoy = computed(() => objetivoDelDia(hoy.value))
+/** Lo del día que ves. */
+export const objetivoDia = computed(() => objetivoDelDia(diaVisto.value))
+export const apuntesDia = computed(() => dias.value[diaVisto.value] ?? [])
+export const totalDia = computed(() => sumar(apuntesDia.value))
 export const serie = computed(() => tendencia(pesajes.value))
 
 export const totales = computed(() =>
@@ -153,17 +179,17 @@ export const historial = computed(() =>
   [...cambios.value].sort((x, y) => y.createdAt.localeCompare(x.createdAt)),
 )
 
-/** Las comidas de hoy, cada una con lo suyo y su suma. */
-export const comidasHoy = computed(() =>
-  porComida(apuntesHoy.value).map((c) => ({ ...c, total: sumar(c.apuntes) })),
+/** Las comidas del día que ves, cada una con lo suyo y su suma. */
+export const comidasDia = computed(() =>
+  porComida(apuntesDia.value).map((c) => ({ ...c, total: sumar(c.apuntes) })),
 )
 
 /** Tu ritmo de peso de las dos últimas semanas (null sin pesajes suficientes). */
 export const ritmoHoy = computed(() => ritmoSemanal(serie.value, hoy.value))
 
-/** Lo de ayer en una comida (para «Repetir»). */
+/** Lo del día anterior al que ves en una comida (para «Repetir»). */
 export function deAyer(comida: Apunte['comida']): Apunte[] {
-  return (dias.value[addDays(hoy.value, -1)] ?? []).filter((x) => x.comida === comida)
+  return (dias.value[addDays(diaVisto.value, -1)] ?? []).filter((x) => x.comida === comida)
 }
 
 /** Un alimento por su id: los tuyos y los de la base. */

@@ -4,9 +4,12 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- **Probar Comida (rama `pantalla/comida`, sale de `pantalla/sesion`) en un móvil real**: calcular tu objetivo, añadir con
-  la ración, Semana, «+ Pesarme» y, con unas semanas de datos, la sugerencia del entrenador. Después, PR a `main` (detrás del
-  de `pantalla/sesion`).
+- **Probar Comida en un móvil real** (rama `pantalla/comida-v2`, sale de `pantalla/comida`): el día con ‹ ›, añadir, la
+  ración, Semana y Tu objetivo; en Dieta, la de ejemplo o la tuya, apuntar del menú, una receta (intercambio y editar), la
+  compra, la cocina, la consulta y el escáner con la cámara (necesita https o la red local; Open Food Facts, internet).
+  Después, PR a `main` (detrás de los de `pantalla/sesion` y `pantalla/comida`).
+- **Dudas de Comida que siguen abiertas**: ¿una dieta de verdad para cargar (o se crea en la app)? ¿La consulta se queda en
+  Comida o pasa a Hoy cuando exista? Fotos para las miniaturas de las comidas.
 - **Probar la rama `pantalla/sesion` en un móvil real** con `npm run dev` (dirección «Network», mismo wifi): Tu plan (tarjetas
   con «▶ Empezar», «Editar», Tu semana, Hoy descansas), Editar rutina, la sesión (teclado, dropsets, notas), Ver sesión y las
   fichas. Hasta ahora todo se ha visto solo en el móvil simulado. Después, PR a `main` con la CI en verde.
@@ -18,10 +21,23 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- Rama `pantalla/comida-v2` (2026-11-05, sin unir): Comida versiones 2 y 3. Verificado: `npm run check` (421 pruebas) y los
+  109 e2e (los 8 de la dieta, con axe).
+  - Estilo de la captura del usuario: tarjeta del día gris con anillo de kcal y macros en %, sin lima; comidas en tarjetas
+    con miniatura; ‹ Hoy › para ver y apuntar en otros días.
+  - Dieta (Hoy · Semana · Dieta): cargar un archivo, crear la tuya o la de ejemplo del prototipo; el menú del día según tu
+    rotación de Entreno, apuntado de un toque; Tu semana con el menú de cada día (entreno o descanso, a mano si quieres).
+  - La receta (como Ver sesión: entreno o descanso, raciones), intercambios (solo hoy o para siempre) y editarla como Editar
+    rutina; recetas y menús tuyos. La compra (días, secciones, lo que tienes, alguien más, compartir). Cocina (arroz y su
+    factor, repartir una olla, calcular un plato y guardarlo).
+  - Consulta semanal (cinta, sensaciones, informe del nutricionista con las reglas de la § 8 y del entrenador): propone,
+    «Aplicar desde mañana» o «Ahora no», y se deshace.
+  - Escáner de códigos (cámara o a mano) con Open Food Facts; lo escaneado queda en Mis alimentos con su código.
+  - Decisiones y motivos en [docs/decisiones.md](docs/decisiones.md) (2026-11-05, «Comida versiones 2 y 3»).
 - Rama `pantalla/comida` (2026-11-05, sin unir; Comida antes que Hoy por decisión del usuario). Verificado: `npm run check` y
   los e2e de Comida (7 de 7, con axe).
   - Letra igual que en Entreno (un tamaño por papel; sin los tres tamaños propios de Comida). Propuesta de las versiones 2 y 3
-    en `Desktop/MUTA-Comida-v2-funcionalidades.png`, pendiente de aprobar (con cuatro dudas).
+    en `Desktop/MUTA-Comida-v2-funcionalidades.png` (hecha en `pantalla/comida-v2`).
   - Diseño aprobado `Desktop/MUTA-Comida-diseno.png`: Hoy (tarjeta lima con lo que te queda, aviso del entrenador, comidas),
     Añadir (buscador por palabras, repetir lo de ayer, solo kcal y proteína, recientes, guardadas, tus alimentos, 16
     categorías), la ración (raciones o gramos, «Así queda tu día»), Semana (media, proteína, peso), Tu objetivo (cómo sale,
@@ -82,7 +98,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Pendiente (por prioridad)
 
-1. Hoy y Progreso, en ese orden (cada una con su PNG aprobado antes). Comida versión 2 (dieta cargada, compra) y 3 (escáner).
+1. Hoy y Progreso, en ese orden (cada una con su PNG aprobado antes).
 2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión y la sesión ya dicen «Sugerido»).
 3. Coach: usar las elecciones guardadas (prioridades, puntos débiles) y `adaptVolume`.
 4. Importar/exportar copia de seguridad en CSV/JSON desde Perfil.

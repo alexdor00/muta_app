@@ -56,17 +56,17 @@
   --on-session-light-soft: rgb(255 255 255 / 72%);
   --on-session-light-line: rgb(255 255 255 / 22%);
   --session-text-shadow: 0 2px 14px rgb(0 0 0 / 60%); /* letra sobre las rayas */
-  /* Comida: la tarjeta de lo que te queda (lima, como la primera de Tu plan) y la de tu objetivo (negra) */
-  --food-hero: var(--session-1);
-  --on-food-hero: var(--on-session-dark);
-  --on-food-hero-soft: var(--on-session-dark-soft);
-  --food-hero-track: var(--on-session-dark-line);
+  /* Comida: la tarjeta del día es gris (sin lima, decisión 2026-11-05) con el anillo de kcal; la de tu objetivo, negra */
+  --ring: 132px; /* anillo de kcal de la tarjeta del día */
+  --ring-stroke: 10px;
+  --meal-thumb: 56px; /* miniatura redonda de cada comida */
   --target-hero: var(--session-4);
   --on-target-hero: var(--on-session-light);
   --on-target-hero-soft: var(--on-session-light-soft);
   --target-hero-step: var(--rest-step);
-  --target-chip: var(--session-1);
-  --goal-line: var(--streak); /* la raya del objetivo en las barras de la semana */
+  --target-chip: var(--on-session-light);
+  --on-target-chip: var(--on-session-dark);
+  --goal-line: var(--label-2); /* la raya del objetivo en las barras de la semana (sin naranja) */
   --float-shadow:
     0 6px 18px rgb(0 0 0 / 28%), 0 1px 3px rgb(0 0 0 / 18%); /* botón que flota sobre una tarjeta («▶ Empezar») */
   --photo-card-scrim: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 55%) 100%);

@@ -1,0 +1,136 @@
+/* Una receta: cabecera de color como Ver sesión, el contenido en blanco por encima y «Apuntar» fijo abajo. */
+
+.screen {
+  padding-bottom: calc(var(--control-lg) + var(--space-8) + var(--safe-bottom));
+}
+
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-block);
+  margin-top: calc(var(--radius-card) * -1);
+  padding: var(--space-5) var(--gutter) 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--bg);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.title {
+  font: var(--text-title-2);
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  font: var(--text-subhead);
+}
+
+.stepper button {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.stepper button:disabled {
+  color: var(--surface-3);
+  cursor: default;
+}
+
+.stepper svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.list {
+  margin: var(--space-2) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list > li {
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.list > li:last-child {
+  border-bottom: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:disabled {
+  cursor: default;
+}
+
+.row > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.rowText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font: var(--text-headline);
+}
+
+.grams {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.bottom {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  z-index: 5;
+  width: 100%;
+  max-width: var(--app-max-width);
+  padding: var(--space-3) var(--gutter) calc(var(--space-4) + var(--safe-bottom));
+  background: var(--bg);
+  transform: translateX(-50%);
+}

@@ -67,17 +67,23 @@ desde `workouts`; no hay otra copia.
 
 ## Flujo de datos: Comida
 
-```n IndexedDB `userContent/nutricion` (tus datos y tu objetivo) + `foodLog` (por día) + `bodyLog` (pesajes) + `coach` (cambios)
+```
+IndexedDB `userContent` (nutricion, dieta, compra…) + `foodLog` (por día) + `bodyLog` (pesajes y consultas) + `coach` (cambios)
 │
-▼ use-cases/nutritionStore.ts · cargarComida() → state/comida.ts (objetivo del día, semana, tendencia del peso)
-│ cada 7 días: domain/review.ts · revisar() → una sugerencia «pendiente» en `coach` (nunca se aplica sola)
+▼ use-cases/nutritionStore.ts · cargarComida() → state/comida.ts y state/dieta.ts
+│   el objetivo del día: con dieta, lo que suman sus recetas ese día (entreno o descanso); si no, tu objetivo de kcal
+│   sin dieta, cada 7 días: domain/review.ts · revisar() → una sugerencia «pendiente» en `coach` (nunca se aplica sola)
+│   cargarTipos() → Entreno (index.ts · tiposDeDia, en diferido) → qué días son de entreno según tu rotación
 ▼
-Comida (Hoy · Semana) · Tu objetivo (solo pintan)
-│ añadir / quitar → use-cases/foodLog.ts → `foodLog`; la base (shared/content/foods.json) se descarga al abrir «Añadir»
-▼ «Aplicar desde mañana» → use-cases/target.ts → `userContent/nutricion` (kcal desde mañana) y `coach` (aplicado)
+Comida (Hoy · Semana · Dieta) · Tu objetivo · Receta · La compra · Cocina · Consulta (solo pintan)
+│ añadir / quitar / apuntar una receta → use-cases/foodLog.ts y diet.ts → `foodLog` (al día que ves con ‹ ›)
+│ la base (shared/content/foods.json) se descarga al abrir «Añadir»; el lector de códigos, al abrir el escáner
+▼ «Aplicar desde mañana» → use-cases/target.ts (objetivo) o consult.ts (un ajuste de la dieta desde mañana) y `coach`
+```
 
-```n
-Comida lee de Perfil solo su objetivo y sus días de entreno (`phaseOf` de su `index.ts`) para el primer cálculo.
+Comida lee de Perfil solo su objetivo y sus días de entreno (`phaseOf` de su `index.ts`) para el primer cálculo, y de Entreno
+(su `index.ts`) los días de entreno y la fuerza en los básicos para la consulta. El escáner consulta Open Food Facts (el único
+acceso a internet de Comida) y guarda lo encontrado en `userContent/alimentos-propios` con su código.
 
 ## Datos y contenido
 
@@ -92,4 +98,7 @@ Comida lee de Perfil solo su objetivo y sus días de entreno (`phaseOf` de su `i
 
 CI (`.github/workflows/ci.yml`): formato → linter con fronteras → CSS con tokens → tipos → pruebas → build →
 tamaño (`size-limit`) → guardas del proyecto → recorridos y accesibilidad (Playwright + axe) → Lighthouse.
+
+```
+
 ```

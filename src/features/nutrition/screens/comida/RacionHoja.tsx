@@ -9,9 +9,9 @@ import {
   COMIDAS,
   macrosIncompletos,
   modoInicial,
-  objetivoHoy,
+  objetivoDia,
   pasoDe,
-  totalHoy,
+  totalDia,
   type Alimento,
   type Apunte,
   type ComidaId,
@@ -46,11 +46,11 @@ export function RacionHoja({ alimento, comida, editando, onClose, avisar }: Prop
   )
   const [escrito, setEscrito] = useState<string | null>(null)
   const apunte = apunteDe(alimento, cantidad, modo, comida)
-  const objetivo = objetivoHoy.value
-  // Lo de hoy sin este apunte (si se está cambiando) y con él
+  const objetivo = objetivoDia.value
+  // Lo del día sin este apunte (si se está cambiando) y con él
   const antes = {
-    kcal: totalHoy.value.kcal - (editando?.kcal ?? 0),
-    protein: totalHoy.value.protein - (editando?.protein ?? 0),
+    kcal: totalDia.value.kcal - (editando?.kcal ?? 0),
+    protein: totalDia.value.protein - (editando?.protein ?? 0),
   }
   const despues = { kcal: antes.kcal + apunte.kcal, protein: antes.protein + apunte.protein }
   const al = COMIDAS.find((c) => c.id === comida)?.al ?? comida

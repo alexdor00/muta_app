@@ -4,7 +4,14 @@ import { computed, signal } from '@preact/signals'
 import type { Level } from '../domain/catalog.ts'
 import { descansosPendientes, hoyTocaDescanso } from '../domain/restDays.ts'
 import { cambioUltimaVez } from '../domain/exerciseProgress.ts'
-import { historialDe, semanaDe, ultimaVez, type Entreno } from '../domain/workoutHistory.ts'
+import {
+  diasDesde,
+  historialDe,
+  semanaDe,
+  ultimaVez,
+  type Entreno,
+  type PlanSemana,
+} from '../domain/workoutHistory.ts'
 import {
   esTecnica,
   rangoDe,
@@ -79,20 +86,30 @@ export function descansasHoy(hoy: string): boolean {
   return hoyTocaDescanso(plan.descansos, hecha, dias)
 }
 
+/** Lo que hace falta de tu plan para repartir los días (null sin rutina). */
+function planSemana(hoy: string): PlanSemana | undefined {
+  const plan = tuPlan.value
+  if (plan.status !== 'ready') return undefined
+  const { hecha, dias } = ultimoEntreno(hoy)
+  return {
+    orden: plan.semana.map((x) => x.sigla),
+    siguiente: plan.rotacion.siguiente,
+    tras: plan.descansos,
+    pendientes: descansosPendientes(plan.descansos, hecha, dias),
+  }
+}
+
 /**
  * Tu semana de lunes a domingo: lo hecho con ✓ y, desde el primer día sin entrenar, las sesiones que tocan en su orden con
  * sus descansos obligatorios.
  */
 export function tuSemana(hoy: string) {
-  const plan = tuPlan.value
-  if (plan.status !== 'ready') return semanaDe(entrenos.value, hoy)
-  const { hecha, dias } = ultimoEntreno(hoy)
-  return semanaDe(entrenos.value, hoy, {
-    orden: plan.semana.map((x) => x.sigla),
-    siguiente: plan.rotacion.siguiente,
-    tras: plan.descansos,
-    pendientes: descansosPendientes(plan.descansos, hecha, dias),
-  })
+  return semanaDe(entrenos.value, hoy, planSemana(hoy))
+}
+
+/** `n` días desde `inicio`, repartidos igual que Tu semana (para Comida: qué días son de entreno). */
+export function diasPrevistos(hoy: string, inicio: string, n: number) {
+  return diasDesde(entrenos.value, hoy, inicio, n, planSemana(hoy))
 }
 
 /** Cuánto cambió un ejercicio la última vez frente a la anterior (máximo estimado o repeticiones); null si no hay dos. */

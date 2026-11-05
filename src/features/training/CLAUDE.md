@@ -13,7 +13,10 @@ resumen, ficha del ejercicio) existen como «pendientes» hasta tener diseño ap
 | `use-cases/`  | Cada acción con un solo punto de entrada: cargar, abrir, elegir, empezar                            | domain, state, `shared/data`, `shared/content`          |
 | `domain/`     | Funciones puras con su `*.test.ts`: sin efectos ni acceso a datos                                   | `shared/lib`                                            |
 
-`index.ts` es la API pública del área: otras áreas solo importan de ahí.
+`index.ts` es la API pública del área: otras áreas solo importan de ahí. Para Comida exporta `tiposDeDia` (qué días son de
+entreno: `diasPrevistos` → `domain/workoutHistory.ts · diasDesde`, el mismo reparto que Tu semana, para cualquier tramo) y
+`fuerzaEnBasicos` (`domain/strengthTrend.ts`: los 3 compuestos más repetidos, 2 semanas frente a las 2 anteriores); los dos
+cargan `use-cases/forComida.ts` en diferido, así Comida no descarga Entreno hasta que lo pide.
 
 ## Dominio: dónde está cada cosa
 

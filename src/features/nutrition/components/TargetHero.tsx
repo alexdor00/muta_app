@@ -9,11 +9,13 @@ type Props = {
   /** «al día», «desde mañana». */
   cuando: string
   macros: { proteina: number; hidratos: number; grasa: number }
+  /** Una línea más bajo los macros («1.780 kcal los días de descanso»). */
+  detalle?: string
   children?: ComponentChildren
 }
 
-/** Tu objetivo en grande, en la tarjeta negra, con sus macros y sus botones. */
-export function TargetHero({ etiqueta, kcal, cuando, macros, children }: Props) {
+/** Tu objetivo (o tu dieta) en grande, en la tarjeta negra, con sus macros y sus botones. */
+export function TargetHero({ etiqueta, kcal, cuando, macros, detalle, children }: Props) {
   return (
     <section class={styles.hero} aria-label="Tu objetivo">
       <span class={styles.chip}>{etiqueta}</span>
@@ -36,6 +38,7 @@ export function TargetHero({ etiqueta, kcal, cuando, macros, children }: Props) 
           <b>{formatInt(macros.grasa)} g</b> grasa
         </span>
       </p>
+      {detalle && <p class={styles.macros}>{detalle}</p>}
       {children && <div class={styles.actions}>{children}</div>}
     </section>
   )

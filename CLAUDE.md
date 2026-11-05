@@ -29,7 +29,7 @@ Los e2e se construyen sin las rutinas privadas (`VITE_NO_LOCAL_PROGRAMS=1`), igu
 - `src/app/` — arranque, rutas, pestañas, pantalla de error, actualizaciones → [CLAUDE.md](src/app/CLAUDE.md)
 - `src/features/training/` — **Entreno**: catálogo, detalle de rutina, elecciones → [CLAUDE.md](src/features/training/CLAUDE.md)
 - `src/features/profile/` — bienvenida y perfil → [CLAUDE.md](src/features/profile/CLAUDE.md)
-- `src/features/nutrition/` — **Comida**: apuntar, la semana, tu objetivo y el entrenador (propone, no aplica) → [CLAUDE.md](src/features/nutrition/CLAUDE.md)
+- `src/features/nutrition/` — **Comida**: apuntar, la semana, tu objetivo, tu dieta (recetas, compra, cocina, consulta) y el escáner; quien aconseja propone, no aplica → [CLAUDE.md](src/features/nutrition/CLAUDE.md)
 - `src/features/today|progress/` — Hoy y Progreso: solo pantallas «pendientes» todavía
 - `src/shared/` — lo común: `ui`, `data`, `content`, `platform`, `lib` → [CLAUDE.md](src/shared/CLAUDE.md)
 - `tests/e2e/` — recorridos, accesibilidad y capturas → [CLAUDE.md](tests/e2e/CLAUDE.md)

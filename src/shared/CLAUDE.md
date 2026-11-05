@@ -7,7 +7,7 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
 | `ui/`       | `tokens.css`, `base.css` y componentes (Button, Choice, Sheet, Switch, Toast, ListRow, Tiles…)                                     | `ui`, `lib`       |
 | `data/`     | IndexedDB: `db.ts`, `schema.ts` (almacenes), `migrations/`, copia de seguridad, programas locales                                  | `data`, `lib`     |
 | `content/`  | JSON versionado: programas de MUTA, consejos, `program-info.json`                                                                  | `content`, `lib`  |
-| `platform/` | Vibración, avisos, wake lock, archivos, compartir texto o imagen (versión web)                                                     | `platform`, `lib` |
+| `platform/` | Vibración, avisos, wake lock, archivos, compartir texto o imagen, la cámara de atrás (`startCamera`, el escáner) (versión web)     | `platform`, `lib` |
 | `lib/`      | Utilidades puras: rutas (`paths.ts`), números y fechas (`format.ts`: `addDays`, `daysBetween`, `formatInt`…), `sinClaves`, errores | `lib`             |
 
 ## Convenciones
@@ -30,6 +30,6 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
   (e2e, CI y Vitest).
 - `foods.json` es la base de alimentos de Comida (1.493 por 100 g, BEDCA y USDA): sale del prototipo con
   `node scripts/foods-from-prototype.cjs`; no se edita a mano. Comida la importa aparte (no pesa al abrir la app).
-- `tokens.css` lleva los colores de Comida (`--food-hero`, `--target-hero`…), alias de los de Entreno; la letra es la misma
-  escala para todas las áreas (sin tamaños propios; ver «Tipografía» en [docs/rediseno.md](../../docs/rediseno.md)).
+- `tokens.css` lleva lo de Comida (la tarjeta negra `--target-hero`, el anillo `--ring`, la miniatura `--meal-thumb`), alias de
+  Entreno; sin lima. La letra es la misma escala para todas las áreas (ver «Tipografía» en [docs/rediseno.md](../../docs/rediseno.md)).
 - `programs.ts` guarda los programas locales (`private/programs/*.json`, rev en `_meta.json`: subirla al cambiar un archivo).

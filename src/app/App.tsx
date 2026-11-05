@@ -61,6 +61,18 @@ const Comida = screen(() =>
 const ObjetivoComida = screen(() =>
   import('../features/nutrition/screens/objetivo/ObjetivoScreen.tsx').then((m) => m.ObjetivoScreen),
 )
+const RecetaComida = screen(() =>
+  import('../features/nutrition/screens/receta/RecetaScreen.tsx').then((m) => m.RecetaScreen),
+)
+const CompraComida = screen(() =>
+  import('../features/nutrition/screens/compra/CompraScreen.tsx').then((m) => m.CompraScreen),
+)
+const CocinaComida = screen(() =>
+  import('../features/nutrition/screens/cocina/CocinaScreen.tsx').then((m) => m.CocinaScreen),
+)
+const ConsultaComida = screen(() =>
+  import('../features/nutrition/screens/consulta/ConsultaScreen.tsx').then((m) => m.ConsultaScreen),
+)
 const Progreso = screen(() =>
   import('../features/progress/screens/progreso/ProgresoScreen.tsx').then((m) => m.ProgresoScreen),
 )
@@ -140,6 +152,10 @@ function Layout() {
             <Route path={patterns.exercise} component={FichaEjercicio} />
             <Route path={paths.nutrition} component={Comida} />
             <Route path={paths.nutritionTarget} component={ObjetivoComida} />
+            <Route path={patterns.recipe} component={RecetaComida} />
+            <Route path={paths.shopping} component={CompraComida} />
+            <Route path={paths.kitchen} component={CocinaComida} />
+            <Route path={paths.checkIn} component={ConsultaComida} />
             <Route path={paths.progress} component={Progreso} />
             <Route path={paths.profile} component={Perfil} />
             <Route path={paths.welcome} component={Bienvenida} />

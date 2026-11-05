@@ -107,8 +107,8 @@ test('sin objetivo: tus datos lo calculan y sale lo que te queda por comer', asy
   await hoja.getByLabel('Pasos al día').fill('9.000')
   await hoja.getByRole('button', { name: 'Calcular mi objetivo' }).click()
   // Sin perfil: mantenimiento, 3 días → 1.780 × 1,61 = 2.866 kcal
-  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toContainText('2.866')
-  await expect(page.getByText('por comer')).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toContainText('de 2.866')
+  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toContainText('Te quedan 2.866 kcal')
   await page.getByRole('link', { name: 'Objetivo' }).click()
   await expect(page.getByRole('heading', { name: 'Cómo sale' })).toBeVisible()
   await expect(page.getByText('Mifflin-St Jeor: 80 kg, 180 cm, 30 años')).toBeVisible()
@@ -148,8 +148,9 @@ test('solo kcal y proteína, y repetir la comida de ayer', async ({ page }) => {
   await rapido.getByLabel('Kcal').fill('600')
   await rapido.getByLabel('Proteína (g)').fill('35')
   await rapido.getByRole('button', { name: 'Guardar' }).click()
-  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toContainText('2.900 de 2.375 kcal')
-  await expect(page.getByText('de más')).toBeVisible()
+  const dia = page.getByRole('region', { name: 'Lo que llevas hoy' })
+  await expect(dia).toContainText('2.900kcalde 2.375')
+  await expect(dia).toContainText('525 kcal de más')
 })
 
 test('la semana: media frente al objetivo, proteína y peso', async ({ page }) => {
@@ -170,7 +171,7 @@ test('la semana: media frente al objetivo, proteína y peso', async ({ page }) =
 test('el entrenador propone −150 kcal; nada cambia hasta aplicarlo y se puede deshacer', async ({ page }) => {
   await prepararComida(page)
   await page.goto('/comida')
-  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toContainText('2.375 kcal')
+  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toContainText('de 2.375')
   await page.getByRole('button', { name: /Te propongo un cambio: −150 kcal/ }).click()
   const hoja = page.getByRole('dialog', { name: 'El entrenador' })
   await expect(hoja.getByRole('heading', { name: 'Bajas más despacio de lo previsto' })).toBeVisible()
@@ -179,7 +180,7 @@ test('el entrenador propone −150 kcal; nada cambia hasta aplicarlo y se puede 
   await hoja.getByRole('button', { name: 'Aplicar desde mañana' }).click()
   await expect(page.getByRole('status')).toContainText('2.225 kcal desde mañana')
   // Hoy sigue el objetivo de antes
-  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toContainText('2.375 kcal')
+  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toContainText('de 2.375')
   await page.getByRole('link', { name: 'Objetivo' }).click()
   await expect(page.getByRole('region', { name: 'Tu objetivo' })).toContainText('2.225')
   await expect(page.getByText('desde mañana')).toBeVisible()

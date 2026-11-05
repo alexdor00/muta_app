@@ -37,6 +37,13 @@ describe('Comida', () => {
     expect(isFullScreen(paths.nutrition)).toBe(false)
     expect(tabOf(paths.nutritionTarget)).toBe('nutrition')
   })
+
+  it('la receta, la compra, la cocina y la consulta, también a pantalla completa', () => {
+    for (const p of [paths.recipe('pollo', 'descanso'), paths.shopping, paths.kitchen, paths.checkIn])
+      expect(isFullScreen(p)).toBe(true)
+    expect(paths.recipe('pollo', 'descanso')).toBe('/comida/receta/pollo?tipo=descanso')
+    expect(tabOf(paths.shopping)).toBe('nutrition')
+  })
 })
 
 describe('tabOf', () => {

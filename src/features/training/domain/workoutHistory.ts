@@ -97,26 +97,51 @@ export type PlanSemana = {
 export function semanaDe(entrenos: readonly Entreno[], hoy: string, plan?: PlanSemana): DiaSemana[] {
   const t = Date.parse(`${hoy}T00:00:00Z`)
   const lunes = t - ((new Date(t).getUTCDay() + 6) % 7) * DIA
+  return diasDesde(entrenos, hoy, new Date(lunes).toISOString().slice(0, 10), 7, plan).map((x, i) => ({
+    letra: LETRAS[i],
+    dia: new Date(lunes + i * DIA).getUTCDate(),
+    sigla: x.sigla,
+    estado: x.estado,
+    hoy: lunes + i * DIA === t,
+  }))
+}
+
+/** Un día cualquiera con lo que hiciste o lo que toca (como en Tu semana). */
+export type DiaPrevisto = { fecha: string; sigla: string; estado: DiaSemana['estado'] }
+
+/**
+ * `n` días desde `inicio`, repartidos como Tu semana: lo entrenado, los días pasados sin entrenar como descanso y, desde el
+ * primer día sin entrenar, las sesiones en su orden con sus descansos obligatorios. Sirve a Comida para saber qué días son
+ * de entreno (el menú y la compra).
+ */
+export function diasDesde(
+  entrenos: readonly Entreno[],
+  hoy: string,
+  inicio: string,
+  n: number,
+  plan?: PlanSemana,
+): DiaPrevisto[] {
+  const t = Date.parse(`${hoy}T00:00:00Z`)
+  const desde = Date.parse(`${inicio}T00:00:00Z`)
+  const orden = enOrden(entrenos)
   let siguiente = plan?.siguiente ?? 0
   let pendientes = plan?.pendientes ?? 0
-  const dias: Omit<DiaSemana, 'hoy'>[] = LETRAS.map((letra, i) => {
-    const d = lunes + i * DIA
+  return Array.from({ length: n }, (_, i): DiaPrevisto => {
+    const d = desde + i * DIA
     const fecha = new Date(d).toISOString().slice(0, 10)
-    const hecho = enOrden(entrenos).find((x) => x.fecha === fecha)
-    const dia = new Date(d).getUTCDate()
-    if (hecho) return { letra, dia, sigla: hecho.sigla, estado: 'hecho' }
-    if (d < t) return { letra, dia, sigla: '', estado: 'descanso' }
-    if (!plan?.orden.length) return { letra, dia, sigla: '', estado: d === t ? 'hoy' : 'pendiente' }
+    const hecho = orden.find((x) => x.fecha === fecha)
+    if (hecho) return { fecha, sigla: hecho.sigla, estado: 'hecho' }
+    if (d < t) return { fecha, sigla: '', estado: 'descanso' }
+    if (!plan?.orden.length) return { fecha, sigla: '', estado: d === t ? 'hoy' : 'pendiente' }
     if (pendientes > 0) {
       pendientes -= 1
-      return { letra, dia, sigla: '', estado: 'descanso' }
+      return { fecha, sigla: '', estado: 'descanso' }
     }
     const sigla = plan.orden[siguiente % plan.orden.length]
     pendientes = plan.tras.filter((x) => x === (siguiente % plan.orden.length) + 1).length
     siguiente += 1
-    return { letra, dia, sigla, estado: d === t ? 'hoy' : 'pendiente' }
+    return { fecha, sigla, estado: d === t ? 'hoy' : 'pendiente' }
   })
-  return dias.map((x, i) => ({ ...x, hoy: lunes + i * DIA === t }))
 }
 
 /** Series directas por músculo de una lista de ejercicios (una por serie, al músculo principal). */

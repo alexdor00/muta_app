@@ -1,8 +1,19 @@
-import { formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import { addDays, daysBetween, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
 import { CoachCard } from '../../components/CoachCard.tsx'
 import { DayHero } from '../../components/DayHero.tsx'
+import { DayNav } from '../../components/DayNav.tsx'
 import { MealList } from '../../components/MealList.tsx'
-import { comidasHoy, hoy, objetivoHoy, pendiente, totalHoy, type ComidaId } from '../../state/comida.ts'
+import { MenuList } from '../../components/MenuList.tsx'
+import {
+  comidasDia,
+  diaVisto,
+  hoy,
+  objetivoDia,
+  pendiente,
+  totalDia,
+  type ComidaId,
+} from '../../state/comida.ts'
+import { apuntada, menuDelDia, tocaConsulta } from '../../state/dieta.ts'
 import styles from './Vistas.module.css'
 
 type Props = {
@@ -10,20 +21,46 @@ type Props = {
   onAbrirComida: (comida: ComidaId) => void
   /** Abre la sugerencia del entrenador; null si no hay ninguna esperando. */
   onSugerencia: (() => void) | null
+  onAbrirReceta: (id: string) => void
+  onApuntarReceta: (id: string) => void
+  onConsulta: () => void
 }
 
-/** Hoy: lo que te queda, el aviso del entrenador (si tiene algo) y tus comidas. */
-export function HoyVista({ onAnadir, onAbrirComida, onSugerencia }: Props) {
-  const objetivo = objetivoHoy.value
+function tituloDia(fecha: string, hoyEs: string): string {
+  const n = daysBetween(fecha, hoyEs)
+  return n === 0 ? 'Hoy' : n === 1 ? 'Ayer' : formatDayDate(fecha)
+}
+
+/**
+ * Hoy (o el día que elijas con ‹ ›): el anillo con lo que llevas, el aviso del entrenador si tiene algo, el menú de tu
+ * dieta si sigues una y tus comidas.
+ */
+export function HoyVista({
+  onAnadir,
+  onAbrirComida,
+  onSugerencia,
+  onAbrirReceta,
+  onApuntarReceta,
+  onConsulta,
+}: Props) {
+  const objetivo = objetivoDia.value
   if (!objetivo) return null
-  const total = totalHoy.value
+  const fecha = diaVisto.value
+  const esHoy = fecha === hoy.value
+  const total = totalDia.value
   const sugerencia = pendiente.value
+  const menu = menuDelDia.value
   const quedan = Math.max(0, objetivo.kcal - total.kcal)
   const faltaProteina = Math.max(0, Math.round(objetivo.protein - total.protein))
   return (
     <div class={styles.stack}>
+      <DayNav
+        titulo={tituloDia(fecha, hoy.value)}
+        etiqueta={esHoy ? `Hoy, ${formatDayDate(fecha)}` : formatDayDate(fecha)}
+        onAntes={() => (diaVisto.value = addDays(fecha, -1))}
+        onDespues={esHoy ? null : () => (diaVisto.value = addDays(fecha, 1))}
+      />
       <DayHero
-        fecha={formatDayDate(hoy.value)}
         comidas={total.kcal}
         objetivo={objetivo.kcal}
         macros={[
@@ -32,15 +69,39 @@ export function HoyVista({ onAnadir, onAbrirComida, onSugerencia }: Props) {
           { nombre: 'Grasa', hecho: total.fat, objetivo: objetivo.fat },
         ]}
       />
-      {sugerencia && onSugerencia && (
+      {esHoy && menu && tocaConsulta.value && (
+        <CoachCard
+          titulo="Tu nutricionista · consulta semanal"
+          texto="Toca la consulta: báscula, cinta y cómo te has sentido"
+          ver="Empezar"
+          onVer={onConsulta}
+        />
+      )}
+      {esHoy && !menu && sugerencia && onSugerencia && (
         <CoachCard
           titulo="El entrenador · revisión semanal"
           texto={`Te propongo un cambio: ${sugerencia.a > (sugerencia.de ?? 0) ? '+' : '−'}${formatInt(Math.abs(sugerencia.a - (sugerencia.de ?? 0)))} kcal`}
           onVer={onSugerencia}
         />
       )}
+      {menu && (
+        <MenuList
+          titulo={`Tu menú · ${menu.menu.id}`}
+          detalle={`${menu.tipo === 'entreno' ? 'Día de entreno' : 'Día de descanso'} · día ${menu.diaCiclo} del menú`}
+          filas={menu.recetas.map((r) => ({
+            id: r.id,
+            rotulo: r.rotulo,
+            nombre: r.nombre,
+            kcal: r.total.kcal,
+            proteina: r.total.protein,
+            apuntada: apuntada(r.id, fecha),
+          }))}
+          onAbrir={onAbrirReceta}
+          onApuntar={onApuntarReceta}
+        />
+      )}
       <MealList
-        comidas={comidasHoy.value.map((c) => ({
+        comidas={comidasDia.value.map((c) => ({
           id: c.id,
           nombre: c.nombre,
           al: c.al,
@@ -51,7 +112,7 @@ export function HoyVista({ onAnadir, onAbrirComida, onSugerencia }: Props) {
         quedan={
           quedan > 0
             ? `Te quedan ${formatInt(quedan)} kcal${faltaProteina ? ` y ${faltaProteina} g de proteína` : ''}`
-            : 'Ya llegas a tu objetivo de hoy'
+            : 'Ya llegas a tu objetivo del día'
         }
         onAbrir={(id) => onAbrirComida(id as ComidaId)}
         onAnadir={(id) => onAnadir(id as ComidaId)}

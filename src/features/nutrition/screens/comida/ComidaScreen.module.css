@@ -1,4 +1,4 @@
-/* Comida: cabecera con «Objetivo», el control Hoy · Semana y el estado sin objetivo. */
+/* Comida: cabecera con «Objetivo», el control Hoy · Semana · Dieta y el estado sin objetivo (tarjeta gris). */
 
 .target {
   display: inline-flex;
@@ -24,8 +24,8 @@
   margin: var(--space-2) var(--gutter);
   padding: var(--space-5);
   border-radius: var(--radius-card);
-  background: var(--food-hero);
-  color: var(--on-food-hero);
+  background: var(--surface);
+  color: var(--label);
 }
 
 .emptyTitle {
@@ -42,8 +42,8 @@
   min-height: var(--control-lg);
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--on-food-hero);
-  color: var(--food-hero);
+  background: var(--accent);
+  color: var(--on-accent);
   font: var(--text-headline);
   cursor: pointer;
 }

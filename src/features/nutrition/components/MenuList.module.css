@@ -1,0 +1,32 @@
+/* El menú de tu dieta: las tarjetas de MealList con la píldora «Apuntar» (negra) o «✓ Apuntada» (gris). */
+
+.detalle {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.toggle svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.done {
+  background: var(--surface-2);
+  color: var(--label);
+}

@@ -15,7 +15,7 @@
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-chip);
   background: var(--target-chip);
-  color: var(--on-food-hero);
+  color: var(--on-target-chip);
   font: var(--text-caption);
   font-weight: var(--weight-bold);
   text-transform: uppercase;

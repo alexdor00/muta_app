@@ -1,5 +1,5 @@
 import { formatInt } from '../../../shared/lib/format.ts'
-import { ChevronRightIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
+import { ChevronRightIcon, ForkIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
 import styles from './MealList.module.css'
 
 export type FilaComida = {
@@ -21,7 +21,10 @@ type Props = {
   onAnadir: (id: string) => void
 }
 
-/** Las comidas del día: cada una con sus kcal y su proteína; la vacía dice cuánto te queda y lleva «+» en negro. */
+/**
+ * Las comidas del día, cada una en su tarjeta: miniatura, lo que llevas y sus kcal (se abre con «›»). La vacía dice cuánto
+ * te queda y lleva «+»; la siguiente que falta, en negro. Aún sin fotos: la miniatura lleva el icono de Comida.
+ */
 export function MealList({ comidas, quedan, onAbrir, onAnadir }: Props) {
   const primeraVacia = comidas.find((c) => !c.alimentos)?.id
   const hechas = comidas.filter((c) => c.alimentos).length
@@ -36,39 +39,35 @@ export function MealList({ comidas, quedan, onAbrir, onAnadir }: Props) {
         </span>
       </div>
       <ul class={styles.list}>
-        {comidas.map((c) =>
-          c.alimentos ? (
-            <li key={c.id} class={styles.row}>
-              <button type="button" class={styles.open} onClick={() => onAbrir(c.id)}>
-                <span class={styles.text}>
-                  <span class={styles.name}>{c.nombre}</span>
-                  <span class={styles.items}>{c.alimentos}</span>
-                </span>
-                <span class={styles.numbers}>
-                  <span class={styles.kcal}>
-                    <b>{formatInt(c.kcal)}</b> kcal
-                  </span>
-                  <span class={styles.protein}>{formatInt(c.proteina)} g prot.</span>
-                </span>
-                <ChevronRightIcon />
-              </button>
-              <button
-                type="button"
-                class={styles.add}
-                aria-label={`Añadir ${c.al}`}
-                onClick={() => onAnadir(c.id)}
-              >
-                <PlusIcon />
-              </button>
-            </li>
-          ) : (
-            <li key={c.id} class={styles.row}>
-              <button type="button" class={styles.open} onClick={() => onAnadir(c.id)}>
-                <span class={styles.text}>
-                  <span class={styles.name}>{c.nombre}</span>
+        {comidas.map((c) => (
+          <li key={c.id} class={styles.card}>
+            <button
+              type="button"
+              class={styles.open}
+              onClick={() => (c.alimentos ? onAbrir(c.id) : onAnadir(c.id))}
+            >
+              <span class={styles.thumb} aria-hidden="true">
+                <ForkIcon />
+              </span>
+              <span class={styles.text}>
+                <span class={styles.name}>{c.nombre}</span>
+                {c.alimentos ? (
+                  <>
+                    <span class={styles.detail}>{formatInt(c.proteina)} g de proteína</span>
+                    <span class={styles.items}>{c.alimentos}</span>
+                  </>
+                ) : (
                   <span class={styles.items}>{c.id === primeraVacia ? quedan : 'Sin apuntar'}</span>
+                )}
+              </span>
+              {c.alimentos && (
+                <span class={styles.kcal}>
+                  <b>{formatInt(c.kcal)}</b> kcal
                 </span>
-              </button>
+              )}
+              {c.alimentos && <ChevronRightIcon />}
+            </button>
+            {!c.alimentos && (
               <button
                 type="button"
                 class={`${styles.add} ${c.id === primeraVacia ? styles.next : ''}`}
@@ -77,9 +76,9 @@ export function MealList({ comidas, quedan, onAbrir, onAnadir }: Props) {
               >
                 <PlusIcon />
               </button>
-            </li>
-          ),
-        )}
+            )}
+          </li>
+        ))}
       </ul>
     </section>
   )
