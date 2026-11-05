@@ -305,3 +305,11 @@ pauta, cerrado: no molesta) pone cualquiera a cualquier ejercicio o quita la de 
 - **La base de alimentos** (1.493, BEDCA y USDA) va en `shared/content/foods.json` y se descarga aparte al abrir «Añadir»:
   no pesa al abrir la app. Su prueba admite, nombrándolas, las kcal que no cuadran con 4P + 4H + 9G por fibra, alcohol,
   polioles o vinagre.
+
+## 2026-11-05 · Comida, con los tamaños de letra de Entreno
+
+- **Un tamaño por papel en toda la app**, a petición del usuario: títulos, datos, subtítulos y cifras de Comida miden lo mismo
+  que en Entreno (tabla en [rediseno.md](rediseno.md), «Tipografía»). Se quitan los tres tamaños propios de Comida
+  (`--text-food-hero` 68, `--text-food-number` 44, `--text-food-tile` 28): «por comer», tu objetivo y la ración usan la cifra
+  protagonista de Entreno (40) y la media, el peso, la sugerencia y las cifras de la ración, la de tarjeta (30). Las kcal de
+  cada fila pasan a 15 y los rótulos en mayúsculas, sin negrita, como «Tu semana».

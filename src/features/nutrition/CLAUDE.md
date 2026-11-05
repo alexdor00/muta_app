@@ -30,6 +30,7 @@ Ni bajar de peso mueve el objetivo por sí solo (decisión 2026-11-05).
   la base (`cargarAlimentos`, descarga aparte la primera vez que se abre «Añadir»).
 - `components/` — `DayHero` (tarjeta lima: lo que te queda), `CoachCard` (aviso negro del entrenador), `MealList`,
   `WeekBars`, `TrendChart` (tendencia, pesajes y banda de lo previsto), `TargetHero` (tarjeta negra de tu objetivo).
+  La letra es la de Entreno, un tamaño por papel (cifra protagonista 40, de tarjeta 30): sin tamaños propios de Comida.
 - `screens/comida` — Comida (pestaña): Hoy · Semana y sus hojas (añadir, ración, solo kcal y proteína, crear alimento, la
   comida del día, tu peso, tus datos). `screens/objetivo` — Tu objetivo (`/comida/objetivo`, pantalla completa): cómo sale,
   revisión semanal, historial; hojas de fase, a mano y la sugerencia.

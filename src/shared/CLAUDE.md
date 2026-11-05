@@ -30,5 +30,6 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
   (e2e, CI y Vitest).
 - `foods.json` es la base de alimentos de Comida (1.493 por 100 g, BEDCA y USDA): sale del prototipo con
   `node scripts/foods-from-prototype.cjs`; no se edita a mano. Comida la importa aparte (no pesa al abrir la app).
-- `tokens.css` lleva los de Comida (`--food-hero`, `--target-hero`, `--text-food-*`…): alias de los colores de Entreno.
+- `tokens.css` lleva los colores de Comida (`--food-hero`, `--target-hero`…), alias de los de Entreno; la letra es la misma
+  escala para todas las áreas (sin tamaños propios; ver «Tipografía» en [docs/rediseno.md](../../docs/rediseno.md)).
 - `programs.ts` guarda los programas locales (`private/programs/*.json`, rev en `_meta.json`: subirla al cambiar un archivo).

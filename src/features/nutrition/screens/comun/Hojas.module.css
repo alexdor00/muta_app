@@ -29,7 +29,6 @@
 
 .eyebrow {
   font: var(--text-caption);
-  font-weight: var(--weight-semibold);
   color: var(--label-2);
   text-transform: uppercase;
 }
@@ -170,7 +169,7 @@
 }
 
 .rowKcal {
-  font: var(--text-body);
+  font: var(--text-subhead);
   white-space: nowrap;
 }
 
@@ -228,7 +227,7 @@
   border: 0;
   background: none;
   color: var(--label);
-  font: var(--text-food-hero);
+  font: var(--text-session-hero);
   text-align: center;
 }
 
@@ -250,7 +249,7 @@
 }
 
 .tileValue {
-  font: var(--text-food-tile);
+  font: var(--text-session-value);
 }
 
 .card {

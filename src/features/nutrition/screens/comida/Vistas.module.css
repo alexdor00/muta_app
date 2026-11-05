@@ -26,7 +26,6 @@
 
 .eyebrow {
   font: var(--text-caption);
-  font-weight: var(--weight-semibold);
   color: var(--label-2);
   text-transform: uppercase;
 }
@@ -39,7 +38,7 @@
 }
 
 .number {
-  font: var(--text-food-number);
+  font: var(--text-session-value);
 }
 
 .sub {

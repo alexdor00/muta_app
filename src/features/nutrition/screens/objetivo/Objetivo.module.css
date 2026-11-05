@@ -204,12 +204,12 @@
 }
 
 .from {
-  font: var(--text-food-number);
+  font: var(--text-session-value);
   color: var(--label-2);
 }
 
 .to {
-  font: var(--text-food-number);
+  font: var(--text-session-value);
 }
 
 .checks {

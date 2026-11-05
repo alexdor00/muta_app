@@ -20,6 +20,10 @@ respuesta inmediata (imagen, sonido, vibración) · pensada para el gimnasio (ac
   resumen diga «naranja» (descanso, check…), se usa el acento neutro: blanco y negro, y el énfasis por tamaño, peso y contraste.
 - **Tipografía** (fuente del sistema, cifras de ancho fijo): título grande 34/41 · título 1 28/34 · título 2 22/28 · titular 17/22 · cuerpo 17/22 ·
   subtítulo 15/20 · nota 13/18 · leyenda 12/16 · cifra grande 48/52.
+  **Un tamaño por papel, igual en todas las áreas** (el de Entreno; decisión 2026-11-05): título de pestaña 24 · hoja grande 28 ·
+  sección y nombre en cabecera 22 · título de fila, botón y título de hoja 17 · dato de fila, explicación, píldora y chip 15 ·
+  nota, segmento y día 13 · rótulo en mayúsculas 12 · cifra protagonista 40 (`--text-session-hero`) · cifra de tarjeta 30
+  (`--text-session-value`) · contador («4 de 5») 22 en cursiva. Ninguna área lleva tamaños propios.
 - **Espacio**: rejilla de 4 · margen lateral 20 · entre bloques 24, dentro 12 · radios 8 chip, 12 control, 20 tarjeta, 28 hoja, 999 píldora ·
   toque ≥ 44 px (botón principal 52) · sin sombras · 150 ms toque, 250 ms hoja, 350 ms pantalla, curva `cubic-bezier(.32,.72,0,1)`.
 - **Tacto y sonido**: marcar serie = toque ligero + clic; mejor que la vez anterior = dos notas; récord = tres notas que suben; fin de descanso = tres pitidos.

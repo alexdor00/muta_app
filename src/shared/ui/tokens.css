@@ -97,17 +97,14 @@
   --text-session-sigla: italic 900 1.125rem / 1.2 var(--font-condensed); /* 18: sigla de la tarjeta de sesión (como en el diseño) */
   --text-session-title: italic 900 1.375rem / 1.1 var(--font-condensed); /* 22 */
   --text-summary-sigla: italic 900 5rem / 0.9 var(--font-condensed); /* 80: sigla del resumen final */
-  --text-session-hero: italic 900 2.5rem / 1 var(--font-condensed); /* 40: sigla grande de Ver sesión */
+  --text-session-hero: italic 900 2.5rem / 1 var(--font-condensed); /* 40: cifra protagonista (sigla de Ver sesión; en Comida, kcal por comer, tu objetivo y la ración) */
   --text-session-label: italic 900 1.375rem / 1 var(--font-condensed); /* 22: nombre en la burbuja de un músculo */
-  --text-session-value: italic 900 1.875rem / 1 var(--font-condensed); /* 30: tonelaje de la gráfica de Ver sesión */
+  --text-session-value: italic 900 1.875rem / 1 var(--font-condensed); /* 30: cifra de tarjeta (tonelaje de Ver sesión; en Comida, la media, el peso y la sugerencia) */
   --text-timer: 700 4.5rem / 1 var(--font); /* 72: número del cronómetro de una serie */
   --text-set-value: 700 1.375rem / 1 var(--font); /* 22: kilos de una serie en la sesión */
   --text-chart-axis: 500 0.8125rem / 1 var(--font); /* 13: números y fechas de los ejes de una gráfica */
   --text-session-ghost: italic 900 11.875rem / 0.8 var(--font-condensed); /* 190: sigla de fondo, solo contorno */
   --text-brand: 800 4rem / 1 var(--font); /* 64: solo el logotipo MUTA de la bienvenida */
-  --text-food-hero: italic 900 4.25rem / 0.9 var(--font-condensed); /* 68: kcal por comer y tu objetivo */
-  --text-food-number: italic 900 2.75rem / 0.95 var(--font-condensed); /* 44: media de la semana, peso, la sugerencia */
-  --text-food-tile: italic 900 1.75rem / 1 var(--font-condensed); /* 28: cifras de la ración */
 
   /* Espacio: múltiplos de 4 */
   --space-1: 4px;

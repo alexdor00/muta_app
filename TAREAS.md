@@ -20,6 +20,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 - Rama `pantalla/comida` (2026-11-05, sin unir; Comida antes que Hoy por decisión del usuario). Verificado: `npm run check` y
   los e2e de Comida (7 de 7, con axe).
+  - Letra igual que en Entreno (un tamaño por papel; sin los tres tamaños propios de Comida). Propuesta de las versiones 2 y 3
+    en `Desktop/MUTA-Comida-v2-funcionalidades.png`, pendiente de aprobar (con cuatro dudas).
   - Diseño aprobado `Desktop/MUTA-Comida-diseno.png`: Hoy (tarjeta lima con lo que te queda, aviso del entrenador, comidas),
     Añadir (buscador por palabras, repetir lo de ayer, solo kcal y proteína, recientes, guardadas, tus alimentos, 16
     categorías), la ración (raciones o gramos, «Así queda tu día»), Semana (media, proteína, peso), Tu objetivo (cómo sale,
