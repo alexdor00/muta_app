@@ -1,4 +1,10 @@
-import { addDays, daysBetween, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import {
+  addDays,
+  daysBetween,
+  formatDayDate,
+  formatDecimal,
+  formatInt,
+} from '../../../../shared/lib/format.ts'
 import { CoachCard } from '../../components/CoachCard.tsx'
 import { DayHero } from '../../components/DayHero.tsx'
 import { DayNav } from '../../components/DayNav.tsx'
@@ -10,6 +16,7 @@ import {
   hoy,
   objetivoDia,
   pendiente,
+  pesajes,
   totalDia,
   type ComidaId,
 } from '../../state/comida.ts'
@@ -17,6 +24,8 @@ import { apuntada, menuDelDia, tocaConsulta } from '../../state/dieta.ts'
 import styles from './Vistas.module.css'
 
 type Props = {
+  /** Apuntar el peso de hoy (hasta que exista la pestaña Hoy). */
+  onPesarme: () => void
   onAnadir: (comida: ComidaId) => void
   onAbrirComida: (comida: ComidaId) => void
   /** Abre la sugerencia del entrenador; null si no hay ninguna esperando. */
@@ -36,6 +45,7 @@ function tituloDia(fecha: string, hoyEs: string): string {
  * dieta si sigues una y tus comidas.
  */
 export function HoyVista({
+  onPesarme,
   onAnadir,
   onAbrirComida,
   onSugerencia,
@@ -50,6 +60,7 @@ export function HoyVista({
   const total = totalDia.value
   const sugerencia = pendiente.value
   const menu = menuDelDia.value
+  const pesoDeHoy = pesajes.value.find((p) => p.date === hoy.value)
   const quedan = Math.max(0, objetivo.kcal - total.kcal)
   const faltaProteina = Math.max(0, Math.round(objetivo.protein - total.protein))
   return (
@@ -69,6 +80,16 @@ export function HoyVista({
           { nombre: 'Grasa', hecho: total.fat, objetivo: objetivo.fat },
         ]}
       />
+      {esHoy && (
+        <p class={`${styles.pad} ${styles.sub}`}>
+          {pesoDeHoy
+            ? `Hoy pesas ${formatDecimal(pesoDeHoy.kg)} kg. `
+            : 'Pésate cada mañana: lo mira el entrenador. '}
+          <button type="button" class={styles.link} onClick={onPesarme}>
+            {pesoDeHoy ? 'Cambiar' : '+ Pesarme'}
+          </button>
+        </p>
+      )}
       {esHoy && menu && tocaConsulta.value && (
         <CoachCard
           titulo="Tu nutricionista · consulta semanal"

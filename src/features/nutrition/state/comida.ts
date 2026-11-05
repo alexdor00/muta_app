@@ -13,8 +13,7 @@ import {
   type Cuerpo,
   type Fase,
 } from '../domain/targets.ts'
-import { resumenSemana } from '../domain/week.ts'
-import { gastoMedido, ritmoSemanal, tendencia, type Pesaje } from '../domain/weight.ts'
+import { gastoMedido, tendencia, type Pesaje } from '../domain/weight.ts'
 
 // Lo que las pantallas necesitan del dominio (no lo importan directamente)
 export {
@@ -35,7 +34,6 @@ export {
   type Sexo,
   type Cuerpo,
 } from '../domain/targets.ts'
-export { letraDia } from '../domain/week.ts'
 export { ritmoPrevisto, tituloCambio } from '../domain/review.ts'
 
 /** Tus datos y tu objetivo (en `userContent`, id «nutricion»). */
@@ -132,10 +130,6 @@ export const totales = computed(() =>
   Object.fromEntries(Object.entries(dias.value).map(([d, a]) => [d, sumar(a)])),
 )
 
-export const semana = computed(() =>
-  objetivoHoy.value ? resumenSemana(totales.value, hoy.value, objetivoHoy.value) : null,
-)
-
 /** Cómo sale tu objetivo, con tus datos de ahora (lo que se enseña en «Tu objetivo»). */
 export const calculo = computed(() => {
   const a = ajustes.value
@@ -183,9 +177,6 @@ export const historial = computed(() =>
 export const comidasDia = computed(() =>
   porComida(apuntesDia.value).map((c) => ({ ...c, total: sumar(c.apuntes) })),
 )
-
-/** Tu ritmo de peso de las dos últimas semanas (null sin pesajes suficientes). */
-export const ritmoHoy = computed(() => ritmoSemanal(serie.value, hoy.value))
 
 /** Lo del día anterior al que ves en una comida (para «Repetir»). */
 export function deAyer(comida: Apunte['comida']): Apunte[] {

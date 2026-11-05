@@ -66,7 +66,6 @@
   --target-hero-step: var(--rest-step);
   --target-chip: var(--on-session-light);
   --on-target-chip: var(--on-session-dark);
-  --goal-line: var(--label-2); /* la raya del objetivo en las barras de la semana (sin naranja) */
   --float-shadow:
     0 6px 18px rgb(0 0 0 / 28%), 0 1px 3px rgb(0 0 0 / 18%); /* botón que flota sobre una tarjeta («▶ Empezar») */
   --photo-card-scrim: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 55%) 100%);

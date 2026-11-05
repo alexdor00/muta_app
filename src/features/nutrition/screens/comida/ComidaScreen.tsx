@@ -42,18 +42,18 @@ import { NuevaRecetaHoja } from './NuevaRecetaHoja.tsx'
 import { PesoHoja } from './PesoHoja.tsx'
 import { RacionHoja } from './RacionHoja.tsx'
 import { RapidoHoja } from './RapidoHoja.tsx'
-import { SemanaVista } from './SemanaVista.tsx'
 import { SugerenciaHoja } from '../objetivo/SugerenciaHoja.tsx'
 
-type Vista = 'hoy' | 'semana' | 'dieta'
+/** La semana (medias, proteína por días, tendencia del peso) no va aquí: será de Progreso. */
+type Vista = 'hoy' | 'dieta'
 
-/** Comida (pestaña): el día, la semana y tu dieta; añadir, la ración, la dieta y la sugerencia del entrenador van en hojas. */
+/** Comida (pestaña): el día y tu dieta; añadir, la ración, la dieta y la sugerencia del entrenador van en hojas. */
 export function ComidaScreen() {
   useEffect(() => {
     void cargarComida()
   }, [])
   const { query, route } = useLocation()
-  const vista: Vista = query.vista === 'semana' || query.vista === 'dieta' ? query.vista : 'hoy'
+  const vista: Vista = query.vista === 'dieta' ? 'dieta' : 'hoy'
   const [comida, setComida] = useState<ComidaId>('desayuno')
   const [alimento, setAlimento] = useState<Alimento | null>(null)
   const [editando, setEditando] = useState<Apunte | null>(null)
@@ -133,7 +133,6 @@ export function ComidaScreen() {
           legend="Ver"
           options={[
             { value: 'hoy', label: 'Hoy' },
-            { value: 'semana', label: 'Semana' },
             { value: 'dieta', label: 'Dieta' },
           ]}
           value={vista}
@@ -174,8 +173,9 @@ export function ComidaScreen() {
             Calcular mi objetivo
           </button>
         </section>
-      ) : vista === 'hoy' ? (
+      ) : (
         <HoyVista
+          onPesarme={peso.show}
           onAnadir={abrirAnadir}
           onAbrirComida={(id) => {
             setComida(id)
@@ -186,8 +186,6 @@ export function ComidaScreen() {
           onApuntarReceta={(id) => void apuntarDelMenu(id)}
           onConsulta={() => route(paths.checkIn)}
         />
-      ) : (
-        <SemanaVista onPesarme={peso.show} />
       )}
 
       {anadir.open && (

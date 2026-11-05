@@ -17,8 +17,8 @@ propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si l
 
 - `domain/food.ts` — alimentos (por 100 g, con `codigo` si lo escaneaste) y apuntes (`receta` si salió del menú):
   `macrosDe`, `sumar`, `COMIDAS` (nombres sugeridos), comida por la hora, raciones o gramos, buscador y recientes.
-- `domain/targets.ts`, `weight.ts`, `review.ts`, `week.ts` — objetivo (Mifflin-St Jeor…), tendencia y ritmo del peso, la
-  revisión semanal sin dieta y la semana. `docs/conocimiento/02-reglas.md` · sección 8.
+- `domain/targets.ts`, `weight.ts`, `review.ts`, `week.ts` — objetivo (Mifflin-St Jeor…), tendencia y ritmo del peso (los usa la
+  revisión), la revisión semanal sin dieta y la letra de cada día. `docs/conocimiento/02-reglas.md` · sección 8.
 - `domain/diet.ts` — la dieta: menús en un ciclo de 7 días, recetas con gramos de entreno y de descanso, la receta que
   «ajusta» (absorbe las kcal de la consulta y de la fase, de 5 en 5 g), el día con tu dieta (`diaDeDieta`), el reparto sin
   rutina y el archivo (`leerDieta` / `aArchivo`, formato `muta-dieta` v1). `dietSample.ts`, la dieta de ejemplo del prototipo.
@@ -34,9 +34,9 @@ propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si l
   `kitchen.ts`, `consult.ts` (preparar el informe; aplicar, «Ahora no», deshacer; la fuerza la da Entreno) y `scanner.ts`
   (lector zxing con su `.wasm` servido por la app, nunca de un CDN; Open Food Facts; guardar con su código).
 - `components/` — `DayHero` (tarjeta gris con anillo y macros), `DayNav` (‹ Hoy ›), `MealList` y `MenuList` (tarjetas con
-  miniatura; aún sin fotos: el icono de Comida), `DietWeek` (como Tu semana), `CoachCard`, `WeekBars`, `TrendChart`,
+  miniatura; aún sin fotos: el icono de Comida), `DietWeek` (como Tu semana), `CoachCard`, `TrendChart` (en la sugerencia),
   `TargetHero`. La letra es la de Entreno, un tamaño por papel: sin tamaños propios.
-- `screens/comida` — la pestaña: Hoy · Semana · Dieta (`?vista=`) y sus hojas (añadir, escáner, ración, solo kcal, crear,
+- `screens/comida` — la pestaña: Hoy · Dieta (`?vista=dieta`; sin Semana: las medias, la proteína por días y la tendencia del peso serán de Progreso; el peso de hoy se apunta en Hoy) y sus hojas (añadir, escáner, ración, solo kcal, crear,
   comida del día, peso, datos, empezar dieta, día de la dieta, tu dieta, receta nueva). Pantallas completas: `objetivo`,
   `receta` (`/comida/receta/:id`, con intercambios y editar), `compra`, `cocina` y `consulta`. Lo común en `screens/comun`.
 

@@ -5,7 +5,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 ## Tarea actual
 
 - **Probar Comida en un móvil real** (rama `pantalla/comida-v2`, sale de `pantalla/comida`): el día con ‹ ›, añadir, la
-  ración, Semana y Tu objetivo; en Dieta, la de ejemplo o la tuya, apuntar del menú, una receta (intercambio y editar), la
+  ración, el peso de hoy y Tu objetivo; en Dieta, la de ejemplo o la tuya, apuntar del menú, una receta (intercambio y editar), la
   compra, la cocina, la consulta y el escáner con la cámara (necesita https o la red local; Open Food Facts, internet).
   Después, PR a `main` (detrás de los de `pantalla/sesion` y `pantalla/comida`).
 - **Dudas de Comida que siguen abiertas**: ¿una dieta de verdad para cargar (o se crea en la app)? ¿La consulta se queda en
@@ -15,7 +15,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   fichas. Hasta ahora todo se ha visto solo en el móvil simulado. Después, PR a `main` con la CI en verde.
 - **Entreno y Comida están hechas.** Siguiente área: **Hoy** (luego Progreso). Primero el PNG con sus funcionalidades y las
   capturas del prototipo que le corresponden, y esperar a que se apruebe (regla de CLAUDE.md); después, su rama `pantalla/hoy`.
-  Hoy se quedará con el peso de cada día (ahora se apunta en Comida · Semana) y leerá `bodyLog`.
+  Hoy se quedará con el peso de cada día (ahora se apunta en Comida · Hoy) y leerá `bodyLog`.
 - **Unir `pantalla/estilo-blanco-negro` a `main`**: comprobada (check y e2e en verde, 2026-11-05) y subida; `main` solo acepta
   PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
@@ -25,7 +25,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   109 e2e (los 8 de la dieta, con axe).
   - Estilo de la captura del usuario: tarjeta del día gris con anillo de kcal y macros en %, sin lima; comidas en tarjetas
     con miniatura; ‹ Hoy › para ver y apuntar en otros días.
-  - Dieta (Hoy · Semana · Dieta): cargar un archivo, crear la tuya o la de ejemplo del prototipo; el menú del día según tu
+  - Sin Semana en Comida: será de Progreso (medias, proteína por días, tendencia); el peso de hoy, en Hoy.
+  - Dieta (Hoy · Dieta): cargar un archivo, crear la tuya o la de ejemplo del prototipo; el menú del día según tu
     rotación de Entreno, apuntado de un toque; Tu semana con el menú de cada día (entreno o descanso, a mano si quieres).
   - La receta (como Ver sesión: entreno o descanso, raciones), intercambios (solo hoy o para siempre) y editarla como Editar
     rutina; recetas y menús tuyos. La compra (días, secciones, lo que tienes, alguien más, compartir). Cocina (arroz y su

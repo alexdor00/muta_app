@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page } from '@playwright/test'
 
-// Comida: calcular tu objetivo, apuntar con «Deshacer», la semana y la sugerencia del entrenador (que nunca se aplica
+// Comida: calcular tu objetivo, apuntar con «Deshacer», el peso de hoy y la sugerencia del entrenador (que nunca se aplica
 // sola). Datos de prueba escritos a mano: 30 días de pesajes bajando 0,28 kg por semana, 4 semanas comiendo 2.300 kcal
 // y el objetivo que sale de la fórmula con esos datos (2.375 kcal, desde hace 33 días, con 10.300 pasos al día): el caso del
 // diseño aprobado, bajar más despacio de lo previsto.
@@ -153,19 +153,15 @@ test('solo kcal y proteína, y repetir la comida de ayer', async ({ page }) => {
   await expect(dia).toContainText('525 kcal de más')
 })
 
-test('la semana: media frente al objetivo, proteína y peso', async ({ page }) => {
+test('sin Semana (será de Progreso); el peso de hoy se apunta en Hoy', async ({ page }) => {
   await prepararComida(page)
   await page.goto('/comida')
-  await page.getByText('Semana', { exact: true }).click()
-  await expect(page.getByText('kcal de media')).toBeVisible()
-  await expect(page.getByText('97 %')).toBeVisible()
-  await expect(page.getByText('6 de 6')).toBeVisible()
-  // La tendencia va un poco por detrás de los pesajes: −0,27 en lugar de −0,28
-  await expect(page.getByText(/−0,2\d kg/)).toBeVisible()
-  await page.getByRole('button', { name: 'Pesarme' }).click()
+  await expect(page.getByText('Semana', { exact: true })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Cambiar' }).click()
   await page.getByLabel('Peso en kilos').fill('79,8')
   await page.getByRole('dialog', { name: 'Tu peso de hoy' }).getByRole('button', { name: 'Guardar' }).click()
   await expect(page.getByRole('status')).toContainText('79,8 kg apuntados')
+  await expect(page.getByText('Hoy pesas 79,8 kg.')).toBeVisible()
 })
 
 test('el entrenador propone −150 kcal; nada cambia hasta aplicarlo y se puede deshacer', async ({ page }) => {
@@ -211,7 +207,7 @@ async function sinFallos(page: Page) {
   ).toEqual([])
 }
 
-test('accesibilidad: Hoy, Semana, Añadir, la ración, Tu objetivo y la sugerencia', async ({ page }) => {
+test('accesibilidad: Hoy, Añadir, la ración, Tu objetivo y la sugerencia', async ({ page }) => {
   test.setTimeout(90_000)
   await prepararComida(page)
   await page.goto('/comida')
@@ -229,10 +225,6 @@ test('accesibilidad: Hoy, Semana, Añadir, la ración, Tu objetivo y la sugerenc
     .click()
   await sinFallos(page)
   await page.screenshot({ path: 'tests/e2e/capturas/comida-racion.png' })
-  await page.goto('/comida')
-  await page.getByText('Semana', { exact: true }).click()
-  await sinFallos(page)
-  await page.screenshot({ path: 'tests/e2e/capturas/comida-semana.png', fullPage: true })
   await page.goto('/comida/objetivo')
   await sinFallos(page)
   await page.screenshot({ path: 'tests/e2e/capturas/comida-objetivo.png', fullPage: true })

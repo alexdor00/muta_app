@@ -343,3 +343,10 @@ El usuario pidió «todas las funcionalidades de Comida» sin contestar aún las
   app y se descarga solo al abrir el escáner; por defecto la librería lo bajaba de un CDN. Open Food Facts es lo único que
   sale a internet; lo encontrado se guarda en «Mis alimentos» con su código y la próxima vez no hace falta red. La cámara,
   por `shared/platform` (`startCamera`).
+
+## 2026-11-05 · Sin Semana en Comida: será de Progreso
+
+El usuario: habrá una pantalla de Progreso con sus funcionalidades, y Semana (las barras de los 7 días frente al objetivo,
+los días con la proteína hecha y la tendencia del peso) no va en Comida. Se quita con su resumen y sus barras. Se queda lo
+que necesitan la revisión del entrenador y la consulta: la tendencia y el ritmo del peso (`domain/weight.ts`) y apuntar el
+peso, que pasa a Hoy («+ Pesarme» bajo la tarjeta del día) hasta que exista la pestaña Hoy.
