@@ -13,18 +13,53 @@ import type { SerieHecha } from './workoutSet.ts'
 
 /** Lo que se rellena porque no viene ni en la rutina ni en la biblioteca. */
 /**
- * Las técnicas que se apuntan con series de más dentro de una serie: «dropset» (bajas el peso y sigues, sin descanso) y
- * «pausa» (rest-pause o myo-reps: unos segundos de pausa y más repeticiones con el mismo peso).
+ * Las técnicas de intensidad que se apuntan con filas de más dentro de una serie, las que traen las rutinas: «dropset»
+ * (bajas el peso y sigues), «mecanico» (dropset mecánico: una variante más fácil con el mismo peso), «pausa» (rest-pause,
+ * myo-reps o cluster: unos segundos de pausa y más repeticiones con el mismo peso) y «parciales» (parciales en
+ * estiramiento al acabar la serie). Fallo, estiramientos y parciales integrados no llevan nada aparte de la serie.
  */
-export type Tecnica = 'dropset' | 'pausa'
+export type Tecnica = 'dropset' | 'mecanico' | 'pausa' | 'parciales'
+
+/** Cada técnica: su nombre, cómo se llama cada fila de más y qué se hace (de las explicaciones de las rutinas). */
+export const TECNICAS: Record<Tecnica, { nombre: string; fila: string; explica: string }> = {
+  dropset: {
+    nombre: 'Dropset',
+    fila: 'Bajada',
+    explica: 'Al acabar la serie, bajas el peso (más o menos a la mitad) y sigues sin descansar.',
+  },
+  mecanico: {
+    nombre: 'Dropset mecánico',
+    fila: 'Cambio',
+    explica: 'Al acabar la serie, pasas a una variante más fácil con el mismo peso y sigues sin descansar.',
+  },
+  pausa: {
+    nombre: 'Rest-pause',
+    fila: 'Mini-serie',
+    explica:
+      'Al acabar la serie, unos segundos de pausa y unas repeticiones más con el mismo peso, hasta el fallo.',
+  },
+  parciales: {
+    nombre: 'Parciales',
+    fila: 'Parciales',
+    explica: 'Al acabar la serie, repeticiones parciales en la parte de estiramiento, con el mismo peso.',
+  },
+}
+
+/** Si un texto (lo elegido en un desplegable) es una técnica. */
+export const esTecnica = (v: string): v is Tecnica => Object.hasOwn(TECNICAS, v)
+
+/** Si las filas de más van con el peso de la serie (todas menos el dropset, que lo baja). */
+export const mismoPeso = (t: Tecnica | null | undefined) => Boolean(t) && t !== 'dropset'
 
 /** La técnica de un ejercicio, por lo que dice el documento (técnica, nombre, repeticiones o explicación); null si ninguna. */
 export function tecnicaDe(
   e: Pick<Exercise, 'technique' | 'name' | 'reps' | 'notes' | 'tip'>,
 ): Tecnica | null {
   const texto = [e.technique, e.name, e.reps, e.notes, e.tip].filter(Boolean).join(' ').toLowerCase()
+  if (/(mechanical drop ?set|drop ?set mec[aá]nico)/.test(texto)) return 'mecanico'
   if (/drop ?set/.test(texto)) return 'dropset'
-  if (/myo-?reps|rest-?pause/.test(texto)) return 'pausa'
+  if (/myo-?reps|rest-?pause|cluster/.test(texto)) return 'pausa'
+  if (/lengthened partials|parciales en estiramiento/.test(texto)) return 'parciales'
   return null
 }
 
@@ -84,7 +119,7 @@ export type EjercicioPlan = {
   superserie?: string
   /** La superserie que elegiste en Editar rutina: con qué ejercicio (su clave) o con ninguno (null); sin elegir, undefined. */
   superserieCon?: string | null
-  /** Dropset o rest-pause: en la sesión se apuntan bajadas o mini-series dentro de cada serie. */
+  /** Técnica de intensidad (de la rutina o de Editar rutina): en la sesión se apuntan sus filas dentro de cada serie. */
   tecnica?: Tecnica
   /** Lo añadiste tú en Editar rutina (no está en la rutina). */
   anadido?: boolean

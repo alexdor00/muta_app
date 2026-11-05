@@ -265,3 +265,19 @@ ejercicio abierto y no estorba.
 - Se da por hecho que de cada disco que hay, hay los que hagan falta. Con discos que faltan, el reparto voraz puede fallar
   (sin 20, 10 ni 5, 30 kg por lado salía 25 + 2,5 + 2,5): `discosPorLado` busca la combinación con menos discos y, si
   empatan, la de discos más grandes.
+
+## 2026-11-05 · La bajada del dropset, a la vista desde el principio
+
+El usuario echaba en falta un sitio para apuntar las bajadas: «+ Bajada» solo salía al marcar la serie. Ahora cada serie de
+un ejercicio con dropset o rest-pause trae su primera fila vacía (sin fondo, para que no parezca otra serie, y con huecos
+grises para escribir); «+ Bajada» añade más cuando la última tiene algo. Los kilos de la bajada no se sugieren: la
+rutina no siempre dice cuánto bajar.
+
+## 2026-11-05 · Todas las técnicas de intensidad, y elegirlas en Editar rutina
+
+Se buscaron en las rutinas las técnicas que traen: dropset, dropset mecánico, myo-reps, cluster, parciales en estiramiento
+(«Lengthened Partials»), parciales integrados, fallo, estiramientos estáticos y superserie. Se apuntan aparte de la serie
+cuatro: dropset (bajadas), dropset mecánico (cambios de variante con el mismo peso), rest-pause —con myo-reps y cluster—
+(mini-series con el mismo peso) y parciales en estiramiento. Las demás se hacen dentro de la serie y no llevan filas. La
+explicación de cada una sale de las notas de las rutinas. En Editar rutina, el desplegable «Técnica» (al final de la
+pauta, cerrado: no molesta) pone cualquiera a cualquier ejercicio o quita la de la rutina.

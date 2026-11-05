@@ -4,7 +4,7 @@
 import { formatRange } from '../../../shared/lib/format.ts'
 import type { LibraryExercise } from './exerciseLibrary.ts'
 import { sessionMinutes } from './programInfo.ts'
-import { ejercicioDelPlan, type EjercicioPlan, type SesionPlan } from './workoutPlan.ts'
+import { ejercicioDelPlan, type EjercicioPlan, type SesionPlan, type Tecnica } from './workoutPlan.ts'
 
 /** Lo que cambias de la pauta de un ejercicio. */
 export type PautaEditada = {
@@ -17,6 +17,8 @@ export type PautaEditada = {
   repsSerie?: [number, number][] | null
   /** Superserie con el ejercicio de esa clave, o con ninguno (null). */
   superserie?: string | null
+  /** Técnica de intensidad que le pones (null: ninguna, aunque la rutina traiga una). */
+  tecnica?: Tecnica | null
 }
 
 /** Un ejercicio que añades a una sesión. */
@@ -60,6 +62,7 @@ const conPauta = (e: EjercicioPlan, p: PautaEditada | undefined): EjercicioPlan 
         ...(p.repsSerie === null ? { repsSerie: undefined } : {}),
         ...(p.repsSerie ? conSeries(p.repsSerie) : {}),
         ...(p.superserie !== undefined ? { superserieCon: p.superserie } : {}),
+        ...(p.tecnica !== undefined ? { tecnica: p.tecnica ?? undefined } : {}),
         sugeridos: e.sugeridos.filter(
           (s) => !(s === 'series' && p.series) && !(s === 'reps' && p.reps) && !(s === 'salto' && p.salto),
         ),
@@ -193,7 +196,7 @@ export const cambiarPauta = (ed: EdicionSesion, clave: string, p: PautaEditada):
 /** La pauta de un ejercicio, para editarla: lo que tiene ahora. */
 export function pautaDe(
   e: EjercicioPlan,
-): Required<Omit<PautaEditada, 'nota' | 'repsSerie' | 'superserie'>> & { nota: string } {
+): Required<Omit<PautaEditada, 'nota' | 'repsSerie' | 'superserie' | 'tecnica'>> & { nota: string } {
   const [a, b = a] = e.reps.split('–').map((x) => parseInt(x, 10))
   return {
     series: e.series,

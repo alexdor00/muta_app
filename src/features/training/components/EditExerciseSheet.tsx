@@ -59,7 +59,8 @@ function Contador(p: {
 }
 
 /**
- * Editar ejercicio (A12–A14): «Cada serie distinta» (un rango por serie) y «Superserie con» el de al lado, además de series, descanso entre series y repeticiones antes del fallo con − / + (cada uno con una
+ * Editar ejercicio (A12–A14): «Cada serie distinta» (un rango por serie), «Superserie con» el de al lado y la técnica de
+ * intensidad (dropset, rest-pause…), además de series, descanso entre series y repeticiones antes del fallo con − / + (cada uno con una
  * línea que lo explica);
  * repeticiones (mínimo y máximo) en un desplegable.
  * Cada toque se guarda solo. «Cambiar por otro» y «Quitar».
@@ -76,6 +77,9 @@ export function EditExerciseSheet(props: {
   /** Superserie con el de al lado: las opciones (ninguno, el anterior, el siguiente) y la elegida. */
   superserie: { opciones: { value: Superserie; label: string }[]; valor: Superserie }
   onSuperserie: (v: Superserie) => void
+  /** Técnica de intensidad: las opciones («Ninguna», «Dropset»…), la elegida y qué se hace con ella. */
+  tecnica: { opciones: { value: string; label: string }[]; valor: string; explica: string | null }
+  onTecnica: (v: string) => void
   onCambiar: () => void
   onQuitar: () => void
   onVolver: () => void
@@ -225,6 +229,27 @@ export function EditExerciseSheet(props: {
             ? 'Cada serie, hasta el fallo: hasta que no puedas hacer otra repetición bien.'
             : `Termina cada serie cuando aún podrías hacer ${p.rir === 1 ? '1 repetición más' : `${p.rir} repeticiones más`}.`}
         </small>
+        <Desplegable
+          titulo="Técnica"
+          valor={props.tecnica.opciones.find((o) => o.value === props.tecnica.valor)?.label ?? 'Ninguna'}
+          abierto={abierto === 'tecnica'}
+          onAbrir={abre('tecnica')}
+        >
+          <small class={styles.hint}>
+            {props.tecnica.explica ?? 'Una técnica de intensidad para alargar cada serie.'} En la sesión se
+            apunta debajo de cada serie.
+          </small>
+          <ChoiceList
+            name="tecnica"
+            legend="Técnica"
+            options={props.tecnica.opciones}
+            value={props.tecnica.valor}
+            onChange={(v) => {
+              props.onTecnica(v)
+              setAbierto(null)
+            }}
+          />
+        </Desplegable>
       </section>
 
       <div class={styles.links}>

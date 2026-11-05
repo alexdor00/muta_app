@@ -2,7 +2,7 @@
 // mini-series (rest-pause) dentro de una serie.
 import { parseDecimal } from '../../../shared/lib/format.ts'
 import { superseries } from '../domain/routineEdit.ts'
-import type { EjercicioPlan } from '../domain/workoutPlan.ts'
+import { mismoPeso, type EjercicioPlan } from '../domain/workoutPlan.ts'
 import {
   terminado,
   type EjercicioEnCurso,
@@ -40,7 +40,7 @@ export const anadirExtra = (x: EjercicioEnCurso, j: number): EjercicioEnCurso =>
   series: x.series.map((s, k) => (k === j ? { ...s, extra: [...(s.extra ?? []), { kg: '', reps: '' }] } : s)),
 })
 
-/** Escribe en la bajada o mini-serie `n` de la serie `j`. */
+/** Escribe en la bajada o mini-serie `n` de la serie `j` (la primera puede ser la fila vacía, aún sin guardar). */
 export const cambiarExtra = (
   x: EjercicioEnCurso,
   j: number,
@@ -50,7 +50,15 @@ export const cambiarExtra = (
 ): EjercicioEnCurso => ({
   ...x,
   series: x.series.map((s, k) =>
-    k === j ? { ...s, extra: (s.extra ?? []).map((y, m) => (m === n ? { ...y, [campo]: valor } : y)) } : s,
+    k === j
+      ? {
+          ...s,
+          extra: Array.from({ length: Math.max(n + 1, s.extra?.length ?? 0) }, (_, m) => {
+            const y = s.extra?.[m] ?? { kg: '', reps: '' }
+            return m === n ? { ...y, [campo]: valor } : y
+          }),
+        }
+      : s,
   ),
 })
 
@@ -60,12 +68,12 @@ export const quitarExtra = (x: EjercicioEnCurso, j: number, n: number): Ejercici
   series: x.series.map((s, k) => (k === j ? { ...s, extra: (s.extra ?? []).filter((_, m) => m !== n) } : s)),
 })
 
-/** Lo hecho de las bajadas o mini-series de una serie: las que tienen repeticiones (en rest-pause, sin peso, el de la serie). */
+/** Lo hecho de las filas de más de una serie: las que tienen repeticiones (sin peso y no es un dropset, el de la serie). */
 export function extrasHechos(e: EjercicioPlan, s: SerieEnCurso): { kg: number | null; reps: number }[] {
   return (s.extra ?? []).flatMap((y) => {
     const reps = parseDecimal(y.reps)
     if (!reps) return []
-    const kg = parseDecimal(y.kg) ?? (e.tecnica === 'pausa' ? parseDecimal(s.kg) : null)
+    const kg = parseDecimal(y.kg) ?? (mismoPeso(e.tecnica) ? parseDecimal(s.kg) : null)
     return [{ kg, reps }]
   })
 }

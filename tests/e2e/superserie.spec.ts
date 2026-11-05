@@ -78,3 +78,22 @@ test('en la sesión: tras una serie del primero de la superserie, 20 s y pasa al
   await expect(page.getByRole('heading', { name: 'A2: Curl con barra Z' })).toBeVisible()
   await expect(page.getByRole('timer', { name: 'Descanso' })).toContainText('0:')
 })
+
+test('técnica de intensidad: se pone a cualquier ejercicio en Editar rutina y se apunta en la sesión', async ({
+  page,
+}) => {
+  await cargar(page)
+  await editarBrazos(page)
+  await page.getByRole('button', { name: /^Sentadilla hack/ }).click()
+  const hack = page.getByRole('dialog', { name: 'Sentadilla hack' })
+  const tecnica = hack.locator('summary', { hasText: 'Técnica' })
+  await expect(tecnica).toContainText('Ninguna')
+  await tecnica.click()
+  await hack.getByText('Rest-pause', { exact: true }).click()
+  await expect(tecnica).toContainText('Rest-pause')
+  await hack.getByRole('button', { name: 'Brazos' }).click()
+
+  await page.goto('/entreno/sesion/s1')
+  await expect(page.getByRole('list', { name: 'Pauta' }).first()).toContainText('Rest-pause')
+  await expect(page.getByLabel('Repeticiones de la mini-serie 1 de la serie 1')).toBeVisible()
+})

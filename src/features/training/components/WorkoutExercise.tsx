@@ -52,7 +52,8 @@ type Props = {
   onCambio: (serie: number, campo: CampoSerie, valor: string) => void
   onMarcar: (serie: number) => void
   /** Dropset o rest-pause: debajo de cada serie hecha, «+ Bajada» o «+ Mini-serie». */
-  tecnica: 'dropset' | 'pausa' | null
+  /** Cómo se llama cada fila de la técnica («Bajada»…); null sin técnica. */
+  fila: string | null
   onAnadirExtra: (serie: number) => void
   onCambioExtra: (serie: number, n: number, campo: 'kg' | 'reps', valor: string) => void
   onQuitarExtra: (serie: number, n: number) => void
@@ -198,7 +199,7 @@ function FilaSerie(props: {
   onCambio: Props['onCambio']
   onMarcar: Props['onMarcar']
   onEliminar: Props['onEliminar']
-  tecnica: Props['tecnica']
+  fila: Props['fila']
   onAnadirExtra: Props['onAnadirExtra']
   onCambioExtra: Props['onCambioExtra']
   onQuitarExtra: Props['onQuitarExtra']
@@ -252,8 +253,7 @@ function FilaSerie(props: {
       <SetExtras
         serie={i}
         extra={s.extra}
-        hecha={s.hecha}
-        tecnica={props.tecnica}
+        fila={props.fila}
         onAnadir={props.onAnadirExtra}
         onCambio={props.onCambioExtra}
         onQuitar={props.onQuitarExtra}
@@ -367,7 +367,7 @@ export function WorkoutExercise(props: Props) {
               setAbierta(null)
               props.onEliminar(j)
             }}
-            tecnica={props.tecnica}
+            fila={props.fila}
             onAnadirExtra={props.onAnadirExtra}
             onCambioExtra={props.onCambioExtra}
             onQuitarExtra={props.onQuitarExtra}

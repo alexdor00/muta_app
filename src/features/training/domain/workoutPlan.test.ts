@@ -19,6 +19,8 @@ import {
   sesionesDeSemana,
   tecnicaDe,
   letraSuperserie,
+  mismoPeso,
+  esTecnica,
   repsDeSerie,
   repsPorSerie,
   textoReps,
@@ -292,15 +294,36 @@ describe('pautaEnPrograma', () => {
 })
 
 describe('tecnicaDe', () => {
-  it('dropset y rest-pause (o myo-reps), por la técnica, el nombre, las repeticiones o la explicación', () => {
+  it('dropset, mecánico, rest-pause (myo-reps, cluster) y parciales, por la técnica, el nombre, las repeticiones o la explicación', () => {
     expect(tecnicaDe({ name: 'Laterales', technique: 'Dropset' })).toBe('dropset')
-    expect(tecnicaDe({ name: 'Pájaros en polea (dropset mecánico)' })).toBe('dropset')
+    expect(tecnicaDe({ name: 'Pájaros en polea (dropset mecánico)' })).toBe('mecanico')
+    expect(tecnicaDe({ name: 'Pájaros', technique: 'Mechanical Dropset (on all sets)' })).toBe('mecanico')
     expect(tecnicaDe({ name: 'Curl', reps: '12-15 (dropset)' })).toBe('dropset')
     expect(tecnicaDe({ name: 'Curl', technique: 'Myo-reps' })).toBe('pausa')
     expect(tecnicaDe({ name: 'Press', tip: 'Haz un rest-pause en la última serie' })).toBe('pausa')
+    expect(tecnicaDe({ name: 'Dominada', notes: '6 cluster sets: 3 reps, rest 15s' })).toBe('pausa')
+    expect(tecnicaDe({ name: 'Curl', technique: 'Lengthened Partials (Extend Set)' })).toBe('parciales')
+    expect(tecnicaDe({ name: 'Curl', technique: 'Parciales en estiramiento' })).toBe('parciales')
     expect(tecnicaDe({ name: 'Sentadilla', reps: '5', technique: 'Fallo' })).toBeNull()
+    // Los parciales integrados van dentro de cada repetición: nada que apuntar aparte
+    expect(tecnicaDe({ name: 'Curl', technique: 'Integrated Partials (All Sets)' })).toBeNull()
     // «Serie de descarga» no es un dropset
     expect(tecnicaDe({ name: 'Serie de descarga: Sentadilla' })).toBeNull()
+  })
+})
+
+describe('mismoPeso y esTecnica', () => {
+  it('solo el dropset baja el peso', () => {
+    expect(mismoPeso('dropset')).toBe(false)
+    expect(mismoPeso('pausa')).toBe(true)
+    expect(mismoPeso('parciales')).toBe(true)
+    expect(mismoPeso(null)).toBe(false)
+  })
+
+  it('esTecnica reconoce lo elegido en el desplegable', () => {
+    expect(esTecnica('parciales')).toBe(true)
+    expect(esTecnica('ninguna')).toBe(false)
+    expect(esTecnica('toString')).toBe(false)
   })
 })
 

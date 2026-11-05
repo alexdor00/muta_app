@@ -5,7 +5,14 @@ import type { Level } from '../domain/catalog.ts'
 import { descansosPendientes, hoyTocaDescanso } from '../domain/restDays.ts'
 import { cambioUltimaVez } from '../domain/exerciseProgress.ts'
 import { historialDe, semanaDe, ultimaVez, type Entreno } from '../domain/workoutHistory.ts'
-import { rangoDe, type EjercicioPlan, type Rotacion, type SesionPlan } from '../domain/workoutPlan.ts'
+import {
+  esTecnica,
+  rangoDe,
+  TECNICAS,
+  type EjercicioPlan,
+  type Rotacion,
+  type SesionPlan,
+} from '../domain/workoutPlan.ts'
 
 export type PlanListo = {
   status: 'ready'
@@ -142,3 +149,18 @@ export { EQUIPMENT_LABEL } from '../domain/exerciseLibrary.ts'
 export const rangosSerie = (e: EjercicioPlan): [number, number][] | null =>
   e.repsSerie?.map((r) => rangoDe(r) ?? [parseInt(r, 10) || 1, parseInt(r, 10) || 1]) ?? null
 export type { Superserie } from '../domain/routineEdit.ts'
+
+/** La técnica de intensidad para Editar rutina: «Ninguna» y las demás, la elegida y qué se hace con ella. */
+export function tecnicaParaEditar(e: EjercicioPlan) {
+  return {
+    opciones: [
+      { value: 'ninguna', label: 'Ninguna' },
+      ...Object.entries(TECNICAS).map(([value, t]) => ({ value, label: t.nombre })),
+    ],
+    valor: e.tecnica ?? 'ninguna',
+    explica: e.tecnica ? TECNICAS[e.tecnica].explica : null,
+  }
+}
+
+/** Lo elegido en el desplegable de la técnica, para guardarlo: la técnica o ninguna (null). */
+export const tecnicaElegida = (v: string) => (esTecnica(v) ? v : null)

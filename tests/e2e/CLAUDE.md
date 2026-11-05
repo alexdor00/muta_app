@@ -8,7 +8,7 @@ Playwright en un iPhone 13 simulado, sobre la app construida **sin rutinas priva
 - `tu-plan.spec.ts` — Tu plan con tu plan: carrusel y «Empezar», hoja Tu rutina, tocar un músculo, barra al bajar, sin rutina.
 - `ver-sesion.spec.ts` — Ver sesión: abrirla desde la tarjeta, gráfica y su medida, desplegar un ejercicio, sesión que no existe.
 - `sesion.spec.ts` — sesión en curso: la vez anterior en gris, teclado, descanso, récord, números imposibles, calentamiento calculado, plegar al terminar, deslizar para eliminar (con ratón), «Terminar» sin series, «Esta sesión» y sus hojas, cambiar el descanso, el resumen, lo apuntado sigue al recargar y terminar guarda y pasa a la siguiente.
-- `superserie.spec.ts` — cada serie distinta y superserie con una rutina CSV: Editar rutina y la sesión.
+- `superserie.spec.ts` — cada serie distinta, superserie y técnica de intensidad con una rutina CSV: Editar rutina y la sesión.
 - `ficha-mas.spec.ts` — el «···» de la ficha (añadir a una sesión con «Deshacer», cambiar en tu plan), tu material en Perfil
   (lo que no tienes, al final; los discos del gimnasio en la calculadora) y la imagen para compartir el resumen.
 - `accesibilidad.spec.ts` — axe (WCAG 2 A y AA) en las pantallas reales y en `/dev/ui` (claro y oscuro). Falla ante fallos graves.

@@ -6,8 +6,10 @@ import { effortLabel } from '../domain/effort.ts'
 import { planCalentamiento } from '../domain/warmup.ts'
 import {
   kilosDeHoy,
+  mismoPeso,
   repsDeSerie,
   sugerenciaDe,
+  TECNICAS,
   textoReps,
   type EjercicioPlan,
   type SesionPlan,
@@ -218,21 +220,29 @@ export const terminado = (x: EjercicioEnCurso) => x.series.every((s) => s.hecha)
 export const esRecord = (e: EjercicioPlan, x: EjercicioEnCurso, j: number) =>
   x.series[j].hecha && compararConAntes(numeros(e, x, j), antesDe(e, x)[j] ?? null) === 1
 
+/** La técnica de hoy (dropset o rest-pause); null si no lleva o si hoy se hace otro ejercicio en su lugar. */
+const tecnicaHoy = (e: EjercicioPlan, x: EjercicioEnCurso) => (x.cambiadoPor ? null : (e.tecnica ?? null))
+
 /**
- * Cada serie del ejercicio abierto con lo gris de sus casillas, si es récord y sus bajadas o mini-series (en rest-pause, el
- * peso de la serie sale en gris: es el mismo).
+ * Cada serie del ejercicio abierto con lo gris de sus casillas, si es récord y las filas de su técnica (bajadas, mini-series…;
+ * si no es un dropset, el peso de la serie sale en gris: es el mismo). Con técnica, cada serie trae desde el principio una
+ * fila vacía para apuntar la primera.
  */
 export function seriesVistas(e: EjercicioPlan, x: EjercicioEnCurso) {
+  const tecnica = tecnicaHoy(e, x)
   return x.series.map((s, j) => {
     const g = grises(e, x, j)
-    const extra = (s.extra ?? []).map((y) => ({ ...y, kgGris: e.tecnica === 'pausa' ? s.kg || g.kg : '' }))
+    const extras = s.extra?.length ? s.extra : tecnica ? [{ kg: '', reps: '' }] : []
+    const extra = extras.map((y) => ({ ...y, kgGris: mismoPeso(tecnica) ? s.kg || g.kg : '' }))
     return { ...s, kgGris: g.kg, repsGris: g.reps, quedanGris: g.quedan, record: esRecord(e, x, j), extra }
   })
 }
 
-/** La técnica de hoy (dropset o rest-pause); null si no lleva o si hoy se hace otro ejercicio en su lugar. */
-export const tecnicaHoy = (e: EjercicioPlan, x: EjercicioEnCurso) =>
-  x.cambiadoPor ? null : (e.tecnica ?? null)
+/** Cómo se llama cada fila de más de la técnica de hoy («Bajada», «Mini-serie»…); null si no lleva. */
+export function filaHoy(e: EjercicioPlan, x: EjercicioEnCurso): string | null {
+  const tecnica = tecnicaHoy(e, x)
+  return tecnica ? TECNICAS[tecnica].fila : null
+}
 
 /** La pauta del ejercicio en la sesión: «3 series», «8–12 reps», «a 2 del fallo» y, si la lleva, la técnica. */
 export function pautaHoy(e: EjercicioPlan, x: EjercicioEnCurso): string[] {
@@ -241,7 +251,7 @@ export function pautaHoy(e: EjercicioPlan, x: EjercicioEnCurso): string[] {
     `${e.series} series`,
     `${textoReps(e)} reps`,
     effortLabel(e.rir),
-    ...(tecnica ? [tecnica === 'pausa' ? 'Rest-pause' : 'Dropset'] : []),
+    ...(tecnica ? [TECNICAS[tecnica].nombre] : []),
   ]
 }
 

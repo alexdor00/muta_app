@@ -47,6 +47,18 @@ describe('aplicarEdicion', () => {
     expect(s2.minutos).toBeGreaterThan(0)
   })
 
+  it('la técnica de intensidad: la pones a cualquier ejercicio o quitas la de la rutina', () => {
+    const conDropset = aplicarEdicion(B1, cambiarPauta({}, 'Curl', { tecnica: 'dropset' }), () => null)
+    expect(conDropset.ejercicios[2].tecnica).toBe('dropset')
+    const curl = { ...ej('Curl'), tecnica: 'pausa' as const }
+    const sin = aplicarEdicion(
+      { ...B1, ejercicios: [curl] },
+      cambiarPauta({}, 'Curl', { tecnica: null }),
+      () => null,
+    )
+    expect(sin.ejercicios[0].tecnica).toBeUndefined()
+  })
+
   it('quitar un añadido lo borra de los añadidos; añadir uno que ya está no lo repite', () => {
     const ed = anadir({}, { nombre: 'Face pull', series: 3, reps: [12, 15], rir: 1, descanso: 90 }, [])
     expect(quitar(ed, 'Face pull').anadidos).toEqual([])

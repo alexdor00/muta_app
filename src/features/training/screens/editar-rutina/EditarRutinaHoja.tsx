@@ -20,6 +20,8 @@ import {
   rangosSerie,
   superserieDe,
   superseries,
+  tecnicaElegida,
+  tecnicaParaEditar,
   unirEnSuperserie,
   textoReps,
   quitar,
@@ -281,6 +283,8 @@ export function EditarRutinaHoja({ onClose }: { onClose: () => void }) {
         onSeriesDistintas={(s) => editar((ed) => cambiarPauta(ed, claveDe(e), { repsSerie: s }))}
         superserie={superserieDe(sesion.ejercicios, abierto)}
         onSuperserie={(v) => editar((ed) => unirEnSuperserie(ed, sesion.ejercicios, abierto, v))}
+        tecnica={tecnicaParaEditar(e)}
+        onTecnica={(v) => editar((ed) => cambiarPauta(ed, claveDe(e), { tecnica: tecnicaElegida(v) }))}
         onCambiar={() => setHoja('cambiar')}
         onQuitar={() => setHoja('quitar')}
         onVolver={aLista}

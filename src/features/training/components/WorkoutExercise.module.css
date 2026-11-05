@@ -422,10 +422,17 @@
 }
 
 /* Dropset y rest-pause: cada bajada o mini-serie, una fila fina bajo su serie (con la misma rejilla), y «+ Bajada» */
+/* La bajada o mini-serie: sin fondo, para que no parezca otra serie; sus casillas, huecos grises para escribir */
 .extra {
   min-height: var(--tap-min);
   padding-top: 0;
   padding-bottom: 0;
+  background: none;
+}
+
+.extra .cell {
+  height: var(--control-sm);
+  background: var(--surface);
 }
 
 .extraMark {

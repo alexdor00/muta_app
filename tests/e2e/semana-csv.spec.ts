@@ -104,7 +104,7 @@ test('un CSV con errores dice cuáles y en qué fila', async ({ page }) => {
   await expect(hoja).toContainText('Fila 2: «tres» no es un número de series.')
 })
 
-test('dropset: tras marcar la serie, «+ Bajada» apunta las bajadas debajo y se quitan con la ×', async ({
+test('dropset: cada serie trae su fila de bajada para apuntarla; «+ Bajada» añade otra y la × la quita', async ({
   page,
 }) => {
   await page.goto('/entreno/rutinas')
@@ -125,21 +125,20 @@ test('dropset: tras marcar la serie, «+ Bajada» apunta las bajadas debajo y se
   await expect(page).toHaveURL(/\/entreno$/)
   await page.goto('/entreno/sesion/s1')
   await expect(page.getByRole('list', { name: 'Pauta' }).first()).toContainText('Dropset')
+  // Desde el principio, sin marcar la serie: una fila vacía por serie, sin × ni «+ Bajada»
+  await expect(page.getByLabel('Kilos de la bajada 1 de la serie 1')).toHaveValue('')
+  await expect(page.getByLabel('Kilos de la bajada 1 de la serie 2')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Quitar la bajada 1 de la serie 1' })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Bajada', exact: true })).toHaveCount(0)
-  const teclado = page.getByRole('group', { name: 'Teclado numérico' })
-  await page.getByLabel('Kilos de la serie 1').click()
-  for (const c of '12') await teclado.getByRole('button', { name: c, exact: true }).click()
-  await teclado.getByRole('button', { name: 'Siguiente' }).click()
-  for (const c of '14') await teclado.getByRole('button', { name: c, exact: true }).click()
-  await page.getByRole('button', { name: /^Serie 1 hecha/ }).click()
-  await teclado.getByRole('button', { name: 'Ocultar teclado' }).click()
-  await page.getByRole('button', { name: 'Bajada', exact: true }).click()
+
   await page.getByLabel('Kilos de la bajada 1 de la serie 1').fill('6')
   await page.getByLabel('Repeticiones de la bajada 1 de la serie 1').fill('10')
-  await expect(page.getByText('Bajada 1', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Bajada', exact: true }).first().click()
+  await page.getByLabel('Kilos de la bajada 2 de la serie 1').fill('3')
   // Se guarda con la sesión: al recargar sigue ahí
   await page.reload()
   await expect(page.getByLabel('Kilos de la bajada 1 de la serie 1')).toHaveValue('6')
-  await page.getByRole('button', { name: 'Quitar la bajada 1 de la serie 1' }).click()
-  await expect(page.getByLabel('Kilos de la bajada 1 de la serie 1')).toHaveCount(0)
+  await expect(page.getByLabel('Kilos de la bajada 2 de la serie 1')).toHaveValue('3')
+  await page.getByRole('button', { name: 'Quitar la bajada 2 de la serie 1' }).click()
+  await expect(page.getByLabel('Kilos de la bajada 2 de la serie 1')).toHaveCount(0)
 })

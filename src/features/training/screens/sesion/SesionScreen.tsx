@@ -28,6 +28,7 @@ import {
   ejerciciosDe,
   descansoDe,
   filaCerrada,
+  filaHoy,
   grises,
   guardarSesion,
   nombreHoy,
@@ -36,7 +37,6 @@ import {
   SERIE_VACIA,
   seriesVistas,
   pautaHoy,
-  tecnicaHoy,
   sesionEnCurso,
   tomarPedido,
   textoSerie,
@@ -248,7 +248,7 @@ export function SesionScreen(props: { sessionId: string }) {
               }}
               onCambio={(serie, campo, valor) => cambiarSerie(i, serie, { [campo]: valor })}
               onMarcar={(j) => marcar(i, j)}
-              tecnica={tecnicaHoy(e, x)}
+              fila={filaHoy(e, x)}
               onAnadirExtra={(j) => guardar(i, (y) => anadirExtra(y, j))}
               onCambioExtra={(j, n, campo, valor) => guardar(i, (y) => cambiarExtra(y, j, n, campo, valor))}
               onQuitarExtra={(j, n) => guardar(i, (y) => quitarExtra(y, j, n))}
