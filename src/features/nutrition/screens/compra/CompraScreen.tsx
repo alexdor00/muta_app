@@ -21,6 +21,8 @@ import {
   desdeElDia,
   desmarcarTodo,
   marcar,
+  modoDeCompra,
+  vecesDeMenu,
   paraDias,
   productosDe,
   quitarPropio,
@@ -61,6 +63,7 @@ export function CompraScreen() {
   const hechos =
     productos.filter((x) => tienes.has(x.clave)).length + c.propios.filter((x) => tienes.has(x.id)).length
   const manana = addDays(hoy.value, 1)
+  const porMenus = c.modo === 'menus'
 
   return (
     <div class={p.page}>
@@ -72,28 +75,70 @@ export function CompraScreen() {
             {total - hechos === 1 ? 'cosa' : 'cosas'} por comprar · <b>{hechos}</b> de {total} ya las tienes
           </span>
         </p>
-        <p class={p.foot}>
-          {formatDayDate(c.desde)} – {formatDayDate(addDays(c.desde, c.dias - 1))}
-          {dieta.value ? `: ${entreno} de entreno y ${descanso} de descanso, según tu semana.` : '.'}
-        </p>
-        <ChoiceCircles
-          name="dias-compra"
-          legend="Para cuántos días"
-          showLegend
-          options={DIAS_COMPRA.map((n) => ({ value: n, label: String(n) }))}
-          value={c.dias}
-          onChange={(n) => void paraDias(n)}
-        />
-        <ChoiceSegmented<string>
-          name="desde-compra"
-          legend="Desde"
+        <ChoiceSegmented<'dias' | 'menus'>
+          name="modo-compra"
+          legend="La lista sale de"
           options={[
-            { value: hoy.value, label: 'Desde hoy' },
-            { value: manana, label: 'Desde mañana' },
+            { value: 'dias', label: 'Unos días' },
+            { value: 'menus', label: 'Unos menús' },
           ]}
-          value={c.desde === manana ? manana : hoy.value}
-          onChange={(d) => void desdeElDia(d)}
+          value={porMenus ? 'menus' : 'dias'}
+          onChange={(m) => void modoDeCompra(m)}
         />
+        {porMenus ? (
+          <ul class={p.list}>
+            {menu.value.menus.map((m) => (
+              <li key={m.id} class={p.row}>
+                <span class={p.rowText}>
+                  <span class={p.rowTitle}>{m.nombre}</span>
+                </span>
+                <span class={h.miniStepper}>
+                  <button
+                    type="button"
+                    aria-label={`${m.nombre}: una vez menos`}
+                    disabled={!(c.menus?.[m.id] ?? 0)}
+                    onClick={() => void vecesDeMenu(m.id, -1)}
+                  >
+                    <MinusIcon />
+                  </button>
+                  <b>× {c.menus?.[m.id] ?? 0}</b>
+                  <button
+                    type="button"
+                    aria-label={`${m.nombre}: una vez más`}
+                    onClick={() => void vecesDeMenu(m.id, 1)}
+                  >
+                    <PlusIcon />
+                  </button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <>
+            <p class={p.foot}>
+              {formatDayDate(c.desde)} – {formatDayDate(addDays(c.desde, c.dias - 1))}
+              {dieta.value ? `: ${entreno} de entreno y ${descanso} de descanso, según tu semana.` : '.'}
+            </p>
+            <ChoiceCircles
+              name="dias-compra"
+              legend="Para cuántos días"
+              showLegend
+              options={DIAS_COMPRA.map((n) => ({ value: n, label: String(n) }))}
+              value={c.dias}
+              onChange={(n) => void paraDias(n)}
+            />
+            <ChoiceSegmented<string>
+              name="desde-compra"
+              legend="Desde"
+              options={[
+                { value: hoy.value, label: 'Desde hoy' },
+                { value: manana, label: 'Desde mañana' },
+              ]}
+              value={c.desde === manana ? manana : hoy.value}
+              onChange={(d) => void desdeElDia(d)}
+            />
+          </>
+        )}
         <button type="button" class={p.textButton} onClick={alguien.show}>
           <PlusIcon /> ¿Come alguien más?
         </button>

@@ -102,7 +102,8 @@ const cache = new Map<string, (number | null)[]>()
 /** Los gramos de un plato en una comida de un día: ajustados a lo que le toca (si el plato se ajusta). */
 export function gramosDeHueco(h: Hueco, p: Plato): (number | null)[] {
   const o = objetivoDeComida(h.fecha, h.comida)
-  if (!o || !p.ajustable) return p.ingredientes.map((i) => i.gramos)
+  const fijo = menu.value.menus.find((x) => x.id === h.menu)?.fijos?.includes(h.comida)
+  if (!o || !p.ajustable || fijo) return p.ingredientes.map((i) => i.gramos)
   const k = `${p.id}|${p.total.kcal}|${p.ingredientes.map((i) => i.alimentoId).join(',')}|${o.kcal}|${o.protein}`
   let g = cache.get(k)
   if (!g) {

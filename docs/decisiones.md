@@ -412,3 +412,17 @@ El usuario decide subir las recetas y las fotos del recetario «tal cual», sabi
 aplicación es para mí y para un amigo»). Pasan de `private/recetas/` a `src/shared/content/recetario/` (sin el nombre de la
 autora en la app). Excepción a la regla 7 de CLAUDE.md solo para el recetario: las rutinas de terceros siguen en `private/`.
 Los generadores siguen en `private/herramientas/`; tras rehacerlo, se copia a `src/shared/content/recetario/`.
+
+## 2026-11-06 · Supermercados, compra por menús, cantidades sugeridas y la calculadora de platos
+
+- **Base de supermercados**: 19.157 productos de Mercadona, Lidl, Carrefour, Alcampo, Ahorramás, Dia y Eroski desde Open
+  Food Facts (datos abiertos, ODbL; `node scripts/foods-off.mjs` → `src/shared/content/foods-super.json`, 374 kB
+  comprimido). Los supermercados no publican sus productos con calorías y copiar sus webs incumple sus condiciones. Se
+  descarga aparte, detrás de los genéricos, y queda en el móvil. El escáner busca en tus alimentos, después en la base y por
+  último en internet. Los equivalentes de un ingrediente salen solo de los genéricos.
+- **La compra**: por días (lo de tu semana) o por los menús que elijas y cuántas veces cada uno.
+- **Cantidades sugeridas**: cada comida de un menú va «para tu objetivo» (ajustada) o «como en la receta», a tu elección.
+- **«+ Añadir menú»** visible; «Cambiar» en Tu semana abre cuántos menús y qué día va cada uno.
+- **Calculadora de platos en Cocina** («Pesa en crudo, come cocinado»), arriba, con los platos de tus menús; se llega desde
+  Menú (Cocina) y desde «Cuándo cocinarlo» (Pesar lo cocinado). No molesta en Hoy ni en Recetas.
+- **CI**: el servidor de los recorridos tarda más en construirse; su límite pasa de 120 s a 300 s.

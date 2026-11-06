@@ -32,6 +32,7 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
   `node scripts/foods-from-prototype.cjs`; no se edita a mano. Comida la importa aparte (no pesa al abrir la app).
 - `tokens.css` lleva lo de Comida (la tarjeta negra `--target-hero`, el anillo `--ring`, la miniatura `--meal-thumb`, los platos `--dish-*`), alias de
   Entreno; sin lima. La letra es la misma escala para todas las áreas (ver «Tipografía» en [docs/rediseno.md](../../docs/rediseno.md)).
-- `data/localRecipes.ts` carga el recetario local (`private/recetas/recetario.json` y una foto por receta; ver
-  [docs/datos.md](../../docs/datos.md)); como las rutinas locales, no se carga con `VITE_NO_LOCAL_PROGRAMS`.
+- `data/localRecipes.ts` carga el recetario (`content/recetario/`: recetas y una foto por receta; ver
+  [docs/datos.md](../../docs/datos.md)); no se carga con `VITE_NO_LOCAL_PROGRAMS`. `foods-super.json`: los productos de
+  supermercado de Open Food Facts (`node scripts/foods-off.mjs`); no se edita a mano.
 - `programs.ts` guarda los programas locales (`private/programs/*.json`, rev en `_meta.json`: subirla al cambiar un archivo).

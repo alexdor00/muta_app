@@ -250,3 +250,11 @@
   margin: 0;
   padding-bottom: var(--space-2);
 }
+
+/* Un menú en la compra: su nombre y cuántas veces entra */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+}

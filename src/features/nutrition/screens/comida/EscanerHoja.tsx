@@ -218,7 +218,12 @@ function Encontrado({
   return (
     <>
       <p class={h.foot}>
-        {resultado.estado === 'tuyo' ? 'En Mis alimentos' : 'Encontrado en Open Food Facts'} · por 100 g
+        {resultado.estado === 'tuyo'
+          ? resultado.deLaBase
+            ? 'En la base de alimentos'
+            : 'En Mis alimentos'
+          : 'Encontrado en Open Food Facts'}{' '}
+        · por 100 g
       </p>
       <h3 class={h.rowTitle}>{titulo}</h3>
       <div class={h.tiles}>

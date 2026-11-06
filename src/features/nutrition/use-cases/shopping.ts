@@ -6,6 +6,7 @@ import { huecosDelDia, recetasDelMenu } from '../domain/menu.ts'
 import { listaDeLaCompra, textoDeLaCompra, type Producto } from '../domain/shopping.ts'
 import { hoy } from '../state/comida.ts'
 import { gramosDeHueco, menu, platoPorId } from '../state/recetas.ts'
+import { COMIDAS } from '../domain/food.ts'
 import { compra, diaDe, type Compra } from '../state/dieta.ts'
 import { guardarCompra } from './nutritionStore.ts'
 
@@ -30,11 +31,52 @@ export function compraActual(): Compra {
 const delMenu = (fechas: readonly string[]) =>
   recetasDelMenu(menu.value, fechas, (id) => platoPorId(id), gramosDeHueco)
 
+/** Los menús que elijas, cada uno las veces que digas (con sus gramos para tu objetivo de hoy). */
+function deMenus(veces: Record<string, number>) {
+  return menu.value.menus.flatMap((m) =>
+    Array.from({ length: veces[m.id] ?? 0 }, () =>
+      COMIDAS.flatMap(({ id: comida }) => {
+        const id = m.platos[comida]
+        const p = id ? platoPorId(id) : null
+        if (!p) return []
+        const g = gramosDeHueco({ fecha: hoy.value, comida, menu: m.id, plato: p.id, cocinado: null }, p)
+        return [
+          {
+            id: p.id,
+            nombre: p.nombre,
+            lista: p.ingredientes.map((i, k) => ({
+              alimentoId: i.alimentoId,
+              nombre: i.nombre,
+              categoria: i.categoria,
+              g: i.cuenta && i.gramos !== null ? Math.round(g[k] ?? i.gramos) : null,
+            })),
+          },
+        ]
+      }),
+    ).flat(),
+  )
+}
+
+export const modoDeCompra = (modo: 'dias' | 'menus') => cambiar({ modo })
+
+/** Cuántas veces entra un menú en la compra (0 a 7). */
+export function vecesDeMenu(id: string, cambio: 1 | -1): Promise<void> {
+  const c = compraActual()
+  const n = Math.min(7, Math.max(0, (c.menus?.[id] ?? 0) + cambio))
+  return cambiar({ modo: 'menus', menus: { ...(c.menus ?? {}), [id]: n } })
+}
+
 /**
  * Lo que hay que comprar y cuántos días son de entreno y de descanso. Los días con platos en tu menú salen del menú; los
  * demás, de tu dieta (si sigues una).
  */
 export function productosDe(c: Compra): { productos: Producto[]; entreno: number; descanso: number } {
+  if (c.modo === 'menus')
+    return {
+      productos: listaDeLaCompra([{ recetas: deMenus(c.menus ?? {}) }], c.extra),
+      entreno: 0,
+      descanso: 0,
+    }
   const fechas = Array.from({ length: c.dias }, (_, i) => addDays(c.desde, i))
   const conMenu = new Set(fechas.filter((f) => huecosDelDia(menu.value, f).length))
   const dias = fechas

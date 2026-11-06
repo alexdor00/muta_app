@@ -12,8 +12,6 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   ración, el peso de hoy y Tu objetivo; en Dieta, la de ejemplo o la tuya, apuntar del menú, una receta (intercambio y editar), la
   compra, la cocina, la consulta y el escáner con la cámara (necesita https o la red local; Open Food Facts, internet).
   Después, PR a `main` (detrás de los de `pantalla/sesion` y `pantalla/comida`).
-- **Las fotos y recetas del recetario en GitHub**: el repositorio es público; decide el usuario (repositorio privado, subirlas
-  con permiso de la autora o construir la app final en local). Hasta entonces, en `private/`.
 - **Dudas de Comida que siguen abiertas**: ¿una dieta de verdad para cargar (o se crea en la app)? ¿La consulta se queda en
   Comida o pasa a Hoy cuando exista? ¿Una fuente para cuánto aguanta lo cocinado en la nevera?
 - **Probar la rama `pantalla/sesion` en un móvil real** con `npm run dev` (dirección «Network», mismo wifi): Tu plan (tarjetas
@@ -39,6 +37,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   - Más sencilla (diseño `Desktop/MUTA-Comida-sencilla-funcionalidades.png`): tus menús A, B, C… (1 a 7) en desplegables
     con sus fotos y tu semana; en Hoy, el plato del menú con su tick; cambiar un ingrediente por tu marca u otro alimento
     equivalente; la compra en desplegables; filtros claros; el peso y lo de hoy, en la pestaña Hoy.
+  - El recetario subido al repositorio (decisión del usuario). Base de 19.157 productos de supermercado (Open Food Facts) y
+    el escáner que reconoce lo que ya está; la compra por menús; cantidades «para tu objetivo» o «como en la receta»;
+    «+ Añadir menú»; categorías al elegir un plato; la calculadora «Pesa en crudo, come cocinado» en Cocina.
   - Decisiones en [docs/decisiones.md](docs/decisiones.md) (2026-11-06) y cómo se rehace el recetario en
     [docs/datos.md](docs/datos.md).
 - Rama `pantalla/comida-v2` (2026-11-05, sin unir): Comida versiones 2 y 3. Verificado: `npm run check` (421 pruebas) y los

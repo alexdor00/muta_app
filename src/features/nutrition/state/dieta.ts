@@ -117,6 +117,10 @@ export type Compra = {
   /** Raciones de más por receta (alguien más come ese plato). */
   extra: Record<string, number>
   propios: { id: string; nombre: string; seccion: string }[]
+  /** Por días (lo de tu semana) o por menús (los que elijas, cuántas veces cada uno). */
+  modo?: 'dias' | 'menus'
+  /** Por menús: cuántas veces entra cada menú. */
+  menus?: Record<string, number>
 }
 
 export const compra = signal<Compra | null>(null)

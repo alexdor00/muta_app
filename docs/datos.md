@@ -128,3 +128,10 @@ app y `fotos/NN.webp`). Se rehace desde el `.docx` traducido, descomprimido en u
 
 Las cifras de cada receta son las del libro; la base de alimentos solo da la diferencia al cambiar gramos (ver
 [decisiones](decisiones.md), 2026-11-06).
+
+## La base de supermercados
+
+`node scripts/foods-off.mjs` descarga de Open Food Facts (búsqueda de search.openfoodfacts.org) los productos de España de
+las marcas propias de cada supermercado (hasta 4.000 por marca, con kcal y macros por 100 g) y deja
+`src/shared/content/foods-super.json`: `[código, nombre, marca, categoría, kcal, proteína, hidratos, grasa]`. Las marcas
+están al principio del script. Datos con licencia ODbL: se cita Open Food Facts.

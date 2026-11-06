@@ -187,9 +187,11 @@ export function mejoresPara(
   objetivo: Macros,
   n = 3,
   sin: readonly string[] = [],
+  /** false: también los que no son de esa comida (eliges tú la categoría). */
+  soloDeLaComida = true,
 ): Encaje[] {
   return platos
-    .filter((p) => p.raciones === 1 && vaCon(p, comida) && !sin.includes(p.id))
+    .filter((p) => p.raciones === 1 && (!soloDeLaComida || vaCon(p, comida)) && !sin.includes(p.id))
     .map((plato) => {
       const ajuste = ajustar(plato, objetivo)
       return { plato, ajuste, error: error(ajuste.total, objetivo) }

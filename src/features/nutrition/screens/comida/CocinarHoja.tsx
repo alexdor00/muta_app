@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks'
+import { paths } from '../../../../shared/lib/paths.ts'
 import { addDays, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
@@ -130,7 +131,12 @@ export function CocinarHoja({ cocinado, onClose, avisar }: Props) {
                 <b>{formatInt(i.gramos!)} g</b>
               </p>
             ))}
-          <p class={h.foot}>Luego cada comida lleva los gramos de su día.</p>
+          <p class={h.foot}>
+            Luego cada comida lleva los gramos de su día.{' '}
+            <a href={`${paths.kitchen}?desde=menu&plato=${p.id}&raciones=${para.length}`}>
+              Pesar lo cocinado ›
+            </a>
+          </p>
         </section>
       </div>
     </Sheet>

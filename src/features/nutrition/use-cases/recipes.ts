@@ -191,7 +191,9 @@ export function cambiarIngrediente(
 /** Otros alimentos que hacen lo mismo que un ingrediente: los mismos gramos de su macro principal. */
 export async function equivalentes(i: IngredientePlato) {
   if (!i.por100 || i.gramos === null) return null
-  return intercambios({ nombre: i.nombre, por100: i.por100 }, i.gramos, await cargarAlimentos())
+  // Equivalentes entre los genéricos (los de supermercado se eligen en «Otra marca» o buscando)
+  const genericos = (await cargarAlimentos()).filter((a) => !a.codigo)
+  return intercambios({ nombre: i.nombre, por100: i.por100 }, i.gramos, genericos)
 }
 
 // --- A tu dieta ---

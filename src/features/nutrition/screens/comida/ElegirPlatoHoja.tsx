@@ -2,25 +2,26 @@ import { useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
+import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
 import { PlusIcon, SearchIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { PlatoFila } from '../../components/Platos.tsx'
 import { hoy, type ComidaId } from '../../state/comida.ts'
 import {
   buscarPlatos,
+  categorias,
   diasDelMenu,
   fotos,
   menu,
   mejoresPara,
   objetivoDeComida,
-  platosTuyos,
-  recetario,
+  vaCon,
 } from '../../state/recetas.ts'
 import { ponerPlato } from '../../use-cases/menu.ts'
 import { comidaDe } from '../comun/platos.ts'
 import type { Aviso } from '../comun/useAviso.ts'
 import h from '../comun/Hojas.module.css'
+import ps from '../plato/Plato.module.css'
 
 type Props = {
   menuId: string
@@ -35,18 +36,27 @@ type Props = {
  * tuyos; o crear uno.
  */
 export function ElegirPlatoHoja({ menuId, comida, onClose, onCrear, avisar }: Props) {
-  const [de, setDe] = useState<'recetario' | 'tuyos'>('recetario')
+  const [cat, setCat] = useState('para')
   const [texto, setTexto] = useState('')
   const m = menu.value.menus.find((x) => x.id === menuId)
   const fecha = diasDelMenu(menu.value, menuId, hoy.value)[0] ?? hoy.value
   const o = objetivoDeComida(fecha, comida)
-  const fuente = de === 'tuyos' ? platosTuyos.value : (recetario.value?.platos ?? [])
+  const todas = categorias.value.flatMap((c) => c.platos)
+  const fuente =
+    cat === 'para'
+      ? todas.filter((p) => vaCon(p, comida))
+      : cat === 'todas'
+        ? todas
+        : (categorias.value.find((c) => c.id === cat)?.platos ?? [])
   const lista = texto.trim()
     ? buscarPlatos(fuente, texto)
         .slice(0, 30)
         .map((plato) => ({ plato, kcal: plato.total.kcal }))
     : o
-      ? mejoresPara(fuente, comida, o, 30).map((e) => ({ plato: e.plato, kcal: e.ajuste.total.kcal }))
+      ? mejoresPara(fuente, comida, o, 30, [], cat === 'para').map((e) => ({
+          plato: e.plato,
+          kcal: e.ajuste.total.kcal,
+        }))
       : fuente.slice(0, 30).map((plato) => ({ plato, kcal: plato.total.kcal }))
   const poner = async (id: string, nombre: string) => {
     const antes = await ponerPlato(menuId, comida, id)
@@ -70,18 +80,6 @@ export function ElegirPlatoHoja({ menuId, comida, onClose, onCrear, avisar }: Pr
       }
     >
       <div class={h.stack}>
-        {platosTuyos.value.length > 0 && (
-          <ChoiceSegmented<'recetario' | 'tuyos'>
-            name="elegir-de"
-            legend="De"
-            options={[
-              { value: 'recetario', label: 'Recetario' },
-              { value: 'tuyos', label: 'Tuyos' },
-            ]}
-            value={de}
-            onChange={setDe}
-          />
-        )}
         <label class={h.search}>
           <SearchIcon />
           <input
@@ -93,6 +91,19 @@ export function ElegirPlatoHoja({ menuId, comida, onClose, onCrear, avisar }: Pr
             onInput={(e) => setTexto(e.currentTarget.value)}
           />
         </label>
+        <div class={ps.filtros}>
+          <ChoiceChips<string>
+            name="elegir-categoria"
+            legend="Categoría"
+            options={[
+              { value: 'para', label: `Para ${comidaDe(comida).el}` },
+              { value: 'todas', label: 'Todas' },
+              ...categorias.value.map((c) => ({ value: c.id, label: c.nombre })),
+            ]}
+            value={cat}
+            onChange={setCat}
+          />
+        </div>
         {lista.length ? (
           <ul class={h.list}>
             {lista.map(({ plato, kcal }) => (
@@ -116,9 +127,7 @@ export function ElegirPlatoHoja({ menuId, comida, onClose, onCrear, avisar }: Pr
             ))}
           </ul>
         ) : (
-          <p class={h.sub}>
-            {de === 'tuyos' ? 'Aún no tienes platos tuyos.' : 'Ningún plato con esa búsqueda.'}
-          </p>
+          <p class={h.sub}>Ningún plato con esa búsqueda.</p>
         )}
       </div>
     </Sheet>

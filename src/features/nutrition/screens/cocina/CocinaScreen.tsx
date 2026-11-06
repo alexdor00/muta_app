@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'preact/hooks'
+import { useLocation } from 'preact-iso'
+import { estadoRecetas } from '../../state/recetas.ts'
+import { cargarRecetas } from '../../use-cases/recipes.ts'
+import { ComoPesar, PesaCrudo } from './PesaCrudo.tsx'
 import { formatDecimal, formatInt, parseDecimal } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
@@ -17,19 +21,23 @@ import { useAviso } from '../comun/useAviso.ts'
 
 const num = (s: string) => parseDecimal(s) ?? 0
 
-/** Cocina: cuánto arroz cocer y cuánto pesa cocido, repartir una olla en raciones y calcular un plato tuyo por 100 g. */
+/** Cocina: pesa en crudo y come cocinado (un plato de tus menús), cuánto arroz cocer y cuánto pesa cocido, repartir una olla en raciones y calcular un plato tuyo por 100 g. */
 export function CocinaScreen() {
   useEffect(() => {
-    void cargarComida()
+    void cargarComida().then(cargarRecetas)
   }, [])
+  const { query } = useLocation()
   const { aviso, avisar } = useAviso()
-  if (estado.value === 'cargando') return null
+  if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
+  const volver = query.desde === 'menu' ? `${paths.nutrition}?vista=menu` : `${paths.nutrition}?vista=dieta`
   return (
     <div class={p.page}>
-      <Barra titulo="Cocina" volver={`${paths.nutrition}?vista=dieta`} />
+      <Barra titulo="Cocina" volver={volver} />
+      <PesaCrudo inicial={{ plato: query.plato, raciones: Number(query.raciones) || undefined }} />
       {dieta.value && <Arroz />}
       <Olla />
       <Plato avisar={avisar} />
+      <ComoPesar />
       <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
     </div>
   )

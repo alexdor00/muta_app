@@ -8,6 +8,7 @@ import {
   clave,
   conCocinado,
   conCuantos,
+  conAjuste,
   conDia,
   conPlato,
   conReparto,
@@ -39,6 +40,8 @@ export const volverA = (m: MenuSemanal) => guardar(m)
 export const cuantosMenus = (n: number) => guardar(conCuantos(menu.value, n))
 export const repartoDeMenus = (r: MenuSemanal['reparto']) => guardar(conReparto(menu.value, r))
 export const menuEnDia = (dia: number, id: string) => guardar(conDia(menu.value, dia, id))
+export const ajustarComida = (id: string, comida: ComidaId, ajustada: boolean) =>
+  guardar(conAjuste(menu.value, id, comida, ajustada))
 export const renombrarMenu = (id: string, nombre: string) => guardar(renombrado(menu.value, id, nombre))
 
 /** Duplica un menú; false si ya tienes 7. */

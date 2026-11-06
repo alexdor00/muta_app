@@ -22,11 +22,32 @@ export const MIS_ALIMENTOS = 'Mis alimentos'
 
 let descarga: Promise<Alimento[]> | null = null
 
-/** La base de 1.493 alimentos: se descarga aparte la primera vez que hace falta (no pesa al abrir la app). */
+/** Un producto de supermercado como viene en foods-super.json. */
+type FilaSuper = [string, string, string, string, number, number, number, number]
+
+const deSuper = (filas: readonly FilaSuper[]): Alimento[] =>
+  filas.map(([codigo, nombre, marca, category, kcal, protein, carbs, fat]) => ({
+    id: `s_${codigo}`,
+    name: marca ? `${nombre} · ${marca}` : nombre,
+    category,
+    kcal,
+    protein,
+    carbs,
+    fat,
+    servingG: 100,
+    servingLabel: '100 g',
+    codigo,
+  }))
+
+/**
+ * La base: los 1.493 alimentos genéricos (se descargan aparte la primera vez que hace falta: no pesan al abrir la app) y,
+ * detrás, sin esperar, los productos de supermercado de Open Food Facts con su marca y su código. Quedan en el móvil.
+ */
 export function cargarAlimentos(): Promise<Alimento[]> {
   descarga ??= import('../../../shared/content/foods.json')
     .then((m) => {
       base.value = m.default as Alimento[]
+      void cargarSupermercados()
       return base.value
     })
     .catch((error) => {
@@ -35,6 +56,23 @@ export function cargarAlimentos(): Promise<Alimento[]> {
       return []
     })
   return descarga
+}
+
+let supermercados: Promise<Alimento[]> | null = null
+
+/** La base con los productos de supermercado (el escáner la espera entera). */
+export function cargarSupermercados(): Promise<Alimento[]> {
+  supermercados ??= Promise.all([cargarAlimentos(), import('../../../shared/content/foods-super.json')])
+    .then(([genericos, m]) => {
+      base.value = [...genericos, ...deSuper(m.default as FilaSuper[])]
+      return base.value
+    })
+    .catch((error) => {
+      supermercados = null
+      logError(error, 'cargar los productos de supermercado')
+      return base.value ?? []
+    })
+  return supermercados
 }
 
 /** Un apunte de un alimento con su cantidad. */

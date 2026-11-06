@@ -6,3 +6,4 @@ package-lock.json
 docs/conocimiento
 private
 src/shared/content/recetario/
+src/shared/content/foods-super.json

@@ -18,6 +18,6 @@ export default defineConfig({
     env: { VITE_NO_LOCAL_PROGRAMS: '1' },
     url: 'http://localhost:4174',
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 300_000, // construir la app con el recetario y la base de supermercados tarda
   },
 })

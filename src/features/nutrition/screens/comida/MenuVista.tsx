@@ -12,6 +12,7 @@ import {
   estadoRecetas,
   fotos,
   huecoDe,
+  MAX_MENUS,
   menu,
   menuDelDia,
   NOMBRE_DIA,
@@ -22,7 +23,7 @@ import {
   totalDelHueco,
   type MenuPlan,
 } from '../../state/recetas.ts'
-import { menuEnDia } from '../../use-cases/menu.ts'
+import { cuantosMenus, menuEnDia } from '../../use-cases/menu.ts'
 import styles from './Menu.module.css'
 import v from './Vistas.module.css'
 
@@ -65,9 +66,9 @@ export function MenuVista({ onPlato, onAnadir, onOpciones, onCuantos, onAvisos }
           <h2 id="tu-semana" class={styles.diaTitulo}>
             Tu semana
           </h2>
-          <span class={v.foot}>
-            {m.menus.length} {m.menus.length === 1 ? 'menú' : 'menús'}
-          </span>
+          <button type="button" class={styles.enlace} onClick={onCuantos}>
+            Cambiar
+          </button>
         </div>
         <ol class={styles.dias}>
           {dias.map((f) => {
@@ -110,13 +111,25 @@ export function MenuVista({ onPlato, onAnadir, onOpciones, onCuantos, onAvisos }
             onOpciones={onOpciones}
           />
         ))}
+        {m.menus.length < MAX_MENUS && (
+          <button
+            type="button"
+            class={styles.nuevoMenu}
+            onClick={async () => {
+              await cuantosMenus(m.menus.length + 1)
+              setAbierto(menu.value.menus.at(-1)?.id ?? null)
+            }}
+          >
+            <PlusIcon /> Añadir menú
+          </button>
+        )}
       </div>
       <div class={styles.atajos}>
-        <button type="button" class={styles.atajo} onClick={onCuantos}>
-          Tus menús
-        </button>
         <a class={styles.atajo} href={paths.shopping}>
           La compra
+        </a>
+        <a class={styles.atajo} href={`${paths.kitchen}?desde=menu`}>
+          Cocina
         </a>
         <button type="button" class={styles.atajo} onClick={onAvisos}>
           Avisos

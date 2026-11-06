@@ -104,15 +104,20 @@ test('tus menús: un plato en la cena, cuándo cocinarlo, el tick en Hoy y lo de
   await expect(page.getByRole('region', { name: 'Lo de hoy' })).toContainText(
     '20:30 · Cocina Salmón con patata asada',
   )
-  // La compra sale de tus menús
+  // La compra sale de tus menús, por días o por los menús que elijas
   await page.goto('/comida/compra')
+  await expect(page.getByText(/Salmón/).first()).toBeVisible()
+  await page.getByText('Unos menús', { exact: true }).click()
+  await page.getByRole('button', { name: 'Menú A: una vez más' }).click()
+  await page.getByRole('button', { name: 'Menú A: una vez más' }).click()
+  await expect(page.getByText('× 2')).toBeVisible()
   await expect(page.getByText(/Salmón/).first()).toBeVisible()
 })
 
 test('tus menús: cuántos y qué día va cada uno', async ({ page }) => {
   await prepararObjetivo(page)
   await page.goto('/comida?vista=menu')
-  await page.getByRole('button', { name: 'Tus menús' }).click()
+  await page.getByRole('region', { name: 'Tu semana' }).getByRole('button', { name: 'Cambiar' }).click()
   const hoja = page.getByRole('dialog', { name: 'Tus menús' })
   await hoja.getByRole('button', { name: 'Un menú más' }).click()
   await hoja.getByRole('button', { name: 'Un menú más' }).click()
@@ -122,6 +127,8 @@ test('tus menús: cuántos y qué día va cada uno', async ({ page }) => {
   await expect(hoja.getByRole('button', { name: 'Mar: menú C, cambiar' })).toBeVisible()
   await hoja.getByRole('button', { name: 'Listo' }).click()
   await expect(page.getByRole('region', { name: 'Menú C' })).toBeVisible()
+  await page.getByRole('button', { name: 'Añadir menú' }).click()
+  await expect(page.getByRole('region', { name: 'Menú D' })).toBeVisible()
 })
 
 test('cuadrar el día con recetas: un plato por comida que queda', async ({ page }) => {

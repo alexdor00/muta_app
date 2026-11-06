@@ -57,6 +57,9 @@ propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si l
   al menú y a tu dieta), una categoría (`/comida/recetas/:categoria`) y tu nutricionista (`/comida/nutricionista`). Pantallas completas: `objetivo`,
   `receta` (`/comida/receta/:id`, con intercambios y editar), `compra`, `cocina` y `consulta`. Lo común en `screens/comun`.
 
+- La base: `foodLog.cargarAlimentos()` (los genéricos) y, detrás, `cargarSupermercados()` (19.157 productos con marca y código).
+  La compra, por días o por menús. Cocina lleva arriba «Pesa en crudo, come cocinado» (`screens/cocina/PesaCrudo.tsx`).
+
 ## Datos
 
 - `userContent`: `nutricion`, `alimentos-propios`, `comidas-guardadas`, `dieta` (la que sigues: dieta, inicio, ajustes,

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   calendarioDelMenu,
   clave,
+  conAjuste,
   conCocinado,
   conCuantos,
   conDia,
@@ -129,5 +130,13 @@ describe('tus menús', () => {
     expect(ics).toContain('SUMMARY:Cocinar: Pollo al chipotle')
     expect(ics).toContain('TRIGGER:-PT30M')
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(2)
+  })
+})
+
+describe('gramos de una comida', () => {
+  it('una comida puede ir con los gramos de la receta y volver a ajustarse', () => {
+    const m = conAjuste(conPlato(menuVacio(), 'A', 'cena', 'rec-1'), 'A', 'cena', false)
+    expect(m.menus[0].fijos).toEqual(['cena'])
+    expect(conAjuste(m, 'A', 'cena', true).menus[0].fijos).toEqual([])
   })
 })

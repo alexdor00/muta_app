@@ -6,7 +6,13 @@ import { COMIDAS, sumar, type ComidaId, type Macros } from './food.ts'
 import type { Plato } from './recipes.ts'
 
 /** Un menú: su nombre y el plato de cada comida (las que no tiene, sin plato). */
-export type MenuPlan = { id: string; nombre: string; platos: Partial<Record<ComidaId, string>> }
+export type MenuPlan = {
+  id: string
+  nombre: string
+  platos: Partial<Record<ComidaId, string>>
+  /** Las comidas que van con los gramos de la receta (las demás, ajustadas a tu objetivo). */
+  fijos?: ComidaId[]
+}
 
 /** Un plato que cocinas un día, a una hora, para varias comidas (fecha|comida). */
 export type Cocinado = { id: string; plato: string; fecha: string; hora: string; para: string[] }
@@ -124,6 +130,18 @@ export function conPlato(m: MenuSemanal, menu: string, comida: ComidaId, plato: 
       if (plato) platos[comida] = plato
       else delete platos[comida]
       return { ...x, platos }
+    }),
+  }
+}
+
+/** Una comida de un menú, con los gramos de tu objetivo (ajustada) o los de la receta. */
+export function conAjuste(m: MenuSemanal, menu: string, comida: ComidaId, ajustada: boolean): MenuSemanal {
+  return {
+    ...m,
+    menus: m.menus.map((x) => {
+      if (x.id !== menu) return x
+      const fijos = (x.fijos ?? []).filter((c) => c !== comida)
+      return { ...x, fijos: ajustada ? fijos : [...fijos, comida] }
     }),
   }
 }
