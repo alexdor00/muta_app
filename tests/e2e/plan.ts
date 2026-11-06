@@ -129,8 +129,49 @@ export async function prepararPlan(page: Page, entrenos = ENTRENOS) {
   }, entrenos)
 }
 
-/** `test` con el plan de prueba ya guardado antes de cada recorrido. */
-export const test = base.extend<{ plan: void }>({
+/**
+ * Espera a que lo que la app está guardando quede escrito: una transacción de escritura sobre todos los almacenes no empieza
+ * hasta que acaban las anteriores. Sin esto, en la CI (más rápida) se recargaba antes de que IndexedDB terminase.
+ */
+export async function guardado(page: Page) {
+  await page.evaluate(async () => {
+    await new Promise((ok) => setTimeout(ok, 150))
+    const db = await new Promise<IDBDatabase>((ok, ko) => {
+      const r = indexedDB.open('muta')
+      r.onsuccess = () => ok(r.result)
+      r.onerror = () => ko(r.error)
+    })
+    if (db.objectStoreNames.length) {
+      const tx = db.transaction([...db.objectStoreNames], 'readwrite')
+      await new Promise((ok) => {
+        tx.oncomplete = ok
+        tx.onerror = ok
+        tx.onabort = ok
+      })
+    }
+    db.close()
+  })
+}
+
+/** `test` en el que recargar o ir a otra página espera a lo guardado. */
+export const testGuardando = base.extend({
+  page: async ({ page }, usar) => {
+    const recargar = page.reload.bind(page)
+    const ir = page.goto.bind(page)
+    page.reload = async (opciones) => {
+      await guardado(page)
+      return recargar(opciones)
+    }
+    page.goto = async (url, opciones) => {
+      if (page.url().startsWith('http')) await guardado(page)
+      return ir(url, opciones)
+    }
+    await usar(page)
+  },
+})
+
+/** `test` con el plan de prueba ya guardado antes de cada recorrido (y esperando a lo guardado). */
+export const test = testGuardando.extend<{ plan: void }>({
   plan: [
     async ({ page }, use) => {
       await prepararPlan(page)

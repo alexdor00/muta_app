@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { testGuardando as test } from './plan.ts'
 
 // Comida: calcular tu objetivo, apuntar con «Deshacer», el peso de hoy y la sugerencia del entrenador (que nunca se aplica
 // sola). Datos de prueba escritos a mano: 30 días de pesajes bajando 0,28 kg por semana, 4 semanas comiendo 2.300 kcal

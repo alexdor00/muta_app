@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { testGuardando as test } from './plan.ts'
 
 // Comida · Dieta (versiones 2 y 3): empezar con la dieta de ejemplo del prototipo, apuntar el menú de un toque, la receta
 // con sus intercambios y su edición, la compra, la cocina, la consulta (que solo propone), el escáner con Open Food Facts

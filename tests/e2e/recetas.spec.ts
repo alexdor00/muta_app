@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { testGuardando as test } from './plan.ts'
 
 // Recetas y tus menús (sin el recetario privado: salen los platos de la dieta de ejemplo, «De ejemplo»). Un plato
 // ajustado a lo que te falta y apuntado, tus menús (cuántos, qué día, un plato y cuándo cocinarlo), el tick en Hoy, lo de
