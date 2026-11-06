@@ -1,7 +1,6 @@
 // La lista de la compra: sale de las recetas de los días elegidos, con la ración de entreno o de descanso de cada día y
 // las raciones de más de quien coma contigo. Regla del prototipo anterior (js/comida/dieta.js · shopCompute).
 import { plainText } from '../../../shared/lib/format.ts'
-import type { RecetaDelDia } from './diet.ts'
 
 /** Secciones de la lista y qué categorías de la base van en cada una (nombres sugeridos: el prototipo los ponía así). */
 export const SECCIONES: { id: string; nombre: string; categorias: string[] }[] = [
@@ -31,8 +30,15 @@ export type Producto = {
 }
 
 /** Lo que hay que comprar para estos días (con `extra[receta]` raciones de más). */
+/** Lo que la lista necesita de una receta (una de tu dieta o un plato de tu menú). */
+export type RecetaParaComprar = {
+  id: string
+  nombre: string
+  lista: readonly { alimentoId: string | null; nombre: string; categoria: string; g: number | null }[]
+}
+
 export function listaDeLaCompra(
-  dias: readonly { recetas: readonly RecetaDelDia[] }[],
+  dias: readonly { recetas: readonly RecetaParaComprar[] }[],
   extra: Readonly<Record<string, number>> = {},
 ): Producto[] {
   const productos = new Map<string, Producto>()

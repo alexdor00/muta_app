@@ -60,6 +60,9 @@
   --ring: 132px; /* anillo de kcal de la tarjeta del día */
   --ring-stroke: 10px;
   --meal-thumb: 56px; /* miniatura redonda de cada comida */
+  --dish-thumb: 64px; /* foto redonda de un plato en una lista */
+  --dish-card: 150px; /* tarjeta de un plato en un carrusel de Recetas */
+  --dish-card-photo: 104px;
   --target-hero: var(--session-4);
   --on-target-hero: var(--on-session-light);
   --on-target-hero-soft: var(--on-session-light-soft);

@@ -1,0 +1,150 @@
+/* Tu menú: la semana con ‹ ›, un día por tarjeta y cada comida en una fila con su foto; lo que cocinas, en negro. */
+
+.semana {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0 var(--gutter);
+}
+
+.semanaTitulo {
+  flex: 1;
+  font: var(--text-headline);
+  text-align: center;
+}
+
+.flecha {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.flecha svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--gutter);
+}
+
+.atajo {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0 var(--gutter);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.diaHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.diaTitulo {
+  font: var(--text-headline);
+}
+
+.filas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-1) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.fila:disabled {
+  cursor: default;
+}
+
+.fila > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.filaTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.comida {
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.plato {
+  font: var(--text-subhead);
+}
+
+.mas {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--meal-thumb);
+  height: var(--meal-thumb);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.mas svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.cocinar {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-caption);
+  white-space: nowrap;
+}

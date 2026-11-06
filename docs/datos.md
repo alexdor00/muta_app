@@ -111,3 +111,20 @@ semana; la primera fila son los títulos (da igual mayúsculas y tildes; separad
 
 Una fila con `Descanso` en la columna de la sesión es un día de descanso obligatorio en ese punto. Lo que no se rellena se
 pone por costumbre y sale como «sugerido». Se guarda en `programs` (id `mia:…`), solo en el móvil.
+
+## El recetario (Comida · Recetas)
+
+Es de terceros: **fuera de git**, en `private/recetas/` (`recetas.json` tal cual del documento, `recetario.json` el que lee la
+app y `fotos/NN.webp`). Se rehace desde el `.docx` traducido, descomprimido en una carpeta (`unzip … -d <carpeta>/docx`):
+
+1. `node private/herramientas/recetario.mjs <carpeta>` — las 100 recetas (nombre, categoría, dificultad, tiempo, raciones,
+   kcal y macros del libro, ingredientes y pasos) y una foto por receta (la del plato terminado; la 68 y la 74, la mitad
+   derecha del último paso: en las otras salen dedos).
+2. `node private/herramientas/recetario-casar.mjs` — propone el alimento de la base para cada ingrediente distinto
+   (`recetario-alimentos.tsv`). Lo que se equivoca se corrige a mano en `recetario-correcciones.tsv` (`-` = no cuenta:
+   especias, «al gusto»; vacío = sin pareja en la base).
+3. `node private/herramientas/recetario-app.mjs` — los gramos de cada ingrediente (los del libro o, en unidades, sugeridos
+   con `recetario-piezas.tsv`), su macro principal y si la receta se puede ajustar. Sube `rev` si cambia algo.
+
+Las cifras de cada receta son las del libro; la base de alimentos solo da la diferencia al cambiar gramos (ver
+[decisiones](decisiones.md), 2026-11-06).

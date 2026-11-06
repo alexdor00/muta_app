@@ -11,6 +11,8 @@ export type FilaComida = {
   proteina: number
   /** Los alimentos, en una línea; vacía si no hay nada. */
   alimentos: string
+  /** La foto del plato apuntado, si salió de una receta con foto. */
+  foto?: string | null
 }
 
 type Props = {
@@ -23,7 +25,7 @@ type Props = {
 
 /**
  * Las comidas del día, cada una en su tarjeta: miniatura, lo que llevas y sus kcal (se abre con «›»). La vacía dice cuánto
- * te queda y lleva «+»; la siguiente que falta, en negro. Aún sin fotos: la miniatura lleva el icono de Comida.
+ * te queda y lleva «+»; la siguiente que falta, en negro. La miniatura es la foto del plato si la tiene; si no, el icono.
  */
 export function MealList({ comidas, quedan, onAbrir, onAnadir }: Props) {
   const primeraVacia = comidas.find((c) => !c.alimentos)?.id
@@ -47,7 +49,7 @@ export function MealList({ comidas, quedan, onAbrir, onAnadir }: Props) {
               onClick={() => (c.alimentos ? onAbrir(c.id) : onAnadir(c.id))}
             >
               <span class={styles.thumb} aria-hidden="true">
-                <ForkIcon />
+                {c.foto ? <img src={c.foto} alt="" loading="lazy" /> : <ForkIcon />}
               </span>
               <span class={styles.text}>
                 <span class={styles.name}>{c.nombre}</span>

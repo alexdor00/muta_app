@@ -350,3 +350,38 @@ El usuario: habrá una pantalla de Progreso con sus funcionalidades, y Semana (l
 los días con la proteína hecha y la tendencia del peso) no va en Comida. Se quita con su resumen y sus barras. Se queda lo
 que necesitan la revisión del entrenador y la consulta: la tendencia y el ritmo del peso (`domain/weight.ts`) y apuntar el
 peso, que pasa a Hoy («+ Pesarme» bajo la tarjeta del día) hasta que exista la pestaña Hoy.
+
+## 2026-11-06 · Recetas que se ajustan, tu menú, tus productos y lo de hoy
+
+Diseños aprobados por el usuario: `Desktop/MUTA-Recetas-funcionalidades.png` («está perfecto») y
+`Desktop/MUTA-Menu-funcionalidades.png` («dalee»).
+
+- **El recetario es de terceros**: sus 100 recetas y una foto por receta van en `private/recetas/` (fuera de git), como las
+  rutinas, y se cargan con `shared/data/localRecipes.ts` (no con `VITE_NO_LOCAL_PROGRAMS`). La app no lleva el nombre de la
+  autora. Sin recetario (CI, e2e) salen los platos de la dieta de ejemplo, marcados «De ejemplo».
+- **Una foto por receta, sin manos**: la del plato terminado; en la 68 y la 74 salían dedos y se usa la mitad derecha de la
+  del último paso (el plato servido). Cuadradas, 480 px, webp.
+- **Se parte siempre de las cifras del libro.** Al casar sus ingredientes con la base de alimentos, la suma suele salir más
+  alta que lo que dice el libro (solo 284 de 923 ingredientes vienen en gramos; el resto en unidades). Con el criterio del
+  diseño («si se aleja más de un 10 %, solo se escala entera») solo se podrían ajustar 8 recetas. Por eso el total es el del
+  libro y, al cambiar gramos, se suma solo la diferencia con los valores por 100 g de la base. Se ajustan 97 de 100 (no: la
+  granola y el pan de plátano, que dan el total de varias raciones, y dos con los ingredientes en una sola línea).
+- **Los gramos de lo que viene en unidades son sugeridos** (`private/herramientas/recetario-piezas.tsv`: un kiwi 75 g, una
+  rebanada de pan 35 g…; cucharada 15 g, cucharadita 5 g, taza de líquido 240 g) y la receta lo marca «sugerido».
+- **Cómo se ajusta**: se mueven los ingredientes que aportan (≥ 40 kcal; su macro principal, la proteína si da un 30 % de
+  sus kcal) entre la mitad y dos veces y media lo del libro (sugerido), de 5 en 5 g, buscando a la vez proteína, hidratos y
+  grasa (error en kcal de cada macro). Si no llega, dice hasta dónde y ofrece repartir, añadir algo u otra receta.
+- **Reparto de lo que falta entre comidas** (desayuno 25 %, comida 35 %, merienda 15 %, cena 25 %) y **qué categorías van
+  con cada comida** (batidos, panes y postres en desayuno y merienda; sopas, pescado y carne en comida y cena): sugeridos,
+  ningún documento los fija.
+- **Menú ocupa el sitio de Dieta** en Comida (Hoy · Menú · Recetas); la dieta se abre desde Menú (`?vista=dieta`). La
+  compra sale del menú en los días con platos y de la dieta en los demás.
+- **Avisos por el calendario**: la app no tiene servidor y no puede sonar a una hora con el móvil bloqueado. «Añadir la
+  semana al calendario» comparte un `.ics` con su alarma; las horas de las comidas (8:00, 14:00, 17:30, 21:00) son
+  sugeridas. Lo de hoy sale arriba en Comida · Hoy hasta que exista la pestaña Hoy.
+- **Tu nutricionista** mira los próximos 7 días con al menos 3 comidas en el menú: si no llegas a la proteína (15 g o más)
+  propone cambiar un plato; si te pasas o te faltan 200 kcal o más, ajustar los gramos de ese día (umbrales sugeridos).
+  Solo propone: «Aplicar», «Ahora no» y «Deshacer». Cuánto aguanta lo cocinado en la nevera no lo dice ni lo limita: no hay
+  fuente.
+- **Tu producto** (tu arroz, tu hummus) se guarda en Mis alimentos (escaneado o a mano) y cuenta en todos tus platos o solo
+  en uno (`userContent/productos`); las kcal del plato se recalculan con sus valores.

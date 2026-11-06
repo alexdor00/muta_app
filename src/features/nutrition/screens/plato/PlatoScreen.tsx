@@ -1,0 +1,260 @@
+import { useLocation } from 'preact-iso'
+import { useEffect, useState } from 'preact/hooks'
+import { daysBetween, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import { paths } from '../../../../shared/lib/paths.ts'
+import { Button } from '../../../../shared/ui/Button.tsx'
+import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
+import { ChevronRightIcon, MinusIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
+import { Toast } from '../../../../shared/ui/Toast.tsx'
+import { useSheet } from '../../../../shared/ui/useSheet.ts'
+import { alimentoPorId, comidaPorHora, diaVisto, dieta, estado, hoy } from '../../state/comida.ts'
+import {
+  estadoRecetas,
+  fotos,
+  MACROS,
+  platoPorId,
+  productoDe,
+  recetario,
+  siguiente,
+  totalDePlato,
+} from '../../state/recetas.ts'
+import { cargarComida } from '../../use-cases/nutritionStore.ts'
+import { apuntarPlato, borrarPlato, cargarRecetas, desapuntar } from '../../use-cases/recipes.ts'
+import { comidaDe, esComida } from '../comun/platos.ts'
+import { useAviso } from '../comun/useAviso.ts'
+import h from '../comun/Hojas.module.css'
+import r from '../receta/Receta.module.css'
+import { ADietaHoja } from './ADietaHoja.tsx'
+import { AjustarHoja } from './AjustarHoja.tsx'
+import { AlMenuHoja } from './AlMenuHoja.tsx'
+import { ProductoHoja } from './ProductoHoja.tsx'
+import styles from './Plato.module.css'
+
+/**
+ * Un plato del recetario o tuyo, como una receta: foto, cifras (las del libro, con tus productos), raciones,
+ * ingredientes con su macro principal y la preparación. «Ajustar a lo que falta» cambia sus gramos; «Apuntar» lo apunta
+ * tal cual o ajustado.
+ */
+export function PlatoScreen(props: { id: string }) {
+  useEffect(() => {
+    void cargarComida().then(cargarRecetas)
+  }, [])
+  const { query, route } = useLocation()
+  const [veces, setVeces] = useState(1)
+  const [gramos, setGramos] = useState<(number | null)[] | null>(null)
+  const [cual, setCual] = useState<number | null>(null)
+  const ajustarHoja = useSheet('ajustar')
+  const producto = useSheet('producto')
+  const alMenu = useSheet('al-menu')
+  const aDieta = useSheet('a-dieta')
+  const { aviso, avisar } = useAviso()
+  if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
+  const p = platoPorId(props.id)
+  const volver = query.desde === 'menu' ? `${paths.nutrition}?vista=menu` : `${paths.nutrition}?vista=recetas`
+  if (!p) {
+    return (
+      <div class={r.page}>
+        <p class={h.sub}>Este plato ya no está.</p>
+        <Button href={volver}>Volver a Comida</Button>
+      </div>
+    )
+  }
+  const comida = esComida(query.comida)
+    ? query.comida
+    : (siguiente.value?.comida ?? comidaPorHora(new Date().getHours()))
+  const fecha = query.fecha ?? diaVisto.value
+  const cuando = daysBetween(fecha, hoy.value) === 0 ? 'hoy' : `el ${formatDayDate(fecha)}`
+  const total = totalDePlato(p, gramos ?? undefined, veces)
+  const categoria = recetario.value?.categorias.find((c) => c.id === p.categoria)?.nombre
+  const detalle = [
+    categoria ?? (p.origen === 'tuyo' ? 'Tuyo' : 'De ejemplo'),
+    p.dificultad,
+    p.minutos ? `${p.minutos} min` : '',
+    p.raciones > 1 ? `${p.raciones} raciones en total` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+  const apuntar = async () => {
+    const ids = await apuntarPlato(p, comida, gramos, veces, fecha)
+    avisar(`Apuntado en ${comidaDe(comida).nombre.toLowerCase()} ${cuando}`, {
+      label: 'Deshacer',
+      onClick: () => void desapuntar(ids, fecha),
+    })
+  }
+
+  return (
+    <div class={r.screen}>
+      <HeroHeader
+        title={p.nombre}
+        description={detalle}
+        photo={fotos.value[p.id]}
+        tone={5}
+        backHref={volver}
+      />
+      <div class={r.page}>
+        <div class={h.tiles}>
+          {[
+            [formatInt(total.kcal), 'kcal'],
+            [formatInt(total.protein), 'proteína'],
+            [formatInt(total.carbs), 'hidratos'],
+            [formatInt(total.fat), 'grasa'],
+          ].map(([v, l]) => (
+            <div key={l} class={h.tile}>
+              <span class={h.tileValue}>{v}</span>
+              <span class={h.foot}>{l}</span>
+            </div>
+          ))}
+        </div>
+        <p class={h.foot}>
+          {p.origen === 'recetario'
+            ? 'Cifras del recetario por ración'
+            : 'Suma de sus ingredientes (base de alimentos)'}
+          {p.raciones > 1
+            ? `: el libro da el total de ${p.raciones} raciones; aquí, ${veces} de ellas.`
+            : '.'}
+          {gramos ? ' Con los gramos ajustados.' : ''}
+        </p>
+        {p.ajustable && (
+          <div class={styles.buttons}>
+            <Button variant="secondary" onClick={ajustarHoja.show}>
+              {gramos ? 'Ajustar otra vez' : 'Ajustar a lo que falta'}
+            </Button>
+          </div>
+        )}
+        <section aria-labelledby="ingredientes">
+          <div class={r.head}>
+            <h2 id="ingredientes" class={r.title}>
+              Ingredientes
+            </h2>
+            <span class={r.stepper}>
+              <button
+                type="button"
+                aria-label="Menos raciones"
+                disabled={veces <= 1}
+                onClick={() => setVeces((n) => Math.max(1, n - 1))}
+              >
+                <MinusIcon />
+              </button>
+              <span>
+                {veces} {veces === 1 ? 'ración' : 'raciones'}
+              </span>
+              <button
+                type="button"
+                aria-label="Más raciones"
+                onClick={() => setVeces((n) => Math.min(12, n + 1))}
+              >
+                <PlusIcon />
+              </button>
+            </span>
+          </div>
+          <ul class={r.list}>
+            {p.ingredientes.map((i, k) => {
+              const g0 = i.gramos === null ? null : (i.gramos * veces) / p.raciones
+              const g = gramos?.[k] != null ? (gramos[k]! * veces) / p.raciones : g0
+              const tuyo = productoDe(p, k)
+              const nombreTuyo = tuyo ? alimentoPorId(tuyo)?.name : null
+              const macro = MACROS.find((m) => m.id === i.macro)
+              return (
+                <li key={`${i.texto}-${k}`}>
+                  <button
+                    type="button"
+                    class={r.row}
+                    disabled={!i.cuenta || !i.alimentoId}
+                    onClick={() => {
+                      setCual(k)
+                      producto.show()
+                    }}
+                  >
+                    <span class={styles.tag} aria-label={macro ? macro.nombre : 'No se ajusta'}>
+                      {macro?.corto ?? '·'}
+                    </span>
+                    <span class={r.rowText}>
+                      <span class={r.name}>{nombreTuyo ?? (i.alimentoId ? i.nombre : i.texto)}</span>
+                      <span class={h.foot}>
+                        {nombreTuyo ? 'El tuyo · ' : ''}
+                        {i.alimentoId || nombreTuyo ? i.texto : ''}
+                      </span>
+                    </span>
+                    {g !== null && i.cuenta && (
+                      <b class={r.grams}>
+                        {g0 !== null && Math.round(g0) !== Math.round(g) && (
+                          <span class={styles.old}>{formatInt(g0)}</span>
+                        )}
+                        {i.sugerido ? '≈ ' : ''}
+                        {formatInt(g)} g{i.sugerido && <span class={styles.sugerido}>sugerido</span>}
+                      </b>
+                    )}
+                    {i.cuenta && i.alimentoId && <ChevronRightIcon />}
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+          <p class={h.foot}>
+            La letra de cada ingrediente es su macro principal (P, HC, G): son los que se mueven al ajustar.
+            Toca uno para decir qué producto compras.
+          </p>
+        </section>
+        {p.pasos.length > 0 && (
+          <section aria-labelledby="preparacion">
+            <h2 id="preparacion" class={r.title}>
+              Preparación
+            </h2>
+            <ol class={r.steps}>
+              {p.pasos.map((x) => (
+                <li key={x}>{x}</li>
+              ))}
+            </ol>
+          </section>
+        )}
+        <div class={styles.more}>
+          <Button variant="secondary" onClick={alMenu.show}>
+            Al menú
+          </Button>
+          {dieta.value && (
+            <Button variant="secondary" onClick={aDieta.show}>
+              A tu dieta
+            </Button>
+          )}
+          {p.origen === 'tuyo' && (
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                await borrarPlato(p.id)
+                route(volver)
+              }}
+            >
+              Borrar
+            </Button>
+          )}
+        </div>
+      </div>
+      <div class={r.bottom}>
+        <Button onClick={() => void apuntar()}>
+          Apuntar en {comidaDe(comida).nombre.toLowerCase()} {cuando}
+        </Button>
+      </div>
+      {ajustarHoja.open && (
+        <AjustarHoja
+          plato={p}
+          comida={comida}
+          fecha={fecha}
+          onClose={ajustarHoja.close}
+          onVer={(g) => {
+            setGramos(g)
+            setVeces(1)
+            ajustarHoja.close()
+          }}
+          avisar={avisar}
+        />
+      )}
+      {producto.open && cual !== null && (
+        <ProductoHoja plato={p} indice={cual} onClose={producto.close} avisar={avisar} />
+      )}
+      {alMenu.open && <AlMenuHoja plato={p} onClose={alMenu.close} avisar={avisar} />}
+      {aDieta.open && <ADietaHoja plato={p} onClose={aDieta.close} avisar={avisar} />}
+      <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
+    </div>
+  )
+}

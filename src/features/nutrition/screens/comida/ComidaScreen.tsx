@@ -26,6 +26,18 @@ import {
   quitarReceta,
 } from '../../use-cases/diet.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
+import { cuadrarSemana, ponerPlato, volverAHuecos } from '../../use-cases/menu.ts'
+import { apuntarPlato, cargarRecetas, desapuntar } from '../../use-cases/recipes.ts'
+import { menu, platoPorId, semanaDelMenu, type Cocinado, type Hueco } from '../../state/recetas.ts'
+import { esComida } from '../comun/platos.ts'
+import { AvisosHoja } from './AvisosHoja.tsx'
+import { CocinarHoja } from './CocinarHoja.tsx'
+import { CrearPlatoHoja } from './CrearPlatoHoja.tsx'
+import { CuadrarDiaHoja } from './CuadrarDiaHoja.tsx'
+import { ElegirPlatoHoja } from './ElegirPlatoHoja.tsx'
+import { HuecoHoja } from './HuecoHoja.tsx'
+import { MenuVista } from './MenuVista.tsx'
+import { RecetasVista } from './RecetasVista.tsx'
 import { useAviso } from '../comun/useAviso.ts'
 import { AnadirHoja } from './AnadirHoja.tsx'
 import styles from './ComidaScreen.module.css'
@@ -44,16 +56,23 @@ import { RacionHoja } from './RacionHoja.tsx'
 import { RapidoHoja } from './RapidoHoja.tsx'
 import { SugerenciaHoja } from '../objetivo/SugerenciaHoja.tsx'
 
-/** La semana (medias, proteína por días, tendencia del peso) no va aquí: será de Progreso. */
-type Vista = 'hoy' | 'dieta'
+/**
+ * La semana (medias, proteína por días, tendencia del peso) no va aquí: será de Progreso. Tu dieta se abre desde Menú
+ * (`?vista=dieta`).
+ */
+type Vista = 'hoy' | 'menu' | 'recetas' | 'dieta'
+const VISTAS: Vista[] = ['hoy', 'menu', 'recetas', 'dieta']
 
-/** Comida (pestaña): el día y tu dieta; añadir, la ración, la dieta y la sugerencia del entrenador van en hojas. */
+/**
+ * Comida (pestaña): el día, tu menú de la semana y las recetas; añadir, la ración, el menú, cocinar, los avisos y la
+ * sugerencia del entrenador van en hojas.
+ */
 export function ComidaScreen() {
   useEffect(() => {
-    void cargarComida()
+    void cargarComida().then(cargarRecetas)
   }, [])
   const { query, route } = useLocation()
-  const vista: Vista = query.vista === 'dieta' ? 'dieta' : 'hoy'
+  const vista: Vista = VISTAS.find((v) => v === query.vista) ?? 'hoy'
   const [comida, setComida] = useState<ComidaId>('desayuno')
   const [alimento, setAlimento] = useState<Alimento | null>(null)
   const [editando, setEditando] = useState<Apunte | null>(null)
@@ -73,7 +92,22 @@ export function ComidaScreen() {
   const diaDieta = useSheet('dia')
   const mas = useSheet('tu-dieta')
   const receta = useSheet('receta-nueva')
+  const elegir = useSheet('plato')
+  const hueco = useSheet('hueco')
+  const cocinar = useSheet('cocinar')
+  const avisos = useSheet('avisos')
+  const crearPlato = useSheet('crear-plato')
+  const cuadrar = useSheet('cuadrar')
+  const [enMenu, setEnMenu] = useState<{ fecha: string; comida: ComidaId } | null>(null)
+  const [cocinado, setCocinado] = useState<Cocinado | null>(null)
   const { aviso, avisar } = useAviso()
+  // «Apuntar así y añadir algo más» (desde Ajustar): abre Añadir en esa comida
+  useEffect(() => {
+    if (!esComida(query.anadir)) return
+    setComida(query.anadir)
+    anadir.show()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query.anadir])
 
   if (estado.value === 'cargando') return null
 
@@ -112,6 +146,18 @@ export function ComidaScreen() {
   const deEjemplo = async () => proponer(await dietaEjemplo())
   const propia = () => proponer(dietaPropia('Mi dieta'))
   const hayObjetivo = ajustes.value || dieta.value
+  const apuntarHueco = async (h: Hueco) => {
+    const p = platoPorId(h.plato)
+    if (!p) return
+    const ids = await apuntarPlato(p, h.comida, h.gramos, 1, h.fecha)
+    avisar(`${p.nombre}: apuntado`, { label: 'Deshacer', onClick: () => void desapuntar(ids, h.fecha) })
+  }
+  const abrirCocinado = (id: string) => {
+    const c = menu.value.cocinados.find((x) => x.id === id)
+    if (!c) return
+    setCocinado(c)
+    cocinar.show()
+  }
 
   return (
     <>
@@ -133,13 +179,39 @@ export function ComidaScreen() {
           legend="Ver"
           options={[
             { value: 'hoy', label: 'Hoy' },
-            { value: 'dieta', label: 'Dieta' },
+            { value: 'menu', label: 'Menú' },
+            { value: 'recetas', label: 'Recetas' },
           ]}
-          value={vista}
+          value={vista === 'dieta' ? 'menu' : vista}
           onChange={cambiarVista}
         />
       </div>
-      {vista === 'dieta' ? (
+      {vista === 'menu' ? (
+        <MenuVista
+          onHueco={(dia, c) => {
+            setEnMenu({ fecha: dia, comida: c })
+            hueco.show()
+          }}
+          onAnadir={(dia, c) => {
+            setEnMenu({ fecha: dia, comida: c })
+            elegir.show()
+          }}
+          onCocinado={abrirCocinado}
+          onCuadrar={async () => {
+            const antes = menu.value.huecos
+            const n = await cuadrarSemana(semanaDelMenu.value)
+            avisar(
+              n
+                ? `Ajustados los gramos de ${n} ${n === 1 ? 'plato' : 'platos'}`
+                : 'Aún no hay platos en esta semana',
+              n ? { label: 'Deshacer', onClick: () => void volverAHuecos(antes) } : undefined,
+            )
+          }}
+          onAvisos={avisos.show}
+        />
+      ) : vista === 'recetas' ? (
+        <RecetasVista />
+      ) : vista === 'dieta' ? (
         <DietaVista
           onArchivo={() => void desdeArchivo()}
           onEjemplo={() => void deEjemplo()}
@@ -167,7 +239,7 @@ export function ComidaScreen() {
           <h2 class={styles.emptyTitle}>Calcula tu objetivo</h2>
           <p class={styles.emptyText}>
             Con tu sexo, edad, altura, peso y pasos al día calculo lo que gastas y cuánto comer para tu fase.
-            Lo ves paso a paso y lo puedes cambiar. O sigue una dieta en «Dieta».
+            Lo ves paso a paso y lo puedes cambiar. O sigue una dieta desde «Menú».
           </p>
           <button type="button" class={styles.emptyButton} onClick={datos.show}>
             Calcular mi objetivo
@@ -185,6 +257,9 @@ export function ComidaScreen() {
           onAbrirReceta={(id) => route(paths.recipe(id, menuDelDia.value?.tipo))}
           onApuntarReceta={(id) => void apuntarDelMenu(id)}
           onConsulta={() => route(paths.checkIn)}
+          onCuadrar={cuadrar.show}
+          onCocinado={abrirCocinado}
+          onApuntarHueco={(h) => void apuntarHueco(h)}
         />
       )}
 
@@ -252,6 +327,46 @@ export function ComidaScreen() {
         />
       )}
       {receta.open && <NuevaRecetaHoja menu={menuReceta} onClose={receta.close} />}
+      {elegir.open && enMenu && (
+        <ElegirPlatoHoja
+          fecha={enMenu.fecha}
+          comida={enMenu.comida}
+          onClose={elegir.close}
+          onCrear={crearPlato.showInstead}
+          avisar={avisar}
+        />
+      )}
+      {hueco.open && enMenu && (
+        <HuecoHoja
+          fecha={enMenu.fecha}
+          comida={enMenu.comida}
+          onClose={hueco.close}
+          onCambiar={elegir.showInstead}
+          onCocinar={(c) => {
+            setCocinado(c)
+            cocinar.showInstead()
+          }}
+          avisar={avisar}
+        />
+      )}
+      {cocinar.open && cocinado && (
+        <CocinarHoja cocinado={cocinado} onClose={cocinar.close} avisar={avisar} />
+      )}
+      {avisos.open && <AvisosHoja onClose={avisos.close} avisar={avisar} />}
+      {crearPlato.open && (
+        <CrearPlatoHoja
+          onClose={crearPlato.close}
+          onCreado={async (id) => {
+            crearPlato.close()
+            if (enMenu) await ponerPlato(enMenu.fecha, enMenu.comida, id)
+            avisar(enMenu ? 'Plato creado y puesto en tu menú' : 'Plato creado: está en Recetas · Tuyos', {
+              label: 'Ver',
+              onClick: () => route(paths.dish(id)),
+            })
+          }}
+        />
+      )}
+      {cuadrar.open && <CuadrarDiaHoja onClose={cuadrar.close} avisar={avisar} />}
       <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
     </>
   )

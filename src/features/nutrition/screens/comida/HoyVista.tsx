@@ -21,6 +21,9 @@ import {
   type ComidaId,
 } from '../../state/comida.ts'
 import { apuntada, menuDelDia, tocaConsulta } from '../../state/dieta.ts'
+import { fotoDeApunte, platos, siguiente, type Hueco } from '../../state/recetas.ts'
+import { Button } from '../../../../shared/ui/Button.tsx'
+import { LoDeHoy } from './LoDeHoy.tsx'
 import styles from './Vistas.module.css'
 
 type Props = {
@@ -33,6 +36,10 @@ type Props = {
   onAbrirReceta: (id: string) => void
   onApuntarReceta: (id: string) => void
   onConsulta: () => void
+  /** Cuadrar el día con recetas (lo que falta, en las comidas que quedan). */
+  onCuadrar: () => void
+  onCocinado: (id: string) => void
+  onApuntarHueco: (h: Hueco) => void
 }
 
 function tituloDia(fecha: string, hoyEs: string): string {
@@ -52,6 +59,9 @@ export function HoyVista({
   onAbrirReceta,
   onApuntarReceta,
   onConsulta,
+  onCuadrar,
+  onCocinado,
+  onApuntarHueco,
 }: Props) {
   const objetivo = objetivoDia.value
   if (!objetivo) return null
@@ -90,6 +100,7 @@ export function HoyVista({
           </button>
         </p>
       )}
+      {esHoy && <LoDeHoy onCocinado={onCocinado} onApuntar={onApuntarHueco} />}
       {esHoy && menu && tocaConsulta.value && (
         <CoachCard
           titulo="Tu nutricionista · consulta semanal"
@@ -129,6 +140,7 @@ export function HoyVista({
           kcal: c.total.kcal,
           proteina: c.total.protein,
           alimentos: c.apuntes.map((a) => a.nombre).join(' · '),
+          foto: fotoDeApunte(c.apuntes.find((a) => a.receta)?.receta),
         }))}
         quedan={
           quedan > 0
@@ -138,6 +150,13 @@ export function HoyVista({
         onAbrir={(id) => onAbrirComida(id as ComidaId)}
         onAnadir={(id) => onAnadir(id as ComidaId)}
       />
+      {siguiente.value && platos.value.length > 0 && (
+        <div class={styles.pad}>
+          <Button variant="secondary" onClick={onCuadrar}>
+            Cuadrar con recetas
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

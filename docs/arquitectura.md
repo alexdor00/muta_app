@@ -68,15 +68,20 @@ desde `workouts`; no hay otra copia.
 ## Flujo de datos: Comida
 
 ```
-IndexedDB `userContent` (nutricion, dieta, compra…) + `foodLog` (por día) + `bodyLog` (pesajes y consultas) + `coach` (cambios)
+IndexedDB `userContent` (nutricion, dieta, compra, menu, platos-tuyos, productos…) + `foodLog` (por día) + `bodyLog` (pesajes y consultas) + `coach` (cambios)
 │
 ▼ use-cases/nutritionStore.ts · cargarComida() → state/comida.ts y state/dieta.ts
 │   el objetivo del día: con dieta, lo que suman sus recetas ese día (entreno o descanso); si no, tu objetivo de kcal
 │   sin dieta, cada 7 días: domain/review.ts · revisar() → una sugerencia «pendiente» en `coach` (nunca se aplica sola)
 │   cargarTipos() → Entreno (index.ts · tiposDeDia, en diferido) → qué días son de entreno según tu rotación
+▼ use-cases/recipes.ts · cargarRecetas() → state/recetas.ts: los platos (private/recetas por shared/data/localRecipes.ts;
+│   sin él, los de la dieta de ejemplo), tu menú, tus platos y tus productos; domain/fit.ts ajusta un plato a lo que falta,
+│   domain/menuCoach.ts propone cambios al menú (nunca los aplica)
 ▼
-Comida (Hoy · Semana · Dieta) · Tu objetivo · Receta · La compra · Cocina · Consulta (solo pintan)
-│ añadir / quitar / apuntar una receta → use-cases/foodLog.ts y diet.ts → `foodLog` (al día que ves con ‹ ›)
+Comida (Hoy · Menú · Recetas; la dieta desde Menú) · Plato · Categoría · Tu nutricionista · Tu objetivo · Receta ·
+La compra (del menú y de la dieta) · Cocina · Consulta (solo pintan)
+│ añadir / quitar / apuntar una receta o un plato → use-cases/foodLog.ts, diet.ts y recipes.ts → `foodLog` (al día que ves)
+│ tu menú, cocinar, avisos y propuestas → use-cases/menu.ts → `userContent/menu`; los avisos, a un .ics del calendario
 │ la base (shared/content/foods.json) se descarga al abrir «Añadir»; el lector de códigos, al abrir el escáner
 ▼ «Aplicar desde mañana» → use-cases/target.ts (objetivo) o consult.ts (un ajuste de la dieta desde mañana) y `coach`
 ```

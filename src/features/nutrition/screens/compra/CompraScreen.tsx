@@ -10,6 +10,8 @@ import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { dieta, estado, hoy } from '../../state/comida.ts'
 import { SECCIONES } from '../../state/dieta.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
+import { cargarRecetas } from '../../use-cases/recipes.ts'
+import { estadoRecetas, menu } from '../../state/recetas.ts'
 import {
   anadirPropio,
   cantidad,
@@ -29,21 +31,24 @@ import p from '../comun/Pagina.module.css'
 import h from '../comun/Hojas.module.css'
 import { useAviso } from '../comun/useAviso.ts'
 
-/** La compra: sale de las recetas de los días que elijas (entreno o descanso según tu semana), por secciones. */
+/**
+ * La compra: sale de tu menú (los días con platos) y de tu dieta (los demás) en los días que elijas, por secciones; tus
+ * productos salen con su nombre.
+ */
 export function CompraScreen() {
   useEffect(() => {
-    void cargarComida()
+    void cargarComida().then(cargarRecetas)
   }, [])
   const anadir = useSheet('anadir')
   const alguien = useSheet('alguien')
   const { aviso, avisar } = useAviso()
-  if (estado.value === 'cargando') return null
-  const a = dieta.value
-  if (!a) {
+  if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
+  const volver = `${paths.nutrition}?vista=menu`
+  if (!dieta.value && !menu.value.huecos.length) {
     return (
       <div class={p.page}>
-        <Barra titulo="La compra" volver={`${paths.nutrition}?vista=dieta`} />
-        <p class={p.sub}>La lista sale de tu dieta: empieza una en Comida · Dieta.</p>
+        <Barra titulo="La compra" volver={volver} />
+        <p class={p.sub}>La lista sale de tu menú o de tu dieta: pon platos en Comida · Menú.</p>
       </div>
     )
   }
@@ -57,7 +62,7 @@ export function CompraScreen() {
 
   return (
     <div class={p.page}>
-      <Barra titulo="La compra" volver={`${paths.nutrition}?vista=dieta`} />
+      <Barra titulo="La compra" volver={volver} />
       <section class={p.card} aria-label="Para cuándo">
         <p class={p.figure}>
           <b class={p.count}>{total - hechos}</b>

@@ -73,6 +73,15 @@ const CocinaComida = screen(() =>
 const ConsultaComida = screen(() =>
   import('../features/nutrition/screens/consulta/ConsultaScreen.tsx').then((m) => m.ConsultaScreen),
 )
+const CategoriaPlatos = screen(() =>
+  import('../features/nutrition/screens/plato/CategoriaScreen.tsx').then((m) => m.CategoriaScreen),
+)
+const PlatoComida = screen(() =>
+  import('../features/nutrition/screens/plato/PlatoScreen.tsx').then((m) => m.PlatoScreen),
+)
+const Nutricionista = screen(() =>
+  import('../features/nutrition/screens/plato/NutricionistaScreen.tsx').then((m) => m.NutricionistaScreen),
+)
 const Progreso = screen(() =>
   import('../features/progress/screens/progreso/ProgresoScreen.tsx').then((m) => m.ProgresoScreen),
 )
@@ -156,6 +165,9 @@ function Layout() {
             <Route path={paths.shopping} component={CompraComida} />
             <Route path={paths.kitchen} component={CocinaComida} />
             <Route path={paths.checkIn} component={ConsultaComida} />
+            <Route path={patterns.dishes} component={CategoriaPlatos} />
+            <Route path={patterns.dish} component={PlatoComida} />
+            <Route path={paths.nutritionist} component={Nutricionista} />
             <Route path={paths.progress} component={Progreso} />
             <Route path={paths.profile} component={Perfil} />
             <Route path={paths.welcome} component={Bienvenida} />

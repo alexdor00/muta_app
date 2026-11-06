@@ -2,8 +2,11 @@
 // Sale siempre de las recetas (domain/shopping.ts): no hay otra copia que se desactualice.
 import { addDays, formatDecimal, formatInt } from '../../../shared/lib/format.ts'
 import { platform } from '../../../shared/platform/index.ts'
+import { recetasDelMenu } from '../domain/menu.ts'
+import { productoEn } from '../domain/recipes.ts'
 import { listaDeLaCompra, textoDeLaCompra, type Producto } from '../domain/shopping.ts'
-import { hoy } from '../state/comida.ts'
+import { alimentoPorId, hoy } from '../state/comida.ts'
+import { menu, platoPorId, productos } from '../state/recetas.ts'
 import { compra, diaDe, type Compra } from '../state/dieta.ts'
 import { guardarCompra } from './nutritionStore.ts'
 
@@ -24,13 +27,37 @@ export function compraActual(): Compra {
   return addDays(c.desde, c.dias - 1) < hoy.value ? { ...c, desde: hoy.value, tienes: [] } : c
 }
 
-/** Lo que hay que comprar y cuántos días son de entreno y de descanso. */
+/** Los platos de tu menú en esos días, con tus productos en vez de los genéricos. */
+function delMenu(fechas: readonly string[]) {
+  return recetasDelMenu(menu.value, fechas, platoPorId).map((r) => {
+    const p = platoPorId(r.id)
+    return {
+      ...r,
+      lista: r.lista.map((i, k) => {
+        const tuyo = p ? productoEn(productos.value, p, k) : null
+        const a = tuyo ? alimentoPorId(tuyo) : null
+        return a ? { ...i, alimentoId: a.id, nombre: a.name, categoria: i.categoria } : i
+      }),
+    }
+  })
+}
+
+/**
+ * Lo que hay que comprar y cuántos días son de entreno y de descanso. Los días con platos en tu menú salen del menú; los
+ * demás, de tu dieta (si sigues una).
+ */
 export function productosDe(c: Compra): { productos: Producto[]; entreno: number; descanso: number } {
-  const dias = Array.from({ length: c.dias }, (_, i) => diaDe(addDays(c.desde, i))).filter(
-    (d): d is NonNullable<typeof d> => d !== null,
-  )
+  const fechas = Array.from({ length: c.dias }, (_, i) => addDays(c.desde, i))
+  const conMenu = new Set(menu.value.huecos.map((h) => h.fecha))
+  const dias = fechas
+    .filter((f) => !conMenu.has(f))
+    .map(diaDe)
+    .filter((d): d is NonNullable<typeof d> => d !== null)
   return {
-    productos: listaDeLaCompra(dias, c.extra),
+    productos: listaDeLaCompra(
+      [...dias, { recetas: delMenu(fechas.filter((f) => conMenu.has(f))) }],
+      c.extra,
+    ),
     entreno: dias.filter((d) => d.tipo === 'entreno').length,
     descanso: dias.filter((d) => d.tipo === 'descanso').length,
   }

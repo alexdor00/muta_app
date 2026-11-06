@@ -14,6 +14,8 @@ Playwright en un iPhone 13 simulado, sobre la app construida **sin rutinas priva
 - `comida.spec.ts` — Comida con datos de prueba escritos a mano: calcular tu objetivo, añadir con su ración y «Deshacer»,
   solo kcal y proteína, repetir lo de ayer, la semana y tu peso, la sugerencia del entrenador (aplicar, deshacer, «Ahora no»)
   y axe en sus pantallas y hojas (con capturas en `capturas/`).
+- `recetas.spec.ts` — Recetas y Menú sin el recetario privado (salen los platos «De ejemplo»): ajustar un plato a lo que
+  falta y apuntarlo, un plato en el menú con cuándo cocinarlo, lo de hoy, la compra del menú, cuadrar el día y axe.
 - `accesibilidad.spec.ts` — axe (WCAG 2 A y AA) en las pantallas reales y en `/dev/ui` (claro y oscuro). Falla ante fallos graves.
 - `sistema-diseno.spec.ts` — las piezas de `/dev/ui` miden lo que dicen los tokens.
 - `zz-galeria.spec.ts` — genera la galería de pantallas (solo local).

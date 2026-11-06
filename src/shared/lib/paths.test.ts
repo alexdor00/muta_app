@@ -44,6 +44,14 @@ describe('Comida', () => {
     expect(paths.recipe('pollo', 'descanso')).toBe('/comida/receta/pollo?tipo=descanso')
     expect(tabOf(paths.shopping)).toBe('nutrition')
   })
+
+  it('los platos, un plato y tu nutricionista, a pantalla completa', () => {
+    for (const p of [paths.dishes('carne'), paths.dish('rec-51'), paths.nutritionist])
+      expect(isFullScreen(p)).toBe(true)
+    expect(paths.dish('rec-51', { comida: 'cena', fecha: '2026-11-09' })).toBe(
+      '/comida/plato/rec-51?comida=cena&fecha=2026-11-09',
+    )
+  })
 })
 
 describe('tabOf', () => {

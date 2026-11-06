@@ -1,0 +1,45 @@
+/* Un plato: lo que no tiene Receta.module.css (el macro de cada ingrediente, los gramos de antes y «sugerido»). */
+
+.tag {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  min-width: var(--control-sm);
+  padding: var(--hairline) var(--space-1);
+  border-radius: var(--radius-chip);
+  background: var(--surface-2);
+  color: var(--label-2);
+  font: var(--text-caption);
+  vertical-align: middle;
+}
+
+.old {
+  margin-right: var(--space-1);
+  color: var(--label-2);
+  font-weight: var(--weight-regular);
+  text-decoration: line-through;
+}
+
+.sugerido {
+  margin-left: var(--space-1);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-chip);
+  background: var(--surface-2);
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+.buttons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.buttons > * {
+  flex: 1;
+}
+
+.more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

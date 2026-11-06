@@ -34,6 +34,13 @@ export const paths = {
   kitchen: '/comida/cocina',
   /** La consulta semanal con tu dieta. */
   checkIn: '/comida/consulta',
+  /** Los platos de una categoría del recetario. */
+  dishes: (categoria: string) => `/comida/recetas/${categoria}`,
+  /** Un plato del recetario o tuyo (para una comida de un día, si viene de ahí). */
+  dish: (id: string, para?: { comida: string; fecha?: string }) =>
+    `/comida/plato/${id}${para ? `?comida=${para.comida}${para.fecha ? `&fecha=${para.fecha}` : ''}` : ''}`,
+  /** Tu nutricionista: lo que propone para tu menú. */
+  nutritionist: '/comida/nutricionista',
   progress: '/progreso',
   profile: '/perfil',
 } as const
@@ -50,6 +57,8 @@ export const patterns = {
   summary: '/entreno/sesion/:sessionId/resumen',
   exercise: '/entreno/ejercicio/:exerciseId',
   recipe: '/comida/receta/:id',
+  dishes: '/comida/recetas/:categoria',
+  dish: '/comida/plato/:id',
 } as const
 
 export type Tab = 'today' | 'training' | 'nutrition' | 'progress'

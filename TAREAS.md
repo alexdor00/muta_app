@@ -4,12 +4,16 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
+- **Probar Recetas y Menú en un móvil real** (rama `pantalla/recetas`, sale de `pantalla/comida-v2`) con `npm run dev`:
+  el recetario con sus fotos, ajustar un plato a lo que falta (y cuando no llega), cuadrar el día, tu producto, tu menú,
+  cuándo cocinar, lo de hoy, la compra del menú, los avisos al calendario (.ics) y tu nutricionista. Después, PR a `main`
+  detrás de los anteriores.
 - **Probar Comida en un móvil real** (rama `pantalla/comida-v2`, sale de `pantalla/comida`): el día con ‹ ›, añadir, la
   ración, el peso de hoy y Tu objetivo; en Dieta, la de ejemplo o la tuya, apuntar del menú, una receta (intercambio y editar), la
   compra, la cocina, la consulta y el escáner con la cámara (necesita https o la red local; Open Food Facts, internet).
   Después, PR a `main` (detrás de los de `pantalla/sesion` y `pantalla/comida`).
 - **Dudas de Comida que siguen abiertas**: ¿una dieta de verdad para cargar (o se crea en la app)? ¿La consulta se queda en
-  Comida o pasa a Hoy cuando exista? Fotos para las miniaturas de las comidas.
+  Comida o pasa a Hoy cuando exista? ¿Una fuente para cuánto aguanta lo cocinado en la nevera?
 - **Probar la rama `pantalla/sesion` en un móvil real** con `npm run dev` (dirección «Network», mismo wifi): Tu plan (tarjetas
   con «▶ Empezar», «Editar», Tu semana, Hoy descansas), Editar rutina, la sesión (teclado, dropsets, notas), Ver sesión y las
   fichas. Hasta ahora todo se ha visto solo en el móvil simulado. Después, PR a `main` con la CI en verde.
@@ -21,6 +25,17 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- Rama `pantalla/recetas` (2026-11-06, sin unir): recetas que se ajustan y tu menú. Diseños aprobados
+  `Desktop/MUTA-Recetas-funcionalidades.png` y `Desktop/MUTA-Menu-funcionalidades.png`.
+  - El recetario (100 recetas, 6 categorías, una foto por receta sin manos) en `private/recetas`, fuera de git; sin él, los
+    platos de ejemplo. Cifras del libro; al cambiar gramos, la diferencia con la base. 97 de 100 se ajustan.
+  - Un plato: ajustar a lo que falta (repartido o todo en una comida; si no llega, hasta dónde y salidas), tu producto (tu
+    arroz, tu hummus: en todos tus platos o en uno), al menú y a tu dieta. Cuadrar el día con recetas desde Hoy.
+  - Comida · Menú (en el sitio de Dieta): la semana con un plato por comida, platos tuyos, cuándo cocinar (día, hora, para
+    qué comidas y los gramos de todo), cuadrar la semana, la compra del menú, avisos al calendario y tu nutricionista (propone
+    por proteína y kcal; «Aplicar», «Ahora no», «Deshacer»). Lo de hoy, arriba en Comida · Hoy.
+  - Decisiones en [docs/decisiones.md](docs/decisiones.md) (2026-11-06) y cómo se rehace el recetario en
+    [docs/datos.md](docs/datos.md).
 - Rama `pantalla/comida-v2` (2026-11-05, sin unir): Comida versiones 2 y 3. Verificado: `npm run check` (421 pruebas) y los
   109 e2e (los 8 de la dieta, con axe).
   - Estilo de la captura del usuario: tarjeta del día gris con anillo de kcal y macros en %, sin lima; comidas en tarjetas
