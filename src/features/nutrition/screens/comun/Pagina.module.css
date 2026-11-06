@@ -209,3 +209,44 @@
   width: var(--icon-xs);
   height: var(--icon-xs);
 }
+
+/* La compra: cada sección es un desplegable gris */
+.seccion {
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.seccionTitulo {
+  font: var(--text-headline);
+}
+
+.seccionAbrir {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--row);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.seccionAbrir > span:first-child {
+  flex: 1;
+}
+
+.seccionAbrir svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.seccion .list {
+  margin: 0;
+  padding-bottom: var(--space-2);
+}

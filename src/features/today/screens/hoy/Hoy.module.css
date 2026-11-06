@@ -1,0 +1,5 @@
+/* Hoy: la fecha junto al título. */
+.fecha {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}

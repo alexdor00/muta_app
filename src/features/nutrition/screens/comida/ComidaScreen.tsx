@@ -7,6 +7,8 @@ import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import {
   ajustes,
+  dias,
+  diaVisto,
   dieta,
   estado,
   pendiente,
@@ -26,16 +28,18 @@ import {
   quitarReceta,
 } from '../../use-cases/diet.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
-import { cuadrarSemana, ponerPlato, volverAHuecos } from '../../use-cases/menu.ts'
-import { apuntarPlato, cargarRecetas, desapuntar } from '../../use-cases/recipes.ts'
-import { menu, platoPorId, semanaDelMenu, type Cocinado, type Hueco } from '../../state/recetas.ts'
+import { ponerPlato } from '../../use-cases/menu.ts'
+import { apuntarPlato, cargarRecetas, desapuntar, platoApuntado } from '../../use-cases/recipes.ts'
+import { gramosDeHueco, huecoDe, menu, platoPorId, type Cocinado } from '../../state/recetas.ts'
 import { esComida } from '../comun/platos.ts'
 import { AvisosHoja } from './AvisosHoja.tsx'
 import { CocinarHoja } from './CocinarHoja.tsx'
 import { CrearPlatoHoja } from './CrearPlatoHoja.tsx'
 import { CuadrarDiaHoja } from './CuadrarDiaHoja.tsx'
 import { ElegirPlatoHoja } from './ElegirPlatoHoja.tsx'
-import { HuecoHoja } from './HuecoHoja.tsx'
+import { CuantosMenusHoja } from './CuantosMenusHoja.tsx'
+import { OpcionesMenuHoja } from './OpcionesMenuHoja.tsx'
+import { PlatoMenuHoja } from './PlatoMenuHoja.tsx'
 import { MenuVista } from './MenuVista.tsx'
 import { RecetasVista } from './RecetasVista.tsx'
 import { useAviso } from '../comun/useAviso.ts'
@@ -51,7 +55,6 @@ import { EscanerHoja } from './EscanerHoja.tsx'
 import { HoyVista } from './HoyVista.tsx'
 import { MasDietaHoja } from './MasDietaHoja.tsx'
 import { NuevaRecetaHoja } from './NuevaRecetaHoja.tsx'
-import { PesoHoja } from './PesoHoja.tsx'
 import { RacionHoja } from './RacionHoja.tsx'
 import { RapidoHoja } from './RapidoHoja.tsx'
 import { SugerenciaHoja } from '../objetivo/SugerenciaHoja.tsx'
@@ -85,7 +88,6 @@ export function ComidaScreen() {
   const crear = useSheet('crear')
   const escaner = useSheet('escaner')
   const delDia = useSheet('comida')
-  const peso = useSheet('peso')
   const datos = useSheet('datos')
   const sugerencia = useSheet('sugerencia')
   const empezar = useSheet('empezar')
@@ -93,12 +95,14 @@ export function ComidaScreen() {
   const mas = useSheet('tu-dieta')
   const receta = useSheet('receta-nueva')
   const elegir = useSheet('plato')
-  const hueco = useSheet('hueco')
+  const platoMenu = useSheet('plato-menu')
+  const cuantos = useSheet('menus')
+  const opciones = useSheet('menu')
   const cocinar = useSheet('cocinar')
   const avisos = useSheet('avisos')
   const crearPlato = useSheet('crear-plato')
   const cuadrar = useSheet('cuadrar')
-  const [enMenu, setEnMenu] = useState<{ fecha: string; comida: ComidaId } | null>(null)
+  const [enMenu, setEnMenu] = useState<{ menu: string; comida: ComidaId } | null>(null)
   const [cocinado, setCocinado] = useState<Cocinado | null>(null)
   const { aviso, avisar } = useAviso()
   // «Apuntar así y añadir algo más» (desde Ajustar): abre Añadir en esa comida
@@ -146,11 +150,19 @@ export function ComidaScreen() {
   const deEjemplo = async () => proponer(await dietaEjemplo())
   const propia = () => proponer(dietaPropia('Mi dieta'))
   const hayObjetivo = ajustes.value || dieta.value
-  const apuntarHueco = async (h: Hueco) => {
-    const p = platoPorId(h.plato)
-    if (!p) return
-    const ids = await apuntarPlato(p, h.comida, h.gramos, 1, h.fecha)
-    avisar(`${p.nombre}: apuntado`, { label: 'Deshacer', onClick: () => void desapuntar(ids, h.fecha) })
+  // El tick de una comida con plato de tu menú: lo apunta (con sus gramos de ese día) o lo quita
+  const tick = async (c: ComidaId) => {
+    const f = diaVisto.value
+    const h = huecoDe(menu.value, f, c)
+    const p = h ? platoPorId(h.plato, f) : null
+    if (!h || !p) return
+    if (platoApuntado(p.id, c, f)) {
+      const ids = (dias.value[f] ?? []).filter((a) => a.receta === p.id && a.comida === c).map((a) => a.id)
+      await desapuntar(ids, f)
+      return
+    }
+    const ids = await apuntarPlato(p, c, gramosDeHueco(h, p), 1, f)
+    avisar(`${p.nombre}: apuntado`, { label: 'Deshacer', onClick: () => void desapuntar(ids, f) })
   }
   const abrirCocinado = (id: string) => {
     const c = menu.value.cocinados.find((x) => x.id === id)
@@ -188,25 +200,19 @@ export function ComidaScreen() {
       </div>
       {vista === 'menu' ? (
         <MenuVista
-          onHueco={(dia, c) => {
-            setEnMenu({ fecha: dia, comida: c })
-            hueco.show()
+          onPlato={(m, c) => {
+            setEnMenu({ menu: m, comida: c })
+            platoMenu.show()
           }}
-          onAnadir={(dia, c) => {
-            setEnMenu({ fecha: dia, comida: c })
+          onAnadir={(m, c) => {
+            setEnMenu({ menu: m, comida: c })
             elegir.show()
           }}
-          onCocinado={abrirCocinado}
-          onCuadrar={async () => {
-            const antes = menu.value.huecos
-            const n = await cuadrarSemana(semanaDelMenu.value)
-            avisar(
-              n
-                ? `Ajustados los gramos de ${n} ${n === 1 ? 'plato' : 'platos'}`
-                : 'Aún no hay platos en esta semana',
-              n ? { label: 'Deshacer', onClick: () => void volverAHuecos(antes) } : undefined,
-            )
+          onOpciones={(m) => {
+            setEnMenu({ menu: m, comida: 'desayuno' })
+            opciones.show()
           }}
+          onCuantos={cuantos.show}
           onAvisos={avisos.show}
         />
       ) : vista === 'recetas' ? (
@@ -247,7 +253,6 @@ export function ComidaScreen() {
         </section>
       ) : (
         <HoyVista
-          onPesarme={peso.show}
           onAnadir={abrirAnadir}
           onAbrirComida={(id) => {
             setComida(id)
@@ -259,7 +264,7 @@ export function ComidaScreen() {
           onConsulta={() => route(paths.checkIn)}
           onCuadrar={cuadrar.show}
           onCocinado={abrirCocinado}
-          onApuntarHueco={(h) => void apuntarHueco(h)}
+          onTick={(c) => void tick(c)}
         />
       )}
 
@@ -312,7 +317,6 @@ export function ComidaScreen() {
           avisar={avisar}
         />
       )}
-      {peso.open && <PesoHoja onClose={peso.close} avisar={avisar} />}
       {datos.open && <DatosHoja onClose={datos.close} />}
       {sugerencia.open && <SugerenciaHoja onClose={sugerencia.close} avisar={avisar} />}
       {empezar.open && nueva && <EmpezarDietaHoja dieta={nueva} onClose={empezar.close} avisar={avisar} />}
@@ -329,18 +333,18 @@ export function ComidaScreen() {
       {receta.open && <NuevaRecetaHoja menu={menuReceta} onClose={receta.close} />}
       {elegir.open && enMenu && (
         <ElegirPlatoHoja
-          fecha={enMenu.fecha}
+          menuId={enMenu.menu}
           comida={enMenu.comida}
           onClose={elegir.close}
           onCrear={crearPlato.showInstead}
           avisar={avisar}
         />
       )}
-      {hueco.open && enMenu && (
-        <HuecoHoja
-          fecha={enMenu.fecha}
+      {platoMenu.open && enMenu && (
+        <PlatoMenuHoja
+          menuId={enMenu.menu}
           comida={enMenu.comida}
-          onClose={hueco.close}
+          onClose={platoMenu.close}
           onCambiar={elegir.showInstead}
           onCocinar={(c) => {
             setCocinado(c)
@@ -358,7 +362,7 @@ export function ComidaScreen() {
           onClose={crearPlato.close}
           onCreado={async (id) => {
             crearPlato.close()
-            if (enMenu) await ponerPlato(enMenu.fecha, enMenu.comida, id)
+            if (enMenu) await ponerPlato(enMenu.menu, enMenu.comida, id)
             avisar(enMenu ? 'Plato creado y puesto en tu menú' : 'Plato creado: está en Recetas · Tuyos', {
               label: 'Ver',
               onClick: () => route(paths.dish(id)),
@@ -367,6 +371,10 @@ export function ComidaScreen() {
         />
       )}
       {cuadrar.open && <CuadrarDiaHoja onClose={cuadrar.close} avisar={avisar} />}
+      {cuantos.open && <CuantosMenusHoja onClose={cuantos.close} />}
+      {opciones.open && enMenu && (
+        <OpcionesMenuHoja menuId={enMenu.menu} onClose={opciones.close} avisar={avisar} />
+      )}
       <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
     </>
   )

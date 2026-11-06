@@ -140,3 +140,28 @@
   background: var(--accent);
   color: var(--on-accent);
 }
+
+/* El tick de una comida con plato de tu menú: vacío hasta que lo apuntas */
+.tick {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0;
+  border: var(--border) solid var(--surface-3);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--on-accent);
+  cursor: pointer;
+}
+
+.tickOn {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.tick svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}

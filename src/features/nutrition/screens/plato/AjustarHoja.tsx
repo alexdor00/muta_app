@@ -17,7 +17,6 @@ import {
   mejoresPara,
   platos,
   repartir,
-  valoresDe,
   type Plato,
 } from '../../state/recetas.ts'
 import { apuntarPlato, desapuntar } from '../../use-cases/recipes.ts'
@@ -56,7 +55,7 @@ export function AjustarHoja({ plato, comida, fecha, onClose, onVer, avisar }: Pr
     )
   }
   const objetivo = modo === 'repartir' && puedeRepartir ? repartir(falta, quedan)[comida] : falta
-  const a = ajustar(plato, objetivo, valoresDe(plato))
+  const a = ajustar(plato, objetivo)
   const cambian = plato.ingredientes.flatMap((i, k) =>
     i.macro && i.gramos !== null ? [{ i, k, antes: i.gramos, despues: a.gramos[k] ?? i.gramos }] : [],
   )
@@ -136,7 +135,7 @@ export function AjustarHoja({ plato, comida, fecha, onClose, onVer, avisar }: Pr
             <p class={h.sub}>
               Este plato llega a{' '}
               <b>
-                {formatInt(llegaHasta(plato, corto, valoresDe(plato)))} g de {nombre(corto)}
+                {formatInt(llegaHasta(plato, corto))} g de {nombre(corto)}
               </b>{' '}
               con lo que lo aporta al máximo. Te quedarían{' '}
               <b>

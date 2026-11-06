@@ -80,10 +80,14 @@ test('la compra: sale de las recetas, se marca lo que tienes y se añade lo tuyo
   await empezarEjemplo(page)
   await page.goto('/comida/compra')
   await expect(page.getByRole('heading', { name: 'Carne y pescado' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Carne y pescado/ })).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  )
   const pollo = page.getByRole('button', { name: /^Pechuga de pollo/ })
   await pollo.click()
   await expect(pollo).toHaveAttribute('aria-pressed', 'true')
-  await page.getByRole('button', { name: '+ Añadir algo' }).click()
+  await page.getByRole('button', { name: '+ Añadir', exact: true }).click()
   const hoja = page.getByRole('dialog', { name: 'Añadir a la lista' })
   await hoja.getByLabel('Qué').fill('Café')
   await hoja.getByRole('button', { name: 'Añadir', exact: true }).click()

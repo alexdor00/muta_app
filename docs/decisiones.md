@@ -385,3 +385,23 @@ Diseños aprobados por el usuario: `Desktop/MUTA-Recetas-funcionalidades.png` (�
   fuente.
 - **Tu producto** (tu arroz, tu hummus) se guarda en Mis alimentos (escaneado o a mano) y cuenta en todos tus platos o solo
   en uno (`userContent/productos`); las kcal del plato se recalculan con sus valores.
+
+## 2026-11-06 · Comida más sencilla: tus menús A, B, C…, el tick y cambiar un alimento
+
+Diseño aprobado: `Desktop/MUTA-Comida-sencilla-funcionalidades.png` («me parece bien»).
+
+- **Tus menús en vez de la semana día a día**: de 1 a 7 menús (A, B, C…), cada uno con un plato por comida, y tu semana de
+  lunes a domingo (seguidos A B C A… o elegidos). Los gramos de cada plato se ajustan solos al objetivo de cada día (entreno
+  o descanso) y a lo que le toca a esa comida. Lo guardado con la forma anterior (huecos por día) no se lee: se empieza con
+  un menú A vacío (la rama no estaba publicada).
+- **Hoy con tick**: cada comida trae el plato de su menú; el tick lo apunta con sus gramos de ese día y quitarlo lo desapunta.
+- **Cambiar un ingrediente**: tu marca (mismos gramos; en todos tus platos o en uno) u otro alimento con la misma cantidad
+  de su macro principal (la regla de los intercambios de la dieta; solo hoy o siempre en ese plato). El plato cuenta con
+  sus valores: el total del libro más la diferencia.
+- **El nutricionista** mira cada menú en su próximo día: proteína corta → cambiar un plato del menú; kcal cortas y una
+  comida vacía → un plato para ella. Los gramos ya se ajustan solos, así que «ajustar el día» deja de proponerse.
+- **El peso pasa a la pestaña Hoy** (con lo de hoy con hora: la compra y lo que cocinas), por `features/nutrition/index.ts`.
+  El resto de Hoy tendrá su propio diseño.
+- **La compra en desplegables** (abierta la primera sección con algo por comprar), sin la lista de recetas de cada producto.
+- **Filtros de una categoría**: «Cuadran» pasa a «Para el desayuno / la cena…» y «≤ 20 min» a «Rápidas», en una fila.
+- **Las fotos del recetario siguen fuera de git** hasta que el usuario decida (el repositorio es público).

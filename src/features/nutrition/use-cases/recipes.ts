@@ -1,5 +1,5 @@
 // Las recetas: cargar el recetario (el tuyo de private/ o, si no hay, los platos de ejemplo), apuntar un plato (tal cual
-// o ajustado), tus platos, tus productos (tu arroz, tu hummus) y poner un plato en tu dieta.
+// o ajustado), tus platos, cambiar un ingrediente (tu marca u otro alimento equivalente) y poner un plato en tu dieta.
 import { getDb } from '../../../shared/data/db.ts'
 import { localRecipePhoto, readLocalRecipes } from '../../../shared/data/localRecipes.ts'
 import { logError } from '../../../shared/lib/logger.ts'
@@ -7,18 +7,20 @@ import { ajustar } from '../domain/fit.ts'
 import { dietaDeEjemplo } from '../domain/dietSample.ts'
 import type { Ingrediente, Receta, TipoDia } from '../domain/diet.ts'
 import type { Alimento, ComidaId } from '../domain/food.ts'
-import { menuVacio, type MenuSemanal } from '../domain/menu.ts'
+import { leerMenu } from '../domain/menu.ts'
+import { intercambios } from '../domain/swaps.ts'
 import {
   ingredienteDe,
   leerRecetario,
   platoDeReceta,
   platoTuyo,
   productosVacios,
+  type CambioIngrediente,
   type IngredientePlato,
   type Plato,
   type Productos,
 } from '../domain/recipes.ts'
-import { dias, diaVisto, hoy } from '../state/comida.ts'
+import { dias, diaVisto } from '../state/comida.ts'
 import { recetaComoToca, recetaPorId } from '../state/dieta.ts'
 import {
   estadoRecetas,
@@ -27,9 +29,7 @@ import {
   platosTuyos,
   productos,
   recetario,
-  semanaVista,
   totalDePlato,
-  valoresDe,
 } from '../state/recetas.ts'
 import { guardarReceta } from './diet.ts'
 import { anadir, cargarAlimentos, quitar } from './foodLog.ts'
@@ -48,14 +48,13 @@ export function cargarRecetas(): Promise<void> {
       const db = await getDb()
       const [tuyos, guardado, mios, local] = await Promise.all([
         db.get('userContent', ID_PLATOS) as Promise<{ platos: Plato[] } | undefined>,
-        db.get('userContent', ID_MENU) as Promise<MenuSemanal | undefined>,
+        db.get('userContent', ID_MENU),
         db.get('userContent', ID_PRODUCTOS) as Promise<Productos | undefined>,
         readLocalRecipes(),
       ])
       platosTuyos.value = tuyos?.platos ?? []
-      menu.value = guardado ? { ...menuVacio(), ...guardado } : menuVacio()
-      productos.value = mios ?? null
-      semanaVista.value = hoy.value
+      menu.value = leerMenu(guardado)
+      productos.value = mios ? { ...productosVacios(), ...mios } : null
       const leido = leerRecetario(local)
       if (leido?.platos.length) {
         recetario.value = leido
@@ -158,7 +157,7 @@ export async function borrarPlato(id: string): Promise<Plato | null> {
 
 export const devolverPlato = (p: Plato) => guardarTuyos([...platosTuyos.value, p])
 
-// --- Tus productos ---
+// --- Cambiar un ingrediente ---
 
 async function guardarProductos(p: Productos): Promise<void> {
   productos.value = p
@@ -166,26 +165,33 @@ async function guardarProductos(p: Productos): Promise<void> {
 }
 
 /**
- * Usa tu producto en un ingrediente: en todos tus platos (lo que lleve ese alimento) o solo en este. `alimentoId` null
- * vuelve al del plato.
+ * Cambia un ingrediente de un plato (el plato tal como viene: `k` es su posición). `donde`: tu marca en todos tus platos
+ * (lo que lleve ese alimento), solo en este plato o solo hoy. `cambio` null vuelve a como viene.
  */
-export function usarProducto(
+export function cambiarIngrediente(
   plato: Plato,
   k: number,
-  alimentoId: string | null,
-  siempre: boolean,
+  cambio: CambioIngrediente | null,
+  donde: 'todos' | 'plato' | 'hoy',
+  hoyEs: string,
 ): Promise<void> {
   const actual = productos.value ?? productosVacios()
   const generico = plato.ingredientes[k]?.alimentoId
   const enEste = { ...(actual.enPlato[plato.id] ?? {}) }
   delete enEste[String(k)]
-  const enPlato = { ...actual.enPlato, [plato.id]: enEste }
-  const todos = { ...actual.siempre }
-  if (siempre && generico) {
-    if (alimentoId) todos[generico] = alimentoId
-    else delete todos[generico]
-  } else if (alimentoId) enPlato[plato.id] = { ...enEste, [String(k)]: alimentoId }
-  return guardarProductos({ ...actual, siempre: todos, enPlato })
+  const siempre = { ...actual.siempre }
+  if (donde === 'todos' && generico) {
+    if (cambio) siempre[generico] = cambio.alimentoId
+    else delete siempre[generico]
+  } else if (cambio) enEste[String(k)] = donde === 'hoy' ? { ...cambio, fecha: hoyEs } : cambio
+  if (!cambio && generico) delete siempre[generico]
+  return guardarProductos({ ...actual, siempre, enPlato: { ...actual.enPlato, [plato.id]: enEste } })
+}
+
+/** Otros alimentos que hacen lo mismo que un ingrediente: los mismos gramos de su macro principal. */
+export async function equivalentes(i: IngredientePlato) {
+  if (!i.por100 || i.gramos === null) return null
+  return intercambios({ nombre: i.nombre, por100: i.por100 }, i.gramos, await cargarAlimentos())
 }
 
 // --- A tu dieta ---
@@ -197,15 +203,14 @@ export function usarProducto(
 export async function ponerEnDieta(p: Plato, recetaId: string): Promise<boolean> {
   const r = recetaPorId(recetaId)
   if (!r) return false
-  const valores = valoresDe(p)
   const por: Record<TipoDia, (number | null)[]> = {
-    entreno: ajustar(p, recetaComoToca(r, 'entreno').total, valores).gramos,
-    descanso: ajustar(p, recetaComoToca(r, 'descanso').total, valores).gramos,
+    entreno: ajustar(p, recetaComoToca(r, 'entreno').total).gramos,
+    descanso: ajustar(p, recetaComoToca(r, 'descanso').total).gramos,
   }
   const ingredientes = p.ingredientes.map((i: IngredientePlato, k): Ingrediente => {
     const e = por.entreno[k]
     const d = por.descanso[k]
-    const v = valores[k] ?? i.por100
+    const v = i.por100
     return {
       nombre: i.nombre,
       alimentoId: i.alimentoId,
@@ -225,9 +230,8 @@ export async function ponerEnDieta(p: Plato, recetaId: string): Promise<boolean>
 export function comoEnDieta(p: Plato, recetaId: string) {
   const r = recetaPorId(recetaId)
   if (!r) return null
-  const valores = valoresDe(p)
-  const entreno = ajustar(p, recetaComoToca(r, 'entreno').total, valores)
-  const descanso = ajustar(p, recetaComoToca(r, 'descanso').total, valores)
+  const entreno = ajustar(p, recetaComoToca(r, 'entreno').total)
+  const descanso = ajustar(p, recetaComoToca(r, 'descanso').total)
   return {
     receta: r,
     antes: { entreno: recetaComoToca(r, 'entreno').total, descanso: recetaComoToca(r, 'descanso').total },

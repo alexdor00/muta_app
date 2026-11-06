@@ -3,7 +3,7 @@ import { addDays, formatDayDate } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceCircles, ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
-import { CheckIcon, MinusIcon, PlusIcon, TrashIcon } from '../../../../shared/ui/icons.tsx'
+import { CheckIcon, ChevronDownIcon, MinusIcon, PlusIcon, TrashIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
@@ -42,9 +42,11 @@ export function CompraScreen() {
   const anadir = useSheet('anadir')
   const alguien = useSheet('alguien')
   const { aviso, avisar } = useAviso()
+  // Las que abres o cierras tú (al empezar, abierta la primera con algo por comprar y las que llevan algo tuyo)
+  const [tocadas, setTocadas] = useState<string[]>([])
   if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
   const volver = `${paths.nutrition}?vista=menu`
-  if (!dieta.value && !menu.value.huecos.length) {
+  if (!dieta.value && !menu.value.menus.some((x) => Object.keys(x.platos).length)) {
     return (
       <div class={p.page}>
         <Barra titulo="La compra" volver={volver} />
@@ -71,8 +73,8 @@ export function CompraScreen() {
           </span>
         </p>
         <p class={p.foot}>
-          {formatDayDate(c.desde)} – {formatDayDate(addDays(c.desde, c.dias - 1))}: {entreno} de entreno y{' '}
-          {descanso} de descanso, según tu semana.
+          {formatDayDate(c.desde)} – {formatDayDate(addDays(c.desde, c.dias - 1))}
+          {dieta.value ? `: ${entreno} de entreno y ${descanso} de descanso, según tu semana.` : '.'}
         </p>
         <ChoiceCircles
           name="dias-compra"
@@ -101,74 +103,87 @@ export function CompraScreen() {
         const de = productos.filter((x) => x.seccion === s.id)
         const suyos = c.propios.filter((x) => x.seccion === s.id)
         if (!de.length && !suyos.length) return null
+        const faltan =
+          de.filter((x) => !tienes.has(x.clave)).length + suyos.filter((x) => !tienes.has(x.id)).length
+        const primera =
+          SECCIONES.find((x) => productos.some((y) => y.seccion === x.id && !tienes.has(y.clave)))?.id ===
+          s.id
+        const abierta = (primera || suyos.length > 0) !== tocadas.includes(s.id)
         return (
-          <section key={s.id} aria-labelledby={`sec-${s.id}`}>
-            <div class={p.head}>
-              <h2 id={`sec-${s.id}`} class={p.eyebrow}>
-                {s.nombre}
-              </h2>
-              <span class={p.foot}>
-                {de.filter((x) => tienes.has(x.clave)).length + suyos.filter((x) => tienes.has(x.id)).length}{' '}
-                de {de.length + suyos.length}
-              </span>
-            </div>
-            <ul class={p.list}>
-              {de.map((x) => (
-                <li key={x.clave}>
-                  <button
-                    type="button"
-                    class={`${p.check} ${tienes.has(x.clave) ? p.checked : ''}`}
-                    aria-pressed={tienes.has(x.clave)}
-                    onClick={() => void marcar(x.clave)}
-                  >
-                    <span class={p.box} aria-hidden="true">
-                      {tienes.has(x.clave) && <CheckIcon />}
-                    </span>
-                    <span class={p.rowText}>
-                      <span class={p.rowTitle}>{x.nombre}</span>
-                      <span class={p.foot}>{x.usos.join(' · ')}</span>
-                    </span>
-                    <b class={p.qty}>{x.gramos ? cantidad(x.gramos) : 'al gusto'}</b>
-                  </button>
-                </li>
-              ))}
-              {suyos.map((x) => (
-                <li key={x.id} class={p.withAction}>
-                  <button
-                    type="button"
-                    class={`${p.check} ${tienes.has(x.id) ? p.checked : ''}`}
-                    aria-pressed={tienes.has(x.id)}
-                    onClick={() => void marcar(x.id)}
-                  >
-                    <span class={p.box} aria-hidden="true">
-                      {tienes.has(x.id) && <CheckIcon />}
-                    </span>
-                    <span class={p.rowText}>
-                      <span class={p.rowTitle}>{x.nombre}</span>
-                      <span class={p.foot}>Añadido por ti</span>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    class={h.round}
-                    aria-label={`Quitar ${x.nombre}`}
-                    onClick={() => void quitarPropio(x.id)}
-                  >
-                    <TrashIcon />
-                  </button>
-                </li>
-              ))}
-            </ul>
+          <section key={s.id} class={p.seccion} aria-labelledby={`sec-${s.id}`}>
+            <h2 class={p.seccionTitulo}>
+              <button
+                type="button"
+                id={`sec-${s.id}`}
+                class={p.seccionAbrir}
+                aria-expanded={abierta}
+                onClick={() =>
+                  setTocadas(tocadas.includes(s.id) ? tocadas.filter((x) => x !== s.id) : [...tocadas, s.id])
+                }
+              >
+                <span>{s.nombre}</span>
+                <span class={p.foot}>{faltan ? faltan : 'todo hecho'}</span>
+                {faltan ? <ChevronDownIcon /> : <CheckIcon />}
+              </button>
+            </h2>
+            {abierta && (
+              <ul class={p.list}>
+                {de.map((x) => (
+                  <li key={x.clave}>
+                    <button
+                      type="button"
+                      class={`${p.check} ${tienes.has(x.clave) ? p.checked : ''}`}
+                      aria-pressed={tienes.has(x.clave)}
+                      onClick={() => void marcar(x.clave)}
+                    >
+                      <span class={p.box} aria-hidden="true">
+                        {tienes.has(x.clave) && <CheckIcon />}
+                      </span>
+                      <span class={p.rowText}>
+                        <span class={p.rowTitle}>{x.nombre}</span>
+                      </span>
+                      <b class={p.qty}>{x.gramos ? cantidad(x.gramos) : 'al gusto'}</b>
+                    </button>
+                  </li>
+                ))}
+                {suyos.map((x) => (
+                  <li key={x.id} class={p.withAction}>
+                    <button
+                      type="button"
+                      class={`${p.check} ${tienes.has(x.id) ? p.checked : ''}`}
+                      aria-pressed={tienes.has(x.id)}
+                      onClick={() => void marcar(x.id)}
+                    >
+                      <span class={p.box} aria-hidden="true">
+                        {tienes.has(x.id) && <CheckIcon />}
+                      </span>
+                      <span class={p.rowText}>
+                        <span class={p.rowTitle}>{x.nombre}</span>
+                        <span class={p.foot}>Añadido por ti</span>
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      class={h.round}
+                      aria-label={`Quitar ${x.nombre}`}
+                      onClick={() => void quitarPropio(x.id)}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         )
       })}
 
       <div class={p.row2}>
         <Button variant="secondary" onClick={anadir.show}>
-          + Añadir algo
+          + Añadir
         </Button>
         <Button variant="secondary" onClick={() => void desmarcarTodo()}>
-          Desmarcar todo
+          Desmarcar
         </Button>
       </div>
       <Button
@@ -180,8 +195,8 @@ export function CompraScreen() {
         Compartir la lista
       </Button>
       <p class={p.foot}>
-        Sale de tus recetas con la ración de entreno o de descanso de cada día y los cambios de la consulta,
-        así siempre cuadra. Lo que va «al gusto» sale sin cantidad.
+        Sale de tus menús con los gramos de cada día{dieta.value ? ' y de tu dieta los días sin menú' : ''}.
+        Lo que va «al gusto» sale sin cantidad.
       </p>
 
       {anadir.open && <AnadirCompraHoja onClose={anadir.close} />}

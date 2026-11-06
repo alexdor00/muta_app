@@ -3,21 +3,14 @@ import { paths } from '../../../../shared/lib/paths.ts'
 import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
 import { PlatoFila } from '../../components/Platos.tsx'
 import { estado } from '../../state/comida.ts'
-import {
-  ajustar,
-  categorias,
-  estadoRecetas,
-  fotos,
-  siguiente,
-  totalDePlato,
-  valoresDe,
-} from '../../state/recetas.ts'
+import { ajustar, categorias, estadoRecetas, fotos, siguiente, totalDePlato } from '../../state/recetas.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
 import { cargarRecetas } from '../../use-cases/recipes.ts'
 import { Barra } from '../comun/Barra.tsx'
 import { comidaDe, macrosCortos } from '../comun/platos.ts'
 import p from '../comun/Pagina.module.css'
 import h from '../comun/Hojas.module.css'
+import styles from './Plato.module.css'
 
 type Filtro = 'todas' | 'cuadran' | 'proteina' | 'rapidas'
 
@@ -43,7 +36,7 @@ export function CategoriaScreen(props: { categoria: string }) {
   const lista =
     filtro === 'cuadran' && s
       ? conTotal.filter(({ plato }) => {
-          const a = ajustar(plato, s.objetivo, valoresDe(plato))
+          const a = ajustar(plato, s.objetivo)
           return !a.corto.length && !a.sobra.length
         })
       : filtro === 'proteina'
@@ -55,24 +48,27 @@ export function CategoriaScreen(props: { categoria: string }) {
           : conTotal
   const opciones: { value: Filtro; label: string }[] = [
     { value: 'todas', label: 'Todas' },
-    ...(s ? [{ value: 'cuadran' as const, label: 'Cuadran' }] : []),
+    ...(s ? [{ value: 'cuadran' as const, label: `Para ${comidaDe(s.comida).el}` }] : []),
     { value: 'proteina', label: 'Más proteína' },
-    { value: 'rapidas', label: '≤ 20 min' },
+    { value: 'rapidas', label: 'Rápidas' },
   ]
   return (
     <div class={p.page}>
       <Barra titulo={c.nombre} volver={volver} />
+      <div class={styles.filtros}>
+        <ChoiceChips<Filtro>
+          name="filtro-platos"
+          legend="Filtrar"
+          options={opciones}
+          value={filtro}
+          onChange={setFiltro}
+        />
+      </div>
       <p class={h.foot}>
-        {c.platos.length} {c.platos.length === 1 ? 'receta' : 'recetas'}
-        {filtro === 'cuadran' && s ? ` · las que se ajustan a ${comidaDe(s.comida).el}` : ''}
+        {lista.length} {lista.length === 1 ? 'receta' : 'recetas'}
+        {filtro === 'rapidas' ? ' de 20 minutos o menos' : ''}
+        {filtro === 'cuadran' && s ? ` que caben en lo que te queda` : ''}
       </p>
-      <ChoiceChips<Filtro>
-        name="filtro-platos"
-        legend="Filtrar"
-        options={opciones}
-        value={filtro}
-        onChange={setFiltro}
-      />
       {lista.length ? (
         <ul class={h.list}>
           {lista.map(({ plato, total }) => (

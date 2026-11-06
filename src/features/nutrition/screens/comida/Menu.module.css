@@ -1,66 +1,17 @@
-/* Tu menú: la semana con ‹ ›, un día por tarjeta y cada comida en una fila con su foto; lo que cocinas, en negro. */
+/* Tus menús: tu semana (la letra del menú de cada día) y cada menú en un desplegable con las fotos de sus platos. */
 
-.semana {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: 0 var(--gutter);
-}
-
-.semanaTitulo {
-  flex: 1;
-  font: var(--text-headline);
-  text-align: center;
-}
-
-.flecha {
-  display: grid;
-  place-items: center;
-  width: var(--tap-min);
-  height: var(--tap-min);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--label);
-  cursor: pointer;
-}
-
-.flecha svg {
-  width: var(--icon-xs);
-  height: var(--icon-xs);
-}
-
-.atajos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  padding: 0 var(--gutter);
-}
-
-.atajo {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--tap-min);
-  padding: 0 var(--space-4);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--surface-2);
-  color: var(--label);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.dia {
+.semanaCard,
+.menuCard {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
   margin: 0 var(--gutter);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+}
+
+.semanaCard {
+  gap: var(--space-3);
 }
 
 .diaHead {
@@ -74,10 +25,143 @@
   font: var(--text-headline);
 }
 
-.filas {
+.dias {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.dias li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.diaNombre {
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+.letra {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: var(--tap-min);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-headline);
+  cursor: pointer;
+}
+
+.letra:disabled {
+  cursor: default;
+}
+
+.letraHoy {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.menus {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.menuHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.menuAbrir {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: var(--row);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuNombre {
+  font: var(--text-headline);
+}
+
+.fotos {
+  display: flex;
+  flex: none;
+}
+
+.mini {
+  display: flex;
+  margin-left: calc(var(--space-3) * -1);
+  border: var(--border) solid var(--surface);
+  border-radius: var(--radius-pill);
+}
+
+.mini:first-child {
+  margin-left: 0;
+}
+
+.mini > span {
+  width: var(--control-sm);
+  height: var(--control-sm);
+}
+
+.flechaMenu {
+  display: grid;
+  flex: none;
+  place-items: center;
+  color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.flechaMenu svg,
+.opciones svg,
+.mas svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.flechaArriba {
+  transform: rotate(180deg);
+}
+
+.opciones {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.filas {
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.filaMenu {
+  border-top: var(--hairline) solid var(--separator);
 }
 
 .fila {
@@ -86,17 +170,13 @@
   gap: var(--space-3);
   width: 100%;
   min-height: var(--row);
-  padding: var(--space-1) 0;
+  padding: var(--space-2) 0;
   border: 0;
   background: none;
   color: var(--label);
   text-align: left;
   text-decoration: none;
   cursor: pointer;
-}
-
-.fila:disabled {
-  cursor: default;
 }
 
 .fila > svg {
@@ -110,6 +190,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: var(--hairline);
   min-width: 0;
 }
 
@@ -120,7 +201,10 @@
 }
 
 .plato {
+  overflow: hidden;
   font: var(--text-subhead);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mas {
@@ -133,18 +217,45 @@
   background: var(--surface-2);
 }
 
-.mas svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-}
-
 .cocinar {
   display: inline-flex;
+  flex: none;
   align-items: center;
-  padding: 0 var(--space-2);
+  padding: var(--hairline) var(--space-2);
   border-radius: var(--radius-pill);
   background: var(--accent);
   color: var(--on-accent);
   font: var(--text-caption);
   white-space: nowrap;
+}
+
+.atajos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  padding: 0 var(--gutter);
+}
+
+.atajo {
+  display: grid;
+  place-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dieta {
+  text-decoration: none;
+}
+
+/* En la hoja (fondo blanco), las letras van en gris */
+.letraHoja {
+  background: var(--surface);
 }

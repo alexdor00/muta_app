@@ -8,10 +8,10 @@ import {
   macroDe,
   platoDeReceta,
   platoTuyo,
-  productoEn,
+  cambioEn,
+  platoCon,
   productosVacios,
   vaCon,
-  valoresCon,
 } from './recipes.ts'
 
 const arroz: Alimento = {
@@ -134,18 +134,37 @@ describe('buscarPlatos y comidas', () => {
   })
 })
 
-describe('tus productos', () => {
-  const p = platoTuyo('mio-1', 'Hummus', [ingredienteDe(arroz, 90), ingredienteDe(pollo, 100)])
-  const tuyo = { kcal: 312, protein: 7, carbs: 12, fat: 26 }
-  const valoresDe = (id: string) => (id === 'mio_hummus' ? tuyo : null)
+describe('tus cambios', () => {
+  const p = platoTuyo('mio-1', 'Arroz con pollo', [ingredienteDe(arroz, 150), ingredienteDe(pollo, 100)])
+  const patata = {
+    id: 'f_patata',
+    name: 'Patata',
+    category: 'Tubérculos',
+    kcal: 80,
+    protein: 2,
+    carbs: 17,
+    fat: 0.1,
+  }
+  const alimentoDe = (id: string) =>
+    id === 'f_patata' ? patata : id === 'mio_arroz' ? { ...arroz, id, kcal: 150 } : null
 
-  it('el tuyo vale en todos los platos o solo en uno (y el de un plato manda)', () => {
-    const siempre = { ...productosVacios(), siempre: { f_arroz: 'mio_hummus' } }
-    expect(productoEn(siempre, p, 0)).toBe('mio_hummus')
-    expect(productoEn(siempre, p, 1)).toBeNull()
-    expect(valoresCon(siempre, p, valoresDe)).toEqual([tuyo, null])
-    const soloAqui = { ...siempre, enPlato: { 'mio-1': { '1': 'otro' } } }
-    expect(productoEn(soloAqui, p, 1)).toBe('otro')
-    expect(productoEn(null, p, 0)).toBeNull()
+  it('tu marca en todos tus platos, con los mismos gramos', () => {
+    const c = { ...productosVacios(), siempre: { f_arroz: 'mio_arroz' } }
+    const con = platoCon(p, c, alimentoDe, '2026-11-09')
+    expect(con.ingredientes[0]).toMatchObject({ alimentoId: 'mio_arroz', gramos: 150, antes: 'Arroz cocido' })
+    expect(con.total.kcal).toBeCloseTo(p.total.kcal + 30)
+  })
+
+  it('otro alimento en un plato: sus gramos; «solo hoy» vale ese día', () => {
+    const c = {
+      ...productosVacios(),
+      enPlato: { 'mio-1': { '0': { alimentoId: 'f_patata', gramos: 250, fecha: '2026-11-09' } } },
+    }
+    expect(platoCon(p, c, alimentoDe, '2026-11-09').ingredientes[0]).toMatchObject({
+      nombre: 'Patata',
+      gramos: 250,
+    })
+    expect(platoCon(p, c, alimentoDe, '2026-11-10')).toBe(p)
+    expect(cambioEn(null, p, 0, '2026-11-09')).toBeNull()
   })
 })

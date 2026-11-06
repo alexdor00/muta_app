@@ -3,15 +3,21 @@ import {
   calendarioDelMenu,
   clave,
   conCocinado,
-  conHueco,
+  conCuantos,
+  conDia,
+  conPlato,
+  diaSemana,
+  diasDelMenu,
+  duplicado,
   huecosDelDia,
+  leerMenu,
   loDeHoy,
+  menuDelDia,
   menuVacio,
   paraCocinar,
   recetasDelMenu,
-  sinHueco,
+  sinMenu,
   totalDelDia,
-  type Hueco,
   type MenuSemanal,
 } from './menu.ts'
 import type { Plato } from './recipes.ts'
@@ -54,84 +60,72 @@ const plato: Plato = {
   origen: 'recetario',
 }
 const platoDe = (id: string) => (id === plato.id ? plato : null)
-const hueco = (fecha: string, comida: Hueco['comida'], gramos: Hueco['gramos'] = null): Hueco => ({
-  fecha,
-  comida,
-  plato: plato.id,
-  gramos,
-  cocinado: null,
-})
+// 2026-11-09 es lunes
+const lunes = '2026-11-09'
 
-describe('menú', () => {
-  it('pone, cambia y quita platos; un día sale en el orden de las comidas', () => {
-    let m = conHueco(menuVacio(), hueco('2026-11-09', 'cena'))
-    m = conHueco(m, hueco('2026-11-09', 'comida'))
-    m = conHueco(m, hueco('2026-11-09', 'cena', [200, null]))
-    expect(huecosDelDia(m, '2026-11-09').map((h) => h.comida)).toEqual(['comida', 'cena'])
-    expect(huecosDelDia(m, '2026-11-09')[1].gramos).toEqual([200, null])
-    expect(sinHueco(m, '2026-11-09', 'cena').huecos).toHaveLength(1)
+describe('tus menús', () => {
+  it('de 1 a 7 menús, seguidos por la semana; quitar uno rehace la semana', () => {
+    expect(diaSemana(lunes)).toBe(0)
+    const tres = conCuantos(menuVacio(), 3)
+    expect(tres.menus.map((x) => x.nombre)).toEqual(['Menú A', 'Menú B', 'Menú C'])
+    expect(tres.semana.join('')).toBe('ABCABCA')
+    expect(conCuantos(tres, 9).menus).toHaveLength(7)
+    expect(sinMenu(tres, 'B').semana.join('')).toBe('ACACACA')
+    expect(sinMenu(menuVacio(), 'A').menus).toHaveLength(1)
   })
 
-  it('un cocinado marca sus comidas; cambiar el plato de una la saca del cocinado', () => {
-    let m = conHueco(
-      conHueco(menuVacio(), hueco('2026-11-09', 'comida')),
-      hueco('2026-11-10', 'comida', [150, null]),
-    )
-    m = conCocinado(m, {
-      id: 'c1',
-      plato: plato.id,
-      fecha: '2026-11-08',
-      hora: '18:00',
-      para: [clave('2026-11-09', 'comida'), clave('2026-11-10', 'comida')],
-    })
-    expect(m.huecos.every((h) => h.cocinado === 'c1')).toBe(true)
-    expect(paraCocinar(m, m.cocinados[0], plato).map((i) => i.gramos)).toEqual([330, null])
-    const otro = conHueco(m, { ...hueco('2026-11-10', 'comida'), plato: 'rec-2' })
-    expect(otro.cocinados[0].para).toEqual([clave('2026-11-09', 'comida')])
-    expect(otro.huecos.find((h) => h.fecha === '2026-11-10')?.cocinado).toBeNull()
+  it('un día a mano pasa a «elegidos»; duplicar copia los platos con la siguiente letra', () => {
+    let m = conPlato(conCuantos(menuVacio(), 2), 'A', 'cena', plato.id)
+    m = conDia(m, 1, 'A')
+    expect(m.reparto).toBe('elegidos')
+    expect(menuDelDia(m, '2026-11-10')?.id).toBe('A')
+    expect(diasDelMenu(m, 'B', lunes)).toEqual(['2026-11-12', '2026-11-14'])
+    const copia = duplicado(m, 'A')
+    expect(copia?.menus[2]).toMatchObject({ id: 'C', platos: { cena: plato.id } })
   })
 
-  it('lo de hoy: la compra y lo que cocinas por hora, y después lo que comes', () => {
+  it('lo de un día sale del menú de ese día; lo guardado con la forma antigua empieza de nuevo', () => {
+    const m = conPlato(menuVacio(), 'A', 'comida', plato.id)
+    expect(huecosDelDia(m, lunes)).toEqual([
+      { fecha: lunes, comida: 'comida', menu: 'A', plato: plato.id, cocinado: null },
+    ])
+    expect(totalDelDia(m, lunes, () => plato.total).kcal).toBe(475)
+    expect(leerMenu({ id: 'menu', huecos: [] }).menus).toHaveLength(1)
+  })
+
+  it('un cocinado junta las comidas; lo de hoy lleva la compra y lo que cocinas por hora', () => {
     let m: MenuSemanal = {
-      ...conHueco(menuVacio(), hueco('2026-11-09', 'comida')),
-      compraEl: { fecha: '2026-11-08', hora: '11:00' },
+      ...conPlato(menuVacio(), 'A', 'comida', plato.id),
+      compraEl: { fecha: lunes, hora: '11:00' },
     }
-    m = conHueco(m, hueco('2026-11-08', 'cena'))
     m = conCocinado(m, {
       id: 'c1',
       plato: plato.id,
-      fecha: '2026-11-08',
+      fecha: lunes,
       hora: '18:00',
-      para: [clave('2026-11-09', 'comida')],
+      para: [clave('2026-11-10', 'comida'), clave('2026-11-11', 'comida')],
     })
-    expect(loDeHoy(m, '2026-11-08').map((t) => t.tipo)).toEqual(['compra', 'cocinar', 'comida'])
-    const manana = loDeHoy(m, '2026-11-09')
-    expect(manana).toHaveLength(1)
-    expect(manana[0].tipo === 'comida' && manana[0].yaCocinado).toBe(true)
-  })
-
-  it('suma un día y da las recetas para la compra con los gramos ajustados', () => {
-    const m = conHueco(
-      conHueco(menuVacio(), hueco('2026-11-09', 'comida', [280, null])),
-      hueco('2026-11-09', 'cena'),
-    )
-    expect(totalDelDia(m, '2026-11-09', platoDe).protein).toBe(35 + 23 + 35)
-    const r = recetasDelMenu(m, ['2026-11-09'], platoDe)
-    expect(r.map((x) => x.lista[0].g)).toEqual([280, 180])
-    expect(r[0].lista[1].g).toBeNull()
+    expect(huecosDelDia(m, '2026-11-10')[0].cocinado).toBe('c1')
+    expect(paraCocinar(m, m.cocinados[0], plato, () => [200, null]).map((i) => i.gramos)).toEqual([400, null])
+    expect(loDeHoy(m, lunes).map((t) => t.tipo)).toEqual(['compra', 'cocinar'])
+    const r = recetasDelMenu(m, [lunes], platoDe, () => [280, null])
+    expect(r[0].lista.map((x) => x.g)).toEqual([280, null])
   })
 
   it('el calendario lleva cada hora con su alarma antes', () => {
-    let m: MenuSemanal = { ...menuVacio(), compraEl: { fecha: '2026-11-08', hora: '11:00' } }
-    m = conCocinado(conHueco(m, hueco('2026-11-09', 'comida')), {
+    let m: MenuSemanal = {
+      ...conPlato(menuVacio(), 'A', 'comida', plato.id),
+      compraEl: { fecha: lunes, hora: '11:00' },
+    }
+    m = conCocinado(m, {
       id: 'c1',
       plato: plato.id,
-      fecha: '2026-11-08',
+      fecha: lunes,
       hora: '18:00',
-      para: [clave('2026-11-09', 'comida')],
+      para: [clave(lunes, 'comida')],
     })
-    const ics = calendarioDelMenu(m, ['2026-11-08', '2026-11-09'], () => plato.nombre, '20261106T120000Z')
-    expect(ics).toContain('DTSTART:20261108T110000')
+    const ics = calendarioDelMenu(m, [lunes], () => plato.nombre, '20261106T120000Z')
+    expect(ics).toContain('DTSTART:20261109T110000')
     expect(ics).toContain('SUMMARY:Cocinar: Pollo al chipotle')
     expect(ics).toContain('TRIGGER:-PT30M')
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(2)

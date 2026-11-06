@@ -7,13 +7,12 @@ import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
 import { ChevronRightIcon, MinusIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
-import { alimentoPorId, comidaPorHora, diaVisto, dieta, estado, hoy } from '../../state/comida.ts'
+import { comidaPorHora, diaVisto, dieta, estado, hoy } from '../../state/comida.ts'
 import {
   estadoRecetas,
   fotos,
   MACROS,
   platoPorId,
-  productoDe,
   recetario,
   siguiente,
   totalDePlato,
@@ -27,7 +26,7 @@ import r from '../receta/Receta.module.css'
 import { ADietaHoja } from './ADietaHoja.tsx'
 import { AjustarHoja } from './AjustarHoja.tsx'
 import { AlMenuHoja } from './AlMenuHoja.tsx'
-import { ProductoHoja } from './ProductoHoja.tsx'
+import { CambiarHoja } from './CambiarHoja.tsx'
 import styles from './Plato.module.css'
 
 /**
@@ -44,12 +43,13 @@ export function PlatoScreen(props: { id: string }) {
   const [gramos, setGramos] = useState<(number | null)[] | null>(null)
   const [cual, setCual] = useState<number | null>(null)
   const ajustarHoja = useSheet('ajustar')
-  const producto = useSheet('producto')
+  const cambiar = useSheet('cambiar')
   const alMenu = useSheet('al-menu')
   const aDieta = useSheet('a-dieta')
   const { aviso, avisar } = useAviso()
   if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
-  const p = platoPorId(props.id)
+  const fecha = query.fecha ?? diaVisto.value
+  const p = platoPorId(props.id, fecha)
   const volver = query.desde === 'menu' ? `${paths.nutrition}?vista=menu` : `${paths.nutrition}?vista=recetas`
   if (!p) {
     return (
@@ -62,7 +62,6 @@ export function PlatoScreen(props: { id: string }) {
   const comida = esComida(query.comida)
     ? query.comida
     : (siguiente.value?.comida ?? comidaPorHora(new Date().getHours()))
-  const fecha = query.fecha ?? diaVisto.value
   const cuando = daysBetween(fecha, hoy.value) === 0 ? 'hoy' : `el ${formatDayDate(fecha)}`
   const total = totalDePlato(p, gramos ?? undefined, veces)
   const categoria = recetario.value?.categorias.find((c) => c.id === p.categoria)?.nombre
@@ -152,8 +151,6 @@ export function PlatoScreen(props: { id: string }) {
             {p.ingredientes.map((i, k) => {
               const g0 = i.gramos === null ? null : (i.gramos * veces) / p.raciones
               const g = gramos?.[k] != null ? (gramos[k]! * veces) / p.raciones : g0
-              const tuyo = productoDe(p, k)
-              const nombreTuyo = tuyo ? alimentoPorId(tuyo)?.name : null
               const macro = MACROS.find((m) => m.id === i.macro)
               return (
                 <li key={`${i.texto}-${k}`}>
@@ -163,18 +160,19 @@ export function PlatoScreen(props: { id: string }) {
                     disabled={!i.cuenta || !i.alimentoId}
                     onClick={() => {
                       setCual(k)
-                      producto.show()
+                      cambiar.show()
                     }}
                   >
-                    <span class={styles.tag} aria-label={macro ? macro.nombre : 'No se ajusta'}>
-                      {macro?.corto ?? '·'}
+                    <span
+                      class={`${styles.tag} ${macro ? '' : styles.sinTag}`}
+                      aria-label={macro ? macro.nombre : undefined}
+                      aria-hidden={macro ? undefined : 'true'}
+                    >
+                      {macro?.corto ?? ''}
                     </span>
                     <span class={r.rowText}>
-                      <span class={r.name}>{nombreTuyo ?? (i.alimentoId ? i.nombre : i.texto)}</span>
-                      <span class={h.foot}>
-                        {nombreTuyo ? 'El tuyo · ' : ''}
-                        {i.alimentoId || nombreTuyo ? i.texto : ''}
-                      </span>
+                      <span class={r.name}>{i.alimentoId ? i.nombre : i.texto}</span>
+                      {i.antes && <span class={h.foot}>En lugar de {i.antes.toLowerCase()}</span>}
                     </span>
                     {g !== null && i.cuenta && (
                       <b class={r.grams}>
@@ -191,10 +189,7 @@ export function PlatoScreen(props: { id: string }) {
               )
             })}
           </ul>
-          <p class={h.foot}>
-            La letra de cada ingrediente es su macro principal (P, HC, G): son los que se mueven al ajustar.
-            Toca uno para decir qué producto compras.
-          </p>
+          <p class={h.foot}>Toca un ingrediente para cambiarlo por otra marca u otro alimento.</p>
         </section>
         {p.pasos.length > 0 && (
           <section aria-labelledby="preparacion">
@@ -249,8 +244,8 @@ export function PlatoScreen(props: { id: string }) {
           avisar={avisar}
         />
       )}
-      {producto.open && cual !== null && (
-        <ProductoHoja plato={p} indice={cual} onClose={producto.close} avisar={avisar} />
+      {cambiar.open && cual !== null && (
+        <CambiarHoja plato={p} indice={cual} fecha={fecha} onClose={cambiar.close} avisar={avisar} />
       )}
       {alMenu.open && <AlMenuHoja plato={p} onClose={alMenu.close} avisar={avisar} />}
       {aDieta.open && <ADietaHoja plato={p} onClose={aDieta.close} avisar={avisar} />}

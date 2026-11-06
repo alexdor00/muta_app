@@ -4,7 +4,15 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { COMIDAS, hoy, tipoDe } from '../../state/comida.ts'
-import { clave, MACROS, menu, paraCocinar, platoPorId, type Cocinado } from '../../state/recetas.ts'
+import {
+  clave,
+  gramosDeHueco,
+  MACROS,
+  menu,
+  paraCocinar,
+  platoPorId,
+  type Cocinado,
+} from '../../state/recetas.ts'
 import { comidasDelPlato, guardarCocinado, quitarCocinado } from '../../use-cases/menu.ts'
 import type { Aviso } from '../comun/useAviso.ts'
 import h from '../comun/Hojas.module.css'
@@ -25,12 +33,12 @@ export function CocinarHoja({ cocinado, onClose, avisar }: Props) {
   const [hora, setHora] = useState(cocinado.hora)
   const [para, setPara] = useState<string[]>(cocinado.para)
   if (!p) return null
-  const posibles = comidasDelPlato(p.id, fecha)
+  const posibles = comidasDelPlato(p.id, hoy.value).filter((x) => x.fecha >= fecha)
   const dias = Array.from({ length: 7 }, (_, i) => addDays(hoy.value, i)).filter(
     (d) => !para.length || para.every((k) => k.split('|')[0] >= d),
   )
   const borrador: Cocinado = { ...cocinado, fecha, hora, para }
-  const gramos = paraCocinar(menu.value, borrador, p)
+  const gramos = paraCocinar(menu.value, borrador, p, gramosDeHueco)
   const existe = menu.value.cocinados.some((c) => c.id === cocinado.id)
   return (
     <Sheet
@@ -122,9 +130,7 @@ export function CocinarHoja({ cocinado, onClose, avisar }: Props) {
                 <b>{formatInt(i.gramos!)} g</b>
               </p>
             ))}
-          <p class={h.foot}>
-            Cada comida lleva sus gramos (el día de entreno, los suyos): están en cada plato del menú.
-          </p>
+          <p class={h.foot}>Luego cada comida lleva los gramos de su día.</p>
         </section>
       </div>
     </Sheet>

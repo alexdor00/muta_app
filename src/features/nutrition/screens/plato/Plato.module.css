@@ -43,3 +43,57 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* Una opción al cambiar un ingrediente: el radio, el nombre, los gramos y cuánto cambian las kcal */
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  border-bottom: var(--hairline) solid var(--separator);
+  cursor: pointer;
+}
+
+.opcion input {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.opcionNombre {
+  flex: 1;
+  min-width: 0;
+  font: var(--text-body);
+}
+
+.opcionKcal {
+  flex: none;
+  min-width: calc(var(--control-sm) * 2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-align: right;
+}
+
+/* Los filtros de una categoría: en una sola fila que se desliza */
+.filtros {
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 0 var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filtros fieldset > div {
+  flex-wrap: nowrap;
+}
+
+.filtros label {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* Lo que no se mueve al ajustar: sin etiqueta, pero en su sitio para que los nombres sigan alineados */
+.sinTag {
+  visibility: hidden;
+}

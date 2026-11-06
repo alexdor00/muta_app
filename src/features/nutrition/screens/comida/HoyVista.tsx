@@ -1,10 +1,5 @@
-import {
-  addDays,
-  daysBetween,
-  formatDayDate,
-  formatDecimal,
-  formatInt,
-} from '../../../../shared/lib/format.ts'
+import { addDays, daysBetween, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import { Button } from '../../../../shared/ui/Button.tsx'
 import { CoachCard } from '../../components/CoachCard.tsx'
 import { DayHero } from '../../components/DayHero.tsx'
 import { DayNav } from '../../components/DayNav.tsx'
@@ -16,19 +11,27 @@ import {
   hoy,
   objetivoDia,
   pendiente,
-  pesajes,
   totalDia,
   type ComidaId,
 } from '../../state/comida.ts'
 import { apuntada, menuDelDia, tocaConsulta } from '../../state/dieta.ts'
-import { fotoDeApunte, platos, siguiente, type Hueco } from '../../state/recetas.ts'
-import { Button } from '../../../../shared/ui/Button.tsx'
-import { LoDeHoy } from './LoDeHoy.tsx'
+import {
+  fotoDeApunte,
+  fotos,
+  gramosDeHueco,
+  huecoDe,
+  menu as menus,
+  menuConPlatos,
+  platoPorId,
+  platos,
+  siguiente,
+  tareasDeHoy,
+  totalCon,
+} from '../../state/recetas.ts'
+import { platoApuntado } from '../../use-cases/recipes.ts'
 import styles from './Vistas.module.css'
 
 type Props = {
-  /** Apuntar el peso de hoy (hasta que exista la pestaña Hoy). */
-  onPesarme: () => void
   onAnadir: (comida: ComidaId) => void
   onAbrirComida: (comida: ComidaId) => void
   /** Abre la sugerencia del entrenador; null si no hay ninguna esperando. */
@@ -39,7 +42,8 @@ type Props = {
   /** Cuadrar el día con recetas (lo que falta, en las comidas que quedan). */
   onCuadrar: () => void
   onCocinado: (id: string) => void
-  onApuntarHueco: (h: Hueco) => void
+  /** El tick de una comida con plato de tu menú. */
+  onTick: (comida: ComidaId) => void
 }
 
 function tituloDia(fecha: string, hoyEs: string): string {
@@ -48,11 +52,10 @@ function tituloDia(fecha: string, hoyEs: string): string {
 }
 
 /**
- * Hoy (o el día que elijas con ‹ ›): el anillo con lo que llevas, el aviso del entrenador si tiene algo, el menú de tu
- * dieta si sigues una y tus comidas.
+ * Hoy (o el día que elijas con ‹ ›): el anillo con lo que llevas, el aviso del entrenador si tiene algo y tus comidas. Con
+ * tu menú, cada comida trae su plato y un tick; con dieta, su menú del día.
  */
 export function HoyVista({
-  onPesarme,
   onAnadir,
   onAbrirComida,
   onSugerencia,
@@ -61,7 +64,7 @@ export function HoyVista({
   onConsulta,
   onCuadrar,
   onCocinado,
-  onApuntarHueco,
+  onTick,
 }: Props) {
   const objetivo = objetivoDia.value
   if (!objetivo) return null
@@ -70,7 +73,8 @@ export function HoyVista({
   const total = totalDia.value
   const sugerencia = pendiente.value
   const menu = menuDelDia.value
-  const pesoDeHoy = pesajes.value.find((p) => p.date === hoy.value)
+  const tuMenu = menu ? null : menuConPlatos(fecha)
+  const cocinas = esHoy ? tareasDeHoy.value.filter((t) => t.tipo === 'cocinar') : []
   const quedan = Math.max(0, objetivo.kcal - total.kcal)
   const faltaProteina = Math.max(0, Math.round(objetivo.protein - total.protein))
   return (
@@ -90,17 +94,6 @@ export function HoyVista({
           { nombre: 'Grasa', hecho: total.fat, objetivo: objetivo.fat },
         ]}
       />
-      {esHoy && (
-        <p class={`${styles.pad} ${styles.sub}`}>
-          {pesoDeHoy
-            ? `Hoy pesas ${formatDecimal(pesoDeHoy.kg)} kg. `
-            : 'Pésate cada mañana: lo mira el entrenador. '}
-          <button type="button" class={styles.link} onClick={onPesarme}>
-            {pesoDeHoy ? 'Cambiar' : '+ Pesarme'}
-          </button>
-        </p>
-      )}
-      {esHoy && <LoDeHoy onCocinado={onCocinado} onApuntar={onApuntarHueco} />}
       {esHoy && menu && tocaConsulta.value && (
         <CoachCard
           titulo="Tu nutricionista · consulta semanal"
@@ -133,15 +126,29 @@ export function HoyVista({
         />
       )}
       <MealList
-        comidas={comidasDia.value.map((c) => ({
-          id: c.id,
-          nombre: c.nombre,
-          al: c.al,
-          kcal: c.total.kcal,
-          proteina: c.total.protein,
-          alimentos: c.apuntes.map((a) => a.nombre).join(' · '),
-          foto: fotoDeApunte(c.apuntes.find((a) => a.receta)?.receta),
-        }))}
+        titulo={tuMenu ? tuMenu.nombre : 'Comidas'}
+        comidas={comidasDia.value.map((c) => {
+          const h = tuMenu ? huecoDe(menus.value, fecha, c.id) : null
+          const p = h ? platoPorId(h.plato, fecha) : null
+          return {
+            id: c.id,
+            nombre: c.nombre,
+            al: c.al,
+            kcal: c.total.kcal,
+            proteina: c.total.protein,
+            alimentos: c.apuntes.map((a) => a.nombre).join(' · '),
+            foto: fotoDeApunte(c.apuntes.find((a) => a.receta)?.receta),
+            menu:
+              h && p
+                ? {
+                    nombre: p.nombre,
+                    kcal: totalCon(p, gramosDeHueco(h, p)).kcal,
+                    foto: fotos.value[p.id] ?? null,
+                    hecho: platoApuntado(p.id, c.id, fecha),
+                  }
+                : undefined,
+          }
+        })}
         quedan={
           quedan > 0
             ? `Te quedan ${formatInt(quedan)} kcal${faltaProteina ? ` y ${faltaProteina} g de proteína` : ''}`
@@ -149,8 +156,20 @@ export function HoyVista({
         }
         onAbrir={(id) => onAbrirComida(id as ComidaId)}
         onAnadir={(id) => onAnadir(id as ComidaId)}
+        onTick={(id) => onTick(id as ComidaId)}
       />
-      {siguiente.value && platos.value.length > 0 && (
+      {cocinas.map(
+        (t) =>
+          t.tipo === 'cocinar' && (
+            <p key={t.id} class={styles.pad}>
+              <button type="button" class={styles.textButton} onClick={() => onCocinado(t.cocinado.id)}>
+                {t.hora} · cocinas {platoPorId(t.cocinado.plato)?.nombre.toLowerCase() ?? 'un plato'} para{' '}
+                {t.raciones} {t.raciones === 1 ? 'comida' : 'comidas'} ›
+              </button>
+            </p>
+          ),
+      )}
+      {!tuMenu && siguiente.value && platos.value.length > 0 && (
         <div class={styles.pad}>
           <Button variant="secondary" onClick={onCuadrar}>
             Cuadrar con recetas

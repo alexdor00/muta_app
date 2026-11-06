@@ -29,6 +29,8 @@ export type IngredientePlato = {
   sugerido: boolean
   /** Su macro principal si se puede mover al ajustar; null si no se toca. */
   macro: MacroId | null
+  /** Si lo cambiaste: el nombre que traía el plato. */
+  antes?: string
 }
 
 export type Plato = {
@@ -203,14 +205,16 @@ export function vaCon(p: Plato, comida: ComidaId): boolean {
   return p.origen !== 'recetario' || CATEGORIAS_DE_COMIDA[comida].includes(p.categoria)
 }
 
-/** Tus productos: el que compras tú en vez del genérico, en todos los platos o en uno (por ingrediente). */
+/** Un ingrediente cambiado: por tu marca (mismos gramos) o por otro alimento (sus gramos); `fecha`, solo ese día. */
+export type CambioIngrediente = { alimentoId: string; gramos: number | null; fecha?: string }
+
+/** Tus cambios: tu marca en todos tus platos (genérico → el tuyo) o un ingrediente de un plato (manda sobre lo otro). */
 export type Productos = {
   id: 'productos'
   target: 'nutricion'
-  /** Alimento genérico → el tuyo (en todos los platos). */
   siempre: Record<string, string>
-  /** Plato → ingrediente → el tuyo (solo en ese plato; manda sobre `siempre`). */
-  enPlato: Record<string, Record<string, string>>
+  /** Plato → ingrediente (su posición) → el cambio. */
+  enPlato: Record<string, Record<string, CambioIngrediente>>
 }
 
 export const productosVacios = (): Productos => ({
@@ -220,23 +224,61 @@ export const productosVacios = (): Productos => ({
   enPlato: {},
 })
 
-/** El producto tuyo que va en un ingrediente de un plato (null: el del plato). */
-export function productoEn(productos: Productos | null, plato: Plato, k: number): string | null {
-  if (!productos) return null
-  const generico = plato.ingredientes[k]?.alimentoId
-  return (
-    productos.enPlato[plato.id]?.[String(k)] ?? (generico ? productos.siempre[generico] : undefined) ?? null
-  )
-}
-
-/** Los valores por 100 g con los que cuenta cada ingrediente: los de tu producto si lo hay. */
-export function valoresCon(
+/** El cambio de un ingrediente de un plato un día (null: como en el plato). */
+export function cambioEn(
   productos: Productos | null,
   plato: Plato,
-  valoresDe: (alimentoId: string) => Macros | null,
-): (Macros | null)[] {
-  return plato.ingredientes.map((_, k) => {
-    const id = productoEn(productos, plato, k)
-    return id ? valoresDe(id) : null
+  k: number,
+  fecha: string,
+): CambioIngrediente | null {
+  if (!productos) return null
+  const propio = productos.enPlato[plato.id]?.[String(k)]
+  if (propio && (!propio.fecha || propio.fecha === fecha)) return propio
+  const generico = plato.ingredientes[k]?.alimentoId
+  const tuyo = generico ? productos.siempre[generico] : undefined
+  return tuyo ? { alimentoId: tuyo, gramos: null } : null
+}
+
+/** Lo que hace falta de un alimento para cambiar un ingrediente. */
+export type AlimentoBase = Pick<Alimento, 'id' | 'name' | 'category' | 'kcal' | 'protein' | 'carbs' | 'fat'>
+
+/**
+ * El plato con tus cambios de ese día: cada ingrediente cambiado lleva su alimento y sus gramos, y el total del plato (el
+ * del libro) suma la diferencia. `antes` guarda el nombre que traía.
+ */
+export function platoCon(
+  p: Plato,
+  productos: Productos | null,
+  alimentoDe: (id: string) => AlimentoBase | null,
+  fecha: string,
+): Plato {
+  if (!productos) return p
+  let total = { ...p.total }
+  let cambia = false
+  const ingredientes = p.ingredientes.map((i, k) => {
+    const c = cambioEn(productos, p, k, fecha)
+    const a = c ? alimentoDe(c.alimentoId) : null
+    if (!c || !a || !i.cuenta || !i.por100 || i.gramos === null) return i
+    cambia = true
+    const g = c.gramos ?? i.gramos
+    const v = { kcal: a.kcal, protein: a.protein, carbs: a.carbs, fat: a.fat }
+    total = {
+      kcal: total.kcal + (g * v.kcal - i.gramos * i.por100.kcal) / 100,
+      protein: total.protein + (g * v.protein - i.gramos * i.por100.protein) / 100,
+      carbs: total.carbs + (g * v.carbs - i.gramos * i.por100.carbs) / 100,
+      fat: total.fat + (g * v.fat - i.gramos * i.por100.fat) / 100,
+    }
+    return {
+      ...i,
+      nombre: a.name,
+      categoria: a.category,
+      alimentoId: a.id,
+      por100: v,
+      gramos: g,
+      sugerido: c.gramos === null && i.sugerido,
+      macro: macroDe(v, g),
+      antes: i.nombre,
+    }
   })
+  return cambia ? { ...p, total, ingredientes } : p
 }

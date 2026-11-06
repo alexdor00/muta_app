@@ -153,15 +153,19 @@ test('solo kcal y proteína, y repetir la comida de ayer', async ({ page }) => {
   await expect(dia).toContainText('525 kcal de más')
 })
 
-test('sin Semana (será de Progreso); el peso de hoy se apunta en Hoy', async ({ page }) => {
+test('sin Semana ni peso en Comida: el peso de hoy se apunta en la pestaña Hoy', async ({ page }) => {
   await prepararComida(page)
   await page.goto('/comida')
+  await expect(page.getByRole('heading', { name: 'Comidas' })).toBeVisible()
   await expect(page.getByText('Semana', { exact: true })).toHaveCount(0)
-  await page.getByRole('button', { name: 'Cambiar' }).click()
+  await expect(page.getByText(/Pésate/)).toHaveCount(0)
+  await page.goto('/hoy')
+  const peso = page.getByRole('region', { name: /Tu peso/ })
+  await peso.getByRole('button', { name: 'Cambiar' }).click()
   await page.getByLabel('Peso en kilos').fill('79,8')
   await page.getByRole('dialog', { name: 'Tu peso de hoy' }).getByRole('button', { name: 'Guardar' }).click()
   await expect(page.getByRole('status')).toContainText('79,8 kg apuntados')
-  await expect(page.getByText('Hoy pesas 79,8 kg.')).toBeVisible()
+  await expect(peso).toContainText('79,8')
 })
 
 test('el entrenador propone −150 kcal; nada cambia hasta aplicarlo y se puede deshacer', async ({ page }) => {
