@@ -435,3 +435,9 @@ Los generadores siguen en `private/herramientas/`; tras rehacerlo, se copia a `s
 - **Tu dieta como tus menús** (lo que prometía el diseño sencillo): «Pasar sus menús a tus menús» crea un menú tuyo por
   cada menú de la dieta (su primera receta de cada comida), tu semana como la de la dieta y sus recetas como platos tuyos;
   se deshace. La dieta y su consulta siguen en su vista.
+
+## 2026-11-06 · Lo grande se guarda en el móvil al usarlo, no al instalar
+
+Las fotos del recetario y los productos de supermercado (unos 5 MB) ya no van en lo que se guarda al instalar la app: se
+guardan la primera vez que se usan (caché «muta-grande») y después funcionan sin cobertura. Instalar era lento y, en la
+CI, se cruzaba con las recargas de los recorridos. Las revisiones de accesibilidad esperan a que acaben las animaciones.

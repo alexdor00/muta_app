@@ -178,6 +178,8 @@ test('accesibilidad: Recetas, un plato, el menú y tu nutricionista', async ({ p
   test.setTimeout(150_000)
   await prepararObjetivo(page)
   const revisar = async (donde: string) => {
+    // Con las hojas ya abiertas del todo (a medio abrir, el texto aún es transparente)
+    await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'))
     const r = await new AxeBuilder({ page }).analyze()
     expect(r.violations, `${donde}: ${r.violations.map((v) => v.id).join(', ')}`).toEqual([])
   }

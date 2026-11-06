@@ -28,9 +28,18 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Todo se guarda en el móvil: la app abre sin cobertura en el gimnasio.
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2}'],
+        // La app se guarda en el móvil al instalarla: abre sin cobertura en el gimnasio. Lo grande (las fotos del recetario y
+        // los productos de supermercado) se guarda la primera vez que se usa, para que instalar sea rápido.
+        globPatterns: ['**/*.{js,css,html,svg,png,json,woff2}'],
+        globIgnores: ['**/foods-super-*.js', '**/foods-super-*.json'],
         navigateFallback: '/index.html',
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/.*\.(webp|js|json)$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'muta-grande', expiration: { maxEntries: 300 } },
+          },
+        ],
       },
     }),
   ],
