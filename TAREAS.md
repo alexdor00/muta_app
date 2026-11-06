@@ -39,7 +39,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
     equivalente; la compra en desplegables; filtros claros; el peso y lo de hoy, en la pestaña Hoy.
   - El recetario subido al repositorio (decisión del usuario). Base de 19.157 productos de supermercado (Open Food Facts) y
     el escáner que reconoce lo que ya está; la compra por menús; cantidades «para tu objetivo» o «como en la receta»;
-    «+ Añadir menú»; categorías al elegir un plato; la calculadora «Pesa en crudo, come cocinado» en Cocina.
+    «+ Añadir menú»; categorías al elegir un plato; la calculadora «Pesa en crudo, come cocinado» en Cocina; tu versión de
+    un plato (editarlo) y pasar los menús de tu dieta a tus menús. Comida, completa respecto al prototipo anterior.
   - Decisiones en [docs/decisiones.md](docs/decisiones.md) (2026-11-06) y cómo se rehace el recetario en
     [docs/datos.md](docs/datos.md).
 - Rama `pantalla/comida-v2` (2026-11-05, sin unir): Comida versiones 2 y 3. Verificado: `npm run check` (421 pruebas) y los

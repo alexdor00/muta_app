@@ -142,6 +142,38 @@ test('cuadrar el día con recetas: un plato por comida que queda', async ({ page
   await expect(page.getByRole('status')).toContainText('Apuntadas las 4')
 })
 
+test('tu versión de un plato: cambiar gramos, quitar un ingrediente y guardarla como tuya', async ({
+  page,
+}) => {
+  await prepararObjetivo(page)
+  await page.goto('/comida/plato/ej-pollo_arroz')
+  await page.getByRole('button', { name: 'Hacer tu versión' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Tu versión' })
+  await hoja.getByLabel('Nombre').fill('Mi pollo con arroz')
+  await hoja
+    .getByRole('button', { name: /^Quitar/ })
+    .first()
+    .click()
+  await hoja.getByRole('button', { name: 'Guardar' }).click()
+  await expect(page.getByRole('heading', { name: 'Mi pollo con arroz', level: 1 })).toBeVisible()
+  await page.goto('/comida?vista=recetas')
+  await expect(page.getByRole('heading', { name: 'Tuyos' })).toBeVisible()
+})
+
+test('tu dieta pasa a tus menús (y se deshace)', async ({ page }) => {
+  await prepararObjetivo(page)
+  await page.goto('/comida?vista=dieta')
+  await page.getByRole('button', { name: 'Probar la dieta de ejemplo' }).click()
+  await page
+    .getByRole('dialog', { name: 'Empezar la dieta' })
+    .getByRole('button', { name: 'Empezar hoy' })
+    .click()
+  await page.goto('/comida?vista=menu')
+  await page.getByRole('button', { name: 'Pasar sus menús a tus menús' }).click()
+  await expect(page.getByRole('status')).toContainText('Tus menús son ahora los de tu dieta')
+  await expect(page.getByRole('region', { name: 'Menú C' })).toBeVisible()
+})
+
 test('accesibilidad: Recetas, un plato, el menú y tu nutricionista', async ({ page }) => {
   test.setTimeout(150_000)
   await prepararObjetivo(page)

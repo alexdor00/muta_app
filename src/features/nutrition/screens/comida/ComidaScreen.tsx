@@ -28,7 +28,7 @@ import {
   quitarReceta,
 } from '../../use-cases/diet.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
-import { ponerPlato } from '../../use-cases/menu.ts'
+import { menusDeTuDieta, ponerPlato, volverA } from '../../use-cases/menu.ts'
 import { apuntarPlato, cargarRecetas, desapuntar, platoApuntado } from '../../use-cases/recipes.ts'
 import { gramosDeHueco, huecoDe, menu, platoPorId, type Cocinado } from '../../state/recetas.ts'
 import { esComida } from '../comun/platos.ts'
@@ -214,6 +214,14 @@ export function ComidaScreen() {
           }}
           onCuantos={cuantos.show}
           onAvisos={avisos.show}
+          onDeDieta={async () => {
+            const antes = await menusDeTuDieta()
+            if (antes)
+              avisar('Tus menús son ahora los de tu dieta', {
+                label: 'Deshacer',
+                onClick: () => void volverA(antes),
+              })
+          }}
         />
       ) : vista === 'recetas' ? (
         <RecetasVista />

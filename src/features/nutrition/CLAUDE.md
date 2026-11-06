@@ -58,7 +58,8 @@ propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si l
   `receta` (`/comida/receta/:id`, con intercambios y editar), `compra`, `cocina` y `consulta`. Lo común en `screens/comun`.
 
 - La base: `foodLog.cargarAlimentos()` (los genéricos) y, detrás, `cargarSupermercados()` (19.157 productos con marca y código).
-  La compra, por días o por menús. Cocina lleva arriba «Pesa en crudo, come cocinado» (`screens/cocina/PesaCrudo.tsx`).
+  La compra, por días o por menús. Tu versión de un plato: `platoEditado` + `EditarPlatoHoja`; tu dieta a tus menús:
+  `menu.menusDeTuDieta()`. Cocina lleva arriba «Pesa en crudo, come cocinado» (`screens/cocina/PesaCrudo.tsx`).
 
 ## Datos
 

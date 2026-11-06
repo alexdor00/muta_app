@@ -27,6 +27,7 @@ import { ADietaHoja } from './ADietaHoja.tsx'
 import { AjustarHoja } from './AjustarHoja.tsx'
 import { AlMenuHoja } from './AlMenuHoja.tsx'
 import { CambiarHoja } from './CambiarHoja.tsx'
+import { EditarPlatoHoja } from './EditarPlatoHoja.tsx'
 import styles from './Plato.module.css'
 
 /**
@@ -44,6 +45,7 @@ export function PlatoScreen(props: { id: string }) {
   const [cual, setCual] = useState<number | null>(null)
   const ajustarHoja = useSheet('ajustar')
   const cambiar = useSheet('cambiar')
+  const editar = useSheet('editar')
   const alMenu = useSheet('al-menu')
   const aDieta = useSheet('a-dieta')
   const { aviso, avisar } = useAviso()
@@ -207,6 +209,9 @@ export function PlatoScreen(props: { id: string }) {
           <Button variant="secondary" onClick={alMenu.show}>
             Al menú
           </Button>
+          <Button variant="secondary" onClick={editar.show}>
+            {p.origen === 'tuyo' ? 'Editar' : 'Hacer tu versión'}
+          </Button>
           {dieta.value && (
             <Button variant="secondary" onClick={aDieta.show}>
               A tu dieta
@@ -249,6 +254,7 @@ export function PlatoScreen(props: { id: string }) {
       )}
       {alMenu.open && <AlMenuHoja plato={p} onClose={alMenu.close} avisar={avisar} />}
       {aDieta.open && <ADietaHoja plato={p} onClose={aDieta.close} avisar={avisar} />}
+      {editar.open && <EditarPlatoHoja plato={p} onClose={editar.close} avisar={avisar} />}
       <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
     </div>
   )

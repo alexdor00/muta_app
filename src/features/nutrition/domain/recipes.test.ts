@@ -10,6 +10,7 @@ import {
   platoTuyo,
   cambioEn,
   platoCon,
+  platoEditado,
   productosVacios,
   vaCon,
 } from './recipes.ts'
@@ -166,5 +167,26 @@ describe('tus cambios', () => {
     })
     expect(platoCon(p, c, alimentoDe, '2026-11-10')).toBe(p)
     expect(cambioEn(null, p, 0, '2026-11-09')).toBeNull()
+  })
+})
+
+describe('tu versión de un plato', () => {
+  it('cambia gramos, quita y añade, y el total parte del suyo', () => {
+    const p = {
+      ...platoTuyo('rec-1', 'Arroz con pollo', [ingredienteDe(arroz, 100), ingredienteDe(pollo, 100)]),
+      origen: 'recetario' as const,
+      total: { kcal: 300, protein: 30, carbs: 30, fat: 3 },
+    }
+    const v = platoEditado(p, {
+      id: 'mio-1',
+      nombre: 'Mi arroz',
+      gramos: [200, null],
+      quitar: [1],
+      anadir: [ingredienteDe(pollo, 50)],
+      pasos: ['Cocer'],
+    })
+    expect(v.ingredientes.map((i) => i.gramos)).toEqual([200, 50])
+    expect(v.total.kcal).toBe(300 + 130 - 110 + 55)
+    expect(v).toMatchObject({ id: 'mio-1', nombre: 'Mi arroz', origen: 'tuyo', categoria: 'tuyos' })
   })
 })

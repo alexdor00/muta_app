@@ -13,6 +13,7 @@ import {
   ingredienteDe,
   leerRecetario,
   platoDeReceta,
+  platoEditado,
   platoTuyo,
   productosVacios,
   type CambioIngrediente,
@@ -156,6 +157,27 @@ export async function borrarPlato(id: string): Promise<Plato | null> {
 }
 
 export const devolverPlato = (p: Plato) => guardarTuyos([...platosTuyos.value, p])
+
+/** Pone (o cambia, si ya estaban) unos platos tuyos. */
+export const guardarPlatosTuyos = (lista: readonly Plato[]) =>
+  guardarTuyos([...platosTuyos.value.filter((x) => !lista.some((y) => y.id === x.id)), ...lista])
+
+/**
+ * Guarda tu versión de un plato: si ya es tuyo, lo cambia; si es del recetario, crea uno tuyo (y el del recetario se queda
+ * como venía). Devuelve su id.
+ */
+export async function guardarTuVersion(
+  original: Plato,
+  cambios: Omit<Parameters<typeof platoEditado>[1], 'id'>,
+): Promise<string> {
+  const id = original.origen === 'tuyo' ? original.id : `mio-${crypto.randomUUID()}`
+  const nuevo = platoEditado(original, { ...cambios, id })
+  await guardarTuyos([...platosTuyos.value.filter((x) => x.id !== id), nuevo])
+  return id
+}
+
+/** Un ingrediente nuevo de la base, con sus gramos (para tu versión de un plato). */
+export const ingredienteNuevo = (a: Alimento, gramos: number) => ingredienteDe(a, gramos)
 
 // --- Cambiar un ingrediente ---
 

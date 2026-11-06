@@ -2,7 +2,6 @@
 // calendario del móvil: la app no tiene servidor) y lo que propone tu nutricionista («Aplicar», «Ahora no», «Deshacer»).
 import { getDb } from '../../../shared/data/db.ts'
 import { platform } from '../../../shared/platform/index.ts'
-import type { ComidaId } from '../domain/food.ts'
 import {
   calendarioDelMenu,
   clave,
@@ -12,6 +11,7 @@ import {
   conDia,
   conPlato,
   conReparto,
+  diaSemana,
   duplicado,
   huecosDelDia,
   renombrado,
@@ -25,9 +25,13 @@ import {
   type MenuSemanal,
 } from '../domain/menu.ts'
 import type { PropuestaMenu } from '../domain/menuCoach.ts'
-import { hoy } from '../state/comida.ts'
 import { menu, platoPorId } from '../state/recetas.ts'
-import { ID_MENU } from './recipes.ts'
+import { addDays } from '../../../shared/lib/format.ts'
+import { menuDe } from '../domain/diet.ts'
+import { COMIDAS, type ComidaId } from '../domain/food.ts'
+import { platoDeReceta } from '../domain/recipes.ts'
+import { dieta, hoy } from '../state/comida.ts'
+import { guardarPlatosTuyos, ID_MENU } from './recipes.ts'
 
 async function guardar(m: MenuSemanal): Promise<void> {
   menu.value = m
@@ -140,4 +144,43 @@ export function deshacerHecho(id: string): Promise<void> {
     ...m,
     hechos: m.hechos.map((x) => (x.id === id ? { ...x, estado: 'deshecho' as const } : x)),
   })
+}
+
+/**
+ * Pasa los menús de tu dieta a tus menús: cada menú de la dieta, un menú tuyo (su primera receta de cada comida) y tu
+ * semana como la de la dieta. Sus recetas pasan a tus platos. Devuelve cómo estaba (para «Deshacer»); null sin dieta.
+ */
+export async function menusDeTuDieta(): Promise<MenuSemanal | null> {
+  const a = dieta.value
+  if (!a) return null
+  const antes = menu.value
+  const d = a.dieta
+  await guardarPlatosTuyos(
+    d.recetas.map((r) => ({
+      ...platoDeReceta(r),
+      id: `dieta-${r.id}`,
+      categoria: 'tuyos',
+      origen: 'tuyo' as const,
+    })),
+  )
+  const letras = 'ABCDEFG'
+  const menus = d.menus.slice(0, 7).map((m, i) => ({
+    id: letras[i],
+    nombre: m.nombre,
+    platos: Object.fromEntries(
+      COMIDAS.flatMap(({ id: c }) => {
+        const r =
+          d.recetas.find((x) => x.comida === c && x.menu === m.id) ??
+          d.recetas.find((x) => x.comida === c && !x.menu)
+        return r ? [[c, `dieta-${r.id}`]] : []
+      }),
+    ),
+  }))
+  const lunes = addDays(hoy.value, -diaSemana(hoy.value))
+  const semana = Array.from({ length: 7 }, (_, i) => {
+    const k = d.menus.findIndex((m) => m.id === menuDe(d, a.inicio, addDays(lunes, i)).id)
+    return letras[Math.max(0, Math.min(menus.length - 1, k))]
+  })
+  await guardar({ ...antes, menus, semana, reparto: 'elegidos' })
+  return antes
 }

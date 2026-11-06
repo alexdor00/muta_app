@@ -33,6 +33,7 @@ type Props = {
   onOpciones: (menu: string) => void
   onCuantos: () => void
   onAvisos: () => void
+  onDeDieta: () => void
 }
 
 const DIA_LARGO = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
@@ -48,7 +49,7 @@ function cuando(dias: readonly string[], hoyEs: string): string {
  * Tus menús: arriba tu semana (qué menú va cada día; tócalo para cambiarlo) y debajo cada menú cerrado con sus kcal y las
  * fotos de sus platos. Abierto, sus cuatro comidas.
  */
-export function MenuVista({ onPlato, onAnadir, onOpciones, onCuantos, onAvisos }: Props) {
+export function MenuVista({ onPlato, onAnadir, onOpciones, onCuantos, onAvisos, onDeDieta }: Props) {
   const { route } = useLocation()
   const [abierto, setAbierto] = useState<string | null>(null)
   if (estadoRecetas.value !== 'listo') return null
@@ -135,11 +136,21 @@ export function MenuVista({ onPlato, onAnadir, onOpciones, onCuantos, onAvisos }
           Avisos
         </button>
       </div>
-      <a class={`${v.pad} ${v.foot} ${styles.dieta}`} href={`${paths.nutrition}?vista=dieta`}>
-        {dieta.value
-          ? `Tu dieta: ${dieta.value.dieta.nombre} ›`
-          : '¿Sigues una dieta pautada? Cárgala aquí ›'}
-      </a>
+      <p class={`${v.pad} ${v.foot}`}>
+        <a class={styles.dieta} href={`${paths.nutrition}?vista=dieta`}>
+          {dieta.value
+            ? `Tu dieta: ${dieta.value.dieta.nombre} ›`
+            : '¿Sigues una dieta pautada? Cárgala aquí ›'}
+        </a>
+        {dieta.value && (
+          <>
+            {' · '}
+            <button type="button" class={styles.enlace} onClick={onDeDieta}>
+              Pasar sus menús a tus menús
+            </button>
+          </>
+        )}
+      </p>
     </div>
   )
 }

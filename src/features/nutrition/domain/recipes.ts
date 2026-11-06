@@ -282,3 +282,49 @@ export function platoCon(
   })
   return cambia ? { ...p, total, ingredientes } : p
 }
+
+/** Tu versión de un plato: con sus gramos, sin lo que quitas y con lo que añades (el total sigue partiendo del suyo). */
+export function platoEditado(
+  p: Plato,
+  cambios: {
+    id: string
+    nombre: string
+    gramos: readonly (number | null)[]
+    quitar: readonly number[]
+    anadir: readonly IngredientePlato[]
+    pasos: string[]
+  },
+): Plato {
+  const ingredientes = p.ingredientes.map((i, k) => ({ ...i, gramos: cambios.gramos[k] ?? i.gramos }))
+  const quedan = ingredientes.filter((_, k) => !cambios.quitar.includes(k))
+  const total = { ...p.total }
+  const suma = (i: IngredientePlato, signo: 1 | -1, g: number | null) => {
+    if (!i.cuenta || !i.por100 || g === null) return
+    for (const m of ['kcal', 'protein', 'carbs', 'fat'] as const) total[m] += (signo * i.por100[m] * g) / 100
+  }
+  p.ingredientes.forEach((i, k) => {
+    suma(i, -1, i.gramos)
+    if (!cambios.quitar.includes(k)) suma(i, 1, ingredientes[k].gramos)
+  })
+  for (const i of cambios.anadir) suma(i, 1, i.gramos)
+  const todos = [...quedan, ...cambios.anadir].map((i) =>
+    i.por100 && i.gramos !== null ? { ...i, macro: macroDe(i.por100, i.gramos) } : i,
+  )
+  return {
+    ...p,
+    id: cambios.id,
+    numero: p.numero,
+    nombre: cambios.nombre.trim() || p.nombre,
+    ingredientes: todos,
+    pasos: cambios.pasos,
+    total: {
+      kcal: Math.max(0, Math.round(total.kcal)),
+      protein: Math.max(0, r1(total.protein)),
+      carbs: Math.max(0, r1(total.carbs)),
+      fat: Math.max(0, r1(total.fat)),
+    },
+    ajustable: p.raciones === 1 && todos.some((i) => i.macro),
+    origen: 'tuyo',
+    categoria: p.origen === 'tuyo' ? p.categoria : 'tuyos',
+  }
+}

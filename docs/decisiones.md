@@ -426,3 +426,12 @@ Los generadores siguen en `private/herramientas/`; tras rehacerlo, se copia a `s
 - **Calculadora de platos en Cocina** («Pesa en crudo, come cocinado»), arriba, con los platos de tus menús; se llega desde
   Menú (Cocina) y desde «Cuándo cocinarlo» (Pesar lo cocinado). No molesta en Hoy ni en Recetas.
 - **CI**: el servidor de los recorridos tarda más en construirse; su límite pasa de 120 s a 300 s.
+
+## 2026-11-06 · Tu versión de un plato y tu dieta como tus menús
+
+- **Editar un plato** (del prototipo: «Recetario editable» y «Editor de platos»): nombre, gramos para siempre, quitar o
+  añadir ingredientes y pasos. Un plato del recetario no se cambia: «Hacer tu versión» lo guarda como tuyo (el total
+  sigue partiendo del libro y suma la diferencia).
+- **Tu dieta como tus menús** (lo que prometía el diseño sencillo): «Pasar sus menús a tus menús» crea un menú tuyo por
+  cada menú de la dieta (su primera receta de cada comida), tu semana como la de la dieta y sus recetas como platos tuyos;
+  se deshace. La dieta y su consulta siguen en su vista.
