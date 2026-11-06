@@ -12,6 +12,8 @@ export default defineConfig({
     ...devices['iPhone 13'],
     defaultBrowserType: 'chromium',
     locale: 'es-ES',
+    // Sin el modo sin conexión: al instalarse a la vez que un recorrido guarda y recarga, en la CI se perdía lo guardado
+    serviceWorkers: 'block',
   },
   webServer: {
     // Sin las rutinas privadas, igual que en la CI (no están en el repositorio)
