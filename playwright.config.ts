@@ -5,7 +5,8 @@ export default defineConfig({
   testDir: 'tests/e2e',
   outputDir: 'test-results',
   fullyParallel: true,
-  reporter: 'list',
+  // En la CI, los fallos también como anotaciones de GitHub (se leen sin abrir el registro)
+  reporter: process.env.CI ? [['github'], ['list']] : 'list',
   use: {
     baseURL: 'http://localhost:4174',
     ...devices['iPhone 13'],
