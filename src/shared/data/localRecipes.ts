@@ -1,8 +1,10 @@
-// El recetario local (private/recetas, fuera del repositorio): recetario.json con las recetas y una foto por receta. Lo
+// El recetario (src/shared/content/recetario, subido por decisión del usuario el 2026-11-06): recetario.json con las recetas y una foto por receta. Lo
 // generan private/herramientas/recetario*.mjs desde el documento original; ver docs/datos.md.
 
-const archivo = import.meta.glob<unknown>('/private/recetas/recetario.json', { import: 'default' })
-const fotos = import.meta.glob<string>('/private/recetas/fotos/*.webp', {
+const archivo = import.meta.glob<unknown>('/src/shared/content/recetario/recetario.json', {
+  import: 'default',
+})
+const fotos = import.meta.glob<string>('/src/shared/content/recetario/fotos/*.webp', {
   query: '?url',
   import: 'default',
   eager: true,
@@ -21,5 +23,5 @@ export async function readLocalRecipes(): Promise<unknown> {
 export function localRecipePhoto(numero: number): string | null {
   if (!enabled) return null
   const n = String(numero).padStart(2, '0')
-  return fotos[`/private/recetas/fotos/${n}.webp`] ?? null
+  return fotos[`/src/shared/content/recetario/fotos/${n}.webp`] ?? null
 }

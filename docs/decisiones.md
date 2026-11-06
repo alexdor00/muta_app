@@ -405,3 +405,10 @@ Diseño aprobado: `Desktop/MUTA-Comida-sencilla-funcionalidades.png` («me parec
 - **La compra en desplegables** (abierta la primera sección con algo por comprar), sin la lista de recetas de cada producto.
 - **Filtros de una categoría**: «Cuadran» pasa a «Para el desayuno / la cena…» y «≤ 20 min» a «Rápidas», en una fila.
 - **Las fotos del recetario siguen fuera de git** hasta que el usuario decida (el repositorio es público).
+
+## 2026-11-06 · El recetario se sube al repositorio (público)
+
+El usuario decide subir las recetas y las fotos del recetario «tal cual», sabiendo que el repositorio es público («la
+aplicación es para mí y para un amigo»). Pasan de `private/recetas/` a `src/shared/content/recetario/` (sin el nombre de la
+autora en la app). Excepción a la regla 7 de CLAUDE.md solo para el recetario: las rutinas de terceros siguen en `private/`.
+Los generadores siguen en `private/herramientas/`; tras rehacerlo, se copia a `src/shared/content/recetario/`.

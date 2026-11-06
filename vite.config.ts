@@ -29,7 +29,7 @@ export default defineConfig({
       },
       workbox: {
         // Todo se guarda en el móvil: la app abre sin cobertura en el gimnasio.
-        globPatterns: ['**/*.{js,css,html,svg,png,json,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,json,woff2}'],
         navigateFallback: '/index.html',
       },
     }),

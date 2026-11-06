@@ -62,7 +62,7 @@ Leer este archivo, `TAREAS.md` y el `CLAUDE.md` del módulo; resumir en cinco l�
 5. Dependencias entre capas: pantallas → casos de uso → dominio; las pantallas solo pintan y llaman casos de uso.
    El linter rechaza un import prohibido (`eslint.config.js`).
 6. Estilos solo con variables de `tokens.css`: sin colores ni tamaños a mano, sin `!important`.
-7. Los datos de terceros (`private/`) no se suben ni se copian a `src/`; sin nombres de personas en la app.
+7. Los datos de terceros (`private/`) no se suben ni se copian a `src/` (excepción: el recetario, decisión 2026-11-06); sin nombres de personas en la app.
 8. Un cambio = una rama (`refactor/…`, `pantalla/…`), un commit con sentido y todo en verde antes de unirlo.
 9. Pantalla nueva: sin diseño aprobado no se programa. Ver el checklist del documento de rediseño.
 
