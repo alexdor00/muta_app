@@ -9,6 +9,7 @@ import {
   platoDeReceta,
   platoTuyo,
   cambioEn,
+  claveDelDia,
   platoCon,
   platoEditado,
   productosVacios,
@@ -167,6 +168,20 @@ describe('tus cambios', () => {
     })
     expect(platoCon(p, c, alimentoDe, '2026-11-10')).toBe(p)
     expect(cambioEn(null, p, 0, '2026-11-09')).toBeNull()
+  })
+
+  it('el cambio de un día convive con el de siempre: ese día manda el suyo, los demás el de siempre', () => {
+    const c = {
+      ...productosVacios(),
+      enPlato: {
+        'mio-1': {
+          '0': { alimentoId: 'mio_arroz', gramos: null },
+          [claveDelDia(0, '2026-11-09')]: { alimentoId: 'f_patata', gramos: 250, fecha: '2026-11-09' },
+        },
+      },
+    }
+    expect(cambioEn(c, p, 0, '2026-11-09')?.alimentoId).toBe('f_patata')
+    expect(cambioEn(c, p, 0, '2026-11-10')?.alimentoId).toBe('mio_arroz')
   })
 })
 

@@ -360,6 +360,39 @@
   height: var(--icon-xs);
 }
 
+/* Un grupo de casillas (sin el borde del navegador) y cada casilla como una fila de la lista */
+.grupo {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.grupo > legend {
+  margin-bottom: var(--space-1);
+  padding: 0;
+}
+
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-bottom: var(--hairline) solid var(--separator);
+  cursor: pointer;
+}
+
+.casilla:last-of-type {
+  border-bottom: 0;
+}
+
+.casilla input {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+  margin: 0;
+  accent-color: var(--accent);
+}
+
 /* Editar una receta: «Quitar», − gramos + y los pasos */
 .danger {
   align-self: flex-start;

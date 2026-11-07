@@ -60,7 +60,7 @@ describe('la compra', () => {
   })
 
   it('por secciones, como texto, sin lo que ya tienes', () => {
-    expect(seccionDe('Pescados')).toBe('carne')
+    expect(seccionDe('Pescados')).toBe('pescado')
     expect(seccionDe('Rarezas')).toBe('despensa')
     const lista = listaDeLaCompra(dias)
     const texto = textoDeLaCompra(
@@ -69,7 +69,7 @@ describe('la compra', () => {
       [{ id: 'x1', nombre: 'Café', seccion: 'despensa' }],
       (g) => `${g} g`,
     )
-    expect(texto).toContain('CARNE Y PESCADO\n· Pechuga de pollo: 340 g')
+    expect(texto).toContain('CARNE\n· Pechuga de pollo: 340 g')
     expect(texto).not.toContain('Salmón')
     expect(texto).toContain('· Café')
   })

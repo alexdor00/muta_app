@@ -451,3 +451,19 @@ Ahora todo usa `nuevoId()` de `shared/lib/id.ts` (con `crypto.getRandomValues`, 
 
 Además, la primera vez que calculas tu objetivo se pregunta qué quieres (definir, mantenerte o volumen; viene marcado lo
 de tu bienvenida, que antes se usaba sin preguntar). La pestaña Hoy enseña lo que comes hoy según tu menú.
+
+## 2026-11-07 · Ajustar sin tocar verduras, lo cocido en crudo, la compra por pasillos y cambiar un día
+
+- **Ajustar** (sugerido): solo se mueve lo principal (carne, pescado, huevos y lácteos, cereales, legumbres, tubérculos,
+  fruta y grasas). Las verduras, salsas y caldos (la base los guarda como verdura) y las bebidas se quedan como en la
+  receta: salía un bowl con 325 g de cebolla y 50 g de pollo. El macro de cada ingrediente se recalcula al leer el recetario.
+  Se siguen ajustando 96 de 100.
+- **Lo cocido, en crudo**: el arroz, la pasta y las legumbres cocidos dicen «≈ 90 g en crudo», por sus kcal frente a su
+  pareja en crudo de la base (lo cocido gana agua, no kcal). Solo si la base tiene la pareja.
+- **La compra por pasillos** (sugerido): fruta, verdura, carne, pescado, huevos y lácteos, pan y cereales, legumbres,
+  conservas y salsas, aceites y especias, frutos secos, dulces, bebidas, platos preparados, suplementos y otros. Lo que la
+  base guarda junto (caldo y salsas como verdura, frutos secos como grasa) o no tiene, por su nombre.
+- **Cambiar un ingrediente** en los dos sitios (elegido por el usuario): al apuntar el día, «solo este día» (o siempre en
+  el plato), y si ya estaba apuntado se vuelve a apuntar; desde el menú, para siempre. El cambio de un día ya no borra el
+  de siempre: van con claves distintas.
+- **Texto justificado** en todos los párrafos (elegido por el usuario), con guiones.

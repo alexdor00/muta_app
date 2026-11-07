@@ -50,6 +50,13 @@ p {
   margin: 0;
 }
 
+/* Los párrafos, justificados (como en un documento) y partiendo palabras con guion para que no queden huecos grandes
+   en una pantalla estrecha. Lo que va centrado o en una fila lo dice su propia clase. */
+p {
+  text-align: justify;
+  hyphens: auto;
+}
+
 button {
   font: inherit;
   color: inherit;

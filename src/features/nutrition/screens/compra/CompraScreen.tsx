@@ -11,7 +11,7 @@ import { dieta, estado, hoy } from '../../state/comida.ts'
 import { SECCIONES } from '../../state/dieta.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
 import { cargarRecetas } from '../../use-cases/recipes.ts'
-import { estadoRecetas, menu } from '../../state/recetas.ts'
+import { enCrudo, estadoRecetas, menu } from '../../state/recetas.ts'
 import {
   anadirPropio,
   cantidad,
@@ -186,6 +186,9 @@ export function CompraScreen() {
                       </span>
                       <span class={p.rowText}>
                         <span class={p.rowTitle}>{x.nombre}</span>
+                        {enCrudo(x.clave, x.gramos) && (
+                          <span class={p.foot}>{enCrudo(x.clave, x.gramos)}</span>
+                        )}
                       </span>
                       <b class={p.qty}>{x.gramos ? cantidad(x.gramos) : 'al gusto'}</b>
                     </button>

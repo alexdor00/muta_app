@@ -1,6 +1,6 @@
 // Cocina: cuánto arroz cocer y cuánto pesa cocido, repartir una olla en raciones y calcular un plato propio por 100 g.
 // Reglas del prototipo anterior (js/comida/dieta.js · cocina y js/comida/calculadora-platos.js).
-import { sumar, type Macros } from './food.ts'
+import { sumar, type Alimento, type Macros } from './food.ts'
 import type { RecetaDelDia } from './diet.ts'
 
 /** El arroz de unas recetas: lo que llevan en crudo, cada una con su peso cocido según tu factor. */
@@ -55,4 +55,36 @@ export function platoPor100(
       fat: r1(total.fat),
     },
   }
+}
+
+/** Lo que se cuece con agua y cambia mucho de peso: de estos se dice lo que es en crudo. */
+const SE_CUECEN = ['Cereales', 'Legumbres']
+const sinCoccion = (nombre: string) =>
+  nombre
+    .toLowerCase()
+    .replace(/\((cocid[oa]s?|crud[oa]s?|sec[oa]s?)\)/g, ' ')
+    .replace(/\b(cocid[oa]s?|crud[oa]s?|sec[oa]s?)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+/**
+ * La pareja en crudo de un cereal o una legumbre cocidos de la base («Arroz blanco (cocido)» → «Arroz blanco (crudo)»);
+ * null si no es de lo que se cuece o la base no la tiene.
+ */
+export function parejaEnCrudo(cocido: Alimento, base: readonly Alimento[]): Alimento | null {
+  if (!SE_CUECEN.includes(cocido.category) || !/cocid[oa]/i.test(cocido.name)) return null
+  const clave = sinCoccion(cocido.name)
+  const crudo = base.find(
+    (a) => a.id !== cocido.id && /crud[oa]|sec[oa]/i.test(a.name) && sinCoccion(a.name) === clave,
+  )
+  // Al cocerse con agua pesa más: si no, no es la pareja que se busca
+  return crudo && crudo.kcal > cocido.kcal ? crudo : null
+}
+
+/**
+ * Los gramos en crudo de unos gramos cocidos, por sus kcal (lo cocido gana agua, no kcal), de 5 en 5: 250 g de arroz
+ * cocido (130 kcal/100 g) son unos 90 g en crudo (355 kcal/100 g). Es aproximado: depende de cuánta agua coja.
+ */
+export function gramosEnCrudo(gramosCocido: number, cocido: Alimento, crudo: Alimento): number {
+  return Math.max(5, Math.round((gramosCocido * cocido.kcal) / crudo.kcal / 5) * 5)
 }

@@ -1,7 +1,8 @@
 // La cocina con recetas hechas a mano (con la dieta de ejemplo de verdad, en use-cases/tools.test.ts).
 import { describe, expect, it } from 'vitest'
 import { recetaDelDia, type Receta } from './diet.ts'
-import { arrozDe, factorDe, platoPor100, racionDeOlla } from './kitchen.ts'
+import type { Alimento } from './food.ts'
+import { arrozDe, factorDe, gramosEnCrudo, parejaEnCrudo, platoPor100, racionDeOlla } from './kitchen.ts'
 
 const receta = (nombre: string, ingredientes: [string, number][]): Receta => ({
   id: nombre,
@@ -60,5 +61,34 @@ describe('la olla y el plato', () => {
       total: { kcal: 500, protein: 50, carbs: 50, fat: 10 },
       por100: null,
     })
+  })
+})
+
+describe('cocido y su equivalencia en crudo', () => {
+  const al = (id: string, name: string, category: string, kcal: number): Alimento => ({
+    id,
+    name,
+    category,
+    kcal,
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    servingG: 100,
+    servingLabel: 'ración',
+  })
+  const cocido = al('a', 'Arroz blanco (cocido)', 'Cereales', 130)
+  const crudo = al('b', 'Arroz blanco (crudo)', 'Cereales', 355)
+  const base = [cocido, crudo, al('c', 'Arroz integral (crudo)', 'Cereales', 350)]
+
+  it('encuentra su pareja en crudo y calcula los gramos por sus kcal, de 5 en 5', () => {
+    expect(parejaEnCrudo(cocido, base)?.id).toBe('b')
+    expect(gramosEnCrudo(250, cocido, crudo)).toBe(90)
+  })
+
+  it('solo de cereales y legumbres, y solo si lo crudo tiene más kcal', () => {
+    const pollo = al('p', 'Pechuga de pollo cocida', 'Carnes', 150)
+    expect(parejaEnCrudo(pollo, [pollo, al('q', 'Pechuga de pollo (cruda)', 'Carnes', 110)])).toBeNull()
+    expect(parejaEnCrudo(crudo, base)).toBeNull()
+    expect(parejaEnCrudo(al('x', 'Arroz basmati cocido', 'Cereales', 130), base)).toBeNull()
   })
 })

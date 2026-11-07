@@ -3,19 +3,60 @@
 import { plainText } from '../../../shared/lib/format.ts'
 
 /** Secciones de la lista y qué categorías de la base van en cada una (nombres sugeridos: el prototipo los ponía así). */
+/**
+ * Las secciones de la compra, en el orden de un paseo por el súper (sugerido). Cada una con las categorías de la base que
+ * le tocan; lo que la base guarda junto pero se compra en otro pasillo (el caldo y las salsas van como verdura; los frutos
+ * secos, como grasa) se reconoce por su nombre.
+ */
 export const SECCIONES: { id: string; nombre: string; categorias: string[] }[] = [
-  { id: 'carne', nombre: 'Carne y pescado', categorias: ['Carnes', 'Pescados', 'Embutidos'] },
+  { id: 'fruta', nombre: 'Fruta', categorias: ['Frutas'] },
+  { id: 'verdura', nombre: 'Verdura y hortalizas', categorias: ['Verduras', 'Tubérculos'] },
+  { id: 'carne', nombre: 'Carne', categorias: ['Carnes', 'Embutidos'] },
+  { id: 'pescado', nombre: 'Pescado y marisco', categorias: ['Pescados'] },
   { id: 'lacteos', nombre: 'Huevos y lácteos', categorias: ['Huevos y lácteos'] },
-  { id: 'pan', nombre: 'Cereales y pan', categorias: ['Cereales'] },
-  { id: 'fruta', nombre: 'Fruta, verdura y tubérculos', categorias: ['Frutas', 'Verduras', 'Tubérculos'] },
-  { id: 'despensa', nombre: 'Despensa', categorias: ['Legumbres', 'Dulces', 'Snacks', 'Platos', 'Bebidas'] },
+  { id: 'pan', nombre: 'Pan, cereales y pasta', categorias: ['Cereales'] },
+  { id: 'legumbres', nombre: 'Legumbres', categorias: ['Legumbres'] },
+  { id: 'conservas', nombre: 'Conservas, salsas y caldos', categorias: [] },
   { id: 'aceites', nombre: 'Aceites y especias', categorias: ['Grasas'] },
+  { id: 'frutos', nombre: 'Frutos secos y semillas', categorias: [] },
+  { id: 'dulces', nombre: 'Dulces y picoteo', categorias: ['Dulces', 'Snacks'] },
+  { id: 'bebidas', nombre: 'Bebidas', categorias: ['Bebidas'] },
+  { id: 'platos', nombre: 'Platos preparados', categorias: ['Platos', 'Comida rápida'] },
   { id: 'suple', nombre: 'Suplementos', categorias: ['Suplementos'] },
+  { id: 'despensa', nombre: 'Otros', categorias: [] },
 ]
 
-/** Sección de una categoría (lo que no está, a la despensa). */
-export function seccionDe(categoria: string): string {
-  return SECCIONES.find((s) => s.categorias.includes(categoria))?.id ?? 'despensa'
+/** Una palabra entera (con tildes: `\b` de JavaScript no las entiende). */
+const palabra = (lista: string) => new RegExp(`(^|[^a-záéíóúüñ])(${lista})([^a-záéíóúüñ]|$)`)
+
+const POR_NOMBRE: [RegExp, string][] = [
+  [
+    palabra(
+      'caldo|salsas?|sofrito|tomate (frito|triturado|concentrado|natural)|pasta de tomate|ketchup|mostaza|mayonesa|vinagre|conservas?|en lata|encurtidos?',
+    ),
+    'conservas',
+  ],
+  [
+    palabra(
+      'almendras?|nuez|nueces|avellanas?|anacardos?|pistachos?|cacahuetes?|semillas?|sésamo|chía|lino|pipas|piñones|crema de (cacahuete|almendra)',
+    ),
+    'frutos',
+  ],
+  [
+    palabra(
+      'sal|pimienta|comino|pimentón|orégano|canela|curry|cúrcuma|especias?|chile en polvo|cayena|nuez moscada|laurel|tomillo|romero|ajo en polvo|cebolla en polvo',
+    ),
+    'aceites',
+  ],
+  [palabra('ajos?|cilantro|perejil|albahaca|menta|hierbabuena|cebollino|jengibre'), 'verdura'],
+  [palabra('lima|limón|limones'), 'fruta'],
+]
+
+/** Sección de un producto por su categoría y, para lo que la base guarda junto, por su nombre (lo que no, a «Otros»). */
+export function seccionDe(categoria: string, nombre = ''): string {
+  const n = nombre.toLowerCase()
+  const porNombre = POR_NOMBRE.find(([re]) => re.test(n))?.[1]
+  return porNombre ?? SECCIONES.find((s) => s.categorias.includes(categoria))?.id ?? 'despensa'
 }
 
 export type Producto = {
@@ -50,7 +91,8 @@ export function listaDeLaCompra(
         const p = productos.get(clave) ?? {
           clave,
           nombre: i.nombre.replace(/\s*\((en )?crud[oa]\)/i, ''),
-          seccion: seccionDe(i.categoria),
+          // Sin alimento de la base, su categoría no dice nada (el recetario les pone «Platos»): manda el nombre
+          seccion: seccionDe(i.alimentoId ? i.categoria : '', i.nombre),
           gramos: null,
           usos: [],
         }

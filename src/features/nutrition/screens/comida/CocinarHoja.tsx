@@ -7,8 +7,8 @@ import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { COMIDAS, hoy, tipoDe } from '../../state/comida.ts'
 import {
   clave,
+  enCrudo,
   gramosDeHueco,
-  MACROS,
   menu,
   paraCocinar,
   platoPorId,
@@ -90,13 +90,13 @@ export function CocinarHoja({ cocinado, onClose, avisar }: Props) {
           <span class={h.foot}>Hora</span>
           <input type="time" value={hora} onInput={(e) => setHora(e.currentTarget.value || hora)} />
         </label>
-        <fieldset class={h.stack}>
+        <fieldset class={h.grupo}>
           <legend class={h.eyebrow}>Para</legend>
           {posibles.length ? (
             posibles.map((x) => {
               const k = clave(x.fecha, x.comida)
               return (
-                <label key={k} class={h.check}>
+                <label key={k} class={h.casilla}>
                   <input
                     type="checkbox"
                     checked={para.includes(k)}
@@ -125,8 +125,11 @@ export function CocinarHoja({ cocinado, onClose, avisar }: Props) {
             .filter((i) => i.gramos !== null)
             .map((i) => (
               <p key={i.texto} class={h.line}>
-                <span>
-                  {MACROS.find((m) => m.id === i.macro)?.corto ?? '·'} {i.nombre}
+                <span class={h.rowMain}>
+                  <span>{i.nombre}</span>
+                  {enCrudo(i.alimentoId, i.gramos) && (
+                    <span class={h.foot}>{enCrudo(i.alimentoId, i.gramos)}</span>
+                  )}
                 </span>
                 <b>{formatInt(i.gramos!)} g</b>
               </p>

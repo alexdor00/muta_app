@@ -4,7 +4,7 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
 import { SearchIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
-import { alimentoPorId, hoy, propios, type Alimento } from '../../state/comida.ts'
+import { alimentoPorId, propios, type Alimento } from '../../state/comida.ts'
 import { cambioDe, MACROS, platoOriginal, type Plato } from '../../state/recetas.ts'
 import { buscar, cargarAlimentos } from '../../use-cases/foodLog.ts'
 import { cambiarIngrediente, equivalentes } from '../../use-cases/recipes.ts'
@@ -18,6 +18,11 @@ type Props = {
   plato: Plato
   indice: number
   fecha: string
+  /**
+   * De dónde vienes: al apuntar un día (`dia`: el cambio es para ese día o para siempre en el plato) o al hacer el menú
+   * (`menu`: para siempre). Sin él, desde el plato.
+   */
+  contexto?: 'dia' | 'menu'
   onClose: () => void
   avisar: (texto: string, accion?: Aviso['accion']) => void
 }
@@ -31,13 +36,15 @@ const signo = (n: number) => (n > 0 ? `+${formatInt(n)}` : n < 0 ? `−${formatI
  * Cambiar un ingrediente: por otra marca (la tuya, escaneada o de su etiqueta; mismos gramos) o por otro alimento que
  * haga lo mismo (los mismos gramos de su macro principal), con cuánto cambian las kcal.
  */
-export function CambiarHoja({ plato, indice, fecha, onClose, avisar }: Props) {
+export function CambiarHoja({ plato, indice, fecha, contexto, onClose, avisar }: Props) {
   const original = platoOriginal(plato.id) ?? plato
   const i = original.ingredientes[indice]
   const actual = cambioDe(original, indice, fecha)
   const [modo, setModo] = useState<'marca' | 'alimento'>(actual?.gramos ? 'alimento' : 'marca')
   const [elegido, setElegido] = useState<Opcion | null>(null)
-  const [donde, setDonde] = useState<Donde>(actual?.gramos ? 'hoy' : 'todos')
+  const [donde, setDonde] = useState<Donde>(
+    contexto === 'dia' ? 'hoy' : contexto === 'menu' ? 'plato' : actual?.gramos ? 'hoy' : 'todos',
+  )
   const [texto, setTexto] = useState('')
   const [paso, setPaso] = useState<'elegir' | 'escanear' | 'crear'>('elegir')
   const [lista, setLista] = useState<Opcion[] | null>(null)
@@ -111,13 +118,13 @@ export function CambiarHoja({ plato, indice, fecha, onClose, avisar }: Props) {
       indice,
       { alimentoId: elegido.id, gramos: modo === 'marca' ? null : elegido.gramos },
       donde,
-      hoy.value,
+      fecha,
     )
     onClose()
     avisar(`${i.nombre} → ${elegido.nombre}`, {
       label: 'Deshacer',
       onClick: () =>
-        void cambiarIngrediente(original, indice, actual, actual?.fecha ? 'hoy' : 'plato', hoy.value),
+        void cambiarIngrediente(original, indice, actual, actual?.fecha ? 'hoy' : 'plato', fecha),
     })
   }
   const ahora = actual ? alimentoPorId(actual.alimentoId) : null
@@ -136,7 +143,7 @@ export function CambiarHoja({ plato, indice, fecha, onClose, avisar }: Props) {
               type="button"
               class={h.textButton}
               onClick={async () => {
-                await cambiarIngrediente(original, indice, null, 'todos', hoy.value)
+                await cambiarIngrediente(original, indice, null, 'todos', fecha)
                 onClose()
                 avisar(`Vuelve ${i.nombre.toLowerCase()}`)
               }}
@@ -160,7 +167,8 @@ export function CambiarHoja({ plato, indice, fecha, onClose, avisar }: Props) {
           onChange={(x) => {
             setModo(x)
             setElegido(null)
-            setDonde(x === 'marca' ? 'todos' : 'hoy')
+            if (!contexto) setDonde(x === 'marca' ? 'todos' : 'hoy')
+            else if (contexto === 'menu') setDonde(x === 'marca' ? 'todos' : 'plato')
           }}
         />
         {modo === 'alimento' ? (
@@ -217,15 +225,27 @@ export function CambiarHoja({ plato, indice, fecha, onClose, avisar }: Props) {
           name="cambiar-donde"
           legend="Dónde"
           options={
-            modo === 'marca'
+            contexto === 'dia'
               ? [
-                  { value: 'todos', label: 'En todos tus platos' },
-                  { value: 'plato', label: 'Solo en este' },
-                ]
-              : [
-                  { value: 'hoy', label: 'Solo hoy' },
+                  { value: 'hoy', label: 'Solo este día' },
                   { value: 'plato', label: 'Siempre en este plato' },
                 ]
+              : contexto === 'menu'
+                ? modo === 'marca'
+                  ? [
+                      { value: 'todos', label: 'En todos tus platos' },
+                      { value: 'plato', label: 'Solo en este' },
+                    ]
+                  : [{ value: 'plato', label: 'Siempre en este plato' }]
+                : modo === 'marca'
+                  ? [
+                      { value: 'todos', label: 'En todos tus platos' },
+                      { value: 'plato', label: 'Solo en este' },
+                    ]
+                  : [
+                      { value: 'hoy', label: 'Solo hoy' },
+                      { value: 'plato', label: 'Siempre en este plato' },
+                    ]
           }
           value={donde}
           onChange={setDonde}

@@ -226,6 +226,7 @@ export function paraCocinar(m: MenuSemanal, c: Cocinado, plato: Plato, gramosDe:
   const gramos = huecos.map((h) => gramosDe(h, plato))
   return plato.ingredientes.map((i, k) => ({
     nombre: i.nombre,
+    alimentoId: i.alimentoId,
     texto: i.texto,
     macro: i.macro,
     gramos:

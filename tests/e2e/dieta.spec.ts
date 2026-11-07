@@ -80,11 +80,12 @@ test('la receta: versión de descanso, un intercambio para siempre y editar sus 
 test('la compra: sale de las recetas, se marca lo que tienes y se añade lo tuyo', async ({ page }) => {
   await empezarEjemplo(page)
   await page.goto('/comida/compra')
-  await expect(page.getByRole('heading', { name: 'Carne y pescado' })).toBeVisible()
-  await expect(page.getByRole('button', { name: /^Carne y pescado/ })).toHaveAttribute(
-    'aria-expanded',
-    'true',
-  )
+  // Por pasillos: la primera con algo por comprar viene abierta; la carne se abre
+  await expect(page.getByRole('heading', { name: /^Carne/ })).toBeVisible()
+  await expect(page.locator('main button[aria-expanded="true"]').first()).toBeVisible()
+  const carne = page.getByRole('button', { name: /^Carne/ })
+  if ((await carne.getAttribute('aria-expanded')) === 'false') await carne.click()
+  await expect(carne).toHaveAttribute('aria-expanded', 'true')
   const pollo = page.getByRole('button', { name: /^Pechuga de pollo/ })
   await pollo.click()
   await expect(pollo).toHaveAttribute('aria-pressed', 'true')
@@ -175,7 +176,7 @@ test('accesibilidad: Dieta, la receta, la compra, la cocina y la consulta', asyn
   await expect(page.getByRole('heading', { name: 'Ingredientes' })).toBeVisible()
   await revisar('Receta')
   await page.goto('/comida/compra')
-  await expect(page.getByRole('heading', { name: 'Carne y pescado' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /^Carne/ })).toBeVisible()
   await revisar('La compra')
   await page.goto('/comida/cocina')
   await expect(page.getByRole('heading', { name: 'Repartir una olla' })).toBeVisible()

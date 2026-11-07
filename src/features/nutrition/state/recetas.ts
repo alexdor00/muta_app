@@ -14,9 +14,10 @@ import {
   type Hueco,
   type MenuSemanal,
 } from '../domain/menu.ts'
+import { gramosEnCrudo, parejaEnCrudo } from '../domain/kitchen.ts'
 import { propuestasDelMenu } from '../domain/menuCoach.ts'
 import { cambioEn, platoCon, type Plato, type Productos, type Recetario } from '../domain/recipes.ts'
-import { alimentoPorId, apuntesDia, hoy, objetivoDelDia, objetivoDia, totalDia } from './comida.ts'
+import { alimentoPorId, apuntesDia, base, hoy, objetivoDelDia, objetivoDia, totalDia } from './comida.ts'
 
 // Lo que las pantallas necesitan del dominio (no lo importan directamente)
 export {
@@ -180,4 +181,21 @@ export const manana = computed(() => addDays(hoy.value, 1))
 /** La foto del plato de un apunte (si salió de un plato con foto). */
 export function fotoDeApunte(receta: string | undefined): string | null {
   return receta ? (fotos.value[receta] ?? null) : null
+}
+
+/** Lo cocido de la base (cereales y legumbres) con su pareja en crudo. */
+const parejasEnCrudo = computed(() => {
+  const lista = base.value ?? []
+  return new Map(
+    lista.flatMap((a) => {
+      const crudo = parejaEnCrudo(a, lista)
+      return crudo ? [[a.id, { cocido: a, crudo }] as const] : []
+    }),
+  )
+})
+
+/** «≈ 90 g en crudo» para unos gramos de arroz, pasta o legumbre cocidos; null si no es de eso o no se sabe. */
+export function enCrudo(alimentoId: string | null, gramos: number | null): string | null {
+  const par = alimentoId && gramos ? parejasEnCrudo.value.get(alimentoId) : null
+  return par ? `≈ ${gramosEnCrudo(gramos!, par.cocido, par.crudo)} g en crudo` : null
 }

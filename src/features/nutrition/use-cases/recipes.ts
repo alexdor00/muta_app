@@ -10,6 +10,7 @@ import type { Alimento, ComidaId } from '../domain/food.ts'
 import { leerMenu } from '../domain/menu.ts'
 import { intercambios } from '../domain/swaps.ts'
 import {
+  claveDelDia,
   ingredienteDe,
   leerRecetario,
   platoDeReceta,
@@ -46,6 +47,8 @@ let carga: Promise<void> | null = null
 export function cargarRecetas(): Promise<void> {
   carga ??= (async () => {
     estadoRecetas.value = 'cargando'
+    // Detrás, sin esperar: la base dice lo que es en crudo el arroz o la pasta cocidos de un plato
+    void cargarAlimentos()
     try {
       const db = await getDb()
       const [tuyos, guardado, mios, local] = await Promise.all([
@@ -120,6 +123,24 @@ export async function apuntarPlato(
 
 /** Quita lo apuntado (deshacer). */
 export const desapuntar = (ids: readonly string[], fecha = diaVisto.value) => quitar(ids, fecha)
+
+/**
+ * Si un plato ya está apuntado en una comida de un día, lo vuelve a apuntar como está ahora (tras cambiar un ingrediente
+ * ese día): con sus gramos y sus kcal nuevos.
+ */
+export async function reapuntarPlato(
+  p: Plato,
+  comida: ComidaId,
+  gramos: readonly (number | null)[],
+  fecha: string,
+): Promise<void> {
+  const ids = (dias.value[fecha] ?? [])
+    .filter((a) => a.receta === p.id && a.comida === comida)
+    .map((a) => a.id)
+  if (!ids.length) return
+  await desapuntar(ids, fecha)
+  await apuntarPlato(p, comida, gramos, 1, fecha)
+}
 
 /** Si un plato está apuntado en una comida de un día. */
 export function platoApuntado(platoId: string, comida: ComidaId, fecha: string): boolean {
@@ -201,12 +222,19 @@ export function cambiarIngrediente(
   const actual = productos.value ?? productosVacios()
   const generico = plato.ingredientes[k]?.alimentoId
   const enEste = { ...(actual.enPlato[plato.id] ?? {}) }
-  delete enEste[String(k)]
+  // El de un día va con su fecha en la clave: convive con el de siempre (ese día manda el suyo)
+  const clave = donde === 'hoy' ? claveDelDia(k, hoyEs) : String(k)
+  delete enEste[clave]
+  // Quitar el cambio lo quita del todo (el de ese día y el de siempre)
+  if (!cambio) {
+    delete enEste[String(k)]
+    delete enEste[claveDelDia(k, hoyEs)]
+  }
   const siempre = { ...actual.siempre }
   if (donde === 'todos' && generico) {
     if (cambio) siempre[generico] = cambio.alimentoId
     else delete siempre[generico]
-  } else if (cambio) enEste[String(k)] = donde === 'hoy' ? { ...cambio, fecha: hoyEs } : cambio
+  } else if (cambio) enEste[clave] = donde === 'hoy' ? { ...cambio, fecha: hoyEs } : cambio
   if (!cambio && generico) delete siempre[generico]
   return guardarProductos({ ...actual, siempre, enPlato: { ...actual.enPlato, [plato.id]: enEste } })
 }

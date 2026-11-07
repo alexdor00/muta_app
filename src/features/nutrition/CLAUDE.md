@@ -24,11 +24,12 @@ propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si l
 - `domain/diet.ts` — la dieta: menús en un ciclo de 7 días, recetas con gramos de entreno y de descanso, la receta que
   «ajusta» (absorbe las kcal de la consulta y de la fase, de 5 en 5 g), el día con tu dieta (`diaDeDieta`), el reparto sin
   rutina y el archivo (`leerDieta` / `aArchivo`, formato `muta-dieta` v1). `dietSample.ts`, la dieta de ejemplo del prototipo.
-- `domain/swaps.ts` (intercambios: mismos gramos del macro principal), `shopping.ts` (la compra por secciones; nombres de
-  sección sugeridos), `kitchen.ts` (arroz y su factor, repartir una olla, un plato por 100 g), `barcode.ts` (variantes
+- `domain/swaps.ts` (intercambios: mismos gramos del macro principal), `shopping.ts` (la compra por pasillos: por categoría y, lo que
+  la base guarda junto o no tiene, por su nombre; sugerido), `kitchen.ts` (arroz y su factor, repartir una olla, un plato por 100 g,
+  lo cocido en crudo por sus kcal), `barcode.ts` (variantes
   EAN/UPC y Open Food Facts), `consult.ts` (la consulta con dieta, reglas 1–8 de la sección 8, y las señales de la sección 5).
-- `domain/recipes.ts` — un plato (del recetario, de ejemplo o tuyo): leer el recetario, su macro principal, buscar, qué
-  categorías van con cada comida (sugerido) y tus productos (`productoEn`, `valoresCon`). `fit.ts` — ajustar un plato a lo
+- `domain/recipes.ts` — un plato (del recetario, de ejemplo o tuyo): leer el recetario, su macro principal (las verduras, salsas, caldos y bebidas no se mueven: `NO_SE_AJUSTA`), buscar, qué
+  categorías van con cada comida (sugerido) y tus productos (el cambio de un solo día, con `claveDelDia`; convive con el de siempre) (`productoEn`, `valoresCon`). `fit.ts` — ajustar un plato a lo
   que falta (parte del total del libro y suma la diferencia; de 5 en 5 g, entre ×0,5 y ×2,5, sugerido), hasta dónde llega,
   el reparto entre comidas (sugerido) y cuadrar el día. `menu.ts` — tus menús (1 a 7, un plato por comida) y tu semana (qué menú va cada día), cocinados, día de la compra,
   avisos, lo de hoy, las recetas para la compra y el `.ics`. `menuCoach.ts` — lo que propone tu nutricionista (por menú).

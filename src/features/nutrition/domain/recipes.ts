@@ -75,23 +75,28 @@ export function leerRecetario(x: unknown): Recetario | null {
         Array.isArray(r.ingredientes) &&
         Array.isArray(r.pasos),
     )
-    .map((r): Plato => ({
-      id: r.id as string,
-      numero: typeof r.numero === 'number' ? r.numero : null,
-      nombre: r.nombre as string,
-      categoria: String(r.categoria ?? ''),
-      dificultad: String(r.dificultad ?? ''),
-      minutos: typeof r.minutos === 'number' ? r.minutos : null,
-      raciones: typeof r.raciones === 'number' && r.raciones > 0 ? r.raciones : 1,
-      total: r.total as Macros,
-      ingredientes: (r.ingredientes as IngredientePlato[]).map((i) => ({
-        ...i,
-        por100: esMacros(i.por100) ? i.por100 : null,
-      })),
-      pasos: (r.pasos as unknown[]).map(String),
-      ajustable: r.ajustable === true,
-      origen: 'recetario',
-    }))
+    .map((r): Plato => {
+      const ingredientes = (r.ingredientes as IngredientePlato[]).map((i) => {
+        const por100 = esMacros(i.por100) ? i.por100 : null
+        // El macro se vuelve a sacar aquí (no del archivo): así cambia la regla sin rehacer el recetario
+        const macro = por100 && typeof i.gramos === 'number' ? macroDe(por100, i.gramos, i.categoria) : null
+        return { ...i, por100, macro: i.macro === null ? null : macro }
+      })
+      return {
+        id: r.id as string,
+        numero: typeof r.numero === 'number' ? r.numero : null,
+        nombre: r.nombre as string,
+        categoria: String(r.categoria ?? ''),
+        dificultad: String(r.dificultad ?? ''),
+        minutos: typeof r.minutos === 'number' ? r.minutos : null,
+        raciones: typeof r.raciones === 'number' && r.raciones > 0 ? r.raciones : 1,
+        total: r.total as Macros,
+        ingredientes,
+        pasos: (r.pasos as unknown[]).map(String),
+        ajustable: r.ajustable === true && ingredientes.some((i) => i.macro),
+        origen: 'recetario',
+      }
+    })
   return {
     rev: typeof o.rev === 'number' ? o.rev : 0,
     categorias: (o.categorias as CategoriaPlato[]).filter((c) => typeof c.id === 'string'),
@@ -99,8 +104,19 @@ export function leerRecetario(x: unknown): Recetario | null {
   }
 }
 
-/** El macro que manda en un ingrediente (si aporta al menos 40 kcal): la proteína si da un 30 % de sus kcal. */
-export function macroDe(por100: Macros, gramos: number): MacroId | null {
+/**
+ * Lo que no se mueve al ajustar aunque aporte (sugerido): las verduras, las salsas y los caldos (la base guarda las
+ * salsas y el caldo como verdura) y las bebidas. Subir la cebolla o el tomate para llegar a los hidratos no es cocinar;
+ * se mueve lo principal: carne, pescado, huevos y lácteos, cereales, legumbres, tubérculos, fruta y grasas.
+ */
+export const NO_SE_AJUSTA = ['Verduras', 'Bebidas'] as const
+
+/**
+ * El macro que manda en un ingrediente (si aporta al menos 40 kcal y no es de lo que no se ajusta): la proteína si da un
+ * 30 % de sus kcal.
+ */
+export function macroDe(por100: Macros, gramos: number, categoria = ''): MacroId | null {
+  if ((NO_SE_AJUSTA as readonly string[]).includes(categoria)) return null
   if ((por100.kcal * gramos) / 100 < 40) return null
   const k = { protein: por100.protein * 4, carbs: por100.carbs * 4, fat: por100.fat * 9 }
   if (k.protein >= 0.3 * por100.kcal) return 'protein'
@@ -135,7 +151,7 @@ export function ingredienteDe(a: Alimento, gramos: number, texto = ''): Ingredie
     cuenta: true,
     gramos,
     sugerido: false,
-    macro: macroDe(por100, gramos),
+    macro: macroDe(por100, gramos, a.category),
   }
 }
 
@@ -173,7 +189,7 @@ export function platoDeReceta(r: Receta): Plato {
     cuenta: i.gramos !== null,
     gramos: i.gramos?.entreno ?? null,
     sugerido: false,
-    macro: i.gramos ? macroDe(i.por100, i.gramos.entreno) : null,
+    macro: i.gramos ? macroDe(i.por100, i.gramos.entreno, i.categoria) : null,
   }))
   return {
     ...platoTuyo(`ej-${r.id}`, r.nombre, ingredientes, r.pasos),
@@ -225,6 +241,9 @@ export const productosVacios = (): Productos => ({
 })
 
 /** El cambio de un ingrediente de un plato un día (null: como en el plato). */
+/** La clave de un cambio de un solo día («3@2026-11-07»); el de siempre va con el índice solo («3»). */
+export const claveDelDia = (k: number, fecha: string) => `${k}@${fecha}`
+
 export function cambioEn(
   productos: Productos | null,
   plato: Plato,
@@ -232,6 +251,8 @@ export function cambioEn(
   fecha: string,
 ): CambioIngrediente | null {
   if (!productos) return null
+  const delDia = productos.enPlato[plato.id]?.[claveDelDia(k, fecha)]
+  if (delDia) return delDia
   const propio = productos.enPlato[plato.id]?.[String(k)]
   if (propio && (!propio.fecha || propio.fecha === fecha)) return propio
   const generico = plato.ingredientes[k]?.alimentoId
@@ -276,7 +297,7 @@ export function platoCon(
       por100: v,
       gramos: g,
       sugerido: c.gramos === null && i.sugerido,
-      macro: macroDe(v, g),
+      macro: macroDe(v, g, a.category),
       antes: i.nombre,
     }
   })
@@ -308,7 +329,7 @@ export function platoEditado(
   })
   for (const i of cambios.anadir) suma(i, 1, i.gramos)
   const todos = [...quedan, ...cambios.anadir].map((i) =>
-    i.por100 && i.gramos !== null ? { ...i, macro: macroDe(i.por100, i.gramos) } : i,
+    i.por100 && i.gramos !== null ? { ...i, macro: macroDe(i.por100, i.gramos, i.categoria) } : i,
   )
   return {
     ...p,

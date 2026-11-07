@@ -9,6 +9,7 @@ import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { comidaPorHora, diaVisto, dieta, estado, hoy } from '../../state/comida.ts'
 import {
+  enCrudo,
   estadoRecetas,
   fotos,
   MACROS,
@@ -175,6 +176,9 @@ export function PlatoScreen(props: { id: string }) {
                     <span class={r.rowText}>
                       <span class={r.name}>{i.alimentoId ? i.nombre : i.texto}</span>
                       {i.antes && <span class={h.foot}>En lugar de {i.antes.toLowerCase()}</span>}
+                      {i.cuenta && enCrudo(i.alimentoId, g) && (
+                        <span class={h.foot}>{enCrudo(i.alimentoId, g)}</span>
+                      )}
                     </span>
                     {g !== null && i.cuenta && (
                       <b class={r.grams}>

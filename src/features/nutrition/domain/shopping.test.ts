@@ -48,7 +48,7 @@ describe('la lista de la compra', () => {
         gramos: 1100,
         usos: ['Pollo con arroz'],
       },
-      { clave: 'sal', nombre: 'Sal', seccion: 'despensa', gramos: null, usos: ['Pollo con arroz'] },
+      { clave: 'sal', nombre: 'Sal', seccion: 'aceites', gramos: null, usos: ['Pollo con arroz'] },
     ])
   })
 
@@ -56,13 +56,27 @@ describe('la lista de la compra', () => {
     expect(listaDeLaCompra(dias, { r: 1 })[0].gramos).toBe(2200)
   })
 
-  it('cada categoría en su sección', () => {
-    expect(seccionDe('Verduras')).toBe('fruta')
-    expect(seccionDe('Grasas')).toBe('aceites')
+  it('cada categoría en su sección, y lo que la base guarda junto, por su nombre', () => {
+    expect(seccionDe('Verduras', 'Cebolla')).toBe('verdura')
+    expect(seccionDe('Frutas', 'Mango')).toBe('fruta')
+    expect(seccionDe('Pescados', 'Salmón')).toBe('pescado')
+    expect(seccionDe('Grasas', 'Aceite de oliva')).toBe('aceites')
+    // El caldo y la salsa, como verdura en la base; los frutos secos, como grasa
+    expect(seccionDe('Verduras', 'Caldo de pollo')).toBe('conservas')
+    expect(seccionDe('Verduras', 'Salsa de tomate')).toBe('conservas')
+    expect(seccionDe('Grasas', 'Almendras')).toBe('frutos')
+    expect(seccionDe('', 'Sal')).toBe('aceites')
+    // «sal» no es «salmón» ni «salsa»
+    expect(seccionDe('Pescados', 'Salmón ahumado')).toBe('pescado')
+    expect(seccionDe('Legumbres', 'Lentejas (crudas)')).toBe('legumbres')
+    // Lo que no está en la base, por su nombre
+    expect(seccionDe('', 'Ajo')).toBe('verdura')
+    expect(seccionDe('', 'Zumo de lima al gusto')).toBe('fruta')
+    expect(seccionDe('', 'Algo raro')).toBe('despensa')
   })
 
   it('el texto para compartir, sin lo que ya tienes', () => {
     const texto = textoDeLaCompra(listaDeLaCompra(dias), new Set(['sal']), [], (g) => `${g / 1000} kg`)
-    expect(texto).toBe('CARNE Y PESCADO\n· Pechuga de pollo: 1.1 kg')
+    expect(texto).toBe('CARNE\n· Pechuga de pollo: 1.1 kg')
   })
 })

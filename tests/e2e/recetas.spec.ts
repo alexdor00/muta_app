@@ -107,6 +107,8 @@ test('tus menús: un plato en la cena, cuándo cocinarlo, el tick en Hoy y lo de
   )
   // La compra sale de tus menús, por días o por los menús que elijas
   await page.goto('/comida/compra')
+  const pescado = page.getByRole('button', { name: /^Pescado y marisco/ })
+  if ((await pescado.getAttribute('aria-expanded')) === 'false') await pescado.click()
   await expect(page.getByText(/Salmón/).first()).toBeVisible()
   await page.getByText('Unos menús', { exact: true }).click()
   await page.getByRole('button', { name: 'Menú A: una vez más' }).click()

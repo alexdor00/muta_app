@@ -9,6 +9,7 @@ import { PlatoFila } from '../../components/Platos.tsx'
 import { hoy, type ComidaId } from '../../state/comida.ts'
 import {
   diasDelMenu,
+  enCrudo,
   fotos,
   gramosDeHueco,
   huecoDe,
@@ -53,7 +54,16 @@ export function PlatoMenuHoja({ menuId, comida, onClose, onCambiar, onCocinar, a
     cocinado: null,
   }
   if (cual !== null && p)
-    return <CambiarHoja plato={p} indice={cual} fecha={fecha} onClose={() => setCual(null)} avisar={avisar} />
+    return (
+      <CambiarHoja
+        plato={p}
+        indice={cual}
+        fecha={fecha}
+        contexto="menu"
+        onClose={() => setCual(null)}
+        avisar={avisar}
+      />
+    )
   const ajustada = !m.fijos?.includes(comida)
   const gramos = p ? gramosDeHueco(hueco, p) : []
   const total = p ? totalCon(p, gramos) : null
@@ -91,6 +101,9 @@ export function PlatoMenuHoja({ menuId, comida, onClose, onCambiar, onCocinar, a
                     <span class={r.rowText}>
                       <span class={r.name}>{i.nombre}</span>
                       {i.antes && <span class={h.foot}>En lugar de {i.antes.toLowerCase()}</span>}
+                      {enCrudo(i.alimentoId, gramos[k] ?? i.gramos) && (
+                        <span class={h.foot}>{enCrudo(i.alimentoId, gramos[k] ?? i.gramos)}</span>
+                      )}
                     </span>
                     <b class={r.grams}>
                       {gramos[k] !== null && gramos[k] !== i.gramos && (
