@@ -82,6 +82,17 @@ export function MealList({ titulo, comidas, quedan, onAbrir, onAnadir, onTick }:
                 </span>
                 {c.alimentos && !m && <ChevronRightIcon />}
               </button>
+              {m && (
+                // Con plato del menú también se apunta otra cosa (por si hoy no sigues el menú)
+                <button
+                  type="button"
+                  class={styles.add}
+                  aria-label={`Añadir otra cosa ${c.al}`}
+                  onClick={() => onAnadir(c.id)}
+                >
+                  <PlusIcon />
+                </button>
+              )}
               {m ? (
                 <button
                   type="button"

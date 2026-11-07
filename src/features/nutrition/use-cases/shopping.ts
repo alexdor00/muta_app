@@ -49,6 +49,7 @@ function deMenus(veces: Record<string, number>) {
           {
             id: p.id,
             nombre: p.nombre,
+            deMenu: m.nombre,
             lista: p.ingredientes.map((i, k) => ({
               alimentoId: i.alimentoId,
               nombre: i.nombre,

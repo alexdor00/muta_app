@@ -8,7 +8,7 @@ import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { dieta, estado, hoy } from '../../state/comida.ts'
-import { SECCIONES } from '../../state/dieta.ts'
+import { emojiDe, SECCIONES } from '../../state/dieta.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
 import { cargarRecetas } from '../../use-cases/recipes.ts'
 import { enCrudo, estadoRecetas, menu } from '../../state/recetas.ts'
@@ -155,6 +155,9 @@ export function CompraScreen() {
         <button type="button" class={p.textButton} onClick={alguien.show}>
           <PlusIcon /> ¿Come alguien más?
         </button>
+        <button type="button" class={p.textButton} onClick={anadir.show}>
+          <PlusIcon /> Añadir algo que no está en el menú
+        </button>
       </section>
 
       {SECCIONES.map((s) => {
@@ -197,10 +200,15 @@ export function CompraScreen() {
                       <span class={p.box} aria-hidden="true">
                         {tienes.has(x.clave) && <CheckIcon />}
                       </span>
+                      <span class={p.emoji} aria-hidden="true">
+                        {emojiDe(x.nombre, x.seccion)}
+                      </span>
                       <span class={p.rowText}>
                         <span class={p.rowTitle}>{x.nombre}</span>
-                        {enCrudo(x.clave, x.gramos) && (
-                          <span class={p.foot}>{enCrudo(x.clave, x.gramos)}</span>
+                        {(x.menus.length > 0 || enCrudo(x.clave, x.gramos)) && (
+                          <span class={p.foot}>
+                            {[x.menus.join(' · '), enCrudo(x.clave, x.gramos)].filter(Boolean).join(' · ')}
+                          </span>
                         )}
                       </span>
                       <b class={p.qty}>{x.gramos ? cantidad(x.gramos) : 'al gusto'}</b>
@@ -217,6 +225,9 @@ export function CompraScreen() {
                     >
                       <span class={p.box} aria-hidden="true">
                         {tienes.has(x.id) && <CheckIcon />}
+                      </span>
+                      <span class={p.emoji} aria-hidden="true">
+                        {emojiDe(x.nombre, x.seccion)}
                       </span>
                       <span class={p.rowText}>
                         <span class={p.rowTitle}>{x.nombre}</span>

@@ -112,7 +112,7 @@ export function ElegirPlatoHoja({ menuId, comida, onClose, onCrear, avisar }: Pr
                 nombre={plato.nombre}
                 foto={fotos.value[plato.id] ?? null}
                 lineas={[`${formatInt(kcal)} kcal`]}
-                href={`${paths.dish(plato.id, { comida })}&desde=menu`}
+                href={`${paths.dish(plato.id, { comida })}&desde=menu&menu=${menuId}`}
                 accion={
                   <button
                     type="button"

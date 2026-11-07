@@ -147,6 +147,14 @@
   height: var(--icon-xs);
 }
 
+/* El emoticono del alimento en la compra */
+.emoji {
+  flex: none;
+  width: var(--icon);
+  font: var(--text-title-2);
+  text-align: center;
+}
+
 .checked .box {
   border-color: var(--accent);
   background: var(--accent);

@@ -25,6 +25,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-07 (rama `pantalla/recetas`): desde el menú, el botón principal pone la receta en el menú; en Hoy manda tu
+  menú sobre la dieta y se apunta otra cosa con «+»; la compra con emoticonos, de qué menú sale cada cosa y añadir lo tuyo arriba.
+
 - 2026-11-07 (rama `pantalla/recetas`): repaso de las 53 pantallas y hojas de Comida con capturas (ver decisiones):
   compra por menús en ×1, el aviso no tapa otras hojas, opciones visibles sobre tarjetas, títulos de hoja iguales, apuntar el
   plato del menú desde su comida, categoría con foto, compra con barra de progreso.

@@ -72,8 +72,10 @@ export function HoyVista({
   const esHoy = fecha === hoy.value
   const total = totalDia.value
   const sugerencia = pendiente.value
-  const menu = menuDelDia.value
-  const tuMenu = menu ? null : menuConPlatos(fecha)
+  // Si ese día tienes un menú tuyo con platos, manda el tuyo; la dieta, solo los días sin menú tuyo
+  const tuMenu = menuConPlatos(fecha)
+  const enDieta = menuDelDia.value
+  const menu = tuMenu ? null : enDieta
   const cocinas = esHoy ? tareasDeHoy.value.filter((t) => t.tipo === 'cocinar') : []
   const quedan = Math.max(0, objetivo.kcal - total.kcal)
   const faltaProteina = Math.max(0, Math.round(objetivo.protein - total.protein))
@@ -94,7 +96,7 @@ export function HoyVista({
           { nombre: 'Grasa', hecho: total.fat, objetivo: objetivo.fat },
         ]}
       />
-      {esHoy && menu && tocaConsulta.value && (
+      {esHoy && enDieta && tocaConsulta.value && (
         <CoachCard
           titulo="Tu nutricionista · consulta semanal"
           texto="Toca la consulta: báscula, cinta y cómo te has sentido"
@@ -102,7 +104,7 @@ export function HoyVista({
           onVer={onConsulta}
         />
       )}
-      {esHoy && !menu && sugerencia && onSugerencia && (
+      {esHoy && !enDieta && sugerencia && onSugerencia && (
         <CoachCard
           titulo="El entrenador · revisión semanal"
           texto={`Te propongo un cambio: ${sugerencia.a > (sugerencia.de ?? 0) ? '+' : '−'}${formatInt(Math.abs(sugerencia.a - (sugerencia.de ?? 0)))} kcal`}

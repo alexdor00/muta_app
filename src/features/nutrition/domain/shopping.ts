@@ -68,6 +68,8 @@ export type Producto = {
   gramos: number | null
   /** Las recetas en las que va. */
   usos: string[]
+  /** Los menús de los que sale («Menú A»); vacío si sale de tu dieta. */
+  menus: string[]
 }
 
 /** Lo que hay que comprar para estos días (con `extra[receta]` raciones de más). */
@@ -75,6 +77,8 @@ export type Producto = {
 export type RecetaParaComprar = {
   id: string
   nombre: string
+  /** El menú del que sale, si es de tus menús. */
+  deMenu?: string
   lista: readonly { alimentoId: string | null; nombre: string; categoria: string; g: number | null }[]
 }
 
@@ -95,14 +99,20 @@ export function listaDeLaCompra(
           seccion: seccionDe(i.alimentoId ? i.categoria : '', i.nombre),
           gramos: null,
           usos: [],
+          menus: [],
         }
         if (i.g !== null) p.gramos = (p.gramos ?? 0) + i.g * veces
         if (!p.usos.includes(r.nombre)) p.usos.push(r.nombre)
+        if (r.deMenu && !p.menus.includes(r.deMenu)) p.menus.push(r.deMenu)
         productos.set(clave, p)
       }
     }
   return [...productos.values()]
-    .map((p) => ({ ...p, gramos: p.gramos === null ? null : Math.round(p.gramos) }))
+    .map((p) => ({
+      ...p,
+      gramos: p.gramos === null ? null : Math.round(p.gramos),
+      menus: [...p.menus].sort((a, b) => a.localeCompare(b, 'es')),
+    }))
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
 }
 
@@ -124,4 +134,88 @@ export function textoDeLaCompra(
     if (de.length) lineas.push(s.nombre.toUpperCase(), ...de, '')
   }
   return lineas.join('\n').trim()
+}
+
+/** Emoticonos por palabra del nombre (lo primero que encaja manda) y, si no, el de su sección. Solo decoran la lista. */
+const EMOJI_NOMBRE: [string, string][] = [
+  ['aguacate', '🥑'],
+  ['manzana', '🍎'],
+  ['plátano|platano|banana', '🍌'],
+  ['naranja|mandarina', '🍊'],
+  ['limón|limon|lima', '🍋'],
+  ['fresa', '🍓'],
+  ['arándano|arandano|frutos rojos|frambuesa|mora', '🫐'],
+  ['uva', '🍇'],
+  ['pera', '🍐'],
+  ['piña', '🍍'],
+  ['mango', '🥭'],
+  ['melocotón|melocoton', '🍑'],
+  ['kiwi', '🥝'],
+  ['sandía|sandia|melón|melon', '🍉'],
+  ['coco', '🥥'],
+  ['cereza', '🍒'],
+  ['tomate', '🍅'],
+  ['zanahoria', '🥕'],
+  ['brócoli|brocoli', '🥦'],
+  ['lechuga|espinaca|rúcula|rucula|canónigo|kale|acelga', '🥬'],
+  ['pepino|calabacín|calabacin', '🥒'],
+  ['pimiento|chile|jalapeño|guindilla', '🫑'],
+  ['cebolla|puerro|cebolleta', '🧅'],
+  ['ajo', '🧄'],
+  ['patata|boniato|batata', '🥔'],
+  ['maíz|maiz', '🌽'],
+  ['champiñón|champiñon|seta', '🍄'],
+  ['berenjena', '🍆'],
+  ['pollo|pavo', '🍗'],
+  ['ternera|cerdo|lomo|carne|hamburguesa', '🥩'],
+  ['jamón|jamon|bacon|beicon|chorizo|salchicha', '🥓'],
+  ['gamba|langostino|marisco', '🦐'],
+  ['salmón|salmon|atún|atun|merluza|bacalao|pescado|sardina|lubina|dorada', '🐟'],
+  ['pulpo|calamar|sepia', '🦑'],
+  ['huevo|clara', '🥚'],
+  ['leche|kéfir|kefir', '🥛'],
+  ['queso|requesón|requeson|mozzarella|parmesano', '🧀'],
+  ['yogur|skyr', '🥣'],
+  ['mantequilla', '🧈'],
+  ['arroz', '🍚'],
+  ['pasta|espagueti|macarr|fideo|tallarín|tallarin', '🍝'],
+  ['pan|tostada|baguette|bagel|wrap|tortilla de trigo|tortita', '🍞'],
+  ['avena|cereal|granola|copos', '🥣'],
+  ['garbanzo|lenteja|alubia|judía|judia|soja|guisante', '🫘'],
+  ['aceite', '🫒'],
+  ['sal|pimienta|especia|comino|pimentón|pimenton|orégano|oregano|canela', '🧂'],
+  ['almendra|nuez|nueces|cacahuete|anacardo|pistacho|avellana|semilla', '🥜'],
+  ['chocolate|cacao', '🍫'],
+  ['miel', '🍯'],
+  ['café|cafe', '☕'],
+  ['té |infusión|infusion', '🍵'],
+  ['vino', '🍷'],
+  ['agua', '💧'],
+  ['caldo|sopa', '🍲'],
+  ['salsa|ketchup|mostaza|mayonesa', '🥫'],
+  ['proteína|proteina|whey', '💪'],
+]
+const EMOJI_SECCION: Record<string, string> = {
+  fruta: '🍎',
+  verdura: '🥬',
+  carne: '🥩',
+  pescado: '🐟',
+  lacteos: '🥛',
+  pan: '🍞',
+  legumbres: '🫘',
+  conservas: '🥫',
+  aceites: '🫒',
+  frutos: '🥜',
+  dulces: '🍫',
+  bebidas: '🥤',
+  platos: '🍱',
+  suple: '💪',
+  despensa: '🛒',
+}
+const REGLAS_EMOJI = EMOJI_NOMBRE.map(([lista, e]) => [palabra(lista), e] as const)
+
+/** El emoticono de un producto de la compra: por su nombre y, si no, por su sección. */
+export function emojiDe(nombre: string, seccion: string): string {
+  const n = nombre.toLowerCase()
+  return REGLAS_EMOJI.find(([re]) => re.test(n))?.[1] ?? EMOJI_SECCION[seccion] ?? '🛒'
 }

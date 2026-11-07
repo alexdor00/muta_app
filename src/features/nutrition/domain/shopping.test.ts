@@ -1,7 +1,7 @@
 // La compra con recetas hechas a mano (con la dieta de ejemplo de verdad, en use-cases/tools.test.ts).
 import { describe, expect, it } from 'vitest'
 import { recetaDelDia, type Receta } from './diet.ts'
-import { listaDeLaCompra, seccionDe, textoDeLaCompra } from './shopping.ts'
+import { emojiDe, listaDeLaCompra, seccionDe, textoDeLaCompra, type RecetaParaComprar } from './shopping.ts'
 
 const receta: Receta = {
   id: 'r',
@@ -47,8 +47,9 @@ describe('la lista de la compra', () => {
         seccion: 'carne',
         gramos: 1100,
         usos: ['Pollo con arroz'],
+        menus: [],
       },
-      { clave: 'sal', nombre: 'Sal', seccion: 'aceites', gramos: null, usos: ['Pollo con arroz'] },
+      { clave: 'sal', nombre: 'Sal', seccion: 'aceites', gramos: null, usos: ['Pollo con arroz'], menus: [] },
     ])
   })
 
@@ -78,5 +79,26 @@ describe('la lista de la compra', () => {
   it('el texto para compartir, sin lo que ya tienes', () => {
     const texto = textoDeLaCompra(listaDeLaCompra(dias), new Set(['sal']), [], (g) => `${g / 1000} kg`)
     expect(texto).toBe('CARNE\n· Pechuga de pollo: 1.1 kg')
+  })
+})
+
+describe('la compra: de qué menú sale y su emoticono', () => {
+  it('cada producto dice de qué menús sale', () => {
+    const r = (id: string, deMenu: string): RecetaParaComprar => ({
+      id,
+      nombre: id,
+      deMenu,
+      lista: [{ alimentoId: 'f_arroz', nombre: 'Arroz', categoria: 'Cereales', g: 100 }],
+    })
+    expect(
+      listaDeLaCompra([{ recetas: [r('a', 'Menú B'), r('b', 'Menú A'), r('c', 'Menú B')] }])[0].menus,
+    ).toEqual(['Menú A', 'Menú B'])
+  })
+  it('por su nombre y, si no, por su sección; «sal» no es «salmón»', () => {
+    expect(emojiDe('Aguacate', 'fruta')).toBe('🥑')
+    expect(emojiDe('Salmón ahumado', 'pescado')).toBe('🐟')
+    expect(emojiDe('Sal al gusto', 'aceites')).toBe('🧂')
+    expect(emojiDe('Pechuga de pollo', 'carne')).toBe('🍗')
+    expect(emojiDe('Algo raro', 'legumbres')).toBe('🫘')
   })
 })

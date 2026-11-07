@@ -266,8 +266,10 @@ export function recetasDelMenu(
 ): {
   id: string
   nombre: string
+  deMenu: string
   lista: { alimentoId: string | null; nombre: string; categoria: string; g: number | null }[]
 }[] {
+  const nombreDe = (id: string) => m.menus.find((x) => x.id === id)?.nombre ?? `Menú ${id}`
   return fechas.flatMap((f) =>
     huecosDelDia(m, f).flatMap((h) => {
       const p = platoDe(h.plato)
@@ -277,6 +279,7 @@ export function recetasDelMenu(
         {
           id: p.id,
           nombre: p.nombre,
+          deMenu: nombreDe(h.menu),
           lista: p.ingredientes.map((i, k) => ({
             alimentoId: i.alimentoId,
             nombre: i.nombre,

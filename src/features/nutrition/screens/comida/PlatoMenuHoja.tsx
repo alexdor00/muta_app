@@ -76,7 +76,7 @@ export function PlatoMenuHoja({ menuId, comida, onClose, onCambiar, onCocinar, a
             nombre={p?.nombre ?? 'Plato que ya no está'}
             foto={fotos.value[id] ?? null}
             lineas={total ? [macrosCortos(total)] : []}
-            href={p ? `${paths.dish(id, { comida })}&desde=menu` : undefined}
+            href={p ? `${paths.dish(id, { comida })}&desde=menu&menu=${menuId}` : undefined}
           />
         </ul>
         {p?.ajustable && (

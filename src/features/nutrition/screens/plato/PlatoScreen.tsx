@@ -13,11 +13,13 @@ import {
   estadoRecetas,
   fotos,
   MACROS,
+  menu,
   platoPorId,
   recetario,
   siguiente,
   totalDePlato,
 } from '../../state/recetas.ts'
+import { ponerPlato } from '../../use-cases/menu.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
 import { apuntarPlato, borrarPlato, cargarRecetas, desapuntar } from '../../use-cases/recipes.ts'
 import { comidaDe, esComida } from '../comun/platos.ts'
@@ -67,6 +69,12 @@ export function PlatoScreen(props: { id: string }) {
     ? query.comida
     : (siguiente.value?.comida ?? comidaPorHora(new Date().getHours()))
   const cuando = daysBetween(fecha, hoy.value) === 0 ? 'hoy' : `el ${formatDayDate(fecha)}`
+  // Desde un menú (al elegir su plato): lo principal es ponerlo en el menú, no apuntarlo hoy
+  const enMenu =
+    query.desde === 'menu' && esComida(query.comida)
+      ? (menu.value.menus.find((m) => m.id === query.menu) ?? null)
+      : null
+  const yaEnMenu = enMenu?.platos[comida] === p.id
   const total = totalDePlato(p, gramos ?? undefined, veces)
   const categoria = recetario.value?.categorias.find((c) => c.id === p.categoria)?.nombre
   const detalle = [
@@ -85,6 +93,12 @@ export function PlatoScreen(props: { id: string }) {
       onClick: () => void desapuntar(ids, fecha),
     })
   }
+
+  const apuntarHoy = (
+    <Button variant={enMenu ? 'secondary' : undefined} onClick={() => void apuntar()}>
+      Apuntar en {comidaDe(comida).nombre.toLowerCase()} {cuando}
+    </Button>
+  )
 
   return (
     <div class={r.screen}>
@@ -106,7 +120,7 @@ export function PlatoScreen(props: { id: string }) {
             : '.'}
           {gramos ? ' Con los gramos ajustados.' : ''}
         </p>
-        {p.ajustable && (
+        {p.ajustable && !enMenu && (
           <div class={styles.buttons}>
             <Button variant="secondary" onClick={ajustarHoja.show}>
               {gramos ? 'Ajustar otra vez' : 'Ajustar a lo que falta'}
@@ -199,9 +213,13 @@ export function PlatoScreen(props: { id: string }) {
           </section>
         )}
         <div class={styles.more}>
-          <Button variant="secondary" onClick={alMenu.show}>
-            Al menú
-          </Button>
+          {enMenu ? (
+            apuntarHoy
+          ) : (
+            <Button variant="secondary" onClick={alMenu.show}>
+              Al menú
+            </Button>
+          )}
           <Button variant="secondary" onClick={editar.show}>
             {p.origen === 'tuyo' ? 'Editar' : 'Hacer tu versión'}
           </Button>
@@ -224,9 +242,20 @@ export function PlatoScreen(props: { id: string }) {
         </div>
       </div>
       <div class={r.bottom}>
-        <Button onClick={() => void apuntar()}>
-          Apuntar en {comidaDe(comida).nombre.toLowerCase()} {cuando}
-        </Button>
+        {!enMenu ? (
+          apuntarHoy
+        ) : yaEnMenu ? (
+          <Button href={volver}>Volver al menú</Button>
+        ) : (
+          <Button
+            onClick={async () => {
+              await ponerPlato(enMenu.id, comida, p.id)
+              route(volver)
+            }}
+          >
+            Poner en {enMenu.nombre} · {comidaDe(comida).nombre.toLowerCase()}
+          </Button>
+        )}
       </div>
       {ajustarHoja.open && (
         <AjustarHoja

@@ -476,3 +476,13 @@ tarjeta gris van en blanco (`--choice-bg`; no se veían); las tres hojas con tí
 cifras, sin justificar; la consulta ya no manda a «Comida · Semana»; el plato del menú se apunta desde su comida del día;
 un menú sin platos sale abierto. Más vistoso: la categoría de recetas con su foto arriba, la compra con barra de lo que
 ya tienes, el nutricionista con «Todo cuadra».
+
+## 2026-11-07 · Desde el menú, al menú; tu menú antes que la dieta; la compra con emoticonos
+
+- Una receta abierta desde un menú (al elegir su plato) tiene como botón principal «Poner en Menú A · desayuno» (o
+  «Volver al menú» si ya está); «Apuntar … hoy» pasa a secundario y no se ofrece «Ajustar a lo que falta», que es para
+  lo que comes hoy. Antes el botón negro apuntaba hoy y llevaba a equivocarse.
+- Comida · Hoy: si ese día tienes un menú tuyo con platos, manda el tuyo; la dieta, solo los días sin menú tuyo (antes la
+  dieta de ejemplo tapaba tus menús). Cada comida con plato del menú lleva también su «+» para apuntar otra cosa.
+- La compra: cada cosa con un emoticono (por su nombre o su sección; solo decora) y los menús de los que sale; «+ Añadir
+  algo que no está en el menú» arriba.

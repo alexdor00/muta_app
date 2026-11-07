@@ -33,7 +33,7 @@ export type {
 } from '../domain/diet.ts'
 export { intercambios, NOMBRE_MACRO, COMPENSAR } from '../domain/swaps.ts'
 export { arrozDe, factorDe, platoPor100, racionDeOlla } from '../domain/kitchen.ts'
-export { SECCIONES } from '../domain/shopping.ts'
+export { emojiDe, SECCIONES } from '../domain/shopping.ts'
 export { CINTURA, ESCALAS, SUENO } from '../domain/consult.ts'
 export type { Decision, Propuesta, Revision } from '../domain/consult.ts'
 
