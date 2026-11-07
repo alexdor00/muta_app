@@ -154,6 +154,14 @@
   border-bottom: 0;
 }
 
+/* La flecha › de una fila, a su tamaño (sin él, el icono se come el ancho y el texto sale en columna) */
+.row > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
 .rowMain {
   display: flex;
   flex: 1;

@@ -1,4 +1,4 @@
-import { expect, test } from './plan.ts'
+import { expect, sinAnimaciones, test } from './plan.ts'
 
 // Editar rutina (A11–A13): desde «Tu rutina», con el plan de prueba (MUTA Cuerpo completo, toca B1).
 const B1 = 'Isquios, glúteo y pecho'
@@ -24,10 +24,7 @@ async function abrirSesion(page: import('@playwright/test').Page, nombre = B1) {
     .click()
   await expect(hoja.getByRole('heading', { name: nombre })).toBeVisible()
   // La hoja sube con una animación: se espera a que no quede ninguna en marcha para medir las filas
-  await page.waitForTimeout(100)
-  await expect
-    .poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length))
-    .toBe(0)
+  await sinAnimaciones(page)
   return hoja
 }
 

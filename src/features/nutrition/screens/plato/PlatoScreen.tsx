@@ -22,6 +22,7 @@ import { cargarComida } from '../../use-cases/nutritionStore.ts'
 import { apuntarPlato, borrarPlato, cargarRecetas, desapuntar } from '../../use-cases/recipes.ts'
 import { comidaDe, esComida } from '../comun/platos.ts'
 import { useAviso } from '../comun/useAviso.ts'
+import { Cifras } from '../comun/Cifras.tsx'
 import h from '../comun/Hojas.module.css'
 import r from '../receta/Receta.module.css'
 import { ADietaHoja } from './ADietaHoja.tsx'
@@ -95,19 +96,7 @@ export function PlatoScreen(props: { id: string }) {
         backHref={volver}
       />
       <div class={r.page}>
-        <div class={h.tiles}>
-          {[
-            [formatInt(total.kcal), 'kcal'],
-            [formatInt(total.protein), 'proteína'],
-            [formatInt(total.carbs), 'hidratos'],
-            [formatInt(total.fat), 'grasa'],
-          ].map(([v, l]) => (
-            <div key={l} class={h.tile}>
-              <span class={h.tileValue}>{v}</span>
-              <span class={h.foot}>{l}</span>
-            </div>
-          ))}
-        </div>
+        <Cifras total={total} />
         <p class={h.foot}>
           {p.origen === 'recetario'
             ? 'Cifras del recetario por ración'

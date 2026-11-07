@@ -27,7 +27,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 - 2026-11-07 (rama `pantalla/recetas`): la hoja «Cocinar» (la lista «Para» salía amontonada: usaba la clase del tick);
   ajustar sin mover verduras ni salsas; lo cocido dice cuánto es en crudo; la compra por pasillos; cambiar un ingrediente
-  «solo este día» al apuntar (y para siempre desde el menú); párrafos justificados.
+  «solo este día» al apuntar (y para siempre desde el menú); párrafos justificados. La hoja de una comida: sus cuatro cifras en tarjeta, la fila de lo apuntado bien (la flecha sin tamaño se comía el ancho) y sin «0 g» en los platos.
 
 - 2026-11-07 (rama `pantalla/recetas`): **en el móvil por la wifi no se guardaba nada nuevo** (sin https no hay
   `crypto.randomUUID`): ahora `nuevoId()` en `shared/lib/id.ts`, el linter lo exige y los recorridos van sin https. Tus

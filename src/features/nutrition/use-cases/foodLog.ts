@@ -221,7 +221,10 @@ const enGramos = (racion: string | null) => !racion || /^\d+([.,]\d+)? ?g$/.test
 /** La cantidad apuntada, en palabras: «1,5 filete · 225 g», «80 g». */
 export function textoCantidad(a: Pick<Apunte, 'raciones' | 'racion' | 'gramos'>): string {
   if (a.raciones !== null && !enGramos(a.racion))
-    return `${formatDecimal(a.raciones)} ${a.racion} · ${formatInt(a.gramos ?? 0)} g`
+    // Un plato apuntado va en raciones, sin gramos: «1 ración»
+    return a.gramos
+      ? `${formatDecimal(a.raciones)} ${a.racion} · ${formatInt(a.gramos)} g`
+      : `${formatDecimal(a.raciones)} ${a.racion}`
   return a.gramos !== null ? `${formatInt(a.gramos)} g` : ''
 }
 

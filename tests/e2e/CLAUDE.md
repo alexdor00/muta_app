@@ -24,4 +24,4 @@ Convenciones: buscar por rol y nombre accesible (`getByRole`), no por clases. Un
 prueba de accesibilidad. Las rutinas privadas no se prueban aquí: se miran a mano o con una sonda local.
 
 Todos los recorridos usan `test` (o `testGuardando`) de `plan.ts`: van **como el móvil por la wifi** (sin https: sin
-`crypto.randomUUID`) y recargar o cambiar de página espera a que IndexedDB termine de guardar.
+`crypto.randomUUID`) y recargar o cambiar de página espera a que IndexedDB termine de guardar. Antes de medir (axe o tamaños) con una hoja abierta, `sinAnimaciones(page)` de `plan.ts`.

@@ -15,6 +15,7 @@ import { gramosDeHueco, huecoDe, menu, platoPorId } from '../../state/recetas.ts
 import { cargarAlimentos, guardarComida, textoCantidad } from '../../use-cases/foodLog.ts'
 import { platoApuntado, reapuntarPlato } from '../../use-cases/recipes.ts'
 import { CambiarHoja } from '../plato/CambiarHoja.tsx'
+import { Cifras } from '../comun/Cifras.tsx'
 import { PlatoDelDia } from './PlatoDelDia.tsx'
 import type { Aviso } from '../comun/useAviso.ts'
 import h from '../comun/Hojas.module.css'
@@ -84,12 +85,7 @@ export function ComidaDelDiaHoja({ comida, onClose, onAnadir, onEditar, avisar }
       }
     >
       <div class={h.stack}>
-        {c.apuntes.length > 0 && (
-          <p class={h.sub}>
-            {formatInt(c.total.kcal)} kcal · {formatInt(c.total.protein)} g de proteína ·{' '}
-            {formatInt(c.total.carbs)} g de hidratos · {formatInt(c.total.fat)} g de grasa
-          </p>
-        )}
+        {c.apuntes.length > 0 && <Cifras total={c.total} />}
         <ul class={h.list}>
           {c.apuntes.map((a) => (
             <li key={a.id} class={h.row}>

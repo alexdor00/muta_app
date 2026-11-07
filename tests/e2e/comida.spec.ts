@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page } from '@playwright/test'
-import { testGuardando as test } from './plan.ts'
+import { sinAnimaciones, testGuardando as test } from './plan.ts'
 
 // Comida: calcular tu objetivo, apuntar con «Deshacer», el peso de hoy y la sugerencia del entrenador (que nunca se aplica
 // sola). Datos de prueba escritos a mano: 30 días de pesajes bajando 0,28 kg por semana, 4 semanas comiendo 2.300 kcal
@@ -227,9 +227,7 @@ test('«Ahora no» deja el objetivo como estaba y queda en el historial', async 
 })
 
 async function sinFallos(page: Page) {
-  await expect
-    .poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length))
-    .toBe(0)
+  await sinAnimaciones(page)
   const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
   const graves = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
   expect(

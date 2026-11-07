@@ -1,4 +1,4 @@
-import { test as base, type Page } from '@playwright/test'
+import { test as base, expect, type Page } from '@playwright/test'
 
 // Punto de partida de los recorridos de Entreno: un perfil, la rutina «MUTA · Cuerpo completo A/B» guardada, la
 // siguiente sesión B1 y un historial de prueba escrito a mano (no viene de nadie). B1 se hizo hace 7, 14 y 21 días;
@@ -154,6 +154,21 @@ export async function guardado(page: Page) {
 }
 
 /**
+ * Espera a que no quede ninguna animación (las hojas suben con una: a medio subir, los grises aún no tienen su contraste).
+ * Cuenta tras dos fotogramas, porque justo tras un toque la de la hoja aún no ha empezado, y cuenta las que van a empezar.
+ */
+export async function sinAnimaciones(page: Page): Promise<void> {
+  await expect
+    .poll(() =>
+      page.evaluate(async () => {
+        for (let i = 0; i < 2; i++) await new Promise((ok) => requestAnimationFrame(ok))
+        return document.getAnimations().filter((a) => a.playState === 'running' || a.pending).length
+      }),
+    )
+    .toBe(0)
+}
+
+/**
  * `test` como en el móvil por la wifi (http://192.168…, sin https: sin `crypto.randomUUID`) y en el que recargar o ir
  * a otra página espera a lo guardado.
  */
@@ -188,4 +203,4 @@ export const test = testGuardando.extend<{ plan: void }>({
   ],
 })
 
-export { expect } from '@playwright/test'
+export { expect }

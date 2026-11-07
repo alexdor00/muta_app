@@ -98,4 +98,7 @@ describe('la ración en palabras', () => {
     expect(textoRacion({ ...base, servingG: 100, servingLabel: '100 g' })).toBe('100 g')
     expect(textoCantidad({ raciones: 1, racion: '100 g', gramos: 100 })).toBe('100 g')
   })
+  it('un plato apuntado va en raciones, sin «0 g»', () => {
+    expect(textoCantidad({ raciones: 1, racion: 'ración', gramos: null })).toBe('1 ración')
+  })
 })

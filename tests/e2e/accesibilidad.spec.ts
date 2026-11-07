@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import type { Page } from '@playwright/test'
-import { expect, test } from './plan.ts'
+import { expect, sinAnimaciones, test } from './plan.ts'
 
 // Accesibilidad de las pantallas (contraste, nombres de botones, foco). Falla ante cualquier fallo grave.
 
@@ -8,10 +8,7 @@ import { expect, test } from './plan.ts'
 test.describe.configure({ timeout: 90_000 })
 
 async function sinFallos(page: Page, sinContraste = false) {
-  // Las hojas suben con una animación: a medio subir, los grises aún no tienen su contraste. Se mide al terminar
-  await expect
-    .poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length))
-    .toBe(0)
+  await sinAnimaciones(page)
   const axe = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa'])
   // La página /dev/ui enseña muestras de color y la etiqueta naranja de una celda: el contraste se mide en las pantallas reales
   if (sinContraste) axe.disableRules(['color-contrast'])

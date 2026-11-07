@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page } from '@playwright/test'
-import { testGuardando as test } from './plan.ts'
+import { sinAnimaciones, testGuardando as test } from './plan.ts'
 
 // Recetas y tus menús (sin el recetario privado: salen los platos de la dieta de ejemplo, «De ejemplo»). Un plato
 // ajustado a lo que te falta y apuntado, tus menús (cuántos, qué día, un plato y cuándo cocinarlo), el tick en Hoy, lo de
@@ -182,7 +182,7 @@ test('accesibilidad: Recetas, un plato, el menú y tu nutricionista', async ({ p
   await prepararObjetivo(page)
   const revisar = async (donde: string) => {
     // Con las hojas ya abiertas del todo (a medio abrir, el texto aún es transparente)
-    await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'))
+    await sinAnimaciones(page)
     const r = await new AxeBuilder({ page }).analyze()
     expect(r.violations, `${donde}: ${r.violations.map((v) => v.id).join(', ')}`).toEqual([])
   }
