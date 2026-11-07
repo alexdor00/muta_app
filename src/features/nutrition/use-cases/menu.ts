@@ -32,6 +32,7 @@ import { COMIDAS, type ComidaId } from '../domain/food.ts'
 import { platoDeReceta } from '../domain/recipes.ts'
 import { dieta, hoy } from '../state/comida.ts'
 import { guardarPlatosTuyos, ID_MENU } from './recipes.ts'
+import { nuevoId } from '../../../shared/lib/id.ts'
 
 async function guardar(m: MenuSemanal): Promise<void> {
   menu.value = m
@@ -83,7 +84,7 @@ export const quitarCocinado = (id: string) => guardar(sinCocinado(menu.value, id
 
 /** Un cocinado nuevo para una comida: ese día, a una hora sugerida, solo para ella. */
 export function cocinadoNuevo(fecha: string, comida: ComidaId, platoId: string): Cocinado {
-  return { id: crypto.randomUUID(), plato: platoId, fecha, hora: '18:00', para: [clave(fecha, comida)] }
+  return { id: nuevoId(), plato: platoId, fecha, hora: '18:00', para: [clave(fecha, comida)] }
 }
 
 /** Las comidas con ese plato en los 7 días desde una fecha (las que puede cubrir un cocinado). */
@@ -122,7 +123,7 @@ const conCambios = (m: MenuSemanal, cambios: readonly CambioMenu[]) =>
 export function aplicarPropuesta(p: PropuestaMenu): Promise<void> {
   const m = conCambios(menu.value, p.despues)
   const hecho = {
-    id: crypto.randomUUID(),
+    id: nuevoId(),
     fecha: hoy.value,
     titulo: p.titulo,
     antes: p.antes,

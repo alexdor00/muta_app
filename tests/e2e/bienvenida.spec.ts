@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { testGuardando as test } from './plan.ts'
 
 /** Captura para comparar con el diseño, sin animaciones a medias. */
 async function capture(page: Page, name: string) {

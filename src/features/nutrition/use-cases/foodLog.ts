@@ -16,6 +16,7 @@ import {
 } from '../domain/food.ts'
 import { alimentoPorId, base, deAyer, diaVisto, dias, guardadas, propios } from '../state/comida.ts'
 import { guardarDia, guardarGuardadas, guardarPropios } from './nutritionStore.ts'
+import { nuevoId } from '../../../shared/lib/id.ts'
 
 /** Categoría de lo que creas tú. */
 export const MIS_ALIMENTOS = 'Mis alimentos'
@@ -96,7 +97,7 @@ export function apunteDe(
 
 /** Añade al día que ves (o a `date`). Devuelve el id (para «Deshacer»). */
 export async function anadir(apunte: Omit<Apunte, 'id'>, date = diaVisto.value): Promise<string> {
-  const id = crypto.randomUUID()
+  const id = nuevoId()
   await guardarDia(date, [...(dias.value[date] ?? []), { ...apunte, id }])
   return id
 }
@@ -107,7 +108,7 @@ export async function anadirVarios(
   comida: ComidaId,
   date = diaVisto.value,
 ): Promise<string[]> {
-  const nuevos = apuntes.map((a) => ({ ...a, comida, id: crypto.randomUUID() }))
+  const nuevos = apuntes.map((a) => ({ ...a, comida, id: nuevoId() }))
   await guardarDia(date, [...(dias.value[date] ?? []), ...nuevos])
   return nuevos.map((a) => a.id)
 }
@@ -166,7 +167,7 @@ export async function guardarComida(nombre: string, comida: ComidaId): Promise<v
   const apuntes = (dias.value[diaVisto.value] ?? []).filter((a) => a.comida === comida)
   if (!apuntes.length) return
   await guardarGuardadas([
-    { id: crypto.randomUUID(), nombre: nombre.trim() || 'Mi comida', apuntes },
+    { id: nuevoId(), nombre: nombre.trim() || 'Mi comida', apuntes },
     ...guardadas.value,
   ])
 }
@@ -177,7 +178,7 @@ export async function borrarGuardada(id: string): Promise<void> {
 
 /** Crea un alimento tuyo con los valores por 100 g de la etiqueta. */
 export async function crearAlimento(datos: Omit<Alimento, 'id' | 'category'>): Promise<Alimento> {
-  const nuevo: Alimento = { ...datos, id: `u_${crypto.randomUUID()}`, category: MIS_ALIMENTOS }
+  const nuevo: Alimento = { ...datos, id: `u_${nuevoId()}`, category: MIS_ALIMENTOS }
   await guardarPropios([nuevo, ...propios.value])
   return nuevo
 }
@@ -214,14 +215,18 @@ export function unaRacion(a: Alimento, comida: ComidaId, modo: Modo): Omit<Apunt
   return apunteDe(a, modo === 'gramos' ? a.servingG : 1, modo, comida)
 }
 
+/** Una ración que ya son gramos («100 g», la de los productos de supermercado): se dice solo en gramos. */
+const enGramos = (racion: string | null) => !racion || /^\d+([.,]\d+)? ?g$/.test(racion.trim())
+
 /** La cantidad apuntada, en palabras: «1,5 filete · 225 g», «80 g». */
 export function textoCantidad(a: Pick<Apunte, 'raciones' | 'racion' | 'gramos'>): string {
-  if (a.raciones !== null && a.racion)
+  if (a.raciones !== null && !enGramos(a.racion))
     return `${formatDecimal(a.raciones)} ${a.racion} · ${formatInt(a.gramos ?? 0)} g`
   return a.gramos !== null ? `${formatInt(a.gramos)} g` : ''
 }
 
-/** La ración habitual en palabras: «1 filete (150 g)». */
+/** La ración habitual en palabras: «1 filete (150 g)»; si la ración ya son gramos, «100 g». */
 export function textoRacion(a: Alimento): string {
+  if (enGramos(a.servingLabel)) return `${formatInt(a.servingG)} g`
   return `1 ${a.servingLabel} (${formatInt(a.servingG)} g)`
 }

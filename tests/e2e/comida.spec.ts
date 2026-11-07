@@ -116,6 +116,32 @@ test('sin objetivo: tus datos lo calculan y sale lo que te queda por comer', asy
   await expect(page.getByText(/Para revisar tu semana me faltan 9 pesajes/)).toBeVisible()
 })
 
+test('después de la bienvenida, tus datos preguntan qué quieres (viene marcado lo de la bienvenida)', async ({
+  page,
+}) => {
+  await page.goto('/bienvenida/1')
+  await page.getByText('Perder grasa').click()
+  await page.getByRole('link', { name: 'Siguiente' }).click()
+  await page.getByRole('button', { name: 'Siguiente' }).click()
+  await expect(page).toHaveURL('/entreno/rutinas')
+  await page.goto('/comida')
+  await page.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Tus datos' })
+  const queQuieres = hoja.getByRole('group', { name: '¿Qué quieres?' })
+  await expect(queQuieres.getByRole('radio', { name: 'Definir' })).toBeChecked()
+  await queQuieres.getByText('Volumen').click()
+  await hoja.getByLabel('Edad').fill('30')
+  // En metros también vale
+  await hoja.getByLabel('Altura (cm)').fill('1,80')
+  await hoja.getByLabel('Peso (kg)').fill('80')
+  await hoja.getByLabel('Pasos al día').fill('8000')
+  await hoja.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  await expect(hoja).toHaveCount(0)
+  await page.getByRole('link', { name: 'Objetivo' }).click()
+  await expect(page.getByText('Mifflin-St Jeor: 80 kg, 180 cm, 30 años')).toBeVisible()
+  await expect(page.getByText(/Empiezas en .* kcal · volumen/)).toBeVisible()
+})
+
 test('añadir un alimento con su ración, verlo en su comida y deshacerlo', async ({ page }) => {
   await prepararComida(page)
   await page.goto('/comida')

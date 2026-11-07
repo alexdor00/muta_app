@@ -20,6 +20,7 @@ import { sumar } from '../domain/food.ts'
 import { dias, dieta, hoy, pesajes, serie } from '../state/comida.ts'
 import { ahoraDieta, consultas, diaDe, revisiones, type Consulta } from '../state/dieta.ts'
 import { guardarConsulta, guardarDieta, guardarRevision } from './nutritionStore.ts'
+import { nuevoId } from '../../../shared/lib/id.ts'
 
 /** Lo que apuntas hoy (lo de hoy si ya empezaste la consulta). */
 export function revisionDeHoy(): Revision {
@@ -143,7 +144,7 @@ export async function guardarInforme(i: Informe): Promise<Consulta> {
   const at = new Date().toISOString()
   const ya = consultas.value.find((c) => c.fecha === hoy.value && c.status === 'pendiente')
   const c: Consulta = {
-    id: ya?.id ?? crypto.randomUUID(),
+    id: ya?.id ?? nuevoId(),
     area: 'dieta',
     status: i.decision.propuestas.length ? 'pendiente' : 'hecho',
     fecha: hoy.value,
@@ -162,7 +163,7 @@ export async function guardarInforme(i: Informe): Promise<Consulta> {
 
 /** El ajuste nuevo que deja una propuesta, sobre lo que vale mañana. */
 function ajusteCon(p: Propuesta, base: AjusteDieta, desde: string): AjusteDieta {
-  const nuevo = { ...base, id: crypto.randomUUID(), desde }
+  const nuevo = { ...base, id: nuevoId(), desde }
   if (p.cambio.tipo === 'kcal')
     return {
       ...nuevo,

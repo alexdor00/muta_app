@@ -441,3 +441,13 @@ Los generadores siguen en `private/herramientas/`; tras rehacerlo, se copia a `s
 Las fotos del recetario y los productos de supermercado (unos 5 MB) ya no van en lo que se guarda al instalar la app: se
 guardan la primera vez que se usan (caché «muta-grande») y después funcionan sin cobertura. Instalar era lento y, en la
 CI, se cruzaba con las recargas de los recorridos. Las revisiones de accesibilidad esperan a que acaben las animaciones.
+
+## 2026-11-07 · Los identificadores, también sin https (el móvil por la wifi)
+
+En el móvil la app se abre por la wifi (`http://192.168…`): sin https, el navegador no da `crypto.randomUUID`, y todo lo
+que guardaba algo nuevo fallaba en silencio (calcular tu objetivo, apuntar, menús, la compra, las sesiones de Entreno).
+Ahora todo usa `nuevoId()` de `shared/lib/id.ts` (con `crypto.getRandomValues`, que sí está siempre); el linter prohíbe
+`crypto.randomUUID` y los recorridos se pasan sin él, como en el móvil.
+
+Además, la primera vez que calculas tu objetivo se pregunta qué quieres (definir, mantenerte o volumen; viene marcado lo
+de tu bienvenida, que antes se usaba sin preguntar). La pestaña Hoy enseña lo que comes hoy según tu menú.

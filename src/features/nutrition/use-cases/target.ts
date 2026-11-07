@@ -49,10 +49,14 @@ async function cambiarObjetivo(a: Ajustes, tipo: Cambio['tipo'], texto: string, 
   await guardarCambio({ status: 'hecho', tipo, de: previo?.kcal ?? null, a: a.kcal, texto })
 }
 
-/** Guarda tus datos y recalcula tu objetivo. La primera vez lo crea; tu peso queda también como pesaje de hoy. */
-export async function guardarDatos(cuerpo: Cuerpo, pasos: number): Promise<void> {
+/**
+ * Guarda tus datos y recalcula tu objetivo. La primera vez lo crea con la fase que eliges (si no, la de tu bienvenida);
+ * tu peso queda también como pesaje de hoy.
+ */
+export async function guardarDatos(cuerpo: Cuerpo, pasos: number, fase?: Fase): Promise<void> {
   const previo = ajustes.value
-  const perfil = previo ?? { ...(await deTuPerfil()), ritmo: RITMO_DE_SERIE }
+  const deLaBienvenida = previo ?? { ...(await deTuPerfil()), ritmo: RITMO_DE_SERIE }
+  const perfil = { ...deLaBienvenida, fase: (!previo && fase) || deLaBienvenida.fase }
   const calculo = calcularObjetivo({
     cuerpo,
     pasos,

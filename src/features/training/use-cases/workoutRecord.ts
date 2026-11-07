@@ -2,12 +2,13 @@ import { localDate, parseDecimal } from '../../../shared/lib/format.ts'
 import type { Entreno } from '../domain/workoutHistory.ts'
 import { ejerciciosDe, nombreHoy, segundosSesion, type SesionEnCurso } from '../state/sesionEnCurso.ts'
 import { extrasHechos } from '../state/seriesEspeciales.ts'
+import { nuevoId } from '../../../shared/lib/id.ts'
 
 /** Lo hecho de una sesión, como se guarda: solo las series marcadas, en el orden de hoy. */
 export function entrenoDe(en: SesionEnCurso, programId: string, ahora: number): Entreno {
   const ejercicios = ejerciciosDe(en)
   return {
-    id: crypto.randomUUID(),
+    id: nuevoId(),
     fecha: localDate(new Date(en.inicio)),
     inicio: en.inicio,
     segundos: Math.round(segundosSesion({ ...en, terminada: ahora }, ahora)),

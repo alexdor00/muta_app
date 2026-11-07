@@ -27,6 +27,7 @@ import {
   type ComidaGuardada,
 } from '../state/comida.ts'
 import { compra, consultas, revisiones, type Compra, type Consulta } from '../state/dieta.ts'
+import { nuevoId } from '../../../shared/lib/id.ts'
 
 export const ID_AJUSTES = 'nutricion'
 export const ID_PROPIOS = 'alimentos-propios'
@@ -152,7 +153,7 @@ export async function guardarCambio(
   const at = new Date().toISOString()
   const fila: Cambio = {
     ...c,
-    id: crypto.randomUUID(),
+    id: nuevoId(),
     area: 'nutricion',
     fecha: hoy.value,
     createdAt: at,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import foods from '../../../shared/content/foods.json'
 import { POPULARES, type Alimento } from '../domain/food.ts'
-import { apunteDe, apunteRapido } from './foodLog.ts'
+import { apunteDe, apunteRapido, textoCantidad, textoRacion } from './foodLog.ts'
 
 const lista = foods as Alimento[]
 
@@ -85,5 +85,17 @@ describe('apuntes', () => {
     expect(apunteRapido(' ', { kcal: 600, protein: 35, carbs: 0, fat: 0 }, 'comida').nombre).toBe(
       'Añadido rápido',
     )
+  })
+})
+
+describe('la ración en palabras', () => {
+  const base = { id: 'x', name: 'X', category: 'Platos', kcal: 100, protein: 1, carbs: 1, fat: 1 }
+  it('una ración con nombre lleva sus gramos', () => {
+    expect(textoRacion({ ...base, servingG: 150, servingLabel: 'filete' })).toBe('1 filete (150 g)')
+    expect(textoCantidad({ raciones: 1.5, racion: 'filete', gramos: 225 })).toBe('1,5 filete · 225 g')
+  })
+  it('si la ración ya son gramos (los productos de supermercado), solo los gramos', () => {
+    expect(textoRacion({ ...base, servingG: 100, servingLabel: '100 g' })).toBe('100 g')
+    expect(textoCantidad({ raciones: 1, racion: '100 g', gramos: 100 })).toBe('100 g')
   })
 })

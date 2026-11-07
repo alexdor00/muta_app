@@ -24,6 +24,7 @@ import { COMIDAS, type Alimento, type ComidaId } from '../domain/food.ts'
 import { diaVisto, dias, dieta, hoy, objetivoHoy } from '../state/comida.ts'
 import { anadir, cargarAlimentos, devolver, quitar } from './foodLog.ts'
 import { guardarCambio, guardarDieta } from './nutritionStore.ts'
+import { nuevoId } from '../../../shared/lib/id.ts'
 
 /** Lo que se enseña antes de empezar una dieta: sus cifras y cuánto cambia tu objetivo. */
 export function vistaPrevia(d: Dieta) {
@@ -88,7 +89,7 @@ export async function dietaEjemplo(): Promise<Dieta | null> {
 
 /** Una dieta tuya desde cero: un menú para todos los días, sin recetas. */
 export function dietaPropia(nombre: string): Dieta {
-  return dietaNueva(`mia-${crypto.randomUUID()}`, nombre)
+  return dietaNueva(`mia-${nuevoId()}`, nombre)
 }
 
 /** Elige un archivo de dieta y lo lee. Devuelve la dieta, o por qué no vale (null si no eliges nada). */
@@ -251,7 +252,7 @@ export function recetaDeHoyCon(r: RecetaDelDia, i: number, nuevo: Alimento, gram
 
 /** Una receta nueva tuya en un menú (null = todos los días). Devuelve su id. */
 export async function crearReceta(nombre: string, comida: ComidaId, menu: string | null): Promise<string> {
-  const id = `u_${crypto.randomUUID()}`
+  const id = `u_${nuevoId()}`
   const rotulo = COMIDAS.find((c) => c.id === comida)?.nombre ?? 'Comida'
   await cambiarActiva((a) => ({
     ...a,

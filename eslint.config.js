@@ -47,7 +47,16 @@ export default tseslint.config(
       '@typescript-eslint/no-redeclare': 'error',
       'no-duplicate-imports': 'error',
       'no-param-reassign': ['error', { props: false }],
+      // Sin https (el móvil por la wifi) no existe: cada guardado fallaba. Se usa nuevoId() de shared/lib/id.ts
+      'no-restricted-properties': [
+        'error',
+        { object: 'crypto', property: 'randomUUID', message: 'Usa nuevoId() de shared/lib/id.ts' },
+      ],
     },
+  },
+  {
+    files: ['src/shared/lib/id.ts', 'src/shared/lib/id.test.ts'],
+    rules: { 'no-restricted-properties': 'off' },
   },
   {
     files: ['src/**/*.{ts,tsx}'],

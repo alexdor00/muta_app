@@ -22,3 +22,6 @@ Playwright en un iPhone 13 simulado, sobre la app construida **sin rutinas priva
 
 Convenciones: buscar por rol y nombre accesible (`getByRole`), no por clases. Un recorrido nuevo por pantalla nueva y su
 prueba de accesibilidad. Las rutinas privadas no se prueban aquí: se miran a mano o con una sonda local.
+
+Todos los recorridos usan `test` (o `testGuardando`) de `plan.ts`: van **como el móvil por la wifi** (sin https: sin
+`crypto.randomUUID`) y recargar o cambiar de página espera a que IndexedDB termine de guardar.

@@ -9,6 +9,7 @@ import { gramosDeHueco, menu, platoPorId } from '../state/recetas.ts'
 import { COMIDAS } from '../domain/food.ts'
 import { compra, diaDe, type Compra } from '../state/dieta.ts'
 import { guardarCompra } from './nutritionStore.ts'
+import { nuevoId } from '../../../shared/lib/id.ts'
 
 /** Para cuántos días se puede hacer la lista (los del prototipo). */
 export const DIAS_COMPRA = [3, 4, 6, 7, 10, 14]
@@ -118,7 +119,7 @@ export function anadirPropio(nombre: string, seccion: string): Promise<void> {
   const n = nombre.trim()
   if (!n) return Promise.resolve()
   const c = compraActual()
-  return cambiar({ propios: [...c.propios, { id: `x_${crypto.randomUUID()}`, nombre: n, seccion }] })
+  return cambiar({ propios: [...c.propios, { id: `x_${nuevoId()}`, nombre: n, seccion }] })
 }
 
 export function quitarPropio(id: string): Promise<void> {

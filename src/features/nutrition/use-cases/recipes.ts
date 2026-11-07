@@ -34,6 +34,7 @@ import {
 } from '../state/recetas.ts'
 import { guardarReceta } from './diet.ts'
 import { anadir, cargarAlimentos, quitar } from './foodLog.ts'
+import { nuevoId } from '../../../shared/lib/id.ts'
 
 export const ID_PLATOS = 'platos-tuyos'
 export const ID_MENU = 'menu'
@@ -141,7 +142,7 @@ export async function crearPlato(
   const n = nombre.trim()
   if (!n || !ingredientes.length) return null
   const p = platoTuyo(
-    `mio-${crypto.randomUUID()}`,
+    `mio-${nuevoId()}`,
     n,
     ingredientes.map((i) => ingredienteDe(i.alimento, i.gramos)),
     pasos,
@@ -170,7 +171,7 @@ export async function guardarTuVersion(
   original: Plato,
   cambios: Omit<Parameters<typeof platoEditado>[1], 'id'>,
 ): Promise<string> {
-  const id = original.origen === 'tuyo' ? original.id : `mio-${crypto.randomUUID()}`
+  const id = original.origen === 'tuyo' ? original.id : `mio-${nuevoId()}`
   const nuevo = platoEditado(original, { ...cambios, id })
   await guardarTuyos([...platosTuyos.value.filter((x) => x.id !== id), nuevo])
   return id

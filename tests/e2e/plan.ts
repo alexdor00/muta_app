@@ -153,9 +153,16 @@ export async function guardado(page: Page) {
   })
 }
 
-/** `test` en el que recargar o ir a otra página espera a lo guardado. */
+/**
+ * `test` como en el móvil por la wifi (http://192.168…, sin https: sin `crypto.randomUUID`) y en el que recargar o ir
+ * a otra página espera a lo guardado.
+ */
 export const testGuardando = base.extend({
   page: async ({ page }, usar) => {
+    await page.addInitScript(() => {
+      // @ts-expect-error -- se quita a propósito, como en un contexto sin https
+      delete Crypto.prototype.randomUUID
+    })
     const recargar = page.reload.bind(page)
     const ir = page.goto.bind(page)
     page.reload = async (opciones) => {

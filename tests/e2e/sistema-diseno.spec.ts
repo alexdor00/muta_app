@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
+import { testGuardando as test } from './plan.ts'
 
 /** Valor en px de un token de tokens.css. */
 const token = (page: Page, name: string) =>

@@ -1,3 +1,4 @@
+import { nuevoId } from '../lib/id.ts'
 // Campos comunes a todo lo que guarda el usuario: listos para sincronizar en el futuro.
 
 export type BaseRecord = {
@@ -10,7 +11,7 @@ export type BaseRecord = {
 
 export function newRecord<T extends object>(data: T, now = new Date()): T & BaseRecord {
   const at = now.toISOString()
-  return { ...data, id: crypto.randomUUID(), createdAt: at, updatedAt: at, deletedAt: null }
+  return { ...data, id: nuevoId(), createdAt: at, updatedAt: at, deletedAt: null }
 }
 
 export function touch<T extends BaseRecord>(record: T, changes: Partial<T>, now = new Date()): T {

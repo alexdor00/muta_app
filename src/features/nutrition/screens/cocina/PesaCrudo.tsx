@@ -91,19 +91,19 @@ export function PesaCrudo({ inicial }: { inicial: { plato?: string; raciones?: n
       <ul class={p.list}>
         {plato.ingredientes.map((i, k) =>
           enCrudo[k] === null ? null : (
-            <li key={`${i.texto}-${k}`} class={p.row}>
-              <span class={p.rowText}>
-                <span class={p.rowTitle}>{i.nombre}</span>
-              </span>
-              <label class={p.gramsField}>
+            <li key={`${i.texto}-${k}`} class={p.withAction}>
+              <span class={p.rowText}>{i.nombre}</span>
+              <label class={`${h.field} ${p.gramsField}`}>
                 <input
                   inputMode="decimal"
                   aria-label={`${i.nombre} en crudo (g)`}
                   value={cambiados[`${plato.id}|${k}`] ?? String(enCrudo[k])}
                   onInput={(e) => setCambiados({ ...cambiados, [`${plato.id}|${k}`]: e.currentTarget.value })}
                 />
-                g
               </label>
+              <span class={p.foot} aria-hidden="true">
+                g
+              </span>
             </li>
           ),
         )}

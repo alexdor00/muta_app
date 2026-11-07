@@ -25,6 +25,12 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-07 (rama `pantalla/recetas`): **en el móvil por la wifi no se guardaba nada nuevo** (sin https no hay
+  `crypto.randomUUID`): ahora `nuevoId()` en `shared/lib/id.ts`, el linter lo exige y los recorridos van sin https. Tus
+  datos preguntan qué quieres (definir, mantenerte o volumen); acepta la altura en metros. «Hoy comes» en la pestaña Hoy. Los
+  campos de Cocina se ven; la compra con línea bajo cada sección; los productos de supermercado se dicen en gramos
+  («100 g», no «1 100 g»); la consulta sin dieta lleva a cargarla.
+
 - Rama `pantalla/recetas` (2026-11-06, sin unir): recetas que se ajustan y tu menú. Diseños aprobados
   `Desktop/MUTA-Recetas-funcionalidades.png` y `Desktop/MUTA-Menu-funcionalidades.png`.
   - El recetario (100 recetas, 6 categorías, una foto por receta sin manos) en `private/recetas`, fuera de git; sin él, los

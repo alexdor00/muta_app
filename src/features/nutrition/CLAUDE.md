@@ -7,7 +7,7 @@ quieres, una dieta con menús, recetas, compra, cocina y consulta semanal; y el 
 funcionalidades.png`, `Desktop/MUTA-Menu-funcionalidades.png` y, más sencilla (tus menús A, B, C…, el tick, cambiar un
 alimento), `Desktop/MUTA-Comida-sencilla-funcionalidades.png` (2026-11-06). Capas y límites, los de
 [Entreno](../training/CLAUDE.md): las pantallas no importan el dominio; lo que necesitan lo reexportan `state/comida.ts` y
-`state/dieta.ts` (y `state/recetas.ts`). Otras áreas solo usan `index.ts`: `HoyDeComida` (tu peso y lo de hoy), para Hoy.
+`state/dieta.ts` (y `state/recetas.ts`). Otras áreas solo usan `index.ts`: `HoyDeComida` (tu peso, lo que comes hoy según tu menú y lo de hoy con hora), para Hoy. «Tus datos» pregunta la primera vez qué quieres (definir, mantenerte o volumen).
 
 ## Regla de oro: el entrenador y el nutricionista **proponen**, nunca cambian nada solos
 

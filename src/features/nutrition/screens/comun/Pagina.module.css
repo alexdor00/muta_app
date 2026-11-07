@@ -36,9 +36,12 @@
   font: var(--text-headline);
 }
 
-/* Sobre una tarjeta gris, los campos en blanco para que se vean */
+/* Sobre una tarjeta gris, los campos en blanco para que se vean (con más peso que el gris de los campos de las hojas:
+   si no, gana el que se carga después y el campo no se ve) */
 .card input,
+.card label input,
 .card textarea,
+.card label textarea,
 .card .onCard {
   background: var(--bg);
 }
@@ -238,6 +241,15 @@
 
 .seccionAbrir > span:first-child {
   flex: 1;
+}
+
+/* Abierta: una línea separa el título de lo que hay que comprar */
+.seccionAbrir[aria-expanded='true'] {
+  border-bottom: var(--hairline) solid var(--separator);
+}
+
+.seccionTitulo + .list {
+  margin-top: 0;
 }
 
 .seccionAbrir svg {

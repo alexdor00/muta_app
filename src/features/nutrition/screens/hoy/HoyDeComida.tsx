@@ -11,11 +11,12 @@ import { CocinarHoja } from '../comida/CocinarHoja.tsx'
 import { LoDeHoy } from '../comida/LoDeHoy.tsx'
 import { PesoHoja } from '../comida/PesoHoja.tsx'
 import { useAviso } from '../comun/useAviso.ts'
+import { ComesHoy } from './ComesHoy.tsx'
 import styles from './Hoy.module.css'
 
 /**
  * Lo de Comida en la pestaña Hoy: tu peso (pésate al levantarte: lo miran el entrenador y la consulta) y lo de hoy con
- * hora (la compra y lo que cocinas). El resto de Hoy tendrá su propio diseño.
+ * hora (la compra y lo que cocinas), y lo que comes hoy según tu menú. El resto de Hoy tendrá su propio diseño.
  */
 export function HoyDeComida() {
   useEffect(() => {
@@ -65,6 +66,7 @@ export function HoyDeComida() {
           </span>
         )}
       </section>
+      {estadoRecetas.value === 'listo' && <ComesHoy />}
       {estadoRecetas.value === 'listo' && (
         <LoDeHoy
           onCocinado={(id) => {
