@@ -1,5 +1,5 @@
 import { useLocation } from 'preact-iso'
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { ChevronDownIcon, DotsIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
@@ -51,8 +51,15 @@ function cuando(dias: readonly string[], hoyEs: string): string {
  */
 export function MenuVista({ onPlato, onAnadir, onOpciones, onCuantos, onAvisos, onDeDieta }: Props) {
   const { route } = useLocation()
-  const [abierto, setAbierto] = useState<string | null>(null)
-  if (estadoRecetas.value !== 'listo') return null
+  // Sin tocar nada, abierto el primer menú sin platos (cerrado no se ve por dónde empezar)
+  const [abierto, setAbierto] = useState<string | null | undefined>(undefined)
+  // Se elige una vez, al cargar: si no, al poner el primer plato el menú se cerraría solo
+  const listo = estadoRecetas.value === 'listo'
+  useEffect(() => {
+    if (listo && abierto === undefined)
+      setAbierto(menu.value.menus.find((x) => !Object.values(x.platos).some(Boolean))?.id ?? null)
+  }, [listo, abierto])
+  if (!listo) return null
   const m = menu.value
   const dias = semanaDesde(hoy.value)
   const n = propuestas.value.length

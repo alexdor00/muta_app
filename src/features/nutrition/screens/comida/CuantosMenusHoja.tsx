@@ -16,6 +16,7 @@ export function CuantosMenusHoja({ onClose }: { onClose: () => void }) {
     <Sheet
       title="Tus menús"
       onClose={onClose}
+      large
       footer={
         <div class={h.actions}>
           <Button onClick={onClose}>Listo</Button>

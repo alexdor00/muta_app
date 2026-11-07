@@ -47,19 +47,17 @@ export function DiaDietaHoja({ fecha, onClose }: Props) {
           value={dia.menu.id}
           onChange={(m) => void menuDelDiaDelCiclo(dia.diaCiclo, m)}
         />
-        <p class={h.foot}>
-          Cambia el menú de este día del ciclo: vale para todas las semanas.{' '}
-          <button
-            type="button"
-            class={h.textButton}
-            onClick={async () => {
-              const id = await anadirMenu()
-              if (id) await menuDelDiaDelCiclo(dia.diaCiclo, id)
-            }}
-          >
-            + Un menú nuevo para este día
-          </button>
-        </p>
+        <p class={h.foot}>Cambia el menú de este día del ciclo: vale para todas las semanas.</p>
+        <button
+          type="button"
+          class={h.textButton}
+          onClick={async () => {
+            const id = await anadirMenu()
+            if (id) await menuDelDiaDelCiclo(dia.diaCiclo, id)
+          }}
+        >
+          + Un menú nuevo para este día
+        </button>
       </div>
     </Sheet>
   )

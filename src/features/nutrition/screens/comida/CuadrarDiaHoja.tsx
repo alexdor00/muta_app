@@ -85,7 +85,7 @@ export function CuadrarDiaHoja({ onClose, avisar }: Props) {
       }
     >
       <div class={h.stack}>
-        <p class={h.sub}>
+        <p class={`${h.sub} ${h.datos}`}>
           Te quedan {quedan.map((c) => comidaDe(c).nombre.toLowerCase()).join(', ')} ·{' '}
           <b>{macrosCortos(falta)}</b>
         </p>

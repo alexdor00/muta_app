@@ -91,7 +91,7 @@ export function AjustarHoja({ plato, comida, fecha, onClose, onVer, avisar }: Pr
       }
     >
       <div class={h.stack}>
-        <p class={h.sub}>
+        <p class={`${h.sub} ${h.datos}`}>
           {modo === 'repartir' && puedeRepartir ? `Le toca ${de.al}` : 'Te faltan'}{' '}
           <b>{macrosCortos(objetivo)}</b>
         </p>

@@ -30,6 +30,8 @@
   padding: var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  /* Las opciones (chips) dentro, en blanco: en gris sobre gris no se ven */
+  --choice-bg: var(--bg);
 }
 
 .cardTitle {

@@ -33,9 +33,13 @@ const delMenu = (fechas: readonly string[]) =>
   recetasDelMenu(menu.value, fechas, (id) => platoPorId(id), gramosDeHueco)
 
 /** Los menús que elijas, cada uno las veces que digas (con sus gramos para tu objetivo de hoy). */
+/** Cuántas veces va un menú en la compra «por menús»: una, si no lo has cambiado (con ×0, la lista salía vacía). */
+export const vecesEnLaCompra = (veces: Readonly<Record<string, number>> | undefined, id: string) =>
+  veces?.[id] ?? 1
+
 function deMenus(veces: Record<string, number>) {
   return menu.value.menus.flatMap((m) =>
-    Array.from({ length: veces[m.id] ?? 0 }, () =>
+    Array.from({ length: vecesEnLaCompra(veces, m.id) }, () =>
       COMIDAS.flatMap(({ id: comida }) => {
         const id = m.platos[comida]
         const p = id ? platoPorId(id) : null
@@ -63,7 +67,7 @@ export const modoDeCompra = (modo: 'dias' | 'menus') => cambiar({ modo })
 /** Cuántas veces entra un menú en la compra (0 a 7). */
 export function vecesDeMenu(id: string, cambio: 1 | -1): Promise<void> {
   const c = compraActual()
-  const n = Math.min(7, Math.max(0, (c.menus?.[id] ?? 0) + cambio))
+  const n = Math.min(7, Math.max(0, vecesEnLaCompra(c.menus, id) + cambio))
   return cambiar({ modo: 'menus', menus: { ...(c.menus ?? {}), [id]: n } })
 }
 

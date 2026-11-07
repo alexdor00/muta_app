@@ -23,6 +23,7 @@ import {
   marcar,
   modoDeCompra,
   vecesDeMenu,
+  vecesEnLaCompra,
   paraDias,
   productosDe,
   quitarPropio,
@@ -75,6 +76,18 @@ export function CompraScreen() {
             {total - hechos === 1 ? 'cosa' : 'cosas'} por comprar · <b>{hechos}</b> de {total} ya las tienes
           </span>
         </p>
+        {total > 0 && (
+          <div
+            class={h.track}
+            role="progressbar"
+            aria-label="Lo que ya tienes"
+            aria-valuemin={0}
+            aria-valuemax={total}
+            aria-valuenow={hechos}
+          >
+            <i style={{ width: `${Math.round((hechos / total) * 100)}%` }} />
+          </div>
+        )}
         <ChoiceSegmented<'dias' | 'menus'>
           name="modo-compra"
           legend="La lista sale de"
@@ -96,12 +109,12 @@ export function CompraScreen() {
                   <button
                     type="button"
                     aria-label={`${m.nombre}: una vez menos`}
-                    disabled={!(c.menus?.[m.id] ?? 0)}
+                    disabled={!vecesEnLaCompra(c.menus, m.id)}
                     onClick={() => void vecesDeMenu(m.id, -1)}
                   >
                     <MinusIcon />
                   </button>
-                  <b>× {c.menus?.[m.id] ?? 0}</b>
+                  <b>× {vecesEnLaCompra(c.menus, m.id)}</b>
                   <button
                     type="button"
                     aria-label={`${m.nombre}: una vez más`}

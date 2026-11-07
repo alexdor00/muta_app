@@ -467,3 +467,12 @@ de tu bienvenida, que antes se usaba sin preguntar). La pestaña Hoy enseña lo 
   el plato), y si ya estaba apuntado se vuelve a apuntar; desde el menú, para siempre. El cambio de un día ya no borra el
   de siempre: van con claves distintas.
 - **Texto justificado** en todos los párrafos (elegido por el usuario), con guiones.
+
+## 2026-11-07 · Repaso de todas las pantallas y hojas de Comida
+
+Auditoría con capturas de las 53 pantallas y hojas (con el recetario real). Arreglado: la compra «por menús» empieza en
+×1 (con ×0 salía vacía); el aviso con «Deshacer» se quita al abrir otra hoja (tapaba su contenido); las opciones sobre una
+tarjeta gris van en blanco (`--choice-bg`; no se veían); las tres hojas con título pequeño, como las demás; las líneas de
+cifras, sin justificar; la consulta ya no manda a «Comida · Semana»; el plato del menú se apunta desde su comida del día;
+un menú sin platos sale abierto. Más vistoso: la categoría de recetas con su foto arriba, la compra con barra de lo que
+ya tienes, el nutricionista con «Todo cuadra».

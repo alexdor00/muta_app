@@ -176,7 +176,7 @@ export function ConsultaScreen() {
               />
             </label>
             <p class={p.foot}>
-              Comparamos medias de la semana, no días sueltos: tus pesajes los apuntas en Comida · Semana.
+              Comparamos medias de la semana, no días sueltos: tus pesajes los apuntas en la pestaña Hoy.
             </p>
           </section>
           <Button

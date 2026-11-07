@@ -1,5 +1,6 @@
 import { useEffect } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
+import { CheckIcon } from '../../../../shared/ui/icons.tsx'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { estado } from '../../state/comida.ts'
@@ -48,10 +49,15 @@ export function NutricionistaScreen() {
           </section>
         ))
       ) : (
-        <p class={h.sub}>
-          Tu menú de los próximos 7 días cuadra con tu objetivo. Cuando un día con al menos 3 comidas en el
-          menú no llegue a la proteína o se pase de kcal, te lo propongo aquí.
-        </p>
+        <section class={h.card} aria-labelledby="todo-cuadra">
+          <h2 id="todo-cuadra" class={h.hecho}>
+            <CheckIcon /> Todo cuadra
+          </h2>
+          <p class={h.sub}>
+            Tu menú de los próximos 7 días cuadra con tu objetivo. Cuando un día con al menos 3 comidas en el
+            menú no llegue a la proteína o se pase de kcal, te lo propongo aquí.
+          </p>
+        </section>
       )}
       {hechos.length > 0 && (
         <section class={h.card} aria-label="Ya hecho">

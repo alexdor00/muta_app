@@ -68,18 +68,29 @@ const sinCoccion = (nombre: string) =>
     .trim()
 
 /**
- * La pareja en crudo de un cereal o una legumbre cocidos de la base («Arroz blanco (cocido)» → «Arroz blanco (crudo)»);
- * null si no es de lo que se cuece o la base no la tiene.
+ * Las parejas en crudo de los cereales y legumbres cocidos de la base («Arroz blanco (cocido)» → «Arroz blanco (crudo)»),
+ * por el id de lo cocido. De una pasada (con un índice por nombre): la base tiene miles de alimentos.
  */
-export function parejaEnCrudo(cocido: Alimento, base: readonly Alimento[]): Alimento | null {
-  if (!SE_CUECEN.includes(cocido.category) || !/cocid[oa]/i.test(cocido.name)) return null
-  const clave = sinCoccion(cocido.name)
-  const crudo = base.find(
-    (a) => a.id !== cocido.id && /crud[oa]|sec[oa]/i.test(a.name) && sinCoccion(a.name) === clave,
-  )
-  // Al cocerse con agua pesa más: si no, no es la pareja que se busca
-  return crudo && crudo.kcal > cocido.kcal ? crudo : null
+export function parejasEnCrudo(
+  base: readonly Alimento[],
+): Map<string, { cocido: Alimento; crudo: Alimento }> {
+  const crudos = new Map<string, Alimento>()
+  for (const a of base)
+    if (SE_CUECEN.includes(a.category) && /crud[oa]|sec[oa]/i.test(a.name) && !crudos.has(sinCoccion(a.name)))
+      crudos.set(sinCoccion(a.name), a)
+  const parejas = new Map<string, { cocido: Alimento; crudo: Alimento }>()
+  for (const c of base) {
+    if (!SE_CUECEN.includes(c.category) || !/cocid[oa]/i.test(c.name)) continue
+    const crudo = crudos.get(sinCoccion(c.name))
+    // Al cocerse con agua pesa más: si no, no es la pareja que se busca
+    if (crudo && crudo.id !== c.id && crudo.kcal > c.kcal) parejas.set(c.id, { cocido: c, crudo })
+  }
+  return parejas
 }
+
+/** La pareja en crudo de un cereal o una legumbre cocidos; null si no es de lo que se cuece o la base no la tiene. */
+export const parejaEnCrudo = (cocido: Alimento, base: readonly Alimento[]): Alimento | null =>
+  parejasEnCrudo(base).get(cocido.id)?.crudo ?? null
 
 /**
  * Los gramos en crudo de unos gramos cocidos, por sus kcal (lo cocido gana agua, no kcal), de 5 en 5: 250 g de arroz

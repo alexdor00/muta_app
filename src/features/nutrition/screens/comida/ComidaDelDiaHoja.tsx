@@ -107,7 +107,7 @@ export function ComidaDelDiaHoja({ comida, onClose, onAnadir, onEditar, avisar }
             </li>
           ))}
         </ul>
-        <PlatoDelDia comida={comida} fecha={fecha} onCambiar={setCual} />
+        <PlatoDelDia comida={comida} fecha={fecha} onCambiar={setCual} avisar={avisar} />
       </div>
     </Sheet>
   )

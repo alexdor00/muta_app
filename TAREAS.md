@@ -25,6 +25,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-07 (rama `pantalla/recetas`): repaso de las 53 pantallas y hojas de Comida con capturas (ver decisiones):
+  compra por menús en ×1, el aviso no tapa otras hojas, opciones visibles sobre tarjetas, títulos de hoja iguales, apuntar el
+  plato del menú desde su comida, categoría con foto, compra con barra de progreso.
+
 - 2026-11-07 (rama `pantalla/recetas`): la hoja «Cocinar» (la lista «Para» salía amontonada: usaba la clase del tick);
   ajustar sin mover verduras ni salsas; lo cocido dice cuánto es en crudo; la compra por pasillos; cambiar un ingrediente
   «solo este día» al apuntar (y para siempre desde el menú); párrafos justificados. La hoja de una comida: sus cuatro cifras en tarjeta, la fila de lo apuntado bien (la flecha sin tamaño se comía el ancho) y sin «0 g» en los platos.

@@ -14,6 +14,7 @@ Ningún área depende de otra por dentro: lo que usan varias vive aquí. `shared
 
 - **ui**: todo color, tamaño y radio sale de variables de `tokens.css`; cada componente con su CSS Module; botones de 44 px mínimo.
   Un componente recibe datos y avisa de toques: no conoce el estado ni los casos de uso.
+  Las opciones (`Choice`) sin elegir usan `--choice-bg` (de serie, `--surface`): sobre una tarjeta gris, la tarjeta la pone en `--bg`.
 - **data**: el esquema lleva versión; cada cambio de formato es una migración numerada con su prueba y una copia previa.
   Los registros llevan `id`, `createdAt`, `updatedAt`, `deletedAt`. Lo que cambia el usuario va aparte del contenido.
 - **content**: archivos JSON que no se editan a mano sin revisar su prueba. Los programas de terceros **no** van aquí: van en `private/`.

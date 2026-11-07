@@ -104,7 +104,7 @@ export function RacionHoja({ alimento, comida, editando, onClose, avisar }: Prop
       }
     >
       <div class={h.stack}>
-        <p class={h.foot}>
+        <p class={`${h.foot} ${h.datos}`}>
           Por 100 g: {formatInt(alimento.kcal)} kcal · P {formatDecimal(alimento.protein)} · H{' '}
           {formatDecimal(alimento.carbs)} · G {formatDecimal(alimento.fat)}
           {alimento.id.startsWith('u_') ? ' · tu etiqueta' : ' · valores medios (BEDCA y USDA)'}

@@ -21,6 +21,7 @@ export function AlMenuHoja({ plato, onClose, avisar }: Props) {
     <Sheet
       title="Al menú"
       onClose={onClose}
+      large
       footer={
         <div class={h.actions}>
           <Button

@@ -55,6 +55,7 @@
   justify-content: space-between;
 }
 
+/* --choice-bg: el fondo de una opción sin elegir; sobre una tarjeta gris, quien la pone lo cambia a blanco */
 .pill,
 .circle,
 .chip {
@@ -62,7 +63,7 @@
   place-items: center;
   height: var(--control);
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  background: var(--choice-bg, var(--surface));
   font: var(--text-subhead);
   font-weight: var(--weight-semibold);
 }

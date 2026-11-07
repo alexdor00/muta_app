@@ -23,6 +23,7 @@ export function OpcionesMenuHoja({ menuId, onClose, avisar }: Props) {
     <Sheet
       title={m.nombre}
       onClose={() => void guardar().then(onClose)}
+      large
       footer={
         <div class={h.actions}>
           <Button onClick={() => void guardar().then(onClose)}>Listo</Button>
