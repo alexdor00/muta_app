@@ -25,6 +25,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-08 (rama `pantalla/recetas`): quitar deslizando (comidas de Hoy, lo apuntado y los platos del menú; el
+  plato del menú, solo ese día) y «De lo que sueles comer» en Añadir, que aprende de dos semanas de apuntes.
+
 - 2026-11-07 (rama `pantalla/recetas`): desde el menú, el botón principal pone la receta en el menú; en Hoy manda tu
   menú sobre la dieta y se apunta otra cosa con «+»; la compra con emoticonos, de qué menú sale cada cosa y añadir lo tuyo arriba.
 
@@ -137,6 +140,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
     rango de días y la cuenta de rutinas. Verificado: `npm run check` (145 tests) y e2e (6 de 6).
 
 ## Pendiente (por prioridad)
+
+- **Hidratos según el día de entreno** (más o menos los días de entreno y de descanso): los documentos no dan una regla;
+  el usuario lo deja para más adelante (2026-11-08). Si vuelve, preguntar de qué documento sale.
 
 1. Hoy y Progreso, en ese orden (cada una con su PNG aprobado antes).
 2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión y la sesión ya dicen «Sugerido»).

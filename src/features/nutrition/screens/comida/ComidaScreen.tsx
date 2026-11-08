@@ -28,10 +28,10 @@ import {
   quitarReceta,
 } from '../../use-cases/diet.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
-import { menusDeTuDieta, ponerPlato, volverA } from '../../use-cases/menu.ts'
+import { menusDeTuDieta, ponerPlato, quitarDelMenu, quitarDeEseDia, volverA } from '../../use-cases/menu.ts'
 import { apuntarPlato, cargarRecetas, desapuntar, platoApuntado } from '../../use-cases/recipes.ts'
 import { gramosDeHueco, huecoDe, menu, platoPorId, type Cocinado } from '../../state/recetas.ts'
-import { esComida } from '../comun/platos.ts'
+import { comidaDe, esComida } from '../comun/platos.ts'
 import { AvisosHoja } from './AvisosHoja.tsx'
 import { CocinarHoja } from './CocinarHoja.tsx'
 import { CrearPlatoHoja } from './CrearPlatoHoja.tsx'
@@ -114,7 +114,6 @@ export function ComidaScreen() {
   }, [query.anadir])
 
   if (estado.value === 'cargando') return null
-
   const cambiarVista = (v: Vista) =>
     route(v === 'hoy' ? paths.nutrition : `${paths.nutrition}?vista=${v}`, true)
   const abrirAnadir = (id: ComidaId) => {
@@ -150,6 +149,11 @@ export function ComidaScreen() {
   const deEjemplo = async () => proponer(await dietaEjemplo())
   const propia = () => proponer(dietaPropia('Mi dieta'))
   const hayObjetivo = ajustes.value || dieta.value
+  // Quitar deslizando (una comida de un día o un plato del menú), con «Deshacer»
+  const quitarYAvisar = async (texto: string, hacer: () => Promise<() => Promise<unknown>>) => {
+    const reponer = await hacer()
+    avisar(texto, { label: 'Deshacer', onClick: () => void reponer() })
+  }
   // El tick de una comida con plato de tu menú: lo apunta (con sus gramos de ese día) o lo quita
   const tick = async (c: ComidaId) => {
     const f = diaVisto.value
@@ -204,6 +208,7 @@ export function ComidaScreen() {
             setEnMenu({ menu: m, comida: c })
             platoMenu.show()
           }}
+          onQuitarPlato={(m, c) => void quitarYAvisar('Quitado del menú', () => quitarDelMenu(m, c))}
           onAnadir={(m, c) => {
             setEnMenu({ menu: m, comida: c })
             elegir.show()
@@ -273,9 +278,13 @@ export function ComidaScreen() {
           onCuadrar={cuadrar.show}
           onCocinado={abrirCocinado}
           onTick={(c) => void tick(c)}
+          onQuitar={(c) =>
+            void quitarYAvisar(`${comidaDe(c).nombre}: quitada de este día`, () =>
+              quitarDeEseDia(c, diaVisto.value),
+            )
+          }
         />
       )}
-
       {anadir.open && (
         <AnadirHoja
           comida={comida}

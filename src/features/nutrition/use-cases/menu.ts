@@ -10,6 +10,8 @@ import {
   conAjuste,
   conDia,
   conPlato,
+  huecoDe,
+  conSinPlato,
   conReparto,
   diaSemana,
   duplicado,
@@ -30,7 +32,8 @@ import { addDays } from '../../../shared/lib/format.ts'
 import { menuDe } from '../domain/diet.ts'
 import { COMIDAS, type ComidaId } from '../domain/food.ts'
 import { platoDeReceta } from '../domain/recipes.ts'
-import { dieta, hoy } from '../state/comida.ts'
+import { dias, dieta, hoy } from '../state/comida.ts'
+import { devolver, quitar } from './foodLog.ts'
 import { guardarPlatosTuyos, ID_MENU } from './recipes.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
 
@@ -73,6 +76,30 @@ export async function ponerPlato(
   const antes = menu.value.menus.find((x) => x.id === menuId)?.platos[comida] ?? null
   await guardar(conPlato(menu.value, menuId, comida, platoId))
   return antes
+}
+
+/** Quita el plato del menú de una comida solo ese día (o lo vuelve a poner, para «Deshacer»). */
+export const sinPlatoEseDia = (fecha: string, comida: ComidaId, sinEl = true) =>
+  guardar(conSinPlato(menu.value, fecha, comida, sinEl, hoy.value))
+
+/**
+ * Quita una comida de un día: lo apuntado en ella y el plato del menú (solo ese día). Devuelve cómo deshacerlo.
+ */
+export async function quitarDeEseDia(comida: ComidaId, fecha: string): Promise<() => Promise<void>> {
+  const ids = (dias.value[fecha] ?? []).filter((a) => a.comida === comida).map((a) => a.id)
+  const teniaPlato = huecoDe(menu.value, fecha, comida) !== null
+  const quitados = ids.length ? await quitar(ids, fecha) : []
+  if (teniaPlato) await sinPlatoEseDia(fecha, comida)
+  return async () => {
+    if (quitados.length) await devolver(quitados, fecha)
+    if (teniaPlato) await sinPlatoEseDia(fecha, comida, false)
+  }
+}
+
+/** Quita el plato de una comida de un menú. Devuelve cómo deshacerlo. */
+export async function quitarDelMenu(menuId: string, comida: ComidaId): Promise<() => Promise<unknown>> {
+  const antes = await ponerPlato(menuId, comida, null)
+  return () => ponerPlato(menuId, comida, antes)
 }
 
 /** Guarda cuándo cocinas un plato y para qué comidas (si no queda ninguna, se quita). */

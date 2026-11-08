@@ -22,6 +22,8 @@ import {
 import {
   anadir,
   anadirVarios,
+  apunteDe,
+  deLoQueSuelesComer,
   borrarGuardada,
   buscar,
   cargarAlimentos,
@@ -70,6 +72,8 @@ export function AnadirHoja({
     void cargarAlimentos()
   }, [])
   const ayer = resumenDeAyer(comida)
+  const sueles = deLoQueSuelesComer(comida)
+  const NOMBRE_MACRO = { protein: 'proteína', carbs: 'hidratos', fat: 'grasa' } as const
   const deshacer = (ids: string[]) => ({ label: 'Deshacer', onClick: () => void quitar(ids) })
 
   async function masUno(a: Alimento) {
@@ -144,6 +148,42 @@ export function AnadirHoja({
               <span class={h.foot}>Para comer fuera o si no lo encuentras</span>
             </button>
           </div>
+        )}
+        {!texto.trim() && sueles && (
+          <section class={h.stack} aria-labelledby="sueles">
+            <h3 id="sueles" class={h.eyebrow}>
+              De lo que sueles comer · te faltan {formatInt(sueles.falta[sueles.macro])} g de{' '}
+              {NOMBRE_MACRO[sueles.macro]}
+            </h3>
+            <ul class={h.list}>
+              {sueles.propuestas.map(({ alimento: a, gramos, aporta }) => (
+                <li key={a.id} class={h.row}>
+                  <span class={h.rowMain}>
+                    <span class={h.rowTitle}>{a.name}</span>
+                    <span class={h.rowDetail}>
+                      {formatInt(gramos)} g · {formatInt(aporta[sueles.macro])} g de{' '}
+                      {NOMBRE_MACRO[sueles.macro]} · {formatInt(aporta.kcal)} kcal
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    class={h.round}
+                    aria-label={`Añadir ${formatInt(gramos)} g de ${a.name}`}
+                    onClick={async () => {
+                      const apunte = apunteDe(a, gramos, 'gramos', comida)
+                      const id = await anadir(apunte)
+                      avisar(`${a.name}: ${formatInt(apunte.kcal)} kcal`, deshacer([id]))
+                    }}
+                  >
+                    <PlusIcon />
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <p class={h.foot}>
+              Lo aprendo de lo que has apuntado estas dos semanas, con lo que sueles echar.
+            </p>
+          </section>
         )}
         {!texto.trim() && (
           <div class={h.chips} role="group" aria-label="Qué ver">

@@ -261,3 +261,85 @@ test('accesibilidad: Hoy, Añadir, la ración, Tu objetivo y la sugerencia', asy
   await sinFallos(page)
   await page.screenshot({ path: 'tests/e2e/capturas/comida-sugerencia.png' })
 })
+
+/** Ocho días con pechuga de pollo y yogur griego en la merienda, para que la app aprenda lo que sueles comer. */
+async function conHabitos(page: Page) {
+  await prepararComida(page)
+  const dias = Array.from({ length: 8 }, (_, i) => fecha(i + 1))
+  await page.evaluate(async (lista) => {
+    const db = await new Promise<IDBDatabase>((ok, ko) => {
+      const r = indexedDB.open('muta')
+      r.onsuccess = () => ok(r.result)
+      r.onerror = () => ko(r.error)
+    })
+    const tx = db.transaction('foodLog', 'readwrite')
+    const ahora = new Date().toISOString()
+    for (const date of lista)
+      tx.objectStore('foodLog').put({
+        date,
+        apuntes: [
+          {
+            id: `p-${date}`,
+            comida: 'comida',
+            nombre: 'Pechuga de pollo (cruda)',
+            alimentoId: 'f_pechuga_de_pollo_cruda',
+            gramos: 150,
+            raciones: null,
+            racion: null,
+            kcal: 165,
+            protein: 35,
+            carbs: 0,
+            fat: 2,
+          },
+        ],
+        createdAt: ahora,
+        updatedAt: ahora,
+      })
+    await new Promise((ok, ko) => {
+      tx.oncomplete = ok
+      tx.onerror = () => ko(tx.error)
+    })
+    db.close()
+  }, dias)
+}
+
+test('con dos semanas apuntando, «Añadir» propone de lo que sueles comer para lo que falta', async ({
+  page,
+}) => {
+  await conHabitos(page)
+  await page.goto('/comida')
+  await page.getByRole('button', { name: 'Añadir a la cena' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Añadir a la cena' })
+  await expect(
+    hoja.getByRole('heading', { name: /De lo que sueles comer · te faltan .* g de proteína/ }),
+  ).toBeVisible()
+  await hoja.getByRole('button', { name: 'Añadir 150 g de Pechuga de pollo (cruda)' }).click()
+  await expect(page.getByRole('status')).toContainText('Pechuga de pollo (cruda): 165 kcal')
+})
+
+test('deslizar una comida a la izquierda la quita de ese día, y se deshace', async ({ page }) => {
+  await conHabitos(page)
+  await page.goto('/comida')
+  await page.getByRole('button', { name: 'Añadir a la cena' }).click()
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /^Añadir 150 g de Pechuga/ })
+    .click()
+  await page.keyboard.press('Escape')
+  const cena = page.getByRole('button', { name: /^Cena/ }).first()
+  await expect(cena).toContainText('Pechuga de pollo')
+  // El aviso de lo apuntado se queda abajo unos segundos, encima de la cena: se espera a que se vaya
+  await expect(page.getByRole('status')).toBeEmpty({ timeout: 8000 })
+  await cena.scrollIntoViewIfNeeded()
+  // Deslizar con el dedo (aquí, el ratón) hacia la izquierda
+  const caja = (await cena.boundingBox())!
+  await page.mouse.move(caja.x + caja.width - 20, caja.y + caja.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(caja.x + caja.width - 140, caja.y + caja.height / 2, { steps: 8 })
+  await page.mouse.up()
+  await page.getByRole('button', { name: 'Quitar cena de este día' }).click()
+  await expect(page.getByRole('status')).toContainText('Cena: quitada de este día')
+  await expect(page.getByRole('button', { name: /^Cena/ }).first()).not.toContainText('Pechuga de pollo')
+  await page.getByRole('status').getByRole('button', { name: 'Deshacer' }).click()
+  await expect(page.getByRole('button', { name: /^Cena/ }).first()).toContainText('Pechuga de pollo')
+})

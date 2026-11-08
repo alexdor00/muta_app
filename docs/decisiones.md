@@ -486,3 +486,15 @@ ya tienes, el nutricionista con «Todo cuadra».
   dieta de ejemplo tapaba tus menús). Cada comida con plato del menú lleva también su «+» para apuntar otra cosa.
 - La compra: cada cosa con un emoticono (por su nombre o su sección; solo decora) y los menús de los que sale; «+ Añadir
   algo que no está en el menú» arriba.
+
+## 2026-11-08 · Quitar deslizando y lo que sueles comer
+
+- **Quitar deslizando** (sin X a la vista): el gesto de la sesión de Entreno pasa a `shared/ui/useDeslizar.ts` y a la
+  pieza `Deslizable` (asoma «Quitar» en rojo). En Comida · Hoy, deslizar una comida quita lo apuntado y el plato del menú
+  solo ese día (`sinPlato` en el menú); en su hoja, cada apunte; en Menú, cada plato del menú. Todo con «Deshacer».
+- **Lo que sueles comer** (`domain/usual.ts`): con 7 días apuntados de los últimos 14, la app conoce lo que repites (2
+  veces o más), cuánto sueles echar (la mediana) y en qué comida. Cuando al día le falta proteína (15 g), hidratos (20 g)
+  o grasa (8 g) y quedan 100 kcal o más, «Añadir» propone 3 de esos alimentos con sus gramos, sin pasarse de las kcal que
+  quedan. Umbrales sugeridos; solo propone, lo apuntas tú.
+- **Hidratos según el día de entreno**: los documentos de conocimiento no dan una regla (solo «hidratos antes y después
+  de entrenar» y «el resto, a hidratos»). Queda pendiente, a petición del usuario.

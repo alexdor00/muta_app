@@ -12,12 +12,13 @@ import {
   type ComidaId,
 } from '../../state/comida.ts'
 import { gramosDeHueco, huecoDe, menu, platoPorId } from '../../state/recetas.ts'
-import { cargarAlimentos, guardarComida, textoCantidad } from '../../use-cases/foodLog.ts'
+import { cargarAlimentos, devolver, guardarComida, quitar, textoCantidad } from '../../use-cases/foodLog.ts'
 import { platoApuntado, reapuntarPlato } from '../../use-cases/recipes.ts'
 import { CambiarHoja } from '../plato/CambiarHoja.tsx'
 import { Cifras } from '../comun/Cifras.tsx'
 import { PlatoDelDia } from './PlatoDelDia.tsx'
 import type { Aviso } from '../comun/useAviso.ts'
+import { Deslizable } from '../../../../shared/ui/Deslizable.tsx'
 import h from '../comun/Hojas.module.css'
 
 type Props = {
@@ -88,22 +89,35 @@ export function ComidaDelDiaHoja({ comida, onClose, onAnadir, onEditar, avisar }
         {c.apuntes.length > 0 && <Cifras total={c.total} />}
         <ul class={h.list}>
           {c.apuntes.map((a) => (
-            <li key={a.id} class={h.row}>
-              <button
-                type="button"
-                class={h.rowMain}
-                onClick={async () => {
-                  if (a.alimentoId) await cargarAlimentos()
-                  onEditar(a, a.alimentoId ? alimentoPorId(a.alimentoId) : null)
+            <li key={a.id}>
+              <Deslizable
+                ariaLabel={`Quitar ${a.nombre}`}
+                onQuitar={async () => {
+                  const quitados = await quitar([a.id], fecha)
+                  avisar(`${a.nombre}: quitado`, {
+                    label: 'Deshacer',
+                    onClick: () => void devolver(quitados, fecha),
+                  })
                 }}
               >
-                <span class={h.rowTitle}>{a.nombre}</span>
-                <span class={h.rowDetail}>
-                  {[textoCantidad(a), `${formatInt(a.protein)} g prot.`].filter(Boolean).join(' · ')}
-                </span>
-              </button>
-              <span class={h.rowKcal}>{formatInt(a.kcal)} kcal</span>
-              <ChevronRightIcon />
+                <div class={h.row}>
+                  <button
+                    type="button"
+                    class={h.rowMain}
+                    onClick={async () => {
+                      if (a.alimentoId) await cargarAlimentos()
+                      onEditar(a, a.alimentoId ? alimentoPorId(a.alimentoId) : null)
+                    }}
+                  >
+                    <span class={h.rowTitle}>{a.nombre}</span>
+                    <span class={h.rowDetail}>
+                      {[textoCantidad(a), `${formatInt(a.protein)} g prot.`].filter(Boolean).join(' · ')}
+                    </span>
+                  </button>
+                  <span class={h.rowKcal}>{formatInt(a.kcal)} kcal</span>
+                  <ChevronRightIcon />
+                </div>
+              </Deslizable>
             </li>
           ))}
         </ul>

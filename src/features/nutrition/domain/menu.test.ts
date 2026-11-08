@@ -7,6 +7,7 @@ import {
   conCuantos,
   conDia,
   conPlato,
+  conSinPlato,
   diaSemana,
   diasDelMenu,
   duplicado,
@@ -65,6 +66,19 @@ const platoDe = (id: string) => (id === plato.id ? plato : null)
 const lunes = '2026-11-09'
 
 describe('tus menús', () => {
+  it('quitar el plato de una comida solo un día: ese día no hay hueco; los demás, sí; se vuelve a poner', () => {
+    const m = conPlato(menuVacio(), 'A', 'cena', plato.id)
+    const sin = conSinPlato(m, lunes, 'cena', true, lunes)
+    expect(huecosDelDia(sin, lunes)).toEqual([])
+    expect(huecosDelDia(sin, '2026-11-10')).toHaveLength(1)
+    expect(huecosDelDia(conSinPlato(sin, lunes, 'cena', false, lunes), lunes)).toHaveLength(1)
+    // Lo de hace más de una semana se olvida
+    expect(conSinPlato(sin, '2026-11-30', 'comida', true, '2026-11-30').sinPlato).toEqual([
+      '2026-11-30|comida',
+    ])
+    expect(leerMenu({ ...m, sinPlato: undefined }).sinPlato).toEqual([])
+  })
+
   it('de 1 a 7 menús, seguidos por la semana; quitar uno rehace la semana', () => {
     expect(diaSemana(lunes)).toBe(0)
     const tres = conCuantos(menuVacio(), 3)

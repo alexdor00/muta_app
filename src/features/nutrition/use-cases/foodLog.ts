@@ -14,7 +14,9 @@ import {
   type Macros,
   type Modo,
 } from '../domain/food.ts'
-import { alimentoPorId, base, deAyer, diaVisto, dias, guardadas, propios } from '../state/comida.ts'
+import { alimentoPorId, base, deAyer, diaVisto, dias, guardadas, hoy, propios } from '../state/comida.ts'
+import { faltaDia } from '../state/recetas.ts'
+import { deLoQueSueles, habitosDe, loQueFalta, type Propuesta } from '../domain/usual.ts'
 import { guardarDia, guardarGuardadas, guardarPropios } from './nutritionStore.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
 
@@ -232,4 +234,19 @@ export function textoCantidad(a: Pick<Apunte, 'raciones' | 'racion' | 'gramos'>)
 export function textoRacion(a: Alimento): string {
   if (enGramos(a.servingLabel)) return `${formatInt(a.servingG)} g`
   return `1 ${a.servingLabel} (${formatInt(a.servingG)} g)`
+}
+
+/**
+ * De lo que sueles comer, lo que cubre lo que más le falta al día (si llevas una semana o más apuntando en las dos
+ * últimas): cuál falta, cuánto y hasta 3 alimentos tuyos con sus gramos. null si no hay nada que proponer.
+ */
+export function deLoQueSuelesComer(
+  comida: ComidaId,
+): { macro: 'protein' | 'carbs' | 'fat'; falta: Macros; propuestas: Propuesta[] } | null {
+  const falta = faltaDia.value
+  const habitos = habitosDe(dias.value, hoy.value)
+  const macro = falta ? loQueFalta(falta) : null
+  if (!falta || !habitos || !macro) return null
+  const propuestas = deLoQueSueles(habitos, falta, comida, alimentoPorId)
+  return propuestas.length ? { macro, falta, propuestas } : null
 }

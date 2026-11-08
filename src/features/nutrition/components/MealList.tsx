@@ -1,5 +1,6 @@
 import { formatInt } from '../../../shared/lib/format.ts'
 import { CheckIcon, ChevronRightIcon, ForkIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
+import { Deslizable } from '../../../shared/ui/Deslizable.tsx'
 import styles from './MealList.module.css'
 
 export type FilaComida = {
@@ -27,6 +28,8 @@ type Props = {
   onAnadir: (id: string) => void
   /** El tick de una comida con plato del menú: apuntarlo o quitarlo. */
   onTick: (id: string) => void
+  /** Deslizar a la izquierda: quita lo de esa comida ese día (lo apuntado y el plato del menú, solo ese día). */
+  onQuitar: (id: string) => void
 }
 
 /**
@@ -34,7 +37,7 @@ type Props = {
  * un tick para apuntarlo; sin menú, la vacía dice cuánto te queda y lleva «+». La miniatura es la foto del plato si la
  * tiene; si no, el icono.
  */
-export function MealList({ titulo, comidas, quedan, onAbrir, onAnadir, onTick }: Props) {
+export function MealList({ titulo, comidas, quedan, onAbrir, onAnadir, onTick, onQuitar }: Props) {
   const primeraVacia = comidas.find((c) => !c.alimentos && !c.menu)?.id
   const hechas = comidas.filter((c) => c.alimentos).length
   return (
@@ -52,8 +55,8 @@ export function MealList({ titulo, comidas, quedan, onAbrir, onAnadir, onTick }:
           const m = c.menu
           const ver = m && !c.alimentos
           const foto = ver ? m.foto : c.foto
-          return (
-            <li key={c.id} class={styles.card}>
+          const tarjeta = (
+            <div class={styles.card}>
               <button
                 type="button"
                 class={styles.open}
@@ -114,6 +117,21 @@ export function MealList({ titulo, comidas, quedan, onAbrir, onAnadir, onTick }:
                     <PlusIcon />
                   </button>
                 )
+              )}
+            </div>
+          )
+          return (
+            <li key={c.id}>
+              {c.alimentos || m ? (
+                <Deslizable
+                  fondo="surface"
+                  ariaLabel={`Quitar ${c.nombre.toLowerCase()} de este día`}
+                  onQuitar={() => onQuitar(c.id)}
+                >
+                  {tarjeta}
+                </Deslizable>
+              ) : (
+                tarjeta
               )}
             </li>
           )

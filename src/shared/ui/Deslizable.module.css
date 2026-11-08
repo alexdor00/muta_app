@@ -1,0 +1,47 @@
+/* Una fila que se desliza a la izquierda y descubre «Quitar» debajo */
+.swipe {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+}
+
+.fila {
+  position: relative;
+  transition: transform var(--duration-sheet) var(--ease);
+  touch-action: pan-y;
+}
+
+.bg {
+  background: var(--bg);
+}
+
+.surface {
+  background: var(--surface);
+}
+
+.fila[style*='translate'] {
+  transition: none;
+}
+
+.abierta {
+  transform: translateX(calc(var(--control-lg) * -1.6));
+}
+
+.quitar {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: calc(var(--control-lg) * 1.6);
+  border: 0;
+  background: var(--critical-label);
+  color: var(--on-photo);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  visibility: hidden;
+}
+
+/* Solo asoma mientras se desliza la fila o cuando se queda abierta */
+.swipe:has(.abierta) .quitar,
+.swipe:has(.fila[style*='translate']) .quitar {
+  visibility: visible;
+}

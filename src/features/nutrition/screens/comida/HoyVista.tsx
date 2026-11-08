@@ -44,6 +44,7 @@ type Props = {
   onCocinado: (id: string) => void
   /** El tick de una comida con plato de tu menú. */
   onTick: (comida: ComidaId) => void
+  onQuitar: (comida: ComidaId) => void
 }
 
 function tituloDia(fecha: string, hoyEs: string): string {
@@ -65,6 +66,7 @@ export function HoyVista({
   onCuadrar,
   onCocinado,
   onTick,
+  onQuitar,
 }: Props) {
   const objetivo = objetivoDia.value
   if (!objetivo) return null
@@ -159,6 +161,7 @@ export function HoyVista({
         onAbrir={(id) => onAbrirComida(id as ComidaId)}
         onAnadir={(id) => onAnadir(id as ComidaId)}
         onTick={(id) => onTick(id as ComidaId)}
+        onQuitar={(id) => onQuitar(id as ComidaId)}
       />
       {cocinas.map(
         (t) =>

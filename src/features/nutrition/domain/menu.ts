@@ -45,6 +45,8 @@ export type MenuSemanal = {
   /** Propuestas a las que dijiste «Ahora no». */
   descartadas: string[]
   hechos: Hecho[]
+  /** Las comidas de un día en que quitaste el plato del menú (solo ese día): `fecha|comida`. */
+  sinPlato: string[]
 }
 
 /** Lo que comes en una comida de un día: el plato de su menú. */
@@ -65,14 +67,33 @@ export function menuVacio(): MenuSemanal {
     avisos: { cocinar: true, compra: true, comidas: false, antesMin: 30 },
     descartadas: [],
     hechos: [],
+    sinPlato: [],
   }
+}
+
+/**
+ * Quita (o vuelve a poner) el plato del menú en una comida de un día, solo ese día: el menú no cambia. Se olvidan los
+ * días ya pasados de hace más de una semana, para que la lista no crezca sin fin.
+ */
+export function conSinPlato(
+  m: MenuSemanal,
+  fecha: string,
+  comida: ComidaId,
+  quitar: boolean,
+  hoyEs: string,
+): MenuSemanal {
+  const k = clave(fecha, comida)
+  const desde = addDays(hoyEs, -7)
+  const resto = m.sinPlato.filter((x) => x !== k && x.split('|')[0] >= desde)
+  return { ...m, sinPlato: quitar ? [...resto, k] : resto }
 }
 
 /** Lo guardado con la forma de antes (huecos por día) no se puede leer: se empieza de nuevo. */
 export function leerMenu(x: unknown): MenuSemanal {
   const m = x as Partial<MenuSemanal> | null
   if (!m || !Array.isArray(m.menus) || !m.menus.length || !Array.isArray(m.semana)) return menuVacio()
-  return { ...menuVacio(), ...m } as MenuSemanal
+  // Lo guardado antes de `sinPlato` no lo trae
+  return { ...menuVacio(), ...m, sinPlato: Array.isArray(m.sinPlato) ? m.sinPlato : [] } as MenuSemanal
 }
 
 export const clave = (fecha: string, comida: ComidaId) => `${fecha}|${comida}`
@@ -174,6 +195,7 @@ export function huecoDe(m: MenuSemanal, fecha: string, comida: ComidaId): Hueco 
   const plato = menu?.platos[comida]
   if (!menu || !plato) return null
   const k = clave(fecha, comida)
+  if (m.sinPlato.includes(k)) return null
   const cocinado = m.cocinados.find((c) => c.plato === plato && c.para.includes(k))
   return { fecha, comida, menu: menu.id, plato, cocinado: cocinado?.id ?? null }
 }
