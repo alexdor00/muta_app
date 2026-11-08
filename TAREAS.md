@@ -25,6 +25,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-08 (rama `pantalla/recetas`): Tu plan más pequeño y claro (objetivo con «Editar», el aviso del nutricionista
+  dentro del menú, Herramientas con nombres claros, la dieta bajo los menús) y, en Cocina, el arroz en crudo y cocido.
+
 - 2026-11-08 (rama `pantalla/recetas`): **Comida pasa a ser Nutrición**: abre en tu día (el día dentro de la tarjeta,
   «Para la cena» y «Ver todas las recetas»), «Tu plan» reúne objetivo, menús y dieta, y la cabecera es como la de Entreno.
 

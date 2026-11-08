@@ -3,7 +3,7 @@ import { formatInt, parseDecimal } from '../../../../shared/lib/format.ts'
 import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
 import { MinusIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
 import { COMIDAS, hoy } from '../../state/comida.ts'
-import { gramosDeHueco, menu, platoPorId, totalCon } from '../../state/recetas.ts'
+import { deCrudoACocido, enCrudoDe, gramosDeHueco, menu, platoPorId, totalCon } from '../../state/recetas.ts'
 import p from '../comun/Pagina.module.css'
 import h from '../comun/Hojas.module.css'
 
@@ -38,14 +38,19 @@ export function PesaCrudo({ inicial }: { inicial: { plato?: string; raciones?: n
     { fecha: hoy.value, comida: elegido.comida, menu: elegido.menu, plato: plato.id, cocinado: null },
     plato,
   )
-  const enCrudo = plato.ingredientes.map((i, k) => {
+  // Cada ingrediente como se pesa: lo cocido del plato (el arroz cocido), en crudo; para las cuentas, en lo del plato
+  const filas = plato.ingredientes.map((i, k) => {
     if (!i.cuenta || i.gramos === null) return null
+    const delPlato = Math.round((g[k] ?? i.gramos) * raciones)
+    const crudo = enCrudoDe(i.alimentoId, delPlato)
     const propio = parseDecimal(cambiados[`${plato.id}|${k}`] ?? '')
-    return propio ?? Math.round((g[k] ?? i.gramos) * raciones)
+    const pesas = propio ?? crudo?.gramos ?? delPlato
+    const cuenta = crudo ? deCrudoACocido(i.alimentoId, pesas) : pesas
+    return { nombre: crudo?.nombre ?? i.nombre, pesas, cocido: crudo ? Math.round(cuenta) : null, cuenta }
   })
   const total = totalCon(
     plato,
-    enCrudo.map((x) => (x === null ? null : x / raciones)),
+    filas.map((x) => (x === null ? null : x.cuenta / raciones)),
     [],
     raciones,
   )
@@ -89,15 +94,19 @@ export function PesaCrudo({ inicial }: { inicial: { plato?: string; raciones?: n
         </span>
       </div>
       <ul class={p.list}>
-        {plato.ingredientes.map((i, k) =>
-          enCrudo[k] === null ? null : (
+        {plato.ingredientes.map((i, k) => {
+          const x = filas[k]
+          return x === null ? null : (
             <li key={`${i.texto}-${k}`} class={p.withAction}>
-              <span class={p.rowText}>{i.nombre}</span>
+              <span class={p.rowText}>
+                {x.nombre}
+                {x.cocido !== null && <span class={p.foot}>≈ {formatInt(x.cocido)} g cocido</span>}
+              </span>
               <label class={`${h.field} ${p.gramsField}`}>
                 <input
                   inputMode="decimal"
-                  aria-label={`${i.nombre} en crudo (g)`}
-                  value={cambiados[`${plato.id}|${k}`] ?? String(enCrudo[k])}
+                  aria-label={`${x.nombre} en crudo (g)`}
+                  value={cambiados[`${plato.id}|${k}`] ?? String(x.pesas)}
                   onInput={(e) => setCambiados({ ...cambiados, [`${plato.id}|${k}`]: e.currentTarget.value })}
                 />
               </label>
@@ -105,8 +114,8 @@ export function PesaCrudo({ inicial }: { inicial: { plato?: string; raciones?: n
                 g
               </span>
             </li>
-          ),
-        )}
+          )
+        })}
       </ul>
       <p class={p.foot}>
         En crudo, para {raciones} {raciones === 1 ? 'ración' : 'raciones'}: {formatInt(total.kcal)} kcal y{' '}

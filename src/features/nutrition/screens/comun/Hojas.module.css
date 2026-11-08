@@ -176,6 +176,7 @@
   background: none;
   color: var(--label);
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
 }
 

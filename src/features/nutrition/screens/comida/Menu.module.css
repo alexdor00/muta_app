@@ -229,30 +229,106 @@
   white-space: nowrap;
 }
 
-.atajos {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-  padding: 0 var(--gutter);
+/* Herramientas (la compra, cocinar y pesar, recordatorios) y la dieta: filas con su dibujo, su nombre y qué hay dentro */
+.herramientasTitulo {
+  margin-bottom: var(--space-2);
+  font: var(--text-title-2);
 }
 
-.atajo {
-  display: grid;
-  place-items: center;
-  min-height: var(--tap-min);
-  padding: 0 var(--space-2);
+.herramientas {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  list-style: none;
+}
+
+.herramientas > li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.herramienta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-3) var(--space-4);
   border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--surface-2);
+  background: var(--surface);
   color: var(--label);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
+  font: inherit;
+  text-align: left;
   text-decoration: none;
   cursor: pointer;
 }
 
-.dieta {
+.herramienta > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.dietaFila {
+  width: auto;
+  margin: 0 var(--gutter);
+  border-radius: var(--radius-card);
+}
+
+.hIcono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-title-2);
+}
+
+.hTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hNombre {
+  font: var(--text-headline);
+}
+
+/* Lo que propone tu nutricionista, dentro de su menú: una línea con un punto naranja */
+.avisoMenu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--label);
   text-decoration: none;
+}
+
+.punto {
+  flex: none;
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--streak);
+}
+
+.avisoTexto {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.ver {
+  flex: none;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
 }
 
 /* En la hoja (fondo blanco), las letras van en gris */

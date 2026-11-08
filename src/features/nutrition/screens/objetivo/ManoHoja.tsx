@@ -16,7 +16,7 @@ export function ManoHoja({ onClose, avisar }: Props) {
   if (!a) return null
   return (
     <Sheet
-      title="Fijar a mano"
+      title="Poner mis kcal"
       onClose={onClose}
       large
       footer={

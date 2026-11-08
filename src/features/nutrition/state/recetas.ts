@@ -191,3 +191,21 @@ export function enCrudo(alimentoId: string | null, gramos: number | null): strin
   const par = alimentoId && gramos ? parejas.value.get(alimentoId) : null
   return par ? `≈ ${gramosEnCrudo(gramos!, par.cocido, par.crudo)} g en crudo` : null
 }
+
+/**
+ * Lo que es en crudo un cereal o una legumbre cocidos: su nombre en crudo («Arroz blanco (crudo)») y sus gramos, para
+ * pesarlo al cocinar. null si no es de eso o la base no tiene su pareja.
+ */
+export function enCrudoDe(
+  alimentoId: string | null,
+  gramosCocido: number,
+): { nombre: string; gramos: number } | null {
+  const par = alimentoId ? parejas.value.get(alimentoId) : null
+  return par ? { nombre: par.crudo.name, gramos: gramosEnCrudo(gramosCocido, par.cocido, par.crudo) } : null
+}
+
+/** Lo contrario: unos gramos pesados en crudo, en gramos cocidos (por sus kcal), para sumar con los valores del plato. */
+export function deCrudoACocido(alimentoId: string | null, gramosCrudo: number): number {
+  const par = alimentoId ? parejas.value.get(alimentoId) : null
+  return par ? (gramosCrudo * par.crudo.kcal) / par.cocido.kcal : gramosCrudo
+}

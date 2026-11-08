@@ -7,7 +7,7 @@ import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { COMIDAS, hoy, tipoDe } from '../../state/comida.ts'
 import {
   clave,
-  enCrudo,
+  enCrudoDe,
   gramosDeHueco,
   menu,
   paraCocinar,
@@ -123,17 +123,19 @@ export function CocinarHoja({ cocinado, onClose, avisar }: Props) {
           </p>
           {gramos
             .filter((i) => i.gramos !== null)
-            .map((i) => (
-              <p key={i.texto} class={h.line}>
-                <span class={h.rowMain}>
-                  <span>{i.nombre}</span>
-                  {enCrudo(i.alimentoId, i.gramos) && (
-                    <span class={h.foot}>{enCrudo(i.alimentoId, i.gramos)}</span>
-                  )}
-                </span>
-                <b>{formatInt(i.gramos!)} g</b>
-              </p>
-            ))}
+            .map((i) => {
+              // Lo que se cuece (el arroz), en crudo, que es como se pesa; debajo, lo que pesará cocido
+              const crudo = enCrudoDe(i.alimentoId, i.gramos!)
+              return (
+                <p key={i.texto} class={h.line}>
+                  <span class={h.rowMain}>
+                    <span>{crudo?.nombre ?? i.nombre}</span>
+                    {crudo && <span class={h.foot}>≈ {formatInt(i.gramos!)} g cocido</span>}
+                  </span>
+                  <b>{formatInt(crudo?.gramos ?? i.gramos!)} g</b>
+                </p>
+              )
+            })}
           <p class={h.foot}>
             Luego cada comida lleva los gramos de su día.{' '}
             <a href={`${paths.kitchen}?desde=menu&plato=${p.id}&raciones=${para.length}`}>

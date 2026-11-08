@@ -1,9 +1,7 @@
-import { useLocation } from 'preact-iso'
 import { useEffect, useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { ChevronDownIcon, DotsIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
-import { CoachCard } from '../../components/CoachCard.tsx'
+import { ChevronDownIcon, ChevronRightIcon, DotsIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
 import { PlatoFoto } from '../../components/Platos.tsx'
 import { COMIDAS, dieta, hoy, type ComidaId } from '../../state/comida.ts'
 import {
@@ -61,7 +59,6 @@ export function MenuVista({
   onAvisos,
   onDeDieta,
 }: Props) {
-  const { route } = useLocation()
   // Sin tocar nada, abierto el primer menú sin platos (cerrado no se ve por dónde empezar)
   const [abierto, setAbierto] = useState<string | null | undefined>(undefined)
   // Se elige una vez, al cargar: si no, al poner el primer plato el menú se cerraría solo
@@ -73,7 +70,6 @@ export function MenuVista({
   if (!listo) return null
   const m = menu.value
   const dias = semanaDesde(hoy.value)
-  const n = propuestas.value.length
   const siguienteMenu = (actual: string) => {
     const i = m.menus.findIndex((x) => x.id === actual)
     return m.menus[(i + 1) % m.menus.length].id
@@ -110,14 +106,6 @@ export function MenuVista({
           })}
         </ol>
       </section>
-      {n > 0 && (
-        <CoachCard
-          titulo="Tu nutricionista"
-          texto={n === 1 ? propuestas.value[0].titulo : `${n} propuestas para tus menús`}
-          ver="Ver"
-          onVer={() => route(paths.nutritionist)}
-        />
-      )}
       <div class={styles.menus}>
         {m.menus.map((x) => (
           <TarjetaMenu
@@ -144,32 +132,72 @@ export function MenuVista({
           </button>
         )}
       </div>
-      <div class={styles.atajos}>
-        <a class={styles.atajo} href={paths.shopping}>
-          La compra
-        </a>
-        <a class={styles.atajo} href={`${paths.kitchen}?desde=menu`}>
-          Cocina
-        </a>
-        <button type="button" class={styles.atajo} onClick={onAvisos}>
-          Avisos
-        </button>
-      </div>
-      <p class={`${v.pad} ${v.foot}`}>
-        <a class={styles.dieta} href={`${paths.nutrition}?vista=dieta`}>
-          {dieta.value
-            ? `Tu dieta: ${dieta.value.dieta.nombre} ›`
-            : '¿Sigues una dieta pautada? Cárgala aquí ›'}
-        </a>
-        {dieta.value && (
-          <>
-            {' · '}
-            <button type="button" class={styles.enlace} onClick={onDeDieta}>
-              Pasar sus menús a tus menús
+      <a class={`${styles.herramienta} ${styles.dietaFila}`} href={`${paths.nutrition}?vista=dieta`}>
+        <span class={styles.hIcono} aria-hidden="true">
+          📋
+        </span>
+        <span class={styles.hTexto}>
+          <span class={styles.hNombre}>
+            {dieta.value ? `Tu dieta: ${dieta.value.dieta.nombre}` : 'Cargar la dieta de tu nutricionista'}
+          </span>
+          <span class={v.foot}>
+            {dieta.value
+              ? 'Sus menús, la consulta semanal y sus recetas'
+              : 'Su archivo de dieta, o la de ejemplo para probar'}
+          </span>
+        </span>
+        <ChevronRightIcon />
+      </a>
+      {dieta.value && (
+        <p class={`${v.pad} ${v.foot}`}>
+          <button type="button" class={styles.enlace} onClick={onDeDieta}>
+            Pasar sus menús a tus menús
+          </button>
+        </p>
+      )}
+      <section class={v.pad} aria-labelledby="herramientas">
+        <h2 id="herramientas" class={styles.herramientasTitulo}>
+          Herramientas
+        </h2>
+        <ul class={styles.herramientas}>
+          <li>
+            <a class={styles.herramienta} href={paths.shopping}>
+              <span class={styles.hIcono} aria-hidden="true">
+                🛒
+              </span>
+              <span class={styles.hTexto}>
+                <span class={styles.hNombre}>Lista de la compra</span>
+                <span class={v.foot}>Lo que hace falta para tus menús</span>
+              </span>
+              <ChevronRightIcon />
+            </a>
+          </li>
+          <li>
+            <a class={styles.herramienta} href={`${paths.kitchen}?desde=menu`}>
+              <span class={styles.hIcono} aria-hidden="true">
+                ⚖️
+              </span>
+              <span class={styles.hTexto}>
+                <span class={styles.hNombre}>Cocinar y pesar</span>
+                <span class={v.foot}>En crudo y cocinado, cuánto servirte y repartir una olla</span>
+              </span>
+              <ChevronRightIcon />
+            </a>
+          </li>
+          <li>
+            <button type="button" class={styles.herramienta} onClick={onAvisos}>
+              <span class={styles.hIcono} aria-hidden="true">
+                🔔
+              </span>
+              <span class={styles.hTexto}>
+                <span class={styles.hNombre}>Recordatorios</span>
+                <span class={v.foot}>El día de la compra y cuándo cocinar, en tu calendario</span>
+              </span>
+              <ChevronRightIcon />
             </button>
-          </>
-        )}
-      </p>
+          </li>
+        </ul>
+      </section>
     </div>
   )
 }
@@ -195,6 +223,9 @@ function TarjetaMenu(props: {
     ? 'Sin platos aún'
     : `${total && total.kcal ? `${formatInt(total.kcal)} kcal · ` : ''}${cuando(dias, hoyEs)}`
   const cuerpo = `cuerpo-${x.id}`
+  // Lo que propone tu nutricionista para este menú («Menú A: no llegas a la proteína» → «No llegas a la proteína»)
+  const titulo = propuestas.value.find((p) => p.menu === x.id)?.titulo.replace(/^[^:]*:\s*/, '')
+  const propuesta = titulo ? titulo.charAt(0).toUpperCase() + titulo.slice(1) : null
   return (
     <section class={styles.menuCard} aria-label={x.nombre}>
       <div class={styles.menuHead}>
@@ -236,6 +267,16 @@ function TarjetaMenu(props: {
           </button>
         )}
       </div>
+      {propuesta && (
+        <a class={styles.avisoMenu} href={paths.nutritionist}>
+          <span class={styles.punto} aria-hidden="true" />
+          <span class={styles.hTexto}>
+            <span class={styles.avisoTexto}>{propuesta}</span>
+            <span class={v.foot}>Tu nutricionista te propone un cambio</span>
+          </span>
+          <span class={styles.ver}>Ver ›</span>
+        </a>
+      )}
       {abierto && (
         <ul id={cuerpo} class={styles.filas}>
           {COMIDAS.map((c) => {

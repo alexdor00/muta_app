@@ -15,7 +15,7 @@ export function FaseHoja({ onClose }: { onClose: () => void }) {
   if (!a) return null
   return (
     <Sheet
-      title="Tu fase"
+      title="¿Qué quieres?"
       onClose={onClose}
       large
       footer={

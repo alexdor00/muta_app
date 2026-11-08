@@ -512,3 +512,17 @@ pequeño y centrado).
   compra, la cocina, los avisos y la dieta pautada. `?vista=plan` (la vieja `?vista=menu` lleva aquí).
 - Las recetas, como vista a la que se llega desde tu día (`?vista=recetas`) y al elegir un plato del menú.
 - Por dentro el área sigue llamándose `nutrition` y las rutas `/comida/…` no cambian.
+
+## 2026-11-08 · Tu plan, más pequeño y claro; en Cocina, crudo y cocido
+
+Aprobado por el usuario (`Desktop/MUTA-Tu-plan-propuesta.png`), con su cambio: la dieta de tu nutricionista va bajo
+los menús, fuera de Herramientas.
+
+- El objetivo, en una tarjeta gris pequeña (fase, kcal, tres cajitas de macros) con un solo «Editar». La hoja «Tu
+  objetivo»: ¿Qué quieres? (Definir · Mantenerte · Volumen) y Velocidad se guardan ahí; «Poner mis kcal» (antes «Fijar a
+  mano»), «Cómo se calcula» (antes «Cómo sale») y «Mis datos» llevan a Tu objetivo.
+- Lo que propone tu nutricionista va dentro del menú al que afecta (punto naranja y «Ver ›»), sin el banner negro.
+- «Herramientas»: Lista de la compra, Cocinar y pesar y Recordatorios, con dibujo y una línea de qué hay dentro.
+- La dieta se carga con su archivo de dieta de MUTA (JSON), no CSV.
+- Cocina: lo que se cuece (el arroz cocido de una receta) sale en crudo, que es como se pesa, con lo que pesará cocido
+  debajo («Arroz blanco (crudo) 175 g · ≈ 478 g cocido»), en «Pesa en crudo» y en la hoja Cocinar.

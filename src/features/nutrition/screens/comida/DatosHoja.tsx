@@ -8,8 +8,8 @@ import { ajustes, cuerpoValido, type Fase, type Sexo } from '../../state/comida.
 import { deTuPerfil, guardarDatos } from '../../use-cases/target.ts'
 import h from '../comun/Hojas.module.css'
 
-/** Lo que quieres conseguir la primera vez (después se cambia en «Tu objetivo» › «Cambiar fase»). */
-const QUE_QUIERES: { value: Fase; label: string }[] = [
+/** Lo que quieres conseguir (la primera vez, aquí; después, en Tu plan › Editar › «¿Qué quieres?»). */
+export const QUE_QUIERES: { value: Fase; label: string }[] = [
   { value: 'definicion', label: 'Definir' },
   { value: 'mantenimiento', label: 'Mantenerte' },
   { value: 'volumen', label: 'Volumen' },

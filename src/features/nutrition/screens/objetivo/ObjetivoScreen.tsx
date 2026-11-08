@@ -60,16 +60,16 @@ export function ObjetivoScreen() {
       <Volver />
       <TarjetaObjetivo>
         <button type="button" onClick={fase.show}>
-          Cambiar fase
+          ¿Qué quieres?
         </button>
         <button type="button" onClick={mano.show}>
-          <PencilIcon /> Fijar a mano
+          <PencilIcon /> Poner mis kcal
         </button>
       </TarjetaObjetivo>
 
       <section aria-labelledby="como-sale">
         <h2 id="como-sale" class={styles.title}>
-          Cómo sale
+          Cómo se calcula
         </h2>
         <ul class={styles.list}>
           <li>
