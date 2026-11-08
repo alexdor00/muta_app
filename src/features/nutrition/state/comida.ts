@@ -26,10 +26,14 @@ export {
 } from '../domain/food.ts'
 export type { Alimento, Apunte, ComidaId, Macros, Modo } from '../domain/food.ts'
 export {
+  avisosReparto,
   cuerpoValido,
   FASES,
   RITMOS,
   KCAL_A_MANO,
+  LIMITES_G_KG,
+  macrosObjetivo,
+  type Reparto,
   type Fase,
   type Sexo,
   type Cuerpo,
@@ -48,6 +52,9 @@ export type Ajustes = {
   ritmo: number
   proteinaGKg: number
   grasaGKg: number
+  /** Proteína y grasa en gramos fijos, si las pones a mano (si no, por kilo). */
+  proteinaG?: number | null
+  grasaG?: number | null
   /** Tu objetivo de kcal desde `desde`; antes de esa fecha, `kcalAnterior`. */
   kcal: number
   kcalAnterior: number | null
@@ -95,7 +102,7 @@ export const diaVisto = signal(localDate())
 /** El objetivo de un día (con su fecha de inicio: una sugerencia aplicada vale desde mañana). */
 export function objetivoDe(a: Ajustes, fecha: string): Macros {
   const kcal = fecha < a.desde && a.kcalAnterior !== null ? a.kcalAnterior : a.kcal
-  return macrosObjetivo(kcal, a.cuerpo.pesoKg, a.proteinaGKg, a.grasaGKg)
+  return macrosObjetivo(kcal, a.cuerpo.pesoKg, a)
 }
 
 /** La dieta que sigues (null si no sigues ninguna). */

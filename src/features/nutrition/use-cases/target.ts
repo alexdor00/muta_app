@@ -14,6 +14,7 @@ import {
   RITMO_DE_SERIE,
   type Cuerpo,
   type Fase,
+  type Reparto,
 } from '../domain/targets.ts'
 import { ajustes, cambios, hoy, type Ajustes, type Cambio } from '../state/comida.ts'
 import { apuntarPeso, guardarAjustes, guardarCambio, ID_AJUSTES, marcarCambio } from './nutritionStore.ts'
@@ -74,6 +75,8 @@ export async function guardarDatos(cuerpo: Cuerpo, pasos: number, fase?: Fase): 
     ritmo: perfil.ritmo,
     proteinaGKg: previo?.proteinaGKg ?? PROTEINA_G_KG[0],
     grasaGKg: previo?.grasaGKg ?? GRASA_G_KG[0],
+    proteinaG: previo?.proteinaG ?? null,
+    grasaG: previo?.grasaG ?? null,
     kcal: calculo.kcal,
     kcalAnterior: null,
     desde: hoy.value,
@@ -106,6 +109,12 @@ export async function cambiarFase(fase: Fase, ritmo: number): Promise<void> {
     aMano: false,
   }
   await cambiarObjetivo(a, 'fase', `Nueva fase: ${nombreFase(fase).toLowerCase()}`, previo)
+}
+
+/** Cambia cómo repartes tus kcal: proteína y grasa por kilo o en gramos; los hidratos son lo que queda. */
+export async function cambiarReparto(r: Reparto): Promise<void> {
+  const previo = ajustes.value
+  if (previo) await guardarAjustes({ ...previo, ...r })
 }
 
 /** Fija las kcal a mano (entre 1.000 y 6.000). Devuelve false si no son válidas. */
@@ -176,7 +185,7 @@ export function deshacible(): Cambio | null {
 /** Tus macros con otras kcal (para enseñar cómo quedaría una sugerencia): cambian los hidratos. */
 export function macrosCon(kcal: number) {
   const a = ajustes.value
-  return a ? macrosObjetivo(kcal, a.cuerpo.pesoKg, a.proteinaGKg, a.grasaGKg) : null
+  return a ? macrosObjetivo(kcal, a.cuerpo.pesoKg, a) : null
 }
 
 /** Lo que han movido tu objetivo las sugerencias aceptadas desde el último cálculo (fase, a mano o tus datos). */

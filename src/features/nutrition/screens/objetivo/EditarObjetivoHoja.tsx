@@ -6,20 +6,23 @@ import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
 import { ChevronRightIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { ajustes, RITMOS, type Fase } from '../../state/comida.ts'
-import { cambiarFase } from '../../use-cases/target.ts'
+import { cambiarFase, cambiarReparto } from '../../use-cases/target.ts'
 import { QUE_QUIERES } from '../comida/DatosHoja.tsx'
 import h from '../comun/Hojas.module.css'
+import { borradorDe, mismoReparto, RepartoMacros, repartoDe, type Borrador } from './RepartoMacros.tsx'
 
 /**
  * Editar tu objetivo, con nombres que dicen lo que hacen: qué quieres (definir, mantenerte o volumen) y a qué velocidad
- * se guardan aquí; «Poner mis kcal», «Cómo se calcula» y «Mis datos» llevan a Tu objetivo.
+ * se guardan aquí, y también la proteína y la grasa (por kilo o en gramos); «Poner mis kcal», «Cómo se calcula» y «Mis datos» llevan a Tu objetivo.
  */
 export function EditarObjetivoHoja({ onClose }: { onClose: () => void }) {
   const a = ajustes.value
   const [fase, setFase] = useState<Fase>(a?.fase ?? 'mantenimiento')
   const [ritmo, setRitmo] = useState(String(a?.ritmo ?? 0.75))
-  if (!a) return null
-  const cambia = fase !== a.fase || (fase === 'definicion' && Number(ritmo) !== a.ritmo)
+  const [reparto, setReparto] = useState<Borrador | null>(a ? borradorDe(a) : null)
+  if (!a || !reparto) return null
+  const cambiaFase = fase !== a.fase || (fase === 'definicion' && Number(ritmo) !== a.ritmo)
+  const cambiaReparto = !mismoReparto(reparto, borradorDe(a))
   const fila = (href: string, nombre: string, detalle: string) => (
     <li class={h.row}>
       <a class={h.rowMain} href={href}>
@@ -35,14 +38,15 @@ export function EditarObjetivoHoja({ onClose }: { onClose: () => void }) {
       onClose={onClose}
       large
       footer={
-        cambia && (
+        (cambiaFase || cambiaReparto) && (
           <Button
             onClick={async () => {
-              await cambiarFase(fase, Number(ritmo))
+              if (cambiaReparto) await cambiarReparto(repartoDe(reparto, a))
+              if (cambiaFase) await cambiarFase(fase, Number(ritmo))
               onClose()
             }}
           >
-            Guardar y recalcular
+            {cambiaFase ? 'Guardar y recalcular' : 'Guardar'}
           </Button>
         )
       }
@@ -66,6 +70,7 @@ export function EditarObjetivoHoja({ onClose }: { onClose: () => void }) {
             onChange={setRitmo}
           />
         )}
+        <RepartoMacros a={a} valor={reparto} onChange={setReparto} />
         <ul class={h.list}>
           {fila(
             `${paths.nutritionTarget}?hoja=mano`,

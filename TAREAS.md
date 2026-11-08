@@ -25,6 +25,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-08 (rama `pantalla/recetas`): proteína y grasa por kilo o en gramos en «Tu objetivo», con lo que dicen
+  tus documentos y un aviso si te sales; los hidratos, lo que queda.
+
 - 2026-11-08 (rama `pantalla/recetas`): Tu plan más pequeño y claro (objetivo con «Editar», el aviso del nutricionista
   dentro del menú, Herramientas con nombres claros, la dieta bajo los menús) y, en Cocina, el arroz en crudo y cocido.
 

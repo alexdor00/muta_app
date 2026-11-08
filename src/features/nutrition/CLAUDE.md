@@ -15,6 +15,8 @@ alimento), `Desktop/MUTA-Comida-sencilla-funcionalidades.png` (2026-11-06). Nutr
 Tu objetivo se calcula una vez y se **guarda**; solo cambia si tú lo cambias o aceptas una sugerencia («Aplicar desde
 mañana»; «Ahora no» la deja en el historial; la última aceptada se deshace). Con dieta pasa lo mismo con la consulta: sus
 propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si las aplicas, y se deshacen.
+Proteína y grasa van por kilo o en gramos fijos (`Reparto`, `macrosObjetivo`); los hidratos, lo que queda. Fuera de lo que
+dicen los documentos (`avisosReparto`) solo se avisa; si algo de fuera los contradice, mandan los documentos.
 
 ## Dónde está cada cosa
 

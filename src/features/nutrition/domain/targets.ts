@@ -87,12 +87,46 @@ export function calcularObjetivo(datos: {
   return { basal, factor, gasto, cambio, suelo: minimo, kcal: enSuelo ? minimo : pedido, enSuelo }
 }
 
-/** Proteína y grasa por kilo; los hidratos, lo que queda. En gramos enteros. */
-export function macrosObjetivo(kcal: number, pesoKg: number, proteinaGKg: number, grasaGKg: number) {
-  const protein = Math.round(proteinaGKg * pesoKg)
-  const fat = Math.round(grasaGKg * pesoKg)
+/**
+ * Cómo repartes tus kcal: proteína y grasa por kilo de tu peso o, si las pones a mano, en gramos fijos (`proteinaG`,
+ * `grasaG`; null o sin poner = por kilo). Los hidratos siempre son lo que queda.
+ */
+export type Reparto = {
+  proteinaGKg: number
+  grasaGKg: number
+  proteinaG?: number | null
+  grasaG?: number | null
+}
+
+/** Proteína y grasa por kilo o en gramos fijos; los hidratos, lo que queda. En gramos enteros. */
+export function macrosObjetivo(kcal: number, pesoKg: number, r: Reparto) {
+  const protein = Math.round(r.proteinaG ?? r.proteinaGKg * pesoKg)
+  const fat = Math.round(r.grasaG ?? r.grasaGKg * pesoKg)
   const carbs = Math.max(0, Math.round((kcal - protein * 4 - fat * 9) / 4))
   return { kcal, protein, carbs, fat }
+}
+
+/**
+ * Lo que dicen tus documentos (docs/conocimiento/01-contenido.md y la guía de culturismo natural): proteína ~1,5 g/kg
+ * basta, 1,8–2,2 solo muy definido y en déficit fuerte; grasa ~0,6 g/kg como suelo; el resto, a hidratos.
+ */
+export const RANGO_PROTEINA_G_KG = { min: 1.5, max: 2.2 } as const
+export const SUELO_GRASA_G_KG = 0.6
+/** Hasta dónde llegan los selectores, en g/kg. */
+export const LIMITES_G_KG = { proteina: { min: 1, max: 3 }, grasa: { min: 0.3, max: 1.5 } } as const
+
+/** Avisos (no impiden guardar) cuando el reparto se sale de lo que dicen tus documentos. */
+export function avisosReparto(pesoKg: number, m: { protein: number; fat: number; carbs: number }): string[] {
+  const avisos: string[] = []
+  const p = m.protein / pesoKg
+  if (p < RANGO_PROTEINA_G_KG.min - 0.005)
+    avisos.push('Proteína por debajo de 1,5 g/kg: puede costarte conservar el músculo.')
+  if (p > RANGO_PROTEINA_G_KG.max + 0.005)
+    avisos.push('Proteína por encima de 2,2 g/kg: no suma músculo y le quita kcal a los hidratos.')
+  if (m.fat / pesoKg < SUELO_GRASA_G_KG - 0.005)
+    avisos.push('Grasa por debajo de 0,6 g/kg: es el suelo, por tu salud hormonal.')
+  if (m.carbs === 0) avisos.push('No te quedan kcal para hidratos: baja la proteína o la grasa.')
+  return avisos
 }
 
 /** Límites de lo que se puede fijar a mano (los del prototipo). */

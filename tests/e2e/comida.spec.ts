@@ -118,6 +118,45 @@ test('sin objetivo: tus datos lo calculan y sale lo que te queda por comer', asy
   await expect(page.getByText(/Para revisar tu semana me faltan 9 pesajes/)).toBeVisible()
 })
 
+test('proteína y grasa por kilo o en gramos: los hidratos son lo que queda y avisa si te sales', async ({
+  page,
+}) => {
+  await abrirBase(page)
+  await page.goto('/comida')
+  await page.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  const datos = page.getByRole('dialog', { name: 'Tus datos' })
+  await datos.getByText('Hombre').click()
+  await datos.getByLabel('Edad').fill('30')
+  await datos.getByLabel('Altura (cm)').fill('180')
+  await datos.getByLabel('Peso (kg)').fill('80')
+  await datos.getByLabel('Pasos al día').fill('9.000')
+  await datos.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  await page.getByRole('link', { name: 'Tu plan' }).first().click()
+  await page.getByRole('button', { name: 'Editar' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Tu objetivo' })
+  const reparto = hoja.getByRole('region', { name: 'Proteína y grasa' })
+  // De serie 1,5 y 0,6 g/kg con 80 kg y 2.866 kcal: 120 g, 48 g y 489 g de hidratos
+  await expect(reparto).toContainText('1,5 g/kg')
+  await expect(reparto).toContainText('489 g')
+  for (let i = 0; i < 3; i++) await reparto.getByRole('button', { name: 'Más proteína' }).click()
+  await expect(reparto).toContainText('1,8 g/kg')
+  await expect(reparto).toContainText('144 g')
+  await reparto.getByRole('button', { name: 'Menos grasa' }).click()
+  await expect(reparto.getByRole('status')).toContainText('Grasa por debajo de 0,6 g/kg')
+  await reparto.getByRole('button', { name: 'Más grasa' }).click()
+  await expect(reparto.getByRole('status')).toHaveCount(0)
+  // A mano en gramos: se pasa lo elegido y va de 5 en 5
+  await reparto.getByText('En gramos').click()
+  await expect(reparto).toContainText('144 g')
+  await reparto.getByRole('button', { name: 'Más proteína' }).click()
+  await expect(reparto).toContainText('149 g')
+  await hoja.getByRole('button', { name: 'Guardar', exact: true }).click()
+  await expect(hoja).toHaveCount(0)
+  await page.getByRole('button', { name: 'Editar' }).click()
+  await expect(reparto.getByRole('radio', { name: 'En gramos' })).toBeChecked()
+  await expect(reparto).toContainText('149 g')
+})
+
 test('después de la bienvenida, tus datos preguntan qué quieres (viene marcado lo de la bienvenida)', async ({
   page,
 }) => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  avisosReparto,
   calcularObjetivo,
   cuerpoValido,
   deficitDiario,
@@ -79,8 +80,25 @@ describe('calcularObjetivo', () => {
 
 describe('macrosObjetivo', () => {
   it('proteína y grasa por kilo; los hidratos, lo que queda', () => {
-    expect(macrosObjetivo(2259, 80, 1.5, 0.6)).toEqual({ kcal: 2259, protein: 120, carbs: 337, fat: 48 })
-    expect(macrosObjetivo(1000, 100, 2.2, 1)).toEqual({ kcal: 1000, protein: 220, carbs: 0, fat: 100 })
+    expect(macrosObjetivo(2259, 80, { proteinaGKg: 1.5, grasaGKg: 0.6 })).toEqual({
+      kcal: 2259,
+      protein: 120,
+      carbs: 337,
+      fat: 48,
+    })
+    expect(macrosObjetivo(1000, 100, { proteinaGKg: 2.2, grasaGKg: 1 })).toEqual({
+      kcal: 1000,
+      protein: 220,
+      carbs: 0,
+      fat: 100,
+    })
+  })
+
+  it('a mano: los gramos fijos mandan sobre el g/kg y no dependen del peso', () => {
+    const r = { proteinaGKg: 1.5, grasaGKg: 0.6, proteinaG: 160, grasaG: 70 }
+    expect(macrosObjetivo(2500, 80, r)).toEqual({ kcal: 2500, protein: 160, carbs: 308, fat: 70 })
+    expect(macrosObjetivo(2500, 90, r).protein).toBe(160)
+    expect(macrosObjetivo(2500, 80, { ...r, grasaG: null }).fat).toBe(48)
   })
 })
 
@@ -92,5 +110,18 @@ describe('validaciones', () => {
     expect(cuerpoValido(yo)).toBe(true)
     expect(cuerpoValido({ ...yo, alturaCm: 18 })).toBe(false)
     expect(cuerpoValido({ sexo: 'hombre', edad: 30 })).toBe(false)
+  })
+})
+
+describe('avisosReparto', () => {
+  it('nada que avisar dentro de lo que dicen tus documentos', () => {
+    expect(avisosReparto(80, { protein: 120, fat: 48, carbs: 300 })).toEqual([])
+    expect(avisosReparto(80, { protein: 176, fat: 64, carbs: 200 })).toEqual([])
+  })
+  it('avisa con poca o demasiada proteína, poca grasa o sin hidratos', () => {
+    expect(avisosReparto(80, { protein: 100, fat: 48, carbs: 300 })[0]).toMatch(/por debajo de 1,5/)
+    expect(avisosReparto(80, { protein: 200, fat: 48, carbs: 300 })[0]).toMatch(/por encima de 2,2/)
+    expect(avisosReparto(80, { protein: 120, fat: 40, carbs: 300 })[0]).toMatch(/0,6 g\/kg/)
+    expect(avisosReparto(80, { protein: 120, fat: 48, carbs: 0 })).toHaveLength(1)
   })
 })

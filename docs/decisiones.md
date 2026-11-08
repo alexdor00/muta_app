@@ -526,3 +526,18 @@ los menús, fuera de Herramientas.
 - La dieta se carga con su archivo de dieta de MUTA (JSON), no CSV.
 - Cocina: lo que se cuece (el arroz cocido de una receta) sale en crudo, que es como se pesa, con lo que pesará cocido
   debajo («Arroz blanco (crudo) 175 g · ≈ 478 g cocido»), en «Pesa en crudo» y en la hoja Cocinar.
+
+## 2026-11-08 · Proteína y grasa, por kilo o en gramos
+
+Pedido por el usuario: cambiar la proteína y la grasa por g/kg de peso o a mano, con las recomendaciones oficiales para
+hombres y mujeres, y **si algo de fuera contradice nuestros documentos, mandan nuestros documentos**.
+
+- En la hoja «Tu objetivo», «Proteína y grasa»: «Por kilo de peso» (de 0,1 en 0,1) o «En gramos» (de 5 en 5, fijos aunque
+  cambie tu peso: `proteinaG`/`grasaG` en tus ajustes). Los hidratos siempre son lo que queda. De serie, 1,5 y 0,6 g/kg.
+- Debajo, lo que dicen nuestros documentos (`docs/conocimiento/01-contenido.md`, sección de nutrición, y la guía de
+  culturismo natural: los hidratos mandan, la proteína suficiente, no excesiva): proteína ~1,5 g/kg; 1,8–2,2 solo muy
+  definido y en déficit fuerte; grasa al menos 0,6 g/kg. Fuera de eso, un aviso que no impide guardar (`avisosReparto`).
+- Fuera: ISSN 2017 (1,4–2,0 g/kg; 2,3–3,1 en déficit en entrenados), ISSN mujer deportista 2023 (1,4–2,2), Helms 2014
+  (2,3–3,1 g/kg de masa magra en déficit). Lo que pasa de 2,2 contradice los documentos: no se recomienda, solo se avisa. Los
+  documentos no dan otra cifra para mujeres: mismo rango, sin bajar la grasa del suelo (salud hormonal).
+- Cambiar el reparto no cambia tus kcal ni descarta sugerencias, y no va al historial de tu objetivo.
