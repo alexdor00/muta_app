@@ -541,3 +541,13 @@ hombres y mujeres, y **si algo de fuera contradice nuestros documentos, mandan n
   (2,3–3,1 g/kg de masa magra en déficit). Lo que pasa de 2,2 contradice los documentos: no se recomienda, solo se avisa. Los
   documentos no dan otra cifra para mujeres: mismo rango, sin bajar la grasa del suelo (salud hormonal).
 - Cambiar el reparto no cambia tus kcal ni descarta sugerencias, y no va al historial de tu objetivo.
+
+## 2026-11-08 · La guía de culturismo natural entra en el conocimiento
+
+El usuario aporta la «Guía definitiva de culturismo natural» (PDF de 30 páginas, de transcripciones de vídeos y clases).
+Se resume en [04-guia-culturismo-natural.md](conocimiento/04-guia-culturismo-natural.md) (fuente G1); el PDF no se sube.
+
+- Choca en 20 puntos con 01 y 02 (proteína en definición, kcal ON/OFF, ritmo de la definición, pausas por calendario,
+  cuándo subir o bajar volumen, RIR 0 frente a fallo, repeticiones, bíceps y tríceps, pasos…). Entre dos documentos
+  nuestros no se elige solo: hasta que el usuario decida, la app sigue con 01 y 02.
+- Sus propuestas para la app (§13) quedan sin aprobar: cada una pasa por diseño.

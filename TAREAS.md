@@ -4,6 +4,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
+- **Decidir los choques de la guía de culturismo natural** con lo que ya teníamos (20, en
+  [04-guia-culturismo-natural.md](docs/conocimiento/04-guia-culturismo-natural.md) §12): cuál manda en cada uno. Hasta
+  entonces la app sigue con 01 y 02. Después, elegir qué propuestas de §13 se diseñan.
 - **Probar Recetas y Menú en un móvil real** (rama `pantalla/recetas`, sale de `pantalla/comida-v2`) con `npm run dev`:
   el recetario con sus fotos, ajustar un plato a lo que falta (y cuando no llega), cuadrar el día, tu producto, tu menú,
   cuándo cocinar, lo de hoy, la compra del menú, los avisos al calendario (.ics) y tu nutricionista. Después, PR a `main`
