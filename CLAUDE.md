@@ -1,7 +1,7 @@
 # MUTA
 
 App de entrenamiento instalable (PWA) en español. Se construye pantalla a pantalla siguiendo el documento
-de rediseño; hoy están hechas las áreas **Entreno** y **Comida** y la **bienvenida**.
+de rediseño; hoy están hechas las áreas **Entreno** y **Nutrición** (antes Comida) y la **bienvenida**.
 Repositorio público: `alexdor00/muta_app`. Cómo trabajar con ella: ver «Reglas globales».
 
 ## Stack

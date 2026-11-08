@@ -2,8 +2,9 @@
 
 .hero {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-5);
+  gap: var(--space-3) var(--space-5);
   margin: 0 var(--gutter);
   padding: var(--space-5) var(--space-4);
   border-radius: var(--radius-card);
@@ -129,4 +130,9 @@
   .arc {
     transition: none;
   }
+}
+
+/* El día, arriba a todo el ancho */
+.cabecera {
+  flex-basis: 100%;
 }

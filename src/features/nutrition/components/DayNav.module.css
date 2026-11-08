@@ -35,3 +35,16 @@
 .title {
   font: var(--text-headline);
 }
+
+/* Dentro de la tarjeta del día: centrado, sin píldora, las flechas en círculos blancos */
+.dentro {
+  justify-content: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  background: none;
+}
+
+.dentro .arrow {
+  background: var(--bg);
+}

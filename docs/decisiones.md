@@ -498,3 +498,17 @@ ya tienes, el nutricionista con «Todo cuadra».
   quedan. Umbrales sugeridos; solo propone, lo apuntas tú.
 - **Hidratos según el día de entreno**: los documentos de conocimiento no dan una regla (solo «hidratos antes y después
   de entrenar» y «el resto, a hidratos»). Queda pendiente, a petición del usuario.
+
+## 2026-11-08 · Comida pasa a ser Nutrición: tu día y «Tu plan»
+
+Diseño aprobado por el usuario (`Desktop/MUTA-Comida-tu-plan-propuesta.png`), con dos cambios suyos: se llama
+**Nutrición** (pestaña y título) y la cabecera es como la de Entreno (título y, al bajar, barra fija con «Nutrición»
+pequeño y centrado).
+
+- Nutrición abre en **tu día** (sin pestañas Hoy · Menú · Recetas): el día con sus flechas va dentro de la tarjeta del
+  anillo; al final, «Para la cena · te faltan…» (recetas ya ajustadas) y «Ver todas las recetas ›».
+- **«Tu plan»** (junto al perfil, como «Editar» en Entreno) reúne tu objetivo (la tarjeta negra con «Cambiar fase»,
+  «Fijar a mano» y «Cómo sale ›», que lleva a Tu objetivo con la revisión y el historial), tus menús de la semana, la
+  compra, la cocina, los avisos y la dieta pautada. `?vista=plan` (la vieja `?vista=menu` lleva aquí).
+- Las recetas, como vista a la que se llega desde tu día (`?vista=recetas`) y al elegir un plato del menú.
+- Por dentro el área sigue llamándose `nutrition` y las rutas `/comida/…` no cambian.

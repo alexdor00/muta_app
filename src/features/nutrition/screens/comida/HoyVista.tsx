@@ -1,4 +1,5 @@
 import { addDays, daysBetween, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { CoachCard } from '../../components/CoachCard.tsx'
 import { DayHero } from '../../components/DayHero.tsx'
@@ -29,6 +30,7 @@ import {
   totalCon,
 } from '../../state/recetas.ts'
 import { platoApuntado } from '../../use-cases/recipes.ts'
+import { ParaLaSiguiente } from './ParaLaSiguiente.tsx'
 import styles from './Vistas.module.css'
 
 type Props = {
@@ -83,13 +85,16 @@ export function HoyVista({
   const faltaProteina = Math.max(0, Math.round(objetivo.protein - total.protein))
   return (
     <div class={styles.stack}>
-      <DayNav
-        titulo={tituloDia(fecha, hoy.value)}
-        etiqueta={esHoy ? `Hoy, ${formatDayDate(fecha)}` : formatDayDate(fecha)}
-        onAntes={() => (diaVisto.value = addDays(fecha, -1))}
-        onDespues={esHoy ? null : () => (diaVisto.value = addDays(fecha, 1))}
-      />
       <DayHero
+        cabecera={
+          <DayNav
+            dentro
+            titulo={esHoy ? `Hoy, ${formatDayDate(fecha)}` : tituloDia(fecha, hoy.value)}
+            etiqueta={esHoy ? `Hoy, ${formatDayDate(fecha)}` : formatDayDate(fecha)}
+            onAntes={() => (diaVisto.value = addDays(fecha, -1))}
+            onDespues={esHoy ? null : () => (diaVisto.value = addDays(fecha, 1))}
+          />
+        }
         comidas={total.kcal}
         objetivo={objetivo.kcal}
         macros={[
@@ -181,6 +186,10 @@ export function HoyVista({
           </Button>
         </div>
       )}
+      {esHoy && <ParaLaSiguiente />}
+      <a class={`${styles.pad} ${styles.verTodas}`} href={`${paths.nutrition}?vista=recetas`}>
+        Ver todas las recetas ›
+      </a>
     </div>
   )
 }

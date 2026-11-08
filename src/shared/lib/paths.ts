@@ -66,7 +66,7 @@ export type Tab = 'today' | 'training' | 'nutrition' | 'progress'
 export const tabs: { id: Tab; label: string; path: string }[] = [
   { id: 'today', label: 'Hoy', path: paths.today },
   { id: 'training', label: 'Entreno', path: paths.training },
-  { id: 'nutrition', label: 'Comida', path: paths.nutrition },
+  { id: 'nutrition', label: 'Nutrición', path: paths.nutrition },
   { id: 'progress', label: 'Progreso', path: paths.progress },
 ]
 

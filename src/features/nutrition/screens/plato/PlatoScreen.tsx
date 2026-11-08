@@ -61,7 +61,7 @@ export function PlatoScreen(props: { id: string }) {
     return (
       <div class={r.page}>
         <p class={h.sub}>Este plato ya no está.</p>
-        <Button href={volver}>Volver a Comida</Button>
+        <Button href={volver}>Volver a Nutrición</Button>
       </div>
     )
   }

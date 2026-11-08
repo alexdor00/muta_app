@@ -1,11 +1,12 @@
-# Comida (`src/features/nutrition`)
+# Nutrición (`src/features/nutrition`, antes Comida)
 
 Apuntar lo que comes, tu objetivo de kcal, tu menú de la semana con las recetas que se ajustan a lo que te falta y, si
 quieres, una dieta con menús, recetas, compra, cocina y consulta semanal; y el escáner de códigos. Diseños: versión 1 aprobada el 2026-11-05 (`Desktop/MUTA-Comida-diseno.png`) y versiones
 2 y 3 (`Desktop/MUTA-Comida-v2-funcionalidades.png`), con el estilo que pidió el usuario: tarjeta del día gris con anillo
 (sin lima), comidas en tarjetas con miniatura y ‹ Hoy › para cambiar de día. Recetas y menú: `Desktop/MUTA-Recetas-
 funcionalidades.png`, `Desktop/MUTA-Menu-funcionalidades.png` y, más sencilla (tus menús A, B, C…, el tick, cambiar un
-alimento), `Desktop/MUTA-Comida-sencilla-funcionalidades.png` (2026-11-06). Capas y límites, los de
+alimento), `Desktop/MUTA-Comida-sencilla-funcionalidades.png` (2026-11-06). Nutrición con tu día y «Tu plan»:
+`Desktop/MUTA-Comida-tu-plan-propuesta.png` (2026-11-08). Capas y límites, los de
 [Entreno](../training/CLAUDE.md): las pantallas no importan el dominio; lo que necesitan lo reexportan `state/comida.ts` y
 `state/dieta.ts` (y `state/recetas.ts`). Otras áreas solo usan `index.ts`: `HoyDeComida` (tu peso, lo que comes hoy según tu menú y lo de hoy con hora), para Hoy. «Tus datos» pregunta la primera vez qué quieres (definir, mantenerte o volumen).
 
@@ -50,7 +51,8 @@ propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si l
 - `components/` — `DayHero` (tarjeta gris con anillo y macros), `DayNav` (‹ Hoy ›), `MealList` (con el plato de tu menú y su tick) y
   `MenuList` (tarjetas con miniatura), `Platos` (foto, fila, tarjeta y carrusel), `DietWeek` (como Tu semana), `CoachCard`, `TrendChart` (en la sugerencia),
   `TargetHero`. La letra es la de Entreno, un tamaño por papel: sin tamaños propios.
-- `screens/comida` — la pestaña: Hoy · Menú · Recetas (`?vista=menu|recetas`; la dieta, `?vista=dieta`, desde Menú; sin
+- `screens/comida` — la pestaña Nutrición: abre en tu día; `Cabecera` (como Entreno, con «Tu plan» y la barra compacta), `?vista=plan`
+  (`PlanVista`: la tarjeta del objetivo y `MenuVista`; `?vista=menu` lleva aquí), `?vista=recetas` y `?vista=dieta` (desde Tu plan); sin
   Semana: será de Progreso; el peso y lo de hoy, en la pestaña Hoy: `screens/hoy/HoyDeComida`) y sus hojas (añadir, escáner, ración, solo kcal, crear,
   comida del día, peso, datos, empezar dieta, día de la dieta, tu dieta, receta nueva, elegir plato, un plato del menú,
   tus menús, opciones de un menú, cocinar, avisos, crear plato, cuadrar el día). `screens/plato` — un plato

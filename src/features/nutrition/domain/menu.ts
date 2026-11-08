@@ -340,7 +340,7 @@ export function calendarioDelMenu(
       uid: `compra-${m.compraEl.fecha}`,
       inicio: fechaIcs(m.compraEl.fecha, m.compraEl.hora),
       titulo: 'Hacer la compra',
-      detalle: 'La lista está en MUTA · Comida · La compra',
+      detalle: 'La lista está en MUTA · Nutrición · Tu plan · La compra',
     })
   if (a.cocinar)
     for (const c of m.cocinados)

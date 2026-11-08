@@ -1,8 +1,6 @@
 import { useLocation } from 'preact-iso'
 import { useEffect, useState } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
-import { ScreenHeader } from '../../../../shared/ui/ScreenHeader.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import {
@@ -47,7 +45,9 @@ import { AnadirHoja } from './AnadirHoja.tsx'
 import styles from './ComidaScreen.module.css'
 import { ComidaDelDiaHoja } from './ComidaDelDiaHoja.tsx'
 import { CrearAlimentoHoja } from './CrearAlimentoHoja.tsx'
+import { Cabecera, type VistaNutricion } from './Cabecera.tsx'
 import { DatosHoja } from './DatosHoja.tsx'
+import { PlanVista } from './PlanVista.tsx'
 import { DiaDietaHoja } from './DiaDietaHoja.tsx'
 import { DietaVista } from './DietaVista.tsx'
 import { EmpezarDietaHoja } from './EmpezarDietaHoja.tsx'
@@ -59,23 +59,23 @@ import { RacionHoja } from './RacionHoja.tsx'
 import { RapidoHoja } from './RapidoHoja.tsx'
 import { SugerenciaHoja } from '../objetivo/SugerenciaHoja.tsx'
 
-/**
- * La semana (medias, proteína por días, tendencia del peso) no va aquí: será de Progreso. Tu dieta se abre desde Menú
- * (`?vista=dieta`).
- */
-type Vista = 'hoy' | 'menu' | 'recetas' | 'dieta'
-const VISTAS: Vista[] = ['hoy', 'menu', 'recetas', 'dieta']
+/** Las vistas (`?vista=`): tu día, Tu plan, el recetario y tu dieta. «menu», la de antes, es Tu plan. */
+const VISTAS: VistaNutricion[] = ['hoy', 'plan', 'recetas', 'dieta']
 
 /**
- * Comida (pestaña): el día, tu menú de la semana y las recetas; añadir, la ración, el menú, cocinar, los avisos y la
- * sugerencia del entrenador van en hojas.
+ * Nutrición (pestaña): abre en tu día. «Tu plan» reúne tu objetivo, tus menús y tu dieta; las recetas, desde tu día
+ * («Para la cena» y «Ver todas»). Añadir, la ración, el menú, cocinar, los avisos y el entrenador van en hojas. La
+ * semana (medias, tendencia del peso) será de Progreso.
  */
 export function ComidaScreen() {
   useEffect(() => {
     void cargarComida().then(cargarRecetas)
   }, [])
   const { query, route } = useLocation()
-  const vista: Vista = VISTAS.find((v) => v === query.vista) ?? 'hoy'
+  const vista: VistaNutricion =
+    query.vista === 'menu' ? 'plan' : (VISTAS.find((v) => v === query.vista) ?? 'hoy')
+  // Cada vista (tu día, Tu plan, Recetas, Tu dieta) empieza arriba, no a la altura de la anterior
+  useEffect(() => window.scrollTo(0, 0), [vista])
   const [comida, setComida] = useState<ComidaId>('desayuno')
   const [alimento, setAlimento] = useState<Alimento | null>(null)
   const [editando, setEditando] = useState<Apunte | null>(null)
@@ -114,8 +114,6 @@ export function ComidaScreen() {
   }, [query.anadir])
 
   if (estado.value === 'cargando') return null
-  const cambiarVista = (v: Vista) =>
-    route(v === 'hoy' ? paths.nutrition : `${paths.nutrition}?vista=${v}`, true)
   const abrirAnadir = (id: ComidaId) => {
     setComida(id)
     anadir.show()
@@ -177,57 +175,35 @@ export function ComidaScreen() {
 
   return (
     <>
-      <ScreenHeader
-        title="Comida"
-        avatarHref={paths.profile}
-        inline
-        action={
-          ajustes.value && (
-            <a class={styles.target} href={paths.nutritionTarget}>
-              Objetivo
-            </a>
-          )
-        }
-      />
-      <div class={styles.segment}>
-        <ChoiceSegmented<Vista>
-          name="vista-comida"
-          legend="Ver"
-          options={[
-            { value: 'hoy', label: 'Hoy' },
-            { value: 'menu', label: 'Menú' },
-            { value: 'recetas', label: 'Recetas' },
-          ]}
-          value={vista === 'dieta' ? 'menu' : vista}
-          onChange={cambiarVista}
-        />
-      </div>
-      {vista === 'menu' ? (
-        <MenuVista
-          onPlato={(m, c) => {
-            setEnMenu({ menu: m, comida: c })
-            platoMenu.show()
-          }}
-          onQuitarPlato={(m, c) => void quitarYAvisar('Quitado del menú', () => quitarDelMenu(m, c))}
-          onAnadir={(m, c) => {
-            setEnMenu({ menu: m, comida: c })
-            elegir.show()
-          }}
-          onOpciones={(m) => {
-            setEnMenu({ menu: m, comida: 'desayuno' })
-            opciones.show()
-          }}
-          onCuantos={cuantos.show}
-          onAvisos={avisos.show}
-          onDeDieta={async () => {
-            const antes = await menusDeTuDieta()
-            if (antes)
-              avisar('Tus menús son ahora los de tu dieta', {
-                label: 'Deshacer',
-                onClick: () => void volverA(antes),
-              })
-          }}
-        />
+      <Cabecera vista={vista} conPlan={Boolean(hayObjetivo)} />
+      {vista === 'plan' ? (
+        <PlanVista>
+          <MenuVista
+            onPlato={(m, c) => {
+              setEnMenu({ menu: m, comida: c })
+              platoMenu.show()
+            }}
+            onQuitarPlato={(m, c) => void quitarYAvisar('Quitado del menú', () => quitarDelMenu(m, c))}
+            onAnadir={(m, c) => {
+              setEnMenu({ menu: m, comida: c })
+              elegir.show()
+            }}
+            onOpciones={(m) => {
+              setEnMenu({ menu: m, comida: 'desayuno' })
+              opciones.show()
+            }}
+            onCuantos={cuantos.show}
+            onAvisos={avisos.show}
+            onDeDieta={async () => {
+              const antes = await menusDeTuDieta()
+              if (antes)
+                avisar('Tus menús son ahora los de tu dieta', {
+                  label: 'Deshacer',
+                  onClick: () => void volverA(antes),
+                })
+            }}
+          />
+        </PlanVista>
       ) : vista === 'recetas' ? (
         <RecetasVista />
       ) : vista === 'dieta' ? (
@@ -258,7 +234,7 @@ export function ComidaScreen() {
           <h2 class={styles.emptyTitle}>Calcula tu objetivo</h2>
           <p class={styles.emptyText}>
             Con tu sexo, edad, altura, peso y pasos al día calculo lo que gastas y cuánto comer para tu fase.
-            Lo ves paso a paso y lo puedes cambiar. O sigue una dieta desde «Menú».
+            Lo ves paso a paso y lo puedes cambiar. O sigue una dieta desde «Tu plan».
           </p>
           <button type="button" class={styles.emptyButton} onClick={datos.show}>
             Calcular mi objetivo

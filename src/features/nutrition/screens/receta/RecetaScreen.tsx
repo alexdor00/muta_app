@@ -47,7 +47,7 @@ export function RecetaScreen(props: { id: string }) {
     return (
       <div class={styles.page}>
         <p class={h.sub}>Esta receta ya no está en tu dieta.</p>
-        <Button href={volver}>Volver a Comida</Button>
+        <Button href={volver}>Volver a Nutrición</Button>
         <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
       </div>
     )

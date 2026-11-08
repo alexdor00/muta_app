@@ -53,7 +53,7 @@ export function CompraScreen() {
     return (
       <div class={p.page}>
         <Barra titulo="La compra" volver={volver} />
-        <p class={p.sub}>La lista sale de tu menú o de tu dieta: pon platos en Comida · Menú.</p>
+        <p class={p.sub}>La lista sale de tu menú o de tu dieta: pon platos en Nutrición · Tu plan.</p>
       </div>
     )
   }

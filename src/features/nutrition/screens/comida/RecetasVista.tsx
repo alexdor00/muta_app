@@ -3,18 +3,10 @@ import { formatInt } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { SearchIcon } from '../../../../shared/ui/icons.tsx'
 import { Carrusel, PlatoFila, PlatoTarjeta } from '../../components/Platos.tsx'
-import {
-  buscarPlatos,
-  categorias,
-  estadoRecetas,
-  fotos,
-  paraLaSiguiente,
-  platos,
-  siguiente,
-  totalDePlato,
-} from '../../state/recetas.ts'
-import { comidaDe, macrosCortos } from '../comun/platos.ts'
+import { buscarPlatos, categorias, estadoRecetas, fotos, platos, totalDePlato } from '../../state/recetas.ts'
+import { macrosCortos } from '../comun/platos.ts'
 import h from '../comun/Hojas.module.css'
+import { ParaLaSiguiente } from './ParaLaSiguiente.tsx'
 import styles from './Vistas.module.css'
 
 /** Recetas: buscar, las que mejor cuadran con lo que te falta (ya ajustadas) y las categorías del recetario. */
@@ -22,7 +14,6 @@ export function RecetasVista() {
   const [texto, setTexto] = useState('')
   if (estadoRecetas.value !== 'listo') return null
   const encontrados = texto.trim() ? buscarPlatos(platos.value, texto).slice(0, 40) : null
-  const s = siguiente.value
   const ejemplo = categorias.value.some((c) => c.id === 'ejemplo')
   return (
     <div class={styles.stack}>
@@ -55,23 +46,7 @@ export function RecetasVista() {
         </ul>
       ) : (
         <>
-          {s && paraLaSiguiente.value.length > 0 && (
-            <Carrusel
-              id="para-ti"
-              titulo={`Para ${comidaDe(s.comida).el}`}
-              extra={`te faltan ${formatInt(s.objetivo.kcal)} kcal`}
-            >
-              {paraLaSiguiente.value.map((e) => (
-                <PlatoTarjeta
-                  key={e.plato.id}
-                  nombre={e.plato.nombre}
-                  foto={fotos.value[e.plato.id] ?? null}
-                  linea={`≈ ${formatInt(e.ajuste.total.kcal)} kcal · ${formatInt(e.ajuste.total.protein)} P${e.plato.ajustable ? ' · ajustada' : ''}`}
-                  href={paths.dish(e.plato.id, { comida: s.comida })}
-                />
-              ))}
-            </Carrusel>
-          )}
+          <ParaLaSiguiente />
           {categorias.value.map((c) => (
             <Carrusel
               key={c.id}

@@ -50,7 +50,7 @@ export function AjustarHoja({ plato, comida, fecha, onClose, onVer, avisar }: Pr
   if (!falta) {
     return (
       <Sheet title={`Ajustar ${de.al}`} onClose={onClose}>
-        <p class={h.sub}>Para ajustar hace falta tu objetivo: calcúlalo en Comida · Hoy.</p>
+        <p class={h.sub}>Para ajustar hace falta tu objetivo: calcúlalo en Nutrición.</p>
       </Sheet>
     )
   }

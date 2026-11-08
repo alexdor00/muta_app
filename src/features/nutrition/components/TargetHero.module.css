@@ -55,7 +55,8 @@
   gap: var(--space-2);
 }
 
-.actions button {
+.actions button,
+.actions a {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -67,6 +68,7 @@
   color: var(--on-target-hero);
   font: var(--text-subhead);
   font-weight: var(--weight-semibold);
+  text-decoration: none;
   cursor: pointer;
 }
 

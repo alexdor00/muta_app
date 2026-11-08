@@ -25,6 +25,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-08 (rama `pantalla/recetas`): **Comida pasa a ser Nutrición**: abre en tu día (el día dentro de la tarjeta,
+  «Para la cena» y «Ver todas las recetas»), «Tu plan» reúne objetivo, menús y dieta, y la cabecera es como la de Entreno.
+
 - 2026-11-08 (rama `pantalla/recetas`): quitar deslizando (comidas de Hoy, lo apuntado y los platos del menú; el
   plato del menú, solo ese día) y «De lo que sueles comer» en Añadir, que aprende de dos semanas de apuntes.
 

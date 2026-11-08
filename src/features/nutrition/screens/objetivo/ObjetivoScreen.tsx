@@ -11,14 +11,12 @@ import { ChevronLeftIcon, PencilIcon } from '../../../../shared/ui/icons.tsx'
 import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
-import { TargetHero } from '../../components/TargetHero.tsx'
-import { ajustes, calculo, estado, FASES, gastoReal, historial, hoy, pendiente } from '../../state/comida.ts'
+import { ajustes, calculo, estado, gastoReal, historial, hoy, pendiente } from '../../state/comida.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
 import {
   aceptadosDesdeElCalculo,
   deshacerCambio,
   deshacible,
-  macrosCon,
   volverAlCalculo,
 } from '../../use-cases/target.ts'
 import { DatosHoja } from '../comida/DatosHoja.tsx'
@@ -28,6 +26,7 @@ import { Historial } from './Historial.tsx'
 import { ManoHoja } from './ManoHoja.tsx'
 import styles from './Objetivo.module.css'
 import { RevisionCard } from './RevisionCard.tsx'
+import { TarjetaObjetivo } from './TarjetaObjetivo.tsx'
 import { SugerenciaHoja } from './SugerenciaHoja.tsx'
 
 /** Tu objetivo: la cifra, cómo sale paso a paso, la revisión semanal del entrenador y el historial de cambios. */
@@ -47,18 +46,10 @@ export function ObjetivoScreen() {
     return (
       <div class={styles.page}>
         <Volver />
-        <p class={styles.sub}>Aún no tienes objetivo: calcúlalo en Comida con tus datos.</p>
+        <p class={styles.sub}>Aún no tienes objetivo: calcúlalo en Nutrición con tus datos.</p>
       </div>
     )
   }
-  const manana = a.desde > hoy.value
-  const macros = macrosCon(a.kcal)
-  const nombreFase = FASES.find((f) => f.id === a.fase)?.nombre ?? a.fase
-  const etiqueta = a.aMano
-    ? `${nombreFase} · fijado a mano`
-    : a.fase === 'definicion'
-      ? `${nombreFase} · −${formatDecimal(a.ritmo)} % por semana`
-      : nombreFase
   const delEntrenador = a.aMano ? 0 : aceptadosDesdeElCalculo()
   const kgSemana = Math.round((a.ritmo / 100) * a.cuerpo.pesoKg * 100) / 100
   const ultimaRevision = historial.value.find((x) => x.tipo === 'sugerencia' || x.tipo === 'sin-cambios')
@@ -67,21 +58,14 @@ export function ObjetivoScreen() {
   return (
     <div class={styles.page}>
       <Volver />
-      {macros && (
-        <TargetHero
-          etiqueta={etiqueta}
-          kcal={a.kcal}
-          cuando={manana ? 'desde mañana' : 'al día'}
-          macros={{ proteina: macros.protein, hidratos: macros.carbs, grasa: macros.fat }}
-        >
-          <button type="button" onClick={fase.show}>
-            Cambiar fase
-          </button>
-          <button type="button" onClick={mano.show}>
-            <PencilIcon /> Fijar a mano
-          </button>
-        </TargetHero>
-      )}
+      <TarjetaObjetivo>
+        <button type="button" onClick={fase.show}>
+          Cambiar fase
+        </button>
+        <button type="button" onClick={mano.show}>
+          <PencilIcon /> Fijar a mano
+        </button>
+      </TarjetaObjetivo>
 
       <section aria-labelledby="como-sale">
         <h2 id="como-sale" class={styles.title}>
@@ -183,7 +167,7 @@ export function ObjetivoScreen() {
         {ultimaRevision
           ? `Próxima revisión: ${formatDayDate(addDays(ultimaRevision.fecha, 7))}`
           : 'La primera revisión llega con 10 pesajes en 14 días y 12 días de comida apuntados.'}
-        {manana &&
+        {a.desde > hoy.value &&
           ` · Tu nuevo objetivo empieza ${daysBetween(hoy.value, a.desde) === 1 ? 'mañana' : formatDayDate(a.desde)}.`}
       </p>
 
@@ -199,7 +183,7 @@ export function ObjetivoScreen() {
 function Volver() {
   return (
     <header class={styles.bar}>
-      <RoundButton label="Volver a Comida" variant="plain" href={paths.nutrition}>
+      <RoundButton label="Volver a Tu plan" variant="plain" href={`${paths.nutrition}?vista=plan`}>
         <ChevronLeftIcon />
       </RoundButton>
       <h1 class={styles.barTitle}>Tu objetivo</h1>

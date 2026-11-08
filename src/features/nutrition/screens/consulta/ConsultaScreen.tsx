@@ -48,7 +48,8 @@ export function ConsultaScreen() {
       <div class={p.page}>
         <Barra titulo="Consulta semanal" volver={volver} />
         <p class={p.sub}>
-          La consulta es con una dieta pautada: cárgala en Comida · Menú, en «¿Sigues una dieta pautada?».
+          La consulta es con una dieta pautada: cárgala en Nutrición · Tu plan, en «¿Sigues una dieta
+          pautada?».
         </p>
         <a class={p.sub} href={`${paths.nutrition}?vista=dieta`}>
           Ir a tu dieta ›

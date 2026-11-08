@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact'
 import { formatInt } from '../../../shared/lib/format.ts'
 import styles from './DayHero.module.css'
 
@@ -7,16 +8,19 @@ type Props = {
   comidas: number
   objetivo: number
   macros: Macro[]
+  /** Arriba, a todo el ancho: el día con sus flechas. */
+  cabecera?: ComponentChildren
 }
 
 const pct = (hecho: number, objetivo: number) => Math.round(objetivo ? (hecho / objetivo) * 100 : 0)
 
 /** La tarjeta del día: el anillo con lo que llevas de tus kcal y, al lado, cómo vas de proteína, hidratos y grasa. */
-export function DayHero({ comidas, objetivo, macros }: Props) {
+export function DayHero({ comidas, objetivo, macros, cabecera }: Props) {
   const lleno = Math.min(100, pct(comidas, objetivo))
   const quedan = objetivo - comidas
   return (
     <section class={styles.hero} aria-label="Lo que llevas hoy">
+      {cabecera && <div class={styles.cabecera}>{cabecera}</div>}
       <div class={styles.ring} role="img" aria-label={`${formatInt(comidas)} de ${formatInt(objetivo)} kcal`}>
         <svg viewBox="0 0 132 132" aria-hidden="true">
           <circle class={styles.base} cx="66" cy="66" r="58" pathLength={100} />

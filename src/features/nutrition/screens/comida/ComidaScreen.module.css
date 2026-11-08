@@ -1,8 +1,10 @@
 /* Comida: cabecera con «Objetivo», el control Hoy · Semana · Dieta y el estado sin objetivo (tarjeta gris). */
 
-.target {
+/* «Tu plan», como «Editar» en Entreno */
+.plan {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-2);
   height: var(--avatar);
   padding: 0 var(--space-4);
   border-radius: var(--radius-pill);
@@ -13,8 +15,14 @@
   text-decoration: none;
 }
 
-.segment {
-  padding: 0 var(--gutter) var(--space-3);
+.plan svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* «‹ Tu plan», «‹ Recetas», «‹ Tu dieta» */
+.barra {
+  padding: calc(var(--safe-top) + var(--space-2)) var(--gutter) var(--space-3);
 }
 
 .empty {
