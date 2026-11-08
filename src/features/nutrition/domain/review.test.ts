@@ -94,4 +94,12 @@ describe('revisar', () => {
     if (mantener.tipo === 'cambio')
       expect(tituloCambio(mantener, 'mantenimiento')).toBe('Estás subiendo de peso')
   })
+
+  it('volumen lento pero tu fuerza no baja: no se suben las kcal; si baja o no hay datos, +150', () => {
+    const lento = { ...base, fase: 'volumen' as const, serie: serie(-0.3) }
+    expect(revisar({ ...lento, fuerza: 0.02 }).tipo).toBe('progresas')
+    expect(revisar({ ...lento, fuerza: 0 }).tipo).toBe('progresas')
+    expect(revisar({ ...lento, fuerza: -0.03 }).tipo).toBe('cambio')
+    expect(revisar({ ...lento, fuerza: null }).tipo).toBe('cambio')
+  })
 })

@@ -133,8 +133,9 @@ export function RepartoMacros({
         <b>{formatInt(m.carbs)} g</b>
       </div>
       <p class={h.rowDetail}>
-        Tus documentos: con 1,5 g/kg de proteína basta; de 1,8 a 2,2 solo si estás muy definido y en déficit
-        fuerte. Grasa, al menos 0,6 g/kg. El resto, a hidratos, que son los que te dejan entrenar fuerte.
+        Tus documentos: proteína suficiente, no excesiva; con 1,5 g/kg basta y solo se sube (hasta ~2 g/kg) si
+        el volumen de comida te obliga. En definición, más baja que en volumen. Grasa, al menos 0,6 g/kg. El
+        resto, a hidratos, que son los que te dejan entrenar fuerte.
       </p>
       {avisos.map((x) => (
         <p key={x} class={h.warn} role="status">

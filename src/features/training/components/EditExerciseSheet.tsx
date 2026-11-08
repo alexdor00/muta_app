@@ -18,7 +18,7 @@ export type PautaEdicion = {
   descanso: number
 }
 
-/** Repeticiones que te quedarían antes del fallo al terminar cada serie: de 0 (al fallo) a 5. */
+/** RIR que se busca al terminar cada serie (repeticiones en reserva): de 0 a 5. */
 const MAX_RIR = 5
 /** Las repeticiones, mínimo y máximo de 1 en 1 (hasta 50); el descanso, de 15 en 15 s (hasta 5 min). */
 const MAX_REPS = 50
@@ -60,7 +60,7 @@ function Contador(p: {
 
 /**
  * Editar ejercicio (A12–A14): «Cada serie distinta» (un rango por serie), «Superserie con» el de al lado y la técnica de
- * intensidad (dropset, rest-pause…), además de series, descanso entre series y repeticiones antes del fallo con − / + (cada uno con una
+ * intensidad (dropset, rest-pause…), además de series, descanso entre series y RIR con − / + (cada uno con una
  * línea que lo explica);
  * repeticiones (mínimo y máximo) en un desplegable.
  * Cada toque se guarda solo. «Cambiar por otro» y «Quitar».
@@ -218,7 +218,7 @@ export function EditExerciseSheet(props: {
           </Desplegable>
         )}
         <Contador
-          nombre="Repeticiones antes del fallo"
+          nombre="RIR (repeticiones en reserva)"
           texto={String(p.rir)}
           puedeMenos={p.rir > 0}
           puedeMas={p.rir < MAX_RIR}

@@ -97,6 +97,12 @@ export function decidir(e: EntradaConsulta): Decision {
       'Los hidratos, antes de entrenar.',
       'Duerme 7–9 horas: el sueño corto da hambre.',
     )
+  // Recarga de hidratos según cómo estás, no por calendario (decisión 2026-11-08, guía G1 §7): en la segunda mitad, con
+  // hambre alta o energía baja; de varios días, nunca de uno. Las cifras las pone tu nutricionista: la guía no las da.
+  if (e.semana >= FASE_FINAL && ((e.revision.hambre ?? 0) >= 7 || (e.revision.energia ?? 10) <= 4))
+    consejos.push(
+      'Llevas semanas de dieta y lo notas: una recarga de hidratos de varios días (nunca de uno) puede ayudarte. Coméntalo con tu nutricionista.',
+    )
   const nada = (titulo: string, detalle: string): Decision => ({
     titulo,
     detalle,
@@ -198,10 +204,11 @@ export function decidir(e: EntradaConsulta): Decision {
     }
   }
 
-  // 6. Fase final y la fuerza baja un 2 % → más proteína (consejo: los gramos los pones tú en tus recetas)
-  if (final && e.fuerza !== null && e.fuerza <= -0.02 && e.pesoKg)
+  // 6. Fase final y la fuerza baja un 2 % → hidratos, no más proteína (decisión 2026-11-08, guía G1 §6–7: en definición la
+  // proteína suficiente, no más; los hidratos son los que te dejan entrenar)
+  if (final && e.fuerza !== null && e.fuerza <= -0.02)
     consejos.unshift(
-      `Sube la proteína hacia 1,9 g por kilo (${Math.round(e.pesoKg * 1.9)} g al día) para no perder músculo al final.`,
+      'Tu fuerza baja al final: no subas la proteína, pon los hidratos alrededor del entreno. Si además tienes hambre o duermes peor, habla con tu nutricionista de una recarga de hidratos de varios días.',
     )
 
   if (antes === null || ahora === null)

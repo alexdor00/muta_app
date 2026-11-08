@@ -155,6 +155,9 @@ export const gastoReal = computed(() => {
   })
 })
 
+/** Cambio de tu fuerza en los básicos (de Entreno); null hasta cargarlo o sin datos. */
+export const fuerzaBasicos = signal<number | null>(null)
+
 /** Lo que vería hoy la revisión semanal (en vivo: faltan datos, vas bien, pasos…). */
 export const revisionDeHoy = computed<Revision | null>(() => {
   const a = ajustes.value
@@ -169,6 +172,7 @@ export const revisionDeHoy = computed<Revision | null>(() => {
     serie: serie.value,
     dias: Object.entries(totales.value).map(([date, t]) => ({ date, kcal: t.kcal })),
     ultimoCambio: a.desde,
+    fuerza: fuerzaBasicos.value,
   })
 })
 

@@ -226,7 +226,7 @@ export function filaHoy(e: EjercicioPlan, x: EjercicioEnCurso): string | null {
   return tecnica ? TECNICAS[tecnica].fila : null
 }
 
-/** La pauta del ejercicio en la sesión: «3 series», «8–12 reps», «a 2 del fallo» y, si la lleva, la técnica. */
+/** La pauta del ejercicio en la sesión: «3 series», «8–12 reps», «RIR 2» y, si la lleva, la técnica. */
 export function pautaHoy(e: EjercicioPlan, x: EjercicioEnCurso): string[] {
   const tecnica = tecnicaHoy(e, x)
   return [

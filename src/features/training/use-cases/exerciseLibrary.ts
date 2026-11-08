@@ -2,11 +2,16 @@ import aliases from '../../../shared/content/exercise-aliases.json'
 import exercises from '../../../shared/content/exercises.json'
 import { LOCAL_EXERCISES, LOCAL_USES } from '../../../shared/data/localExercises.ts'
 import { equivalentes, type Equivalente } from '../domain/equivalence.ts'
-import { searchLibrary, type LibraryExercise } from '../domain/exerciseLibrary.ts'
+import { repsDeLaGuia, searchLibrary, type LibraryExercise } from '../domain/exerciseLibrary.ts'
 import type { MuscleId } from '../domain/muscles.ts'
 
-/** Los 141 ejercicios del prototipo anterior (scripts/exercises-from-prototype.cjs). */
-export const LIBRARY = exercises as unknown as LibraryExercise[]
+/**
+ * Los 141 ejercicios del prototipo anterior (scripts/exercises-from-prototype.cjs), con las repeticiones en 5–12 (guía G1).
+ */
+export const LIBRARY = (exercises as unknown as LibraryExercise[]).map((e) => ({
+  ...e,
+  reps: repsDeLaGuia(e.reps),
+}))
 
 /** La biblioteca que se usa: la de MUTA y los ejercicios originales de tus rutinas locales (si los hay). */
 export const BIBLIOTECA: LibraryExercise[] = [...LIBRARY, ...(LOCAL_EXERCISES as LibraryExercise[])]

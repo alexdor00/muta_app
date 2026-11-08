@@ -41,7 +41,7 @@ describe('suggestFor (doble progresión)', () => {
   it('sobrar 3 o más de reserva dentro del rango también sube', () => {
     expect(suggestFor({ ...plan, ultima: [serie(60, 8, 5)] })).toMatchObject({
       kg: 62.5,
-      porque: 'Te sobraron 5 reps antes del fallo (tocaba a 2 del fallo): subes 2,5 kg.',
+      porque: 'Te sobraron 5 reps en reserva (tocaba RIR 2): subes 2,5 kg.',
     })
   })
   it('por debajo del mínimo baja un 5 % (al menos un salto)', () => {
@@ -72,7 +72,7 @@ describe('suggestFor (doble progresión)', () => {
       kg: null,
       reps: '6–10',
       tendencia: 'nuevo',
-      porque: 'Primera vez: elige un peso con el que hagas 6–10 reps a 2 del fallo.',
+      porque: 'Primera vez: elige un peso con el que hagas 6–10 reps RIR 2.',
     })
   })
 })

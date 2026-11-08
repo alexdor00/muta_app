@@ -5,7 +5,7 @@ import styles from './WorkoutExercise.module.css'
 type RowProps = {
   numero: number
   nombre: string
-  /** «3 series de 8–12 reps, a 1 del fallo · 2:15». */
+  /** «3 series de 8–12 reps, RIR 1 · 2:15». */
   detalle: string
   /** Pendiente: «Hoy 24 kg · antes 22 kg × 12». Terminado: lo hecho, con ★ en las series récord. */
   resumen: string

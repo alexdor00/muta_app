@@ -120,6 +120,9 @@ Valores por defecto según tipo:
 - Aislamiento: 10–15 reps · RIR 1 (RIR 0 si estable) · 90 s.
 - Cuello: 12–20 · RIR 2 · 90 s · +1,25 kg.
 
+> **Decisión 2026-11-08 (usuario, guía G1, [04-guia-culturismo-natural.md](04-guia-culturismo-natural.md) §14, choque 12):** al añadir un ejercicio desde la biblioteca, las
+> repeticiones se proponen en 5–12 (`repsDeLaGuia`). Las rutinas ya hechas no se tocan.
+
 Se extraen con script (ver README). Ejemplo de formato destino:
 
 ```json
@@ -184,6 +187,13 @@ Se extraen con script (ver README). Ejemplo de formato destino:
 | cutRate | Pérdida 0,5–1 % del peso por semana (evidencia general). |
 | cardioEvidence | Cardio + pesas no reduce hipertrofia (Schumann 2022), pero correr mucho cerca de pierna resta (Wilson 2012). OMS: 150–300 min/sem moderado. |
 
+> **Decisiones 2026-11-08 (usuario, guía G1, [04-guia-culturismo-natural.md](04-guia-culturismo-natural.md) §14):** `protein`: suficiente, no excesiva; ~1,5 g/kg y solo hasta
+> ~2 g/kg si el volumen de comida lo obliga; en definición, más baja que en volumen (choque 1). `dietBreak`: no por
+> calendario, sino recargas de hidratos de varios días según hambre, rendimiento y sueño, sobre todo en la segunda
+> mitad (choque 5). `steps`: al menos 10.000 y, los que pueda cada uno, 12.000–15.000 (choque 16). Subir volumen
+> cuando mejoras en casi todas las series y recuperas; si el rendimiento cae, antes sueño, estrés y comida (choques
+> 7 y 8). `fat`, `reverse` y el resto se quedan.
+
 ## 6. Consejos por músculo (137) y familias (72)
 
 Por músculo: Pecho 11 · Dorsal 12 · Espalda alta 9 · Hombro anterior 5 · Hombro lateral 11 · Hombro posterior 5 · Bíceps 10 · Tríceps 10 · Antebrazo 8 · Cuádriceps 12 · Femoral 8 · Glúteo 9 · Aductores 5 · Gemelo 10 · Abdomen 12 · Cuello 0.
@@ -218,7 +228,7 @@ Cada familia: `trabaja más`, `perfil de resistencia` (descendente · ascendente
 
 | Término | Definición |
 |---|---|
-| RIR | Repeticiones en recámara al acabar la serie. RIR 0 es el límite. |
+| RIR | Repeticiones en recámara al acabar la serie. RIR 0 = todas las que salen; **no es fallo** (fallo = intentas otra y no sale). La app lo escribe siempre «RIR N» (decisión 2026-11-08, choque 11). |
 | Doble progresión | Mantienes el peso hasta el máximo del rango; subes y vuelves al mínimo. |
 | Mesociclo | Bloque de varias semanas con la misma rutina y objetivo. |
 | Descarga | Semana más suave (menos series, más margen). |

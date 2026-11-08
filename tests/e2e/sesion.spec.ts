@@ -376,7 +376,7 @@ test('«Cambiar ejercicio» propone los que hacen lo mismo y, en tu plan, lo cam
   // Las próximas veces, con la pauta de la rutina, y se puede volver al de la rutina
   await page.goto('/entreno/rutina/b1')
   const fila = page.getByRole('button', { name: /^Peso muerto piernas rígidas/ })
-  await expect(fila).toContainText('3 series · 6–10 reps · a 2 del fallo')
+  await expect(fila).toContainText('3 series · 6–10 reps · RIR 2')
   await expect(fila).toContainText('En lugar de Peso muerto rumano (cambiado en tu plan)')
   await page.reload()
   await expect(page.getByRole('button', { name: /^Peso muerto piernas rígidas/ })).toBeVisible()

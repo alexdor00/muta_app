@@ -32,7 +32,7 @@ export type SerieVista = {
 type Props = {
   numero: number
   nombre: string
-  /** La pauta en etiquetas: «3 series», «6–10 reps», «a 2 del fallo». */
+  /** La pauta en etiquetas: «3 series», «6–10 reps», «RIR 2». */
   pauta: string[]
   /** Descanso entre series: «2:45». */
   descanso: string
@@ -77,11 +77,11 @@ export function Estrella() {
 const CAMPOS = [
   { campo: 'kg', gris: 'kgGris', nombre: 'Kilos' },
   { campo: 'reps', gris: 'repsGris', nombre: 'Repeticiones' },
-  { campo: 'quedan', gris: 'quedanGris', nombre: 'Repeticiones que quedaban al fallo' },
+  { campo: 'quedan', gris: 'quedanGris', nombre: 'RIR (repeticiones en reserva)' },
 ] as const
 
 /**
- * Una serie: Nº · Kg · Reps · Quedan · círculo. Deslizada a la izquierda descubre «Eliminar» (C06); mantenida pulsada,
+ * Una serie: Nº · Kg · Reps · RIR · círculo. Deslizada a la izquierda descubre «Eliminar» (C06); mantenida pulsada,
  * se borra (con «Deshacer» en el aviso).
  */
 function FilaSerie(props: {
@@ -244,7 +244,7 @@ export function WorkoutExercise(props: Props) {
           <span>Nº</span>
           <span>Kg</span>
           <span>Reps</span>
-          <span>Quedan</span>
+          <span>RIR</span>
           <span />
         </div>
         {series.map((s, i) => (

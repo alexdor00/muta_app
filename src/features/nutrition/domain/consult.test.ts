@@ -55,9 +55,15 @@ describe('la consulta semanal con dieta', () => {
     ])
   })
 
-  it('6. fase final y fuerza −2 %: consejo de proteína', () => {
+  it('6. fase final y fuerza −2 %: hidratos alrededor del entreno, no más proteína', () => {
     const d = decidir({ ...base, semana: 9, fuerza: -0.02, fase: base.fases[1] })
-    expect(d.consejos[0]).toContain('151 g')
+    expect(d.consejos[0]).toContain('no subas la proteína')
+  })
+
+  it('recarga de hidratos según cómo estás: en la segunda mitad y con hambre, no antes', () => {
+    const conHambre = { ...base, fase: base.fases[1], revision: { hambre: 8, energia: 7 } }
+    expect(decidir({ ...conHambre, semana: 9 }).consejos.join(' ')).toContain('recarga de hidratos')
+    expect(decidir({ ...conHambre, semana: 4 }).consejos.join(' ')).not.toContain('recarga')
   })
 
   it('7. una sola semana fuera: esperar', () => {

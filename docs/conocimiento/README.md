@@ -8,7 +8,7 @@ Es la referencia para las fases 2 (motor) y 3 (contenido) del rediseño.
 | [01-contenido.md](01-contenido.md) | Parte I: fuentes, perfil, músculos y rangos, guías de volumen, consejos generales, reglas escritas, glosario, plantillas, cardio, material, cadencias |
 | [02-reglas.md](02-reglas.md) | Parte II: cálculos y decisiones del motor y del coach, con cifras exactas |
 | [03-migracion.md](03-migracion.md) | Parte III: método, equivalencia de campos, destino de cada bloque y contradicciones |
-| [04-guia-culturismo-natural.md](04-guia-culturismo-natural.md) | Parte IV (2026-11-08): la guía de culturismo natural (G1) resumida, sus choques con 01 y 02 (pendientes de decidir) y lo que se puede llevar a la app |
+| [04-guia-culturismo-natural.md](04-guia-culturismo-natural.md) | Parte IV (2026-11-08): la guía de culturismo natural (G1) resumida, sus 23 choques con 01 y 02 con la decisión del usuario en cada uno (§14) |
 
 ## Cifras
 

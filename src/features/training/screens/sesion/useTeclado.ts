@@ -16,12 +16,12 @@ export type Casilla = { ej: number; serie: number; campo: CampoSerie }
 const NOMBRE_CAMPO: Record<CampoSerie, string> = {
   kg: 'peso en kg',
   reps: 'repeticiones',
-  quedan: 'las que quedaban al fallo',
+  quedan: 'el RIR (repeticiones en reserva)',
 }
 const ETIQUETA_CAMPO: Record<CampoSerie, string> = {
   kg: 'Kilos de la serie',
   reps: 'Repeticiones de la serie',
-  quedan: 'Repeticiones que quedaban al fallo en la serie',
+  quedan: 'RIR de la serie (repeticiones en reserva)',
 }
 const ORDEN: CampoSerie[] = ['kg', 'reps', 'quedan']
 

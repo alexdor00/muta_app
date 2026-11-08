@@ -3,7 +3,7 @@ import styles from './ExerciseList.module.css'
 
 type Ejercicio = {
   nombre: string
-  /** «3 series · 6–10 reps · al fallo». */
+  /** «3 series · 6–10 reps · RIR 0». */
   detalle: string
   /** Kilos × repeticiones de cada serie la última vez («60 × 10»); vacío la primera vez. */
   ultima: readonly string[]

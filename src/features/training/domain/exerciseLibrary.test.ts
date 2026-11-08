@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { libraryLine, libraryProblems, searchLibrary, type LibraryExercise } from './exerciseLibrary.ts'
+import {
+  libraryLine,
+  libraryProblems,
+  searchLibrary,
+  type LibraryExercise,
+  repsDeLaGuia,
+} from './exerciseLibrary.ts'
 
 const ej = (over: Partial<LibraryExercise>): LibraryExercise => ({
   id: 'press_banca',
@@ -81,5 +87,15 @@ describe('libraryProblems', () => {
       'press_banca: reps 12–8 al revés',
       'x: suma a «nuca», que no existe',
     ])
+  })
+})
+
+describe('repsDeLaGuia', () => {
+  it('deja las repeticiones en 5–12 sin rangos de menos de 2', () => {
+    expect(repsDeLaGuia([6, 10])).toEqual([6, 10])
+    expect(repsDeLaGuia([10, 15])).toEqual([10, 12])
+    expect(repsDeLaGuia([6, 15])).toEqual([6, 12])
+    expect(repsDeLaGuia([12, 20])).toEqual([8, 12])
+    expect(repsDeLaGuia([3, 5])).toEqual([5, 9])
   })
 })

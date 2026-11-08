@@ -7,7 +7,7 @@ import { logError } from '../../../shared/lib/logger.ts'
 import type { Revision } from '../domain/consult.ts'
 import type { DietaActiva } from '../domain/diet.ts'
 import type { Alimento, Apunte } from '../domain/food.ts'
-import { tiposDeDia } from '../../training/index.ts'
+import { fuerzaEnBasicos, tiposDeDia } from '../../training/index.ts'
 import { tituloCambio } from '../domain/review.ts'
 import {
   ajustes,
@@ -16,6 +16,7 @@ import {
   dias,
   dieta,
   estado,
+  fuerzaBasicos,
   guardadas,
   hoy,
   pesajes,
@@ -95,6 +96,7 @@ export function cargarComida(): Promise<void> {
       void cargarTipos()
       propios.value = mios?.alimentos ?? []
       guardadas.value = comidas?.comidas ?? []
+      await cargarFuerza()
       await revisarSemana()
     } catch (error) {
       logError(error, 'cargar Comida')
@@ -103,6 +105,16 @@ export function cargarComida(): Promise<void> {
     }
   })()
   return carga
+}
+
+/** En volumen, tu fuerza en los básicos: la revisión la mira antes de proponer más kcal (guía G1 §6). */
+async function cargarFuerza(): Promise<void> {
+  if (ajustes.value?.fase !== 'volumen') return
+  try {
+    fuerzaBasicos.value = (await fuerzaEnBasicos(hoy.value))?.cambio ?? null
+  } catch (error) {
+    logError(error, 'leer tu fuerza en los básicos')
+  }
 }
 
 /**

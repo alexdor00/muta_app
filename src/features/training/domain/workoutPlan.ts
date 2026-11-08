@@ -91,7 +91,7 @@ export type EjercicioPlan = {
   series: number
   /** «6–10», «12» o «AMRAP», con raya. */
   reps: string
-  /** RIR: repeticiones que quedan al acabar la serie (0 = al fallo). */
+  /** RIR: repeticiones que quedan al acabar la serie (0 = todas las que salen; no es fallo). */
   rir: number
   /** Kilos y repeticiones de cada serie la última vez (vacío la primera vez). */
   ultima: SerieHecha[]
@@ -134,7 +134,7 @@ export type Rotacion = { bloque: number; semana: number; siguiente: number }
 
 export const INICIO: Rotacion = { bloque: 0, semana: 0, siguiente: 0 }
 
-/** Lo que se pone cuando falta (sugerido): 3 series, 8–12 reps, a 2 del fallo y 2,5 kg; el descanso, por tipo (restMinutes). */
+/** Lo que se pone cuando falta (sugerido): 3 series, 8–12 reps, RIR 2 y 2,5 kg; el descanso, por tipo (restMinutes). */
 const RELLENO = { series: 3, reps: '8–12', rir: 2, salto: 2.5 }
 
 /** «A1 · Cuádriceps y espalda» → A1; si el nombre no trae sigla, S y su puesto en la semana («S2»). */

@@ -223,7 +223,7 @@ describe('lo sugerido, a la vista', () => {
       null,
     )
     expect(notaSugerido(sinNada)).toBe(
-      'Sugerido, no lo dice la rutina: 3 series, 8–12 reps, a 2 del fallo, descanso 1:30, salto de 2,5 kg',
+      'Sugerido, no lo dice la rutina: 3 series, 8–12 reps, RIR 2, descanso 1:30, salto de 2,5 kg',
     )
     const soloSalto = ejercicioDelPlan(
       { name: 'Curl predicador', sets: 2, reps: '10-15', rpe: '9', rest: '~1-2 min' },

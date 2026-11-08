@@ -86,7 +86,7 @@ test('cargar tu rutina desde un CSV: vista previa, nombre y empezar', async ({ p
   await expect(page.getByRole('link', { name: /Torso/ })).toBeVisible()
   await page.getByRole('link', { name: /Torso/ }).click()
   await expect(page.getByRole('button', { name: /Press banca/ })).toContainText(
-    '3 series · 6–10 reps · a 2 del fallo',
+    '3 series · 6–10 reps · RIR 2',
   )
 })
 

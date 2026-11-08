@@ -551,3 +551,20 @@ Se resume en [04-guia-culturismo-natural.md](conocimiento/04-guia-culturismo-nat
   cuándo subir o bajar volumen, RIR 0 frente a fallo, repeticiones, bíceps y tríceps, pasos…). Entre dos documentos
   nuestros no se elige solo: hasta que el usuario decida, la app sigue con 01 y 02.
 - Sus propuestas para la app (§13) quedan sin aprobar: cada una pasa por diseño.
+
+## 2026-11-08 · Lo que se sigue de la guía de culturismo natural
+
+El usuario decide los 23 choques entre la guía (G1) y 01/02 (tabla en
+[04-guia-culturismo-natural.md](conocimiento/04-guia-culturismo-natural.md) §14). Manda la guía en 1, 3 (optativo),
+4 (optativo), 5, 6, 7, 8, 9, 11, 12, 16, 18, 21 (solo un poco), 22 y 23 (según la persona); se queda lo de antes en 2, 10,
+13, 14, 15, 17, 19 y 20. Lo aplicado ya:
+
+- **El esfuerzo, siempre en RIR** («RIR 2», nunca «al fallo» ni «a N del fallo»): RIR 0 no es fallo. Cambia la regla del
+  documento de rediseño («sin siglas»).
+- Proteína: aviso por encima de 2 g/kg; la consulta con dieta ya no sube la proteína en la fase final y sugiere una
+  recarga de hidratos de varios días con hambre o poca energía en la segunda mitad (sin cifras: la guía no las da).
+- Revisión semanal en volumen: si el peso sube despacio pero tu fuerza en los básicos no baja, no se suben las kcal.
+- Pasos: mínimo 10.000 antes de comer menos; se recomiendan 12.000–15.000, los que puedas.
+- Biblioteca: al añadir un ejercicio, repeticiones en 5–12 (las rutinas ya hechas no cambian).
+- Consejos de dorsal (descolgar solo un poco) y de parciales (puntuales, casi nunca en definición).
+- Lo demás (ON/OFF, ritmo por fases, frecuencia por persona, el entrenador de Entreno) necesita diseño aprobado.

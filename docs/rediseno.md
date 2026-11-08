@@ -74,7 +74,7 @@ Datos: fechas `2026-10-27`, kg, cm y segundos por dentro; coma decimal en pantal
   aislamientos; tu material primero; alfabético. Grupos fijos «En tu plan» y «Recientes». Búsqueda sin acentos por nombre y alias (empieza por, contiene, alias).
   Filtros en chips. Campos: `id, name/aliases, primary, contributes (1 o 0,5), kind, pattern, equipment, reps/rir/rest/step, stable, key, media, family`.
 - **Consejos** (pegados al ejercicio y al músculo, no a la rutina): máximo 3 a la vista («Ver N más»); una acción por consejo, imperativo, < 120 caracteres; el porqué
-  al tocar; sin siglas («RIR 2» = «a 2 del fallo»); no se repiten; se editan con lápiz (ocultar, cambiar, volver al original, añadir «Tuyo»). Estructura:
+  al tocar; el esfuerzo siempre en RIR («RIR 2»; decisión 2026-11-08: RIR 0 no es fallo); no se repiten; se editan con lápiz (ocultar, cambiar, volver al original, añadir «Tuyo»). Estructura:
   `id, scope (general|session|muscle|family|exercise), target, text, why, when (before|during|after), priority, source`.
 
 ## Fases de construcción («Hecho cuando…»)

@@ -46,6 +46,22 @@ export const EQUIPMENT_LABEL: Record<Equipment, string> = {
   other: 'Otro',
 }
 
+/**
+ * Las repeticiones de un ejercicio de la biblioteca dentro de 5–12, el rango general de la guía de culturismo natural
+ * (decisión 2026-11-08, docs/conocimiento/04-guia-culturismo-natural.md §4). Solo para lo que añades desde la biblioteca;
+ * las rutinas ya hechas no se tocan. Si el rango queda muy corto, se abre 4 por abajo (o por arriba, si no cabe) (sugerido).
+ */
+export const REPS_GUIA = { min: 5, max: 12 } as const
+
+export function repsDeLaGuia([desde, hasta]: Range): Range {
+  const ajusta = (n: number) => Math.min(REPS_GUIA.max, Math.max(REPS_GUIA.min, n))
+  const max = ajusta(hasta)
+  const min = ajusta(desde)
+  if (max - min >= 2) return [min, max]
+  const abajo = Math.max(REPS_GUIA.min, max - 4)
+  return max - abajo >= 2 ? [abajo, max] : [abajo, abajo + 4]
+}
+
 /** Los que coinciden con lo escrito (sin tildes) y, si hay, con el músculo principal; en el orden de la biblioteca. */
 export function searchLibrary(
   list: LibraryExercise[],

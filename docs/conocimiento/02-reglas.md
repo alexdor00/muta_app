@@ -160,6 +160,12 @@ Al empezar en ciclo de descarga: 70 % de las series (redondeado, mínimo 1), RIR
 4. **Resumen positivo:** ejercicios que progresan («No toques lo que funciona»).
 5. **Calibrar el RIR cada 4 ciclos:** última serie de 2–3 ejercicios estables, apunta las que crees que quedan y sigue al fallo técnico.
 
+> **Decisiones 2026-11-08 (usuario, guía G1, [04-guia-culturismo-natural.md](04-guia-culturismo-natural.md) §14):** con un ejercicio estancado, el entrenador **no propone cambiar
+> de ejercicio** ni uno nuevo (choque 9): revisa técnica, esfuerzo, sueño y comida. En definición, nada de «mantener
+> los kilos ya es buen resultado»: se puede progresar en déficit (choque 18). Volumen: se sube cuando mejoras en casi
+> todas las series y recuperas; si cae el rendimiento, primero sueño, estrés y comida, y después se recorta (choques
+> 7 y 8). La frecuencia depende de cada persona y puede ir en ciclos de 9 o 14 días (choque 23).
+
 ### Pruebas (prueba y error)
 - Tipos: +1 serie, −1 serie, cambio de rango, ejercicio nuevo, cambio de ejercicio. Se guarda el estado anterior.
 - Se evalúan tras 3 sesiones del ejercicio: mejor 1RM desde el cambio vs el de las 2 sesiones de antes.
@@ -253,9 +259,17 @@ Basal (Mifflin-St Jeor) = 10 × kg + 6,25 × cm − 5 × edad + 5 (hombre) | −
 - **Salir de dieta:** objetivo guardado o gasto − 300. **Mantener / recomposición:** gasto.
 - Macros: proteína 1,5 g/kg (1,5 · 1,8 · 2,2), grasa 0,6 g/kg (0,6 · 0,8 · 1,0), resto hidratos. Pasos 10.000.
 
+> **Decisión 2026-11-08 (choque 1):** proteína suficiente, no excesiva (aviso por encima de 2 g/kg). Hidratos ON/OFF y
+> ritmo de definición por fases (rápido al principio, suave al final): **optativos**, pendientes de diseño (choques 3
+> y 4).
+
 ### Revisión semanal automática (sin dieta cargada)
 - Con 8 pesajes y 8 días de comida en 14: gasto observado = comida media − pendiente del peso × 7.700. Nuevo gasto = 0,6 × anterior + 0,4 × observado (entre basal × 1,1 y × 2,6).
 - Sin datos, por ritmo: definición más lenta de −0,25 %/sem dos semanas → primero 10.000 pasos, luego −150 kcal; más rápida de −1,2 %/sem → +150. Volumen <0,1 %/mes → +100; >0,8 %/mes → −100. Salir de dieta con peso estable (±0,15 %) → +200 kcal hidratos. Mantener ±0,3 %/sem → ∓100.
+
+> **Decisión 2026-11-08 (choques 6 y 16):** en volumen, con el peso subiendo despacio, si tu fuerza en los básicos no
+> baja no se suben las kcal (`progresas`): antes, descanso y medidas. Los 10.000 pasos son el mínimo antes de comer
+> menos; se recomiendan 12.000–15.000, los que puedas.
 
 ### Ajuste semanal propuesto (±150 kcal)
 - Necesita ≥10 pesajes en 14 días y 12 días de comida en 4 semanas.
@@ -272,6 +286,10 @@ Basal (Mifflin-St Jeor) = 10 × kg + 6,25 × cm − 5 × edad + 5 (hombre) | −
 6. Fase final (semana 9 o grasa a 3 puntos del objetivo) y fuerza −2 % → proteína hacia 1,9 g/kg.
 7. Una sola semana fuera → esperar.
 8. Hambre alta o energía baja → consejos (verdura, proteína repartida, hidratos antes de entrenar, sueño).
+
+> **Decisión 2026-11-08 (choques 1 y 5):** la regla 6 ya no sube la proteína: con la fuerza bajando al final, hidratos
+> alrededor del entreno y, con hambre o sueño peor, hablar de una recarga de hidratos de varios días. La pausa de dieta
+> de abajo ya no va por calendario: recarga según hambre y energía en la segunda mitad (consejo, sin cifras).
 
 Entrenador en la consulta: descarga si toca; «recuperación justa» con 2 señales; 3+ récords en 7 días → «no toques lo que funciona»; si no, «semana sólida». Fuerza en básicos: los 3 compuestos más repetidos, mejor 1RM de 2 semanas vs las 2 anteriores.
 

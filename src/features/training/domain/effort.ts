@@ -1,27 +1,16 @@
 /**
- * El esfuerzo de una serie sin siglas (documento de rediseño: «RIR 2» = «a 2 del fallo»).
- * Se guarda en RIR (repeticiones que quedan); en pantalla se dice así.
+ * El esfuerzo de una serie, siempre en RIR (repeticiones en reserva al acabar la serie). Decisión 2026-11-08: nada de «al
+ * fallo» ni «a N del fallo», porque RIR 0 no es fallo (docs/conocimiento/04-guia-culturismo-natural.md §3): RIR 0 es hacer
+ * todas las que salen; fallo es intentar otra y que no salga.
  */
 export function effortLabel(rir: number): string {
-  return rir <= 0 ? 'al fallo' : `a ${rir} del fallo`
+  return `RIR ${Math.max(0, rir)}`
 }
 
 /**
- * Un texto del contenido sin la sigla (ficha-ejercicio.js · plainRir del prototipo): «RIR 2» → «a 2 del fallo»,
- * «RIR 1–2» → «a 1–2 del fallo», «RIR 0» → «al fallo»; con mayúscula si empieza la frase.
+ * Un texto del contenido con el esfuerzo escrito igual en todas partes: «0–3 RIR» → «RIR 0–3». Lo demás no cambia
+ * («cerca del fallo» habla del fallo de verdad).
  */
 export function plainEffort(text: string): string {
-  // «a RIR 2» y «0–3 RIR» también («a» ya va en las palabras); «al fallo o fallo» se queda en «al fallo»
-  return text
-    .replace(
-      /\b(?:a )?RIR (\d+(?:–\d+)?)|\b(\d+(?:–\d+)?) RIR\b/g,
-      (_, n1: string, n2: string, at: number) => {
-        const n = n1 ?? n2
-        const words = n === '0' ? 'al fallo' : `a ${n} del fallo`
-        return /(^|[.!?:]\s*)$/.test(text.slice(0, at))
-          ? words.charAt(0).toUpperCase() + words.slice(1)
-          : words
-      },
-    )
-    .replace(/al fallo o fallo/g, 'al fallo')
+  return text.replace(/\b(\d+(?:–\d+)?) RIR\b/g, 'RIR $1')
 }

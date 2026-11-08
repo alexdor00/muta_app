@@ -1,5 +1,6 @@
 // La revisión semanal del entrenador: mira 14 días y, si hace falta, propone un cambio. Nunca lo aplica: lo decides tú.
-// Reglas de docs/conocimiento/02-reglas.md · sección 8 («Ajuste semanal propuesto (±150 kcal)»).
+// Reglas de docs/conocimiento/02-reglas.md · sección 8 («Ajuste semanal propuesto (±150 kcal)»). En volumen, antes de subir
+// kcal se mira si progresas (decisión 2026-11-08, guía G1 §6, 04-guia-culturismo-natural.md).
 import { daysBetween, formatInt } from '../../../shared/lib/format.ts'
 import { PASOS_OBJETIVO, type Fase } from './targets.ts'
 import { deLosUltimos, ritmoSemanal, type PuntoPeso } from './weight.ts'
@@ -32,6 +33,8 @@ export type Revision =
   | { tipo: 'esperar'; dias: number }
   /** En definición y lento: antes de comer menos, llegar a 10.000 pasos. */
   | { tipo: 'pasos'; pct: number; kgSemana: number; previsto: { min: number; max: number }; pasos: number }
+  /** En volumen subes despacio, pero tu fuerza en los básicos no baja: no se tocan las kcal. */
+  | { tipo: 'progresas'; pct: number; fuerza: number }
   /** Ya estás en el mínimo: no se baja más. */
   | { tipo: 'suelo'; pct: number; suelo: number }
   /** La sugerencia: de `de` a `a` kcal. */
@@ -59,6 +62,8 @@ export type DatosRevision = {
   dias: readonly { date: string; kcal: number }[]
   /** Fecha del último cambio de tu objetivo. */
   ultimoCambio: string | null
+  /** Cambio de tu fuerza en los básicos (0,02 = un 2 % más); null o sin poner si no hay datos. */
+  fuerza?: number | null
 }
 
 export function revisar(d: DatosRevision): Revision {
@@ -88,6 +93,9 @@ export function revisar(d: DatosRevision): Revision {
   const lento = d.fase === 'definicion' ? bajar : d.fase === 'volumen' ? !bajar : false
   const desde = d.ultimoCambio ? daysBetween(d.ultimoCambio, d.hoy) : Infinity
   if (desde < DIAS_ENTRE_CAMBIOS) return { tipo: 'esperar', dias: DIAS_ENTRE_CAMBIOS - desde }
+  // Peso parado en volumen: si progresas en tus básicos, no se suben las kcal (antes, descanso, perímetros…)
+  if (d.fase === 'volumen' && lento && d.fuerza != null && d.fuerza >= 0)
+    return { tipo: 'progresas', pct, fuerza: d.fuerza }
   if (d.fase === 'definicion' && bajar && d.pasos < PASOS_OBJETIVO)
     return { tipo: 'pasos', pct, kgSemana, previsto, pasos: d.pasos }
 

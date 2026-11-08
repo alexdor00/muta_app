@@ -116,11 +116,11 @@ describe('validaciones', () => {
 describe('avisosReparto', () => {
   it('nada que avisar dentro de lo que dicen tus documentos', () => {
     expect(avisosReparto(80, { protein: 120, fat: 48, carbs: 300 })).toEqual([])
-    expect(avisosReparto(80, { protein: 176, fat: 64, carbs: 200 })).toEqual([])
+    expect(avisosReparto(80, { protein: 160, fat: 64, carbs: 200 })).toEqual([])
   })
   it('avisa con poca o demasiada proteína, poca grasa o sin hidratos', () => {
     expect(avisosReparto(80, { protein: 100, fat: 48, carbs: 300 })[0]).toMatch(/por debajo de 1,5/)
-    expect(avisosReparto(80, { protein: 200, fat: 48, carbs: 300 })[0]).toMatch(/por encima de 2,2/)
+    expect(avisosReparto(80, { protein: 200, fat: 48, carbs: 300 })[0]).toMatch(/por encima de 2 g/)
     expect(avisosReparto(80, { protein: 120, fat: 40, carbs: 300 })[0]).toMatch(/0,6 g\/kg/)
     expect(avisosReparto(80, { protein: 120, fat: 48, carbs: 0 })).toHaveLength(1)
   })

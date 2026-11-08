@@ -16,7 +16,10 @@ Tu objetivo se calcula una vez y se **guarda**; solo cambia si tú lo cambias o 
 mañana»; «Ahora no» la deja en el historial; la última aceptada se deshace). Con dieta pasa lo mismo con la consulta: sus
 propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si las aplicas, y se deshacen.
 Proteína y grasa van por kilo o en gramos fijos (`Reparto`, `macrosObjetivo`); los hidratos, lo que queda. Fuera de lo que
-dicen los documentos (`avisosReparto`) solo se avisa; si algo de fuera los contradice, mandan los documentos.
+dicen los documentos (`avisosReparto`: proteína 1,5–2 g/kg, grasa desde 0,6) solo se avisa; si algo de fuera los contradice,
+mandan los documentos. En volumen, la revisión semanal no sube kcal si tu fuerza en los básicos no baja (`progresas`,
+`fuerzaBasicos`, cargada de Entreno al abrir); la consulta con dieta no sube la proteína al final y sugiere recargas de
+hidratos según cómo estás (guía G1, decisiones del 2026-11-08 en `docs/conocimiento/04-guia-culturismo-natural.md` §14).
 
 ## Dónde está cada cosa
 

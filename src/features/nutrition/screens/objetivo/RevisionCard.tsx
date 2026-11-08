@@ -26,7 +26,9 @@ export function RevisionCard({ onVer }: { onVer: (() => void) | null }) {
   else if (r?.tipo === 'esperar')
     texto = `Dejo 10 días entre cambios para ver su efecto: vuelvo a mirar en ${r.dias} ${r.dias === 1 ? 'día' : 'días'}.`
   else if (r?.tipo === 'pasos')
-    texto = `Bajas más despacio de lo previsto (${pct(r.pct)} por semana). Antes de comer menos: llega a 10.000 pasos al día (ahora, ${formatInt(r.pasos)}). Cámbialo en tus datos cuando lo hagas.`
+    texto = `Bajas más despacio de lo previsto (${pct(r.pct)} por semana). Antes de comer menos, muévete más: llega al menos a 10.000 pasos al día y, si puedes, a 12.000–15.000, repartidos en varios ratos (ahora, ${formatInt(r.pasos)}). Cámbialo en tus datos cuando lo hagas.`
+  else if (r?.tipo === 'progresas')
+    texto = `Subes más despacio de lo previsto (${pct(r.pct)} por semana), pero tu fuerza en los básicos ${r.fuerza > 0 ? 'sube' : 'se mantiene'}: no toco las calorías. Antes de comer más, revisa el descanso y tus medidas.`
   else if (r?.tipo === 'suelo')
     texto = `Ya estás en el mínimo (${formatInt(r.suelo)} kcal): no bajo más. Mejor más pasos o paciencia.`
   return (

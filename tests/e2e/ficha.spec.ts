@@ -16,7 +16,7 @@ test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos
   await expect(page.getByText('Repeticiones de tu plan')).toBeVisible()
   await expect(pauta.getByLabel('Descanso 3:00')).toBeVisible()
 
-  await expect(page.getByRole('region', { name: 'La clave' })).not.toContainText('RIR')
+  await expect(page.getByRole('region', { name: 'La clave' })).toContainText('RIR 2–3')
   const sugerido = page.getByRole('region', { name: 'Peso sugerido' })
   await expect(sugerido).toContainText('↑ Sube')
   await expect(sugerido).toContainText('62,5 kg × 6–10')
@@ -49,7 +49,7 @@ test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos
 test('un ejercicio que no está en tu plan: primera vez, sin descanso ni historial', async ({ page }) => {
   await page.goto('/entreno/ejercicio/press_banca')
   await expect(page.getByRole('region', { name: 'Peso sugerido' })).toContainText(
-    'Primera vez: elige un peso con el que hagas 6–10 reps a 2 del fallo.',
+    'Primera vez: elige un peso con el que hagas 6–10 reps RIR 2.',
   )
   await expect(page.getByText('Aún no has hecho este ejercicio.')).toBeVisible()
   await expect(page.getByRole('region', { name: 'Descanso' })).toHaveCount(0)

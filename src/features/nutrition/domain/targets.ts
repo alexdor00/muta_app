@@ -17,6 +17,7 @@ export const RITMO_DE_SERIE = 0.75
 /** Proteína y grasa por kilo: de serie, la primera de cada lista. */
 export const PROTEINA_G_KG = [1.5, 1.8, 2.2] as const
 export const GRASA_G_KG = [0.6, 0.8, 1.0] as const
+/** Lo mínimo antes de comer menos (01 `steps`); la guía G1 recomienda 12.000–15.000, los que puedas (decisión 2026-11-08). */
 export const PASOS_OBJETIVO = 10_000
 export const KCAL_POR_KG = 7_700
 
@@ -108,9 +109,10 @@ export function macrosObjetivo(kcal: number, pesoKg: number, r: Reparto) {
 
 /**
  * Lo que dicen tus documentos (docs/conocimiento/01-contenido.md y la guía de culturismo natural): proteína ~1,5 g/kg
- * basta, 1,8–2,2 solo muy definido y en déficit fuerte; grasa ~0,6 g/kg como suelo; el resto, a hidratos.
+ * basta y solo sube (hasta ~2 g/kg) si el volumen de comida lo obliga, más baja en definición que en volumen (guía G1,
+ * decisión 2026-11-08); grasa ~0,6 g/kg como suelo; el resto, a hidratos, que tienen prioridad.
  */
-export const RANGO_PROTEINA_G_KG = { min: 1.5, max: 2.2 } as const
+export const RANGO_PROTEINA_G_KG = { min: 1.5, max: 2 } as const
 export const SUELO_GRASA_G_KG = 0.6
 /** Hasta dónde llegan los selectores, en g/kg. */
 export const LIMITES_G_KG = { proteina: { min: 1, max: 3 }, grasa: { min: 0.3, max: 1.5 } } as const
@@ -122,7 +124,9 @@ export function avisosReparto(pesoKg: number, m: { protein: number; fat: number;
   if (p < RANGO_PROTEINA_G_KG.min - 0.005)
     avisos.push('Proteína por debajo de 1,5 g/kg: puede costarte conservar el músculo.')
   if (p > RANGO_PROTEINA_G_KG.max + 0.005)
-    avisos.push('Proteína por encima de 2,2 g/kg: no suma músculo y le quita kcal a los hidratos.')
+    avisos.push(
+      'Proteína por encima de 2 g/kg: solo si el volumen de comida te obliga; si no, le quita sitio a los hidratos.',
+    )
   if (m.fat / pesoKg < SUELO_GRASA_G_KG - 0.005)
     avisos.push('Grasa por debajo de 0,6 g/kg: es el suelo, por tu salud hormonal.')
   if (m.carbs === 0) avisos.push('No te quedan kcal para hidratos: baja la proteína o la grasa.')

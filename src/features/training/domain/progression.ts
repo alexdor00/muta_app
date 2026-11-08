@@ -5,7 +5,7 @@ import { e1rm } from './e1rm.ts'
 import { effortLabel } from './effort.ts'
 import type { Range } from './muscles.ts'
 
-/** Una serie de la última vez; `rir` es lo que quedó al fallo si se apuntó (null si no). */
+/** Una serie de la última vez; `rir` es el RIR apuntado (null si no). */
 export type SerieAnterior = { kg: number | null; reps: number; rir: number | null }
 
 export type Sugerencia = {
@@ -95,7 +95,7 @@ export function suggestFor(
       porque:
         s.reps >= b
           ? `Llegaste a ${s.reps} reps: subes ${subes} kg y vuelves a la parte baja del rango.`
-          : `Te sobraron ${rr} reps antes del fallo (tocaba ${effortLabel(p.rir)}): subes ${subes} kg.`,
+          : `Te sobraron ${rr} reps en reserva (tocaba ${effortLabel(p.rir)}): subes ${subes} kg.`,
     }
   }
   if (s.reps < a) {

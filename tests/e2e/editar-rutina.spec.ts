@@ -78,7 +78,7 @@ test('editar la pauta se guarda sola y se ve en Ver sesión', async ({ page }) =
   await ej.getByRole('button', { name: 'Máximo de reps: más' }).click()
   await ej.getByRole('button', { name: 'Máximo de reps: más' }).click()
   await expect(ej.locator('summary', { hasText: 'Repeticiones' })).toContainText('6–12')
-  await ej.getByRole('button', { name: 'Repeticiones antes del fallo: menos' }).click()
+  await ej.getByRole('button', { name: 'RIR (repeticiones en reserva): menos' }).click()
   await expect(ej.getByText('Termina cada serie cuando aún podrías hacer 1 repetición más.')).toBeVisible()
   for (let i = 0; i < 4; i++) await ej.getByRole('button', { name: 'Descanso entre series: menos' }).click()
   await expect(ej.getByLabel('Descanso entre series', { exact: true })).toHaveText('2:00')
@@ -88,11 +88,11 @@ test('editar la pauta se guarda sola y se ve en Ver sesión', async ({ page }) =
   await page.getByRole('dialog', { name: 'Editar rutina' }).getByRole('button', { name: 'Cerrar' }).click()
   await page.getByRole('link', { name: new RegExp(B1) }).click()
   await expect(page.getByRole('button', { name: /Peso muerto rumano/ })).toContainText(
-    '4 series · 6–12 reps · a 1 del fallo',
+    '4 series · 6–12 reps · RIR 1',
   )
   await page.reload()
   await expect(page.getByRole('button', { name: /Peso muerto rumano/ })).toContainText(
-    '4 series · 6–12 reps · a 1 del fallo',
+    '4 series · 6–12 reps · RIR 1',
   )
 })
 
