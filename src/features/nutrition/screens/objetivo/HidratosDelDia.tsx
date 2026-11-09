@@ -11,12 +11,11 @@ import {
   objetivoDe,
   type Ajustes,
 } from '../../state/comida.ts'
-import h from '../comun/Hojas.module.css'
+import s from './Seccion.module.css'
 
 /**
- * Hidratos según el día (ON/OFF, guía de culturismo natural): con el interruptor, los días que te toca entrenar (los sabe tu
- * rutina) llevan más hidratos y los de descanso menos, con la misma media semanal: tu déficit, volumen o mantenimiento no
- * cambia. `valor`: la diferencia elegida, o null si está apagado.
+ * Hidratos según el día (ON/OFF): con el interruptor, los días que te toca entrenar (los sabe tu rutina) llevan más
+ * hidratos y los de descanso menos, con las mismas kcal en la semana. `valor`: la diferencia elegida, o null si está apagado.
  */
 export function HidratosDelDia({
   a,
@@ -32,9 +31,9 @@ export function HidratosDelDia({
   const dia = (entreno: boolean) =>
     macrosObjetivo(kcalDelDia(sin.kcal, entreno, n, valor ?? 0), a.cuerpo.pesoKg, a)
   return (
-    <section class={h.card} aria-labelledby="hidratos-dia">
-      <div class={h.line}>
-        <h3 id="hidratos-dia" class={h.rowTitle}>
+    <section class={s.card} aria-labelledby="hidratos-dia">
+      <div class={s.cabecera}>
+        <h3 id="hidratos-dia" class={s.eti}>
           Hidratos según el día
         </h3>
         <Switch
@@ -43,36 +42,29 @@ export function HidratosDelDia({
           onChange={(on) => onChange(on ? DIFERENCIA_DE_SERIE : null)}
         />
       </div>
-      <p class={h.rowDetail}>
-        Más hidratos los días que te toca entrenar y menos los de descanso. Tus kcal de la semana son las
-        mismas: tu objetivo no cambia.
-      </p>
+      <p class={s.nota}>Más los días de entreno y menos los de descanso, con las mismas kcal en la semana.</p>
       {valor !== null && (
         <>
           <ChoiceSegmented<string>
             name="diferencia-on-off"
-            legend="Diferencia entre entreno y descanso (10 %, sugerido)"
-            showLegend
-            options={DIFERENCIAS_ON_OFF.map((d) => ({
-              value: String(d),
-              label: `${Math.round(d * 100)} %`,
-            }))}
+            legend="Diferencia entre entreno y descanso"
+            options={DIFERENCIAS_ON_OFF.map((d) => ({ value: String(d), label: `${Math.round(d * 100)} %` }))}
             value={String(valor)}
             onChange={(v) => onChange(Number(v))}
           />
+          <p class={s.nota}>Se recomienda un 10 % de diferencia.</p>
           {n <= 0 || n >= 7 ? (
-            <p class={h.rowDetail}>
-              Esta semana no hay días de entreno y de descanso a la vez: todos los días comes igual.
-            </p>
+            <p class={s.nota}>Esta semana todos los días son iguales: comes lo mismo cada día.</p>
           ) : (
-            [true, false].map((entreno) => (
-              <div key={String(entreno)} class={h.line}>
-                <span>{entreno ? `Entreno · ${n} días` : `Descanso · ${7 - n} días`}</span>
-                <b>
-                  {formatInt(dia(entreno).kcal)} kcal · {formatInt(dia(entreno).carbs)} g hidratos
-                </b>
-              </div>
-            ))
+            <ul class={s.cajas}>
+              {[true, false].map((entreno) => (
+                <li key={String(entreno)}>
+                  {entreno ? `Entreno · ${n} días` : `Descanso · ${7 - n} días`}
+                  <b>{formatInt(dia(entreno).kcal)} kcal</b>
+                  {formatInt(dia(entreno).carbs)} g de hidratos
+                </li>
+              ))}
+            </ul>
           )}
         </>
       )}

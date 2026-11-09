@@ -9,6 +9,7 @@ import {
   type Reparto,
 } from '../../state/comida.ts'
 import h from '../comun/Hojas.module.css'
+import sec from './Seccion.module.css'
 
 /** Lo que estás eligiendo: proteína y grasa en g por kilo (modo «kg») o en gramos (modo «g»). */
 export type Borrador = { modo: 'kg' | 'g'; proteina: number; grasa: number }
@@ -84,7 +85,7 @@ export function RepartoMacros({
     const poner = (x: number) =>
       onChange({ ...valor, [cual]: entre(enKg ? unDecimal(x) : Math.round(x), min, max) })
     return (
-      <div class={h.line}>
+      <div class={`${h.line} ${sec.fila}`}>
         <span>
           {nombre}
           <span class={h.rowDetail}>
@@ -115,8 +116,8 @@ export function RepartoMacros({
     )
   }
   return (
-    <section class={h.card} aria-labelledby="reparto-titulo">
-      <h3 id="reparto-titulo" class={h.rowTitle}>
+    <section class={sec.card} aria-labelledby="reparto-titulo">
+      <h3 id="reparto-titulo" class={sec.eti}>
         Proteína y grasa
       </h3>
       <ChoiceSegmented<Borrador['modo']>
@@ -128,14 +129,13 @@ export function RepartoMacros({
       />
       {fila('proteina', 'Proteína', m.protein)}
       {fila('grasa', 'Grasa', m.fat)}
-      <div class={h.line}>
+      <div class={`${h.line} ${sec.fila}`}>
         <span>Hidratos: lo que queda</span>
         <b>{formatInt(m.carbs)} g</b>
       </div>
-      <p class={h.rowDetail}>
-        Tus documentos: proteína suficiente, no excesiva; con 1,5 g/kg basta y solo se sube (hasta ~2 g/kg) si
-        el volumen de comida te obliga. En definición, más baja que en volumen. Grasa, al menos 0,6 g/kg. El
-        resto, a hidratos, que son los que te dejan entrenar fuerte.
+      <p class={sec.nota}>
+        Se recomienda proteína 1,5–2 g/kg (algo menos en definición), grasa desde 0,6 g/kg y el resto en
+        hidratos.
       </p>
       {avisos.map((x) => (
         <p key={x} class={h.warn} role="status">

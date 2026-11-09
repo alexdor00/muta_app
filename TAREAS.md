@@ -29,6 +29,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-09 (rama `pantalla/recetas`): «Tu objetivo» más bonito y cohesionado (secciones con título pequeño, nota corta y
+  cajitas); las recomendaciones como «Se recomienda…» sin citar documentos (regla en `docs/rediseno.md`).
+
 - 2026-11-09 (rama `pantalla/recetas`): hidratos según el día (ON/OFF) con un interruptor en Tu objetivo: más los días
   de entreno de tu rutina y menos los de descanso, misma media semanal; Tu día dice cuántos gramos cambia.
 

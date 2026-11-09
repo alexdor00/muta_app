@@ -1,0 +1,61 @@
+/* Las secciones de la hoja «Tu objetivo» (proteína y grasa, hidratos según el día): como la tarjeta del objetivo, gris con
+   título pequeño en mayúsculas, una nota corta y los datos en cajitas blancas. */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.eti {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nota {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.cajas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cajas li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.cajas b {
+  font: var(--text-headline);
+  color: var(--label);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Una fila con su control (proteína y grasa): letra de subtítulo, no de cuerpo */
+.fila {
+  font: var(--text-subhead);
+}

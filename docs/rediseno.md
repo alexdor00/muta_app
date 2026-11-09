@@ -12,6 +12,10 @@ pestañas para las cuatro áreas, pila para detalles, hojas para tareas cortas, 
 respuesta inmediata (imagen, sonido, vibración) · pensada para el gimnasio (acciones abajo, botones de 52 px, números ≥ 28 px, pantalla encendida) ·
 «Deshacer» mejor que preguntar · accesible (rem, etiquetas, contraste 4,5:1, reducir movimiento) · privada (sin cuenta; copia en un archivo).
 
+**Cómo se escriben las recomendaciones en la app** (decisión del usuario, 2026-11-09): cortas, en una o dos líneas, y como
+regla: «Se recomienda…». Nunca citan de dónde salen («tus documentos», «la guía», un estudio): eso va en `docs/`, no en
+pantalla. Letra pequeña (pie o subtítulo) y, si hay cifras, en cajitas como el resto de la app.
+
 ## Sistema de diseño (todo sale de `tokens.css`)
 
 - **Color** (claro/oscuro): `--bg` #FFF/#000 · `--surface` #F4F4F5/#1C1C1E · `--surface-2` #E9E9EB/#2C2C2E · `--surface-3` #DCDCDF/#3A3A3C · `--label` #111113/#F2F2F7 ·
