@@ -692,3 +692,10 @@ Decidido por el usuario:
   como mucho una cada 3 semanas. Se propone en Tu día y en la revisión («Empezar» / «Ahora no»: no vuelve en 7 días).
   Con el check diario de Hoy se sumará la energía.
 - **Hidratos según el día**: se queda 10 · 15 · 20 %.
+
+## 2026-11-09 · Los Word de docs/ no se suben
+
+`docs/MUTA-instrucciones-periodicas.docx` (tu guía de prompts) y su temporal de Word se colaron en git en `723bfc1` al
+añadir la carpeta `docs` entera. Salen del repositorio (se quedan en tu ordenador) y `.gitignore` ignora `docs/*.docx` y
+`~$*`. Siguen en el historial de la rama `pantalla/recetas` en GitHub: quitarlos de ahí exige reescribir el historial
+(pendiente de que el usuario lo decida).

@@ -4,10 +4,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- **Guía de culturismo natural**: los 23 choques ya están decididos ([04](docs/conocimiento/04-guia-culturismo-natural.md) §14). Falta
-  la frecuencia por persona (ciclos de 9 o 14 días) y Hoy y
-  Progreso (check diario, perímetros). El «efecto rebote» no se aplica (decisión 2026-11-09). Plan completo en
-  `Desktop/MUTA-guia-aplicacion.docx`.
+- **Siguiente: aprobar dos propuestas** (PNG en el escritorio): `MUTA-Hoy-propuesta.png` (Hoy solo con lo de hoy, el
+  «¿Cómo estás hoy?» y pasos) y `MUTA-Frecuencia-propuesta.png` (tu ciclo de 7, 9 o 14 días en Editar rutina). Con su visto
+  bueno, rama `pantalla/hoy` y después la frecuencia. Lo que falta de la guía está en
+  [04](docs/conocimiento/04-guia-culturismo-natural.md) §14 (Hoy y Progreso: check diario y perímetros).
 - **Probar Recetas y Menú en un móvil real** (rama `pantalla/recetas`, sale de `pantalla/comida-v2`) con `npm run dev`:
   el recetario con sus fotos, ajustar un plato a lo que falta (y cuando no llega), cuadrar el día, tu producto, tu menú,
   cuándo cocinar, lo de hoy, la compra del menú, los avisos al calendario (.ics) y tu nutricionista. Después, PR a `main`
@@ -26,6 +26,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
 ## Hecho
+
+- 2026-11-09 (rama `pantalla/recetas`): cierre: los Word de `docs/` salen de git (se habían colado en `723bfc1`) y se
+  ignoran (`docs/*.docx`, `~$*`).
 
 - 2026-11-09 (rama `pantalla/recetas`): dietas también desde CSV; aviso de congelar lo cocinado a partir del 4.º día;
   la definición no aprieta desde la semana 9; recarga de hidratos propuesta por tu rendimiento (una vuelta de tu rutina a

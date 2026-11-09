@@ -26,3 +26,7 @@ Thumbs.db
 # Programas de entrenamiento de terceros: solo en local, nunca en el repositorio público
 private/
 .lighthouseci/
+
+# Documentos de Word tuyos y sus temporales (no se suben)
+docs/*.docx
+~$*
