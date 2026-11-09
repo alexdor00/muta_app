@@ -115,13 +115,7 @@ export function WorkoutKeypad({
         >
           <div class={styles.restText}>
             <b>{descanso.tiempo}</b>
-            <small>
-              {descanso.quedan <= 0
-                ? '¡A por ella!'
-                : descanso.quedan <= 15
-                  ? 'Prepárate: a por tu registro'
-                  : 'Descanso entre series'}
-            </small>
+            <small>{descanso.quedan <= 0 ? '¡A por ella!' : 'Descanso entre series'}</small>
           </div>
           <button type="button" class={styles.restSkip} onClick={descanso.onSaltar}>
             Omitir

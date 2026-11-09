@@ -582,3 +582,25 @@ Pedido por el usuario («hazme absolutamente todo esto»), con su frase: casi to
 - **RIR progresivo**: las primeras series con uno de margen más y la última al RIR de la rutina; cada semana del bloque,
   una serie más al objetivo. Es lo que sale en gris: la rutina sigue mandando.
 - Entreno lee tu fase de Nutrición (solo la lee) para el aviso de técnicas en definición y el tono del entrenador.
+
+## 2026-11-09 · Las reglas del entrenador (cuestionario)
+
+El usuario pidió mirarlo mejor y lo decidió con un cuestionario. Todo son sugerencias («Aplicar / Ahora no»).
+
+1. **«Casi todas»**: los documentos no dan cifra; el ejemplo de la guía (§5: mejorar en 4 de 5 series indica volumen
+   corto) encaja con el 80 %. Se queda en 80 %, marcado «sugerido». El texto: «toca subir volumen».
+2. **Cada semana** (la guía: «paso a paso cada semana»): los últimos 7 días, y las dos semanas de antes para ver si algo se
+   repite.
+3. **Mejorar = doble progresión**: llegar al máximo del rango de repeticiones con el mismo peso o más, o haber subido el
+   peso sin bajar del mínimo del rango. Ir peor = baja el 1RM estimado (sin contar subir el peso dentro del rango).
+4. **Recuperas = las series no bajan**: con el 10 % o más yendo peor, no se sube.
+5. **Subir**: +1 serie en el ejercicio con menos series; no todos a la vez (como mucho 2 músculos por semana, sugerido),
+   primero los de Prioridad; los de Mantener no suben, y «No me interesa» pasa el músculo a Mantener.
+6. **Ir peor** (≥ 10 %): aviso (sueño, estrés, comida); si se repite la semana siguiente, −1 serie (nunca por debajo de 2).
+7. **Estancado**: 1.ª semana, sueño, comida y estrés (en volumen, un poco más de kcal, mejor los días de entreno); 2.ª, el
+   RIR; 3.ª, +1 serie. Nunca cambiar de ejercicio.
+8. **Un cambio por músculo** y una semana de espera para ver su efecto.
+9. **Definición**: subir igual que en volumen; el estancamiento solo da un aviso suave (mantener ya vale).
+10. Todos los músculos con al menos 4 series que comparar (los de Mantener, solo si van peor).
+
+Se quita el aviso «Prepárate» a 15 s del final del descanso (no lo quiere el usuario).

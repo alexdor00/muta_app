@@ -29,7 +29,7 @@ import {
 } from '../../state/plan.ts'
 import { MUSCLES, type MuscleId } from '../../state/routines.ts'
 import { consejosEntrenador } from '../../state/entrenador.ts'
-import { aplicarConsejo, cargarEntrenador, dejarConsejo } from '../../use-cases/entrenador.ts'
+import { aplicarConsejo, cargarEntrenador, dejarConsejo, noMeInteresa } from '../../use-cases/entrenador.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
 import styles from './TuPlanScreen.module.css'
@@ -123,6 +123,7 @@ function TuPlan({ siguiente }: { siguiente: number }) {
           consejos={consejosEntrenador.value}
           onAplicar={(c) => void aplicarConsejo(c)}
           onDejar={(c) => void dejarConsejo(c)}
+          onNoMeInteresa={(c) => void noMeInteresa(c)}
         />
         <MusclesCard
           periodo={periodo}

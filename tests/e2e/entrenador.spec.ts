@@ -12,8 +12,8 @@ test('casi todas las series mejoran: puedes subir volumen, y «Aplicar» suma un
   const tarjeta = page.getByRole('region', { name: 'Tu entrenador' })
   await expect(tarjeta).toBeVisible()
   const femoral = tarjeta.getByRole('listitem').filter({ hasText: 'Femoral' })
-  await expect(femoral).toContainText('mejoras en 5 de 5 series')
-  await expect(femoral).toContainText('puedes subir volumen')
+  await expect(femoral).toContainText('mejoras en 4 de 5 series')
+  await expect(femoral).toContainText('toca subir volumen')
   const aplicar = femoral.getByRole('button', { name: /^Aplicar/ })
   await expect(aplicar).toHaveText('Aplicar: 2 → 3 series')
   await aplicar.click()
@@ -41,6 +41,23 @@ test('«Ahora no» lo quita hasta la semana que viene', async ({ page }) => {
   await expect(biceps).toHaveCount(0)
   await page.reload()
   await expect(page.getByRole('region', { name: 'Tu entrenador' }).getByText(/Bíceps/)).toHaveCount(0)
+})
+
+test('«No me interesa» pasa el músculo a Mantener y deja de proponerle subir', async ({ page }) => {
+  await prepararPlan(page, ENTRENOS_MEJORANDO)
+  await page.goto('/entreno')
+  const tarjeta = page.getByRole('region', { name: 'Tu entrenador' })
+  const femoral = tarjeta.getByRole('listitem').filter({ hasText: 'Femoral' })
+  await femoral.getByRole('button', { name: 'No me interesa' }).click()
+  await expect(femoral).toHaveCount(0)
+  await page.goto('/entreno/ejercicio/peso_muerto_rumano')
+  await page
+    .getByRole('region', { name: 'Músculos que trabaja' })
+    .getByRole('button', { name: 'Femoral' })
+    .click()
+  await expect(
+    page.getByRole('dialog', { name: 'Femoral' }).getByRole('button', { name: /^Mantener/ }),
+  ).toHaveAttribute('aria-pressed', 'true')
 })
 
 test('sin entrenos en los últimos 7 días no sale el entrenador', async ({ page }) => {

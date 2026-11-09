@@ -8,19 +8,23 @@ type Consejo = {
   detalle: string
   mejora: { mejoran: number; comparables: number }
   propuesta: { de: number; a: number } | null
+  noMeInteresa: boolean
 }
 
 type Props<T extends Consejo> = {
   consejos: T[]
   onAplicar: (c: T) => void
   onDejar: (c: T) => void
+  /** «No me interesa»: ese músculo pasa a Mantener. */
+  onNoMeInteresa: (c: T) => void
 }
 
 /**
  * «Tu entrenador» en Tu plan: cada músculo con su % de series que mejoran esta semana y lo que toca según la guía. Con
- * propuesta (+1 serie), «Aplicar» y «Ahora no»; sin ella, «Entendido». Nada cambia hasta que lo aplicas.
+ * propuesta (una serie más o menos), «Aplicar» y «Ahora no» (y, si propone subir, «No me interesa», que lo pasa a Mantener);
+ * sin ella, «Entendido». Todo son sugerencias: nada cambia hasta que lo aplicas.
  */
-export function CoachCard<T extends Consejo>({ consejos, onAplicar, onDejar }: Props<T>) {
+export function CoachCard<T extends Consejo>({ consejos, onAplicar, onDejar, onNoMeInteresa }: Props<T>) {
   if (!consejos.length) return null
   return (
     <section class={styles.card} aria-labelledby="entrenador">
@@ -47,6 +51,11 @@ export function CoachCard<T extends Consejo>({ consejos, onAplicar, onDejar }: P
                   <button type="button" class={styles.later} onClick={() => onDejar(c)}>
                     Ahora no
                   </button>
+                  {c.noMeInteresa && (
+                    <button type="button" class={styles.later} onClick={() => onNoMeInteresa(c)}>
+                      No me interesa
+                    </button>
+                  )}
                 </>
               ) : (
                 <button type="button" class={styles.later} onClick={() => onDejar(c)}>
@@ -58,8 +67,9 @@ export function CoachCard<T extends Consejo>({ consejos, onAplicar, onDejar }: P
         ))}
       </ul>
       <p class={styles.foot}>
-        Series que mejoran la misma serie de la vez anterior, en los últimos 7 días. «Casi todas»: desde el 80
-        % (sugerido).
+        Cada serie frente a la misma de la vez anterior, en los últimos 7 días: mejora si llegas al máximo del
+        rango o subes el peso. Toca subir volumen desde el 80 % (sugerido) y sin ir peor en ninguna; como
+        mucho 2 músculos por semana.
       </p>
     </section>
   )

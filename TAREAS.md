@@ -29,9 +29,12 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-09 (rama `pantalla/recetas`): reglas del entrenador decididas con un cuestionario (doble progresión, 80 %
+  sugerido, recuperar = no ir peor en el 10 %, 2 músculos por semana, Mantener no sube, «No me interesa», estancado por
+  pasos) y se quita «Prepárate» del descanso.
+
 - 2026-11-09 (rama `pantalla/recetas`): la guía en Entreno: «Tu entrenador» en Tu plan (% de series que mejoras y
-  +1 serie con «Aplicar»), RIR progresivo por serie, «Fallo» en el teclado, RIR guardado en cada serie, «Prepárate» en
-  el descanso, aviso de técnicas en definición, orden de pierna, revisar la técnica antes de cambiar y 14 consejos nuevos.
+  +1 serie con «Aplicar»), RIR progresivo por serie, «Fallo» en el teclado, RIR guardado en cada serie, aviso de técnicas en definición, orden de pierna, revisar la técnica antes de cambiar y 14 consejos nuevos.
 
 - 2026-11-08 (rama `pantalla/recetas`): guía de culturismo natural completa en el conocimiento y, en la app, lo
   decidido: esfuerzo siempre en RIR, proteína hasta ~2 g/kg, la consulta ya no sube la proteína al final y sugiere
