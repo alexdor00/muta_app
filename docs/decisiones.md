@@ -604,3 +604,21 @@ El usuario pidió mirarlo mejor y lo decidió con un cuestionario. Todo son suge
 10. Todos los músculos con al menos 4 series que comparar (los de Mantener, solo si van peor).
 
 Se quita el aviso «Prepárate» a 15 s del final del descanso (no lo quiere el usuario).
+
+## 2026-11-09 · El entrenador sigue el paso a paso de la guía (segundo cuestionario)
+
+Sustituye en lo que cambia a «Las reglas del entrenador (cuestionario)». Comprobado en la guía (p. 11): «es mejor 10 series
+manteniendo en 8–9 y progresando en 1–2 que 5 progresando en 4» y «progresar en el 100 % suele indicar volumen bajo».
+
+1. **Mejorar = más kilos o más repeticiones** que la misma serie de la vez anterior (guía: «carga o repeticiones»), y
+   solo se propone subir tras **3 semanas seguidas** mejorando en casi todas (el usuario dijo 3–4: se usan 3).
+2. **Paso 1 de la guía**: un ejercicio solo cuenta si tiene el RIR apuntado en todas sus series, a ±1 del de la rutina.
+3. **Subir**: lo puedes hacer tú con cualquier músculo; el entrenador solo lo recomienda en los que progresan, **un músculo
+   por semana y una serie**, y como mucho **+2 series por músculo** en total.
+4. **+1 serie**; si no cabe, añadir un ejercicio en otra sesión a **48 h o más** de las que ya trabajan ese músculo y sin
+   pisar los músculos de ese día (solo texto).
+5. **Estancado**: sueño, comida y estrés → el RIR → un poco menos de intensidad (RIR +1) → −1 serie.
+6. **Las kcal no las toca el entrenador**: van en la revisión de peso de Nutrición, que ya no las sube si progresas en tus
+   básicos.
+7. «Tras una definición, no priorizar» queda pendiente: el usuario no lo tenía claro.
+8. Ir peor: aviso y, si se repite, −1 serie (igual). 9. «Casi todas» = 80 % (igual). 10. Definición: igual.

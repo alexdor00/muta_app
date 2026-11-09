@@ -36,13 +36,14 @@ cargan `use-cases/forComida.ts` en diferido, así Comida no descarga Entreno has
 - `progression.ts` — **el motor**: doble progresión con RIR (`suggestFor`, la tabla de `docs/conocimiento/02-reglas.md`, sin descarga);
   `exerciseProgress.ts` — máximo y volumen de cada vez; `exerciseLibrary.ts` — la biblioteca: forma, búsqueda y comprobación.
 - `adaptVolume.ts` — ajuste de volumen para el coach (no se usa al elegir: las rutinas se enseñan tal cual).
-- `coach/revision.ts` — **Tu entrenador** (reglas del usuario, 2026-11-09, en `docs/decisiones.md`): cada semana, por músculo,
-  cada serie frente a la vez anterior con doble progresión (`compararSerie`: máximo del rango o más peso sin bajar del mínimo);
-  `lecturaMejora`: ≥ 10 % peor → aviso y, si se repite, −1 serie; ≥ 80 % mejora (sugerido) → toca subir, +1 serie, como mucho
-  2 músculos (Prioridad primero; Mantener no sube; «No me interesa» lo pasa a Mantener); estancado → sueño y comida (kcal en
-  volumen), luego RIR, luego +1 serie (en definición, solo aviso). Tras aplicar, una semana de espera. Estado en
-  `state/entrenador.ts` (tres semanas de 7 días y los rangos del plan), acciones en `use-cases/entrenador.ts`, tarjeta
-  `CoachCard` en Tu plan.
+- `coach/revision.ts` — **Tu entrenador** (reglas del usuario con dos cuestionarios, 2026-11-09, en `docs/decisiones.md`):
+  cada semana, por músculo, cada serie frente a la vez anterior (`compararSerie`: más kilos o más repeticiones); solo
+  cuentan los ejercicios con el RIR apuntado a ±1 del de la rutina (`esfuerzoEstandar`). ≥ 10 % peor → aviso y, si se repite,
+  −1 serie; ≥ 80 % mejora (sugerido) 3 semanas seguidas → +1 serie en un solo músculo por semana (Prioridad primero; Mantener
+  no sube; como mucho +2 por músculo; «No me interesa» lo pasa a Mantener); estancado → sueño y comida → RIR → RIR +1
+  (`propuestaDeIntensidad`) → −1 serie (en definición, solo aviso). Tras aplicar, una semana de espera. Las kcal no las toca:
+  van en la revisión de peso de Nutrición. Estado en `state/entrenador.ts` (cuatro semanas, las pautas del plan y las marcas
+  `aplicado`/`subida`), acciones en `use-cases/entrenador.ts`, tarjeta `CoachCard` en Tu plan.
 - La sesión según la guía: RIR progresivo por serie (`effort.ts · rirProgresivo`, guardado en `rirSerie` al empezar con
   la semana del bloque), «Fallo» en el teclado (casilla RIR = «F»; se guarda `rir` y `fallo` en cada serie con
   `esfuerzoApuntado`), aviso de técnicas en definición

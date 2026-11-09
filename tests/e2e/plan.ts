@@ -4,7 +4,7 @@ import { test as base, expect, type Page } from '@playwright/test'
 // siguiente sesión B1 y un historial de prueba escrito a mano (no viene de nadie). B1 se hizo hace 7, 14 y 21 días;
 // la última vez, con los números del diseño (peso muerto rumano 60 × 10, 62,5 × 6, 60 × 7).
 
-type Serie = { kg: number | null; reps: number }
+type Serie = { kg: number | null; reps: number; rir?: number }
 type Ejercicio = { nombre: string; musculo: string; puesto: number; series: Serie[] }
 
 const s = (kg: number, ...reps: number[]): Serie[] => reps.map((r) => ({ kg, reps: r }))
@@ -76,12 +76,19 @@ export const ENTRENOS = [
   entreno(7, 'B1', 'Isquios, glúteo y pecho', B1),
 ]
 
+/** Con el RIR apuntado en cada serie (a ±1 del de la rutina: así cuentan para el entrenador). */
+const conRir = (ejercicios: Ejercicio[], rir = 1): Ejercicio[] =>
+  ejercicios.map((e) => ({ ...e, series: e.series.map((x) => ({ ...x, rir })) }))
+
 /**
- * B1 hace 10 días y otra vez hace 3 con 2,5 kg más en todo: esta semana mejoras en todas las series (para el entrenador).
+ * B1 cada semana durante 4 semanas, con 2,5 kg más cada vez y el RIR apuntado: 3 semanas seguidas mejorando en casi todas
+ * (para el entrenador).
  */
 export const ENTRENOS_MEJORANDO = [
-  entreno(10, 'B1', 'Isquios, glúteo y pecho', antes(2.5, 1)),
-  entreno(3, 'B1', 'Isquios, glúteo y pecho', B1),
+  entreno(24, 'B1', 'Isquios, glúteo y pecho', conRir(antes(7.5, 1))),
+  entreno(17, 'B1', 'Isquios, glúteo y pecho', conRir(antes(5, 1))),
+  entreno(10, 'B1', 'Isquios, glúteo y pecho', conRir(antes(2.5, 1))),
+  entreno(3, 'B1', 'Isquios, glúteo y pecho', conRir(B1)),
 ]
 
 /** Guarda el perfil, el plan, la rotación (toca B1) y los entrenos, y deja la app en Tu plan sin nada en memoria. */

@@ -7,9 +7,10 @@ import {
   mejoraPorMusculo,
   revisionEntrenador,
   type ConsejoEntrenador,
+  type Pauta,
   type Semanas,
 } from '../domain/coach/revision.ts'
-import type { MuscleId, Range } from '../domain/muscles.ts'
+import type { MuscleId } from '../domain/muscles.ts'
 import { rangoDe } from '../domain/workoutPlan.ts'
 import { faseActual } from './fase.ts'
 import { elecciones } from './musculos.ts'
@@ -18,8 +19,9 @@ import { entrenos, tuPlan } from './plan.ts'
 export type { ConsejoEntrenador } from '../domain/coach/revision.ts'
 
 /**
- * Lo ya visto: `músculo|lunes|lectura` (aplicado o «Ahora no») y `músculo|lunes|aplicado` (para esperar una semana a ver
- * el efecto). Se guarda en `userContent` (use-cases/entrenador.ts).
+ * Lo ya visto: `músculo|lunes|lectura` (aplicado o «Ahora no»), `músculo|lunes|aplicado` (para esperar una semana a ver
+ * el efecto) y `músculo|lunes|subida` (cada serie que el entrenador le sumó). Se guarda en `userContent`
+ * (use-cases/entrenador.ts).
  */
 export const vistosEntrenador = signal<string[]>([])
 
@@ -27,34 +29,39 @@ export const vistosEntrenador = signal<string[]>([])
 export const marcaDe = (c: Pick<ConsejoEntrenador, 'musculo' | 'lectura'>, hoy = localDate()) =>
   `${c.musculo}|${lunesDe(hoy)}|${c.lectura}`
 export const marcaAplicado = (musculo: MuscleId, hoy = localDate()) => `${musculo}|${lunesDe(hoy)}|aplicado`
+export const marcaSubida = (musculo: MuscleId, hoy = localDate()) => `${musculo}|${lunesDe(hoy)}|subida`
 
 export const consejosEntrenador = computed<ConsejoEntrenador[]>(() => {
   const plan = tuPlan.value
   if (plan.status !== 'ready') return []
   const hoy = localDate()
-  const rangos: Record<string, Range> = {}
+  const pautas: Record<string, Pauta> = {}
   for (const s of plan.semana)
-    for (const e of s.ejercicios) {
-      const r = rangoDe(e.reps)
-      if (r) rangos[e.nombre] = r
-    }
-  // Tres semanas de 7 días hacia atrás: la de ahora, la anterior y la de antes
+    for (const e of s.ejercicios) pautas[e.nombre] = { rango: rangoDe(e.reps), rir: e.rir }
+  // Cuatro semanas de 7 días hacia atrás: la de ahora primero
   const semana = (n: number) =>
-    mejoraPorMusculo(entrenos.value, addDays(hoy, -7 * n - 6), addDays(hoy, -7 * n), rangos)
-  const [s0, s1, s2] = [semana(0), semana(1), semana(2)]
+    mejoraPorMusculo(entrenos.value, addDays(hoy, -7 * n - 6), addDays(hoy, -7 * n), pautas)
+  const [s0, s1, s2, s3] = [semana(0), semana(1), semana(2), semana(3)]
   const semanas: Partial<Record<MuscleId, Semanas>> = {}
-  for (const m of Object.keys(s0) as MuscleId[]) semanas[m] = [s0[m], s1[m], s2[m]]
+  for (const m of Object.keys(s0) as MuscleId[]) semanas[m] = [s0[m], s1[m], s2[m], s3[m]]
   const vistos = new Set(vistosEntrenador.value)
   const pasada = addDays(hoy, -7)
   const aplicadoHace = new Set(
     (Object.keys(s0) as MuscleId[]).filter((m) => vistos.has(marcaAplicado(m, pasada))),
   )
+  const subidas: Partial<Record<MuscleId, number>> = {}
+  for (const v of vistosEntrenador.value)
+    if (v.endsWith('|subida')) {
+      const m = v.split('|')[0] as MuscleId
+      subidas[m] = (subidas[m] ?? 0) + 1
+    }
   const modos = Object.fromEntries(Object.entries(elecciones.value).map(([m, e]) => [m, e?.modo]))
   return revisionEntrenador({
     semanas,
     semana: plan.semana,
-    fase: faseActual.value === 'cut' ? 'definicion' : faseActual.value === 'bulk' ? 'volumen' : 'otra',
+    definicion: faseActual.value === 'cut',
     modos,
     aplicadoHace,
+    subidas,
   }).filter((c) => !vistos.has(marcaDe(c, hoy)))
 })

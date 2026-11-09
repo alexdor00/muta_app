@@ -7,7 +7,7 @@ type Consejo = {
   titulo: string
   detalle: string
   mejora: { mejoran: number; comparables: number }
-  propuesta: { de: number; a: number } | null
+  propuesta: { campo: 'series' | 'rir'; de: number; a: number } | null
   noMeInteresa: boolean
 }
 
@@ -46,7 +46,9 @@ export function CoachCard<T extends Consejo>({ consejos, onAplicar, onDejar, onN
               {c.propuesta ? (
                 <>
                   <button type="button" class={styles.apply} onClick={() => onAplicar(c)}>
-                    Aplicar: {c.propuesta.de} → {c.propuesta.a} series
+                    {c.propuesta.campo === 'rir'
+                      ? `Aplicar: RIR ${c.propuesta.de} → ${c.propuesta.a}`
+                      : `Aplicar: ${c.propuesta.de} → ${c.propuesta.a} series`}
                   </button>
                   <button type="button" class={styles.later} onClick={() => onDejar(c)}>
                     Ahora no

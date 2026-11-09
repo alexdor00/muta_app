@@ -1,7 +1,13 @@
 import { getDb } from '../../../shared/data/db.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import { cambiarPauta } from '../domain/routineEdit.ts'
-import { marcaAplicado, marcaDe, vistosEntrenador, type ConsejoEntrenador } from '../state/entrenador.ts'
+import {
+  marcaAplicado,
+  marcaDe,
+  marcaSubida,
+  vistosEntrenador,
+  type ConsejoEntrenador,
+} from '../state/entrenador.ts'
 import { elegirModo } from '../state/musculos.ts'
 import { editarSesion } from './training.ts'
 
@@ -35,8 +41,9 @@ async function marcar(...marcas: string[]): Promise<void> {
  */
 export async function aplicarConsejo(c: ConsejoEntrenador): Promise<void> {
   const p = c.propuesta
-  if (p) await editarSesion(p.sigla, (ed) => cambiarPauta(ed, p.clave, { series: p.a }))
-  await marcar(marcaDe(c), marcaAplicado(c.musculo))
+  if (p) await editarSesion(p.sigla, (ed) => cambiarPauta(ed, p.clave, { [p.campo]: p.a }))
+  const subida = p?.campo === 'series' && p.a > p.de ? [marcaSubida(c.musculo)] : []
+  await marcar(marcaDe(c), marcaAplicado(c.musculo), ...subida)
 }
 
 /** «No me interesa»: ese músculo pasa a Mantener (como en su ficha) y no se le propone subir. */
