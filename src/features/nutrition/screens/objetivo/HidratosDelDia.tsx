@@ -51,11 +51,11 @@ export function HidratosDelDia({
         <>
           <ChoiceSegmented<string>
             name="diferencia-on-off"
-            legend="Diferencia entre un día de entreno y uno de descanso"
+            legend="Diferencia entre entreno y descanso (10 %, sugerido)"
             showLegend
             options={DIFERENCIAS_ON_OFF.map((d) => ({
               value: String(d),
-              label: `${Math.round(d * 100)} %${d === DIFERENCIA_DE_SERIE ? ' (sugerido)' : ''}`,
+              label: `${Math.round(d * 100)} %`,
             }))}
             value={String(valor)}
             onChange={(v) => onChange(Number(v))}
@@ -67,7 +67,7 @@ export function HidratosDelDia({
           ) : (
             [true, false].map((entreno) => (
               <div key={String(entreno)} class={h.line}>
-                <span>{entreno ? `Días de entreno (${n})` : `Días de descanso (${7 - n})`}</span>
+                <span>{entreno ? `Entreno · ${n} días` : `Descanso · ${7 - n} días`}</span>
                 <b>
                   {formatInt(dia(entreno).kcal)} kcal · {formatInt(dia(entreno).carbs)} g hidratos
                 </b>
