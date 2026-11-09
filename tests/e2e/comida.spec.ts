@@ -184,6 +184,40 @@ test('hidratos según el día: con el interruptor, más los días de entreno y m
   await expect(page.getByText(/^Día de (entreno|descanso): [+−]\d+ g de hidratos/)).toBeVisible()
 })
 
+test('tu situación (tras un parón) en mantenimiento y velocidad por fases en definición', async ({
+  page,
+}) => {
+  await abrirBase(page)
+  await page.goto('/comida')
+  await page.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  const datos = page.getByRole('dialog', { name: 'Tus datos' })
+  await datos.getByText('Hombre').click()
+  await datos.getByLabel('Edad').fill('30')
+  await datos.getByLabel('Altura (cm)').fill('180')
+  await datos.getByLabel('Peso (kg)').fill('80')
+  await datos.getByLabel('Pasos al día').fill('9.000')
+  await datos.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  await page.getByRole('link', { name: 'Tu plan' }).first().click()
+  await page.getByRole('button', { name: 'Editar' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Tu objetivo' })
+  const situacion = hoja.getByRole('region', { name: 'Tu situación' })
+  await situacion.getByText('Tras parón').click()
+  await expect(situacion).toContainText('+200 kcal en hidratos')
+  await hoja.getByRole('button', { name: 'Guardar y recalcular' }).click()
+  await expect(hoja).toHaveCount(0)
+  await page.getByRole('button', { name: 'Editar' }).click()
+  await expect(situacion.getByRole('radio', { name: 'Tras parón' })).toBeChecked()
+  // En definición sale la velocidad por fases (y no la situación)
+  await hoja.getByRole('group', { name: '¿Qué quieres?' }).getByText('Definir').click()
+  await expect(situacion).toHaveCount(0)
+  const fases = hoja.getByRole('region', { name: 'Velocidad por fases' })
+  await fases.getByRole('switch', { name: 'Velocidad por fases' }).click()
+  await expect(fases).toContainText('Semanas 1–4')
+  await expect(fases).toContainText('−1 %')
+  await hoja.getByRole('button', { name: 'Guardar y recalcular' }).click()
+  await expect(hoja).toHaveCount(0)
+})
+
 test('después de la bienvenida, tus datos preguntan qué quieres (viene marcado lo de la bienvenida)', async ({
   page,
 }) => {

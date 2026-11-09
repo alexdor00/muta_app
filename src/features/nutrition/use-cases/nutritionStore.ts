@@ -111,7 +111,7 @@ export function cargarComida(): Promise<void> {
 
 /** En volumen, tu fuerza en los básicos: la revisión la mira antes de proponer más kcal (guía G1 §6). */
 async function cargarFuerza(): Promise<void> {
-  if (ajustes.value?.fase !== 'volumen') return
+  if (ajustes.value?.fase !== 'volumen' && ajustes.value?.fase !== 'definicion') return
   try {
     fuerzaBasicos.value = (await fuerzaEnBasicos(hoy.value))?.cambio ?? null
   } catch (error) {

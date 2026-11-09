@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { addDays } from '../../../shared/lib/format.ts'
-import { revisar, ritmoPrevisto, tituloCambio, type DatosRevision } from './review.ts'
+import { consejosDeLaSemana, revisar, ritmoPrevisto, tituloCambio, type DatosRevision } from './review.ts'
 
 const HOY = '2026-11-05'
 
@@ -101,5 +101,45 @@ describe('revisar', () => {
     expect(revisar({ ...lento, fuerza: 0 }).tipo).toBe('progresas')
     expect(revisar({ ...lento, fuerza: -0.03 }).tipo).toBe('cambio')
     expect(revisar({ ...lento, fuerza: null }).tipo).toBe('cambio')
+  })
+})
+
+describe('velocidad por fases', () => {
+  it('al llegar a la siguiente etapa propone su objetivo (más suave al final: más kcal)', () => {
+    const r = revisar({
+      ...base,
+      porFases: true,
+      pesoKg: 80,
+      semanaFase: 9,
+      ritmoAplicado: 0.75,
+      serie: serie(-0.6),
+    })
+    expect(r.tipo).toBe('cambio')
+    if (r.tipo !== 'cambio') return
+    expect(r.extra).toEqual({ ritmoTramo: 0.5 })
+    expect(r.a).toBeGreaterThan(r.de)
+    expect(tituloCambio(r, 'definicion')).toContain('Nueva etapa')
+  })
+})
+
+describe('mesetas (tras un parón o al salir de una definición)', () => {
+  const mant = { ...base, fase: 'mantenimiento' as const, situacion: 'paron' as const }
+  it('con el peso estable, +200 kcal; si no, espera; tras 2 mesetas de un parón, ya puedes definir', () => {
+    const estable = revisar({ ...mant, serie: serie(0) })
+    expect(estable).toMatchObject({ tipo: 'cambio', a: base.kcal + 200, extra: { meseta: true } })
+    expect(revisar({ ...mant, serie: serie(0.5) }).tipo).toBe('meseta')
+    expect(revisar({ ...mant, serie: serie(0), mesetas: 2 }).tipo).toBe('mesetasHechas')
+    expect(revisar({ ...mant, situacion: 'salida', serie: serie(0), mesetas: 3 }).tipo).toBe('cambio')
+  })
+})
+
+describe('consejosDeLaSemana', () => {
+  it('si la grasa no baja, y la recarga en la segunda mitad con la fuerza bajando; solo en definición', () => {
+    expect(consejosDeLaSemana({ fase: 'definicion', lento: true })[0]).toContain('Si la grasa no baja')
+    expect(
+      consejosDeLaSemana({ fase: 'definicion', lento: false, semanaFase: 10, fuerza: -0.03 })[0],
+    ).toContain('recarga de hidratos')
+    expect(consejosDeLaSemana({ fase: 'definicion', lento: false, semanaFase: 4, fuerza: -0.03 })).toEqual([])
+    expect(consejosDeLaSemana({ fase: 'volumen', lento: true })).toEqual([])
   })
 })

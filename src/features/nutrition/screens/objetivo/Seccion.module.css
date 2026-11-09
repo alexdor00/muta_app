@@ -59,3 +59,8 @@
 .fila {
   font: var(--text-subhead);
 }
+
+/* Tres cajitas (las etapas de la velocidad por fases) */
+.tres {
+  grid-template-columns: repeat(3, 1fr);
+}

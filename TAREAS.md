@@ -5,7 +5,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 ## Tarea actual
 
 - **Guía de culturismo natural**: los 23 choques ya están decididos ([04](docs/conocimiento/04-guia-culturismo-natural.md) §14). Falta
-  lo optativo que queda (ritmo de definición por fases), la frecuencia por persona (ciclos de 9 o 14 días) y Hoy y
+  la frecuencia por persona (ciclos de 9 o 14 días) y Hoy y
   Progreso (check diario, perímetros). Plan completo en
   `Desktop/MUTA-guia-aplicacion.docx`.
 - **Probar Recetas y Menú en un móvil real** (rama `pantalla/recetas`, sale de `pantalla/comida-v2`) con `npm run dev`:
@@ -28,6 +28,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
 ## Hecho
+
+- 2026-11-09 (rama `pantalla/recetas`): lo que quedaba de la guía en Nutrición (menos suplementos): velocidad por
+  fases, tu situación (parón o salida de una definición) con mesetas, hidratos antes y después de entrenar, «si la grasa no
+  baja», recarga de hidratos sin dieta y base vegetal primero en las recetas.
 
 - 2026-11-09 (rama `pantalla/recetas`): si te pasas de grasa, las recetas se adaptan: menos grasa (el aceite puede
   quitarse) y menos hidratos para que el día cuadre con tus kcal; aviso en «Para la …» y en Cuadrar el día.
@@ -178,7 +182,6 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
     rango de días y la cuenta de rutinas. Verificado: `npm run check` (145 tests) y e2e (6 de 6).
 
 ## Pendiente (por prioridad)
-
 
 1. Hoy y Progreso, en ese orden (cada una con su PNG aprobado antes).
 2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión y la sesión ya dicen «Sugerido»).

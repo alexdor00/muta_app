@@ -5,11 +5,12 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
 import { ChevronRightIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
-import { ajustes, RITMOS, type Fase } from '../../state/comida.ts'
+import { ajustes, RITMOS, type Fase, type Situacion } from '../../state/comida.ts'
 import { cambiarFase, cambiarOnOff, cambiarReparto } from '../../use-cases/target.ts'
 import { QUE_QUIERES } from '../comida/DatosHoja.tsx'
 import h from '../comun/Hojas.module.css'
 import { HidratosDelDia } from './HidratosDelDia.tsx'
+import { TuSituacion, VelocidadPorFases } from './OpcionesDeFase.tsx'
 import { borradorDe, mismoReparto, RepartoMacros, repartoDe, type Borrador } from './RepartoMacros.tsx'
 
 /**
@@ -22,8 +23,13 @@ export function EditarObjetivoHoja({ onClose }: { onClose: () => void }) {
   const [ritmo, setRitmo] = useState(String(a?.ritmo ?? 0.75))
   const [reparto, setReparto] = useState<Borrador | null>(a ? borradorDe(a) : null)
   const [onOff, setOnOff] = useState<number | null>(a?.onOff ?? null)
+  const [porFases, setPorFases] = useState(a?.porFases ?? false)
+  const [situacion, setSituacion] = useState<Situacion | null>(a?.situacion ?? null)
   if (!a || !reparto) return null
-  const cambiaFase = fase !== a.fase || (fase === 'definicion' && Number(ritmo) !== a.ritmo)
+  const cambiaFase =
+    fase !== a.fase ||
+    (fase === 'definicion' && (Number(ritmo) !== a.ritmo || porFases !== (a.porFases ?? false))) ||
+    (fase === 'mantenimiento' && situacion !== (a.situacion ?? null))
   const cambiaReparto = !mismoReparto(reparto, borradorDe(a))
   const cambiaOnOff = onOff !== (a.onOff ?? null)
   const fila = (href: string, nombre: string, detalle: string) => (
@@ -46,7 +52,7 @@ export function EditarObjetivoHoja({ onClose }: { onClose: () => void }) {
             onClick={async () => {
               if (cambiaReparto) await cambiarReparto(repartoDe(reparto, a))
               if (cambiaOnOff) await cambiarOnOff(onOff)
-              if (cambiaFase) await cambiarFase(fase, Number(ritmo))
+              if (cambiaFase) await cambiarFase(fase, Number(ritmo), { porFases, situacion })
               onClose()
             }}
           >
@@ -74,6 +80,10 @@ export function EditarObjetivoHoja({ onClose }: { onClose: () => void }) {
             onChange={setRitmo}
           />
         )}
+        {fase === 'definicion' && (
+          <VelocidadPorFases ritmo={Number(ritmo)} valor={porFases} onChange={setPorFases} />
+        )}
+        {fase === 'mantenimiento' && <TuSituacion valor={situacion} onChange={setSituacion} />}
         <RepartoMacros a={a} valor={reparto} onChange={setReparto} />
         <HidratosDelDia a={a} valor={onOff} onChange={setOnOff} />
         <ul class={h.list}>

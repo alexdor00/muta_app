@@ -10,7 +10,7 @@ import {
   comidasDia,
   diaVisto,
   hoy,
-  hidratosDelDia,
+  notaHidratos,
   objetivoDia,
   pendiente,
   totalDia,
@@ -84,8 +84,8 @@ export function HoyVista({
   const cocinas = esHoy ? tareasDeHoy.value.filter((t) => t.tipo === 'cocinar') : []
   const quedan = Math.max(0, objetivo.kcal - total.kcal)
   const faltaProteina = Math.max(0, Math.round(objetivo.protein - total.protein))
-  // Hidratos según el día (ON/OFF): si es de entreno o de descanso y cuánto cambia
-  const onOff = hidratosDelDia(fecha)
+  // Los hidratos de ese día: antes y después de entrenar, y con ON/OFF cuánto cambian
+  const nota = notaHidratos(fecha)
   return (
     <div class={styles.stack}>
       <DayHero
@@ -106,14 +106,7 @@ export function HoyVista({
           { nombre: 'Grasa', hecho: total.fat, objetivo: objetivo.fat },
         ]}
       />
-      {onOff && (
-        <p class={`${styles.pad} ${styles.foot}`}>
-          {onOff.entreno
-            ? `Día de entreno: ${onOff.gramos > 0 ? '+' : '−'}${Math.abs(onOff.gramos)} g de hidratos para rendir.`
-            : `Día de descanso: ${onOff.gramos > 0 ? '+' : '−'}${Math.abs(onOff.gramos)} g de hidratos.`}{' '}
-          Tu semana sigue en tu objetivo.
-        </p>
-      )}
+      {nota && <p class={`${styles.pad} ${styles.foot}`}>{nota}</p>}
       {esHoy && enDieta && tocaConsulta.value && (
         <CoachCard
           titulo="Tu nutricionista · consulta semanal"

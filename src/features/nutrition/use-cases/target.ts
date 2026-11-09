@@ -15,6 +15,9 @@ import {
   type Cuerpo,
   type Fase,
   type Reparto,
+  ritmoDeLaSemana,
+  semanaDeLaFase,
+  type Situacion,
 } from '../domain/targets.ts'
 import { ajustes, cambios, hoy, type Ajustes, type Cambio } from '../state/comida.ts'
 import { apuntarPeso, guardarAjustes, guardarCambio, ID_AJUSTES, marcarCambio } from './nutritionStore.ts'
@@ -94,15 +97,31 @@ export async function guardarDatos(cuerpo: Cuerpo, pasos: number, fase?: Fase): 
   )
 }
 
-/** Cambia de fase (y de ritmo en definición) y recalcula. */
-export async function cambiarFase(fase: Fase, ritmo: number): Promise<void> {
+/**
+ * Cambia de fase (y de ritmo en definición) y recalcula. Con velocidad por fases, las kcal salen de la velocidad de la
+ * etapa en la que estás; en mantenimiento, `situacion` (parón o salida de una definición) empieza sus mesetas de cero.
+ */
+export async function cambiarFase(
+  fase: Fase,
+  ritmo: number,
+  opciones: { porFases?: boolean; situacion?: Situacion | null } = {},
+): Promise<void> {
   const previo = ajustes.value
   if (!previo) return
-  const calculo = calcularObjetivo({ ...previo, fase, ritmo })
+  const faseDesde = fase !== previo.fase ? hoy.value : (previo.faseDesde ?? previo.creado)
+  const porFases = fase === 'definicion' && (opciones.porFases ?? previo.porFases ?? false)
+  const ritmoTramo = porFases ? ritmoDeLaSemana(ritmo, semanaDeLaFase(faseDesde, hoy.value)) : null
+  const situacion = fase === 'mantenimiento' ? (opciones.situacion ?? previo.situacion ?? null) : null
+  const calculo = calcularObjetivo({ ...previo, fase, ritmo: ritmoTramo ?? ritmo })
   const a: Ajustes = {
     ...previo,
     fase,
     ritmo,
+    faseDesde,
+    porFases,
+    ritmoTramo,
+    situacion,
+    mesetas: situacion !== (previo.situacion ?? null) ? 0 : (previo.mesetas ?? 0),
     kcal: calculo.kcal,
     kcalAnterior: null,
     desde: hoy.value,
@@ -157,7 +176,16 @@ export async function aplicarSugerencia(id: string): Promise<void> {
     desde: previo.desde,
     aMano: previo.aMano,
   }
-  await guardarAjustes({ ...previo, kcal: c.a, kcalAnterior: previo.kcal, desde: addDays(hoy.value, 1) })
+  const extra = c.revision?.extra
+  await guardarAjustes({
+    ...previo,
+    kcal: c.a,
+    kcalAnterior: previo.kcal,
+    desde: addDays(hoy.value, 1),
+    // Una etapa nueva de la definición o una meseta más
+    ...(extra?.ritmoTramo ? { ritmoTramo: extra.ritmoTramo } : {}),
+    ...(extra?.meseta ? { mesetas: (previo.mesetas ?? 0) + 1 } : {}),
+  })
   const nuevo = { ...c, status: 'aplicado' as const, antes, updatedAt: new Date().toISOString() }
   cambios.value = cambios.value.map((x) => (x.id === id ? nuevo : x))
   await (await getDb()).put('coach', nuevo)

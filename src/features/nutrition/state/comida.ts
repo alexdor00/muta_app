@@ -4,7 +4,7 @@ import { computed, signal } from '@preact/signals'
 import { addDays, localDate } from '../../../shared/lib/format.ts'
 import { diaDeDieta, repartoSinRutina, type DietaActiva, type TipoDia } from '../domain/diet.ts'
 import { porComida, sumar, type Alimento, type Apunte, type Macros } from '../domain/food.ts'
-import { revisar, type Revision } from '../domain/review.ts'
+import { consejosDeLaSemana, revisar, type Revision } from '../domain/review.ts'
 import {
   calcularObjetivo,
   gastoEnReposo,
@@ -13,6 +13,8 @@ import {
   type Cuerpo,
   type Fase,
   kcalDelDia,
+  semanaDeLaFase,
+  type Situacion,
 } from '../domain/targets.ts'
 import { gastoMedido, tendencia, type Pesaje } from '../domain/weight.ts'
 
@@ -28,6 +30,10 @@ export {
 export type { Alimento, Apunte, ComidaId, Macros, Modo } from '../domain/food.ts'
 export {
   avisosReparto,
+  MESETAS_PARON,
+  ritmoDeLaSemana,
+  SUBIDA_MESETA,
+  type Situacion,
   kcalDelDia,
   DIFERENCIAS_ON_OFF,
   DIFERENCIA_DE_SERIE,
@@ -61,6 +67,14 @@ export type Ajustes = {
   grasaG?: number | null
   /** Hidratos según el día (ON/OFF): la diferencia entre un día de entreno y uno de descanso (0,1 = 10 % de tus kcal); null o sin poner, apagado. */
   onOff?: number | null
+  /** Desde cuándo estás en tu fase (la semana 1 es la primera); sin poner, desde que creaste tu objetivo. */
+  faseDesde?: string
+  /** Velocidad por fases en definición, y la velocidad con la que están calculadas tus kcal ahora (la de la etapa). */
+  porFases?: boolean
+  ritmoTramo?: number | null
+  /** En mantenimiento: vuelves de un parón o sales de una definición, y las mesetas que llevas. */
+  situacion?: Situacion | null
+  mesetas?: number
   /** Tu objetivo de kcal desde `desde`; antes de esa fecha, `kcalAnterior`. */
   kcal: number
   kcalAnterior: number | null
@@ -127,6 +141,19 @@ export function objetivoDe(a: Ajustes, fecha: string, diferencia = a.onOff ?? 0)
     ? kcalDelDia(deSiempre, tipoDe(fecha) === 'entreno', entrenosDeLaSemana(fecha), diferencia)
     : deSiempre
   return macrosObjetivo(kcal, a.cuerpo.pesoKg, a)
+}
+
+/**
+ * La nota de los hidratos de un día en Tu día: los días de entreno, ponerlos sobre todo antes y después de entrenar (guía:
+ * timing de hidratos) y, con ON/OFF, cuántos gramos más o menos lleva. null si no hay nada que decir (o sigues una dieta).
+ */
+export function notaHidratos(fecha: string): string | null {
+  if (dieta.value || !ajustes.value) return null
+  const h = hidratosDelDia(fecha)
+  const cambio = h ? `${h.gramos > 0 ? '+' : '−'}${Math.abs(h.gramos)} g de hidratos. ` : ''
+  if (tipoDe(fecha) === 'entreno')
+    return `Día de entreno: ${cambio}Se recomienda comer la mayor parte de los hidratos antes y después de entrenar.`
+  return h ? `Día de descanso: ${cambio}Tu semana sigue en tu objetivo.` : null
 }
 
 /** Con ON/OFF, cuántos gramos de hidratos más (o menos) lleva ese día frente a tu objetivo de siempre; null si está apagado. */
@@ -204,6 +231,26 @@ export const revisionDeHoy = computed<Revision | null>(() => {
     serie: serie.value,
     dias: Object.entries(totales.value).map(([date, t]) => ({ date, kcal: t.kcal })),
     ultimoCambio: a.desde,
+    fuerza: fuerzaBasicos.value,
+    pesoKg: a.cuerpo.pesoKg,
+    semanaFase: semanaDeLaFase(a.faseDesde ?? a.creado, hoy.value),
+    porFases: a.porFases ?? false,
+    ritmoAplicado: a.ritmoTramo ?? a.ritmo,
+    situacion: a.situacion ?? null,
+    mesetas: a.mesetas ?? 0,
+  })
+})
+
+/** Consejos que acompañan a la revisión de esta semana (si la grasa no baja, la recarga de hidratos). */
+export const consejosSemana = computed<string[]>(() => {
+  const a = ajustes.value
+  const r = revisionDeHoy.value
+  if (!a || !r || dieta.value) return []
+  const lento = r.tipo === 'pasos' || (r.tipo === 'cambio' && r.lento && !r.motivo)
+  return consejosDeLaSemana({
+    fase: a.fase,
+    lento,
+    semanaFase: semanaDeLaFase(a.faseDesde ?? a.creado, hoy.value),
     fuerza: fuerzaBasicos.value,
   })
 })

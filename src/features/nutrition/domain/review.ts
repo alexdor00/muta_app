@@ -2,7 +2,15 @@
 // Reglas de docs/conocimiento/02-reglas.md · sección 8 («Ajuste semanal propuesto (±150 kcal)»). En volumen, antes de subir
 // kcal se mira si progresas (decisión 2026-11-08, guía G1 §6, 04-guia-culturismo-natural.md).
 import { daysBetween, formatInt } from '../../../shared/lib/format.ts'
-import { PASOS_OBJETIVO, type Fase } from './targets.ts'
+import {
+  deficitDiario,
+  MESETAS_PARON,
+  PASOS_OBJETIVO,
+  ritmoDeLaSemana,
+  SUBIDA_MESETA,
+  type Fase,
+  type Situacion,
+} from './targets.ts'
 import { deLosUltimos, ritmoSemanal, type PuntoPeso } from './weight.ts'
 
 export const PESAJES_MINIMOS = 10 // en 14 días
@@ -35,6 +43,10 @@ export type Revision =
   | { tipo: 'pasos'; pct: number; kgSemana: number; previsto: { min: number; max: number }; pasos: number }
   /** En volumen subes despacio, pero tu fuerza en los básicos no baja: no se tocan las kcal. */
   | { tipo: 'progresas'; pct: number; fuerza: number }
+  /** Vuelves de un parón o sales de una definición: esperando a que tu peso se estabilice para subir. */
+  | { tipo: 'meseta'; pct: number; hechas: number }
+  /** Tras un parón, las dos mesetas hechas: ya puedes definir (o seguir subiendo). */
+  | { tipo: 'mesetasHechas'; hechas: number }
   /** Ya estás en el mínimo: no se baja más. */
   | { tipo: 'suelo'; pct: number; suelo: number }
   /** La sugerencia: de `de` a `a` kcal. */
@@ -47,6 +59,10 @@ export type Revision =
       kgSemana: number
       previsto: { min: number; max: number }
       comprobaciones: Comprobacion[]
+      /** Por qué, si no es por el ritmo (nueva etapa de la definición, una meseta). */
+      motivo?: string
+      /** Lo que cambia en tus ajustes al aplicarla, además de las kcal. */
+      extra?: { ritmoTramo?: number; meseta?: true }
     }
 
 export type DatosRevision = {
@@ -64,6 +80,15 @@ export type DatosRevision = {
   ultimoCambio: string | null
   /** Cambio de tu fuerza en los básicos (0,02 = un 2 % más); null o sin poner si no hay datos. */
   fuerza?: number | null
+  /** Tu peso (para el déficit de cada etapa) y la semana de tu fase (1 = la primera). */
+  pesoKg?: number
+  semanaFase?: number
+  /** Velocidad por fases en definición, y la velocidad con la que están calculadas tus kcal ahora. */
+  porFases?: boolean
+  ritmoAplicado?: number
+  /** Vuelves de un parón o sales de una definición (en mantenimiento), y las mesetas que llevas. */
+  situacion?: Situacion | null
+  mesetas?: number
 }
 
 export function revisar(d: DatosRevision): Revision {
@@ -84,14 +109,57 @@ export function revisar(d: DatosRevision): Revision {
   if (cumplido < CUMPLIR.min || cumplido > CUMPLIR.max)
     return { tipo: 'cumplir', cumplido: redondear(cumplido) }
 
-  const previsto = ritmoPrevisto(d.fase, d.ritmo)
+  const aplicado = d.ritmoAplicado ?? d.ritmo
+  const previsto = ritmoPrevisto(d.fase, aplicado)
   const { pctSemana: pct, kgSemana } = ritmo
+  const desde = d.ultimoCambio ? daysBetween(d.ultimoCambio, d.hoy) : Infinity
+  const comprobacionesBase = [
+    { texto: `${pesajes} pesajes en 14 días`, detalle: `mín. ${PESAJES_MINIMOS}` },
+    { texto: `Comiste el ${Math.round(cumplido * 100)} % de tu objetivo`, detalle: '85–115 %' },
+  ]
+
+  // Velocidad por fases: al llegar a la siguiente etapa de la definición, se propone su objetivo
+  if (d.fase === 'definicion' && d.porFases && d.semanaFase && d.pesoKg) {
+    const toca = ritmoDeLaSemana(d.ritmo, d.semanaFase)
+    if (toca !== aplicado)
+      return {
+        tipo: 'cambio',
+        de: d.kcal,
+        a: Math.max(d.suelo, d.kcal + deficitDiario(d.pesoKg, aplicado) - deficitDiario(d.pesoKg, toca)),
+        lento: toca < aplicado,
+        pct,
+        kgSemana,
+        previsto,
+        comprobaciones: comprobacionesBase,
+        motivo: `Nueva etapa de la definición: −${toca.toLocaleString('es-ES')} % por semana`,
+        extra: { ritmoTramo: toca },
+      }
+  }
+
+  // Vuelta de un parón o salida de una definición: +200 kcal en hidratos cada vez que el peso se estabiliza
+  if (d.fase === 'mantenimiento' && d.situacion) {
+    const hechas = d.mesetas ?? 0
+    if (d.situacion === 'paron' && hechas >= MESETAS_PARON) return { tipo: 'mesetasHechas', hechas }
+    if (Math.abs(pct) > 0.15) return { tipo: 'meseta', pct, hechas }
+    if (desde < DIAS_ENTRE_CAMBIOS) return { tipo: 'esperar', dias: DIAS_ENTRE_CAMBIOS - desde }
+    return {
+      tipo: 'cambio',
+      de: d.kcal,
+      a: d.kcal + SUBIDA_MESETA,
+      lento: true,
+      pct,
+      kgSemana,
+      previsto,
+      comprobaciones: comprobacionesBase,
+      motivo: `Meseta ${hechas + 1}: tu peso se ha estabilizado, +${SUBIDA_MESETA} kcal en hidratos`,
+      extra: { meseta: true },
+    }
+  }
   if (pct >= previsto.min && pct <= previsto.max) return { tipo: 'bien', pct, kgSemana, previsto }
 
   // Por encima del previsto: pierdes menos (o ganas más) de lo que toca → comer menos
   const bajar = pct > previsto.max
   const lento = d.fase === 'definicion' ? bajar : d.fase === 'volumen' ? !bajar : false
-  const desde = d.ultimoCambio ? daysBetween(d.ultimoCambio, d.hoy) : Infinity
   if (desde < DIAS_ENTRE_CAMBIOS) return { tipo: 'esperar', dias: DIAS_ENTRE_CAMBIOS - desde }
   // Peso parado en volumen: si progresas en tus básicos, no se suben las kcal (antes, descanso, perímetros…)
   if (d.fase === 'volumen' && lento && d.fuerza != null && d.fuerza >= 0)
@@ -126,10 +194,39 @@ export function revisar(d: DatosRevision): Revision {
 const redondear = (n: number) => Math.round(n * 100) / 100
 
 /** El título de la sugerencia, en palabras. */
-export function tituloCambio(r: { lento: boolean; de: number; a: number }, fase: Fase): string {
+export function tituloCambio(
+  r: { lento: boolean; de: number; a: number; motivo?: string },
+  fase: Fase,
+): string {
+  if (r.motivo) return r.motivo
   if (fase === 'definicion')
     return r.lento ? 'Bajas más despacio de lo previsto' : 'Bajas más deprisa de lo previsto'
   if (fase === 'volumen')
     return r.lento ? 'Subes más despacio de lo previsto' : 'Subes más deprisa de lo previsto'
   return r.a < r.de ? 'Estás subiendo de peso' : 'Estás bajando de peso'
+}
+
+/**
+ * Consejos de la semana que acompañan a la revisión (no cambian nada): si la grasa no baja en definición, y en la segunda
+ * mitad de una definición, la recarga de hidratos de varios días (guía G1 §7; cuántos días y cuánto, sugerido).
+ */
+export function consejosDeLaSemana(d: {
+  fase: Fase
+  /** Bajas más despacio de lo previsto. */
+  lento: boolean
+  semanaFase?: number
+  /** Cambio de tu fuerza en los básicos (−0,02 = un 2 % menos). */
+  fuerza?: number | null
+}): string[] {
+  if (d.fase !== 'definicion') return []
+  const out: string[] = []
+  if (d.lento)
+    out.push(
+      'Si la grasa no baja: simplifica las fuentes de hidratos, modera la fibra, quita lo que te sienta mal y revisa el estrés.',
+    )
+  if ((d.semanaFase ?? 0) >= 9 && (d.fuerza ?? 0) < 0)
+    out.push(
+      'Llevas semanas en definición y tu fuerza baja: se recomienda una recarga de hidratos de 2–3 días, comiendo lo de mantenimiento (nunca de un solo día).',
+    )
+  return out
 }

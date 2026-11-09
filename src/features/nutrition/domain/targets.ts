@@ -171,3 +171,29 @@ export function kcalDelDia(kcal: number, entreno: boolean, diasEntreno: number, 
   const descanso = kcal - (diasEntreno * diferencia * kcal) / 7
   return Math.round(entreno ? descanso + diferencia * kcal : descanso)
 }
+
+/**
+ * Velocidad por fases en definición (optativo; guía: rápido al principio y suave al final; las cifras son sugeridas):
+ * semanas 1–4, tu velocidad + 0,25 (máx. 1 %); 5–8, la tuya; desde la 9, − 0,25 (mín. 0,5 %).
+ */
+export const TRAMOS_SEMANAS = { rapido: 4, medio: 8 } as const
+export function ritmoDeLaSemana(ritmo: number, semana: number): number {
+  const r = (n: number) => Math.round(n * 100) / 100
+  if (semana <= TRAMOS_SEMANAS.rapido) return r(Math.min(1, ritmo + 0.25))
+  if (semana <= TRAMOS_SEMANAS.medio) return ritmo
+  return r(Math.max(0.5, ritmo - 0.25))
+}
+
+/** Semana de la fase (la 1 es la primera) desde que empezó. */
+export const semanaDeLaFase = (desde: string, hoy: string) =>
+  Math.floor(
+    (new Date(`${hoy}T12:00:00`).getTime() - new Date(`${desde}T12:00:00`).getTime()) / (7 * 86_400_000),
+  ) + 1
+
+/**
+ * Volver de un parón o salir de una definición: se come lo de mantenimiento y, cada vez que el peso se estabiliza, se
+ * sube +200 kcal en hidratos (docs/conocimiento: «reverse»). Tras un parón, dos mesetas y después ya se puede definir.
+ */
+export type Situacion = 'paron' | 'salida'
+export const SUBIDA_MESETA = 200
+export const MESETAS_PARON = 2

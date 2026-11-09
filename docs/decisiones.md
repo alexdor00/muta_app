@@ -648,3 +648,20 @@ proteína), lo que sobra se quita de los hidratos que quedan, a igualdad de kcal
 el día sigue cuadrando con tu objetivo. Con 0 g de grasa por comer, al ajustar una receta lo que aporta sobre todo grasa
 (el aceite, el aguacate) puede bajar hasta 0, y las que mejor encajan son las magras. Lo avisan «Para la …» («con menos
 grasa» y la grasa de cada plato) y Cuadrar el día.
+
+## 2026-11-09 · Lo que quedaba de la guía en Nutrición
+
+Pedido por el usuario («haz todo menos lo de los suplementos, diseño cohesionado»). Todo son sugerencias; las cifras que la
+guía no da van marcadas como «sugerido» aquí.
+
+- **Velocidad por fases** (definición, interruptor): semanas 1–4 tu velocidad + 0,25 (máx. 1 %), 5–8 la tuya y desde la 9
+  − 0,25 (mín. 0,5 %) — sugerido. La revisión semanal propone el nuevo objetivo al pasar de etapa.
+- **Tu situación** (mantenimiento): «Tras parón» o «Tras definir». Cada vez que el peso se estabiliza (±0,15 %/sem), la
+  revisión propone +200 kcal en hidratos (01 `reverse`); tras un parón, dos mesetas y ya se puede definir (guía §10).
+- **Hidratos alrededor del entreno**: los días de entreno, Tu día recomienda comer la mayor parte de los hidratos antes y
+  después de entrenar (sin hora: la app no sabe a qué hora entrenas).
+- **«Si la grasa no baja»** (definición, bajando más despacio de lo previsto) y **recarga de hidratos sin dieta** (semana 9
+  o más y tu fuerza bajando: 2–3 días comiendo lo de mantenimiento, nunca uno — sugerido), como consejos de la revisión.
+- **Base vegetal**: entre recetas que encajan parecido, primero las de más legumbre, verdura, fruta y semillas (hasta un
+  15 % menos de error — sugerido).
+- Fuera: los suplementos (no los quiere el usuario) y los perímetros en la revisión (llegan con Progreso).

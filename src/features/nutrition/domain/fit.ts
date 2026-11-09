@@ -204,7 +204,28 @@ export function repartir(falta: Macros, comidas: readonly ComidaId[]): Record<st
 
 export type Encaje = { plato: Plato; ajuste: Ajuste; error: number }
 
-/** Los platos que mejor encajan en una comida con un objetivo, ya ajustados (los mejores primero). */
+const VEGETAL = new Set(['Legumbres', 'Verduras', 'Frutas'])
+
+/** Qué parte de los gramos de un plato es base vegetal: legumbres, verdura, fruta y semillas (de 0 a 1). */
+export function parteVegetal(p: Plato): number {
+  let vegetal = 0
+  let total = 0
+  for (const i of p.ingredientes) {
+    if (!i.cuenta || !i.gramos) continue
+    total += i.gramos
+    if (VEGETAL.has(i.categoria) || /semilla|chía|chia|lino|sésamo|sesamo/i.test(i.nombre))
+      vegetal += i.gramos
+  }
+  return total ? vegetal / total : 0
+}
+
+/** Cuánto ayuda la base vegetal al elegir entre platos que encajan parecido (sugerido: hasta un 15 % menos de error). */
+export const PESO_VEGETAL = 0.15
+
+/**
+ * Los platos que mejor encajan en una comida con un objetivo, ya ajustados (los mejores primero; entre parecidos, los de
+ * más base vegetal).
+ */
 export function mejoresPara(
   platos: readonly Plato[],
   comida: ComidaId,
@@ -214,14 +235,21 @@ export function mejoresPara(
   /** false: también los que no son de esa comida (eliges tú la categoría). */
   soloDeLaComida = true,
 ): Encaje[] {
-  return platos
-    .filter((p) => p.raciones === 1 && (!soloDeLaComida || vaCon(p, comida)) && !sin.includes(p.id))
-    .map((plato) => {
-      const ajuste = ajustar(plato, objetivo)
-      return { plato, ajuste, error: error(ajuste.total, objetivo) }
-    })
-    .sort((x, y) => x.error - y.error)
-    .slice(0, n)
+  return (
+    platos
+      .filter((p) => p.raciones === 1 && (!soloDeLaComida || vaCon(p, comida)) && !sin.includes(p.id))
+      .map((plato) => {
+        const ajuste = ajustar(plato, objetivo)
+        return { plato, ajuste, error: error(ajuste.total, objetivo) }
+      })
+      // A igualdad de encaje, primero los de más base vegetal (legumbres, verdura, fruta y semillas)
+      .sort(
+        (x, y) =>
+          x.error * (1 - PESO_VEGETAL * parteVegetal(x.plato)) -
+          y.error * (1 - PESO_VEGETAL * parteVegetal(y.plato)),
+      )
+      .slice(0, n)
+  )
 }
 
 /**

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   avisosReparto,
+  ritmoDeLaSemana,
+  semanaDeLaFase,
   kcalDelDia,
   calcularObjetivo,
   cuerpoValido,
@@ -135,5 +137,19 @@ describe('kcalDelDia (ON/OFF)', () => {
     expect(Math.abs(4 * on + 3 * off - 7 * 2800)).toBeLessThanOrEqual(2)
     expect(kcalDelDia(2800, true, 0, 0.1)).toBe(2800)
     expect(kcalDelDia(2800, false, 7, 0.1)).toBe(2800)
+  })
+})
+
+describe('velocidad por fases y semanas de la fase', () => {
+  it('más rápido al principio y más suave al final', () => {
+    expect(ritmoDeLaSemana(0.75, 1)).toBe(1)
+    expect(ritmoDeLaSemana(0.75, 6)).toBe(0.75)
+    expect(ritmoDeLaSemana(0.75, 10)).toBe(0.5)
+    expect(ritmoDeLaSemana(1, 2)).toBe(1)
+    expect(ritmoDeLaSemana(0.5, 12)).toBe(0.5)
+  })
+  it('la semana de la fase empieza en 1', () => {
+    expect(semanaDeLaFase('2026-11-02', '2026-11-08')).toBe(1)
+    expect(semanaDeLaFase('2026-11-02', '2026-11-09')).toBe(2)
   })
 })

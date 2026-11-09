@@ -6,6 +6,7 @@ import {
   faltaDelDia,
   llegaHasta,
   mejoresPara,
+  parteVegetal,
   repartir,
   totalCon,
 } from './fit.ts'
@@ -127,6 +128,19 @@ describe('ajustar sin grasa', () => {
     expect(a.gramos[2]).toBe(0)
     const conGrasa = ajustar(bowl, { kcal: 600, protein: 40, carbs: 70, fat: 10 })
     expect(conGrasa.gramos[2]).toBeGreaterThanOrEqual(30)
+  })
+})
+
+describe('base vegetal', () => {
+  it('qué parte del plato es legumbre, verdura, fruta o semillas', () => {
+    const conVerdura = {
+      ...bowl,
+      ingredientes: bowl.ingredientes.map((i) =>
+        i.nombre === 'tomate' ? { ...i, categoria: 'Verduras' } : i,
+      ),
+    }
+    expect(parteVegetal(conVerdura)).toBeCloseTo(120 / 480, 3)
+    expect(parteVegetal(bowl)).toBe(0)
   })
 })
 
