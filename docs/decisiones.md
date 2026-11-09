@@ -640,3 +640,11 @@ descanso, con **las mismas kcal en la semana**: el déficit, el volumen o el man
 - Cálculo: con n días de entreno en la semana, descanso = kcal − n·d·kcal/7 y entreno = descanso + d·kcal. La proteína y
   la grasa no cambian; los hidratos son lo que queda.
 - Tu día dice «Día de entreno: +N g de hidratos» o «Día de descanso: −N g». Con una dieta cargada manda la dieta.
+
+## 2026-11-09 · Si te pasas de grasa, las recetas se adaptan
+
+Pedido por el usuario. Lo que falta del día ya no es solo «objetivo − comido» por separado: si te pasas de grasa (o de
+proteína), lo que sobra se quita de los hidratos que quedan, a igualdad de kcal (1 g de grasa = 2,25 g de hidratos), así
+el día sigue cuadrando con tu objetivo. Con 0 g de grasa por comer, al ajustar una receta lo que aporta sobre todo grasa
+(el aceite, el aguacate) puede bajar hasta 0, y las que mejor encajan son las magras. Lo avisan «Para la …» («con menos
+grasa» y la grasa de cada plato) y Cuadrar el día.

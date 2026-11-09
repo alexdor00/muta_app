@@ -26,6 +26,24 @@ export type Ajuste = {
 
 const r1 = (n: number) => Math.round(n * 10) / 10
 
+/**
+ * Lo que te falta en un día, coherente con tus kcal: nunca menos de 0 y, si te has pasado de grasa o de proteína, lo que
+ * sobra se quita de los hidratos que quedan (son lo que queda de tus kcal). Así las recetas que se ajustan a lo que falta
+ * vienen con menos grasa y el día sigue cuadrando.
+ */
+export function faltaDelDia(objetivo: Macros, comido: Macros): Macros {
+  const falta = (m: keyof Macros) => Math.max(0, objetivo[m] - comido[m])
+  const deMas = (m: 'protein' | 'fat') => Math.max(0, comido[m] - objetivo[m])
+  // Lo que te pasaste, en gramos de hidratos con las mismas kcal (4 kcal/g; la grasa, 9)
+  const quitar = (deMas('fat') * 9 + deMas('protein') * 4) / 4
+  return {
+    kcal: falta('kcal'),
+    protein: r1(falta('protein')),
+    carbs: r1(Math.max(0, falta('carbs') - quitar)),
+    fat: r1(falta('fat')),
+  }
+}
+
 /** Los gramos del plato tal cual. */
 export const gramosDelPlato = (p: Plato): (number | null)[] => p.ingredientes.map((i) => i.gramos)
 
@@ -72,8 +90,11 @@ export function desvio(total: Macros, objetivo: Macros): { corto: MacroId[]; sob
   return { corto, sobra }
 }
 
-/** Lo que se puede mover: índice, gramos del libro, valores por gramo (en kcal de cada macro) y límites. */
-function movibles(p: Plato, valores: Valores) {
+/**
+ * Lo que se puede mover: índice, gramos del libro, valores por gramo (en kcal de cada macro) y límites. `sinGrasa`: ya no
+ * te queda grasa en el día, así que lo que aporta sobre todo grasa (el aceite) puede quitarse del todo.
+ */
+function movibles(p: Plato, valores: Valores, sinGrasa = false) {
   return p.ingredientes.flatMap((i, k) => {
     if (!p.ajustable || !i.macro || !i.por100 || i.gramos === null || i.gramos <= 0) return []
     const v = valores[k] ?? i.por100
@@ -82,7 +103,10 @@ function movibles(p: Plato, valores: Valores) {
         k,
         g0: i.gramos,
         a: MACROS.map((m) => (v[m.id] * m.kcalPorG) / 100),
-        min: Math.max(PASO_G, Math.round((i.gramos * LIMITES.min) / PASO_G) * PASO_G),
+        min:
+          sinGrasa && i.macro === 'fat'
+            ? 0
+            : Math.max(PASO_G, Math.round((i.gramos * LIMITES.min) / PASO_G) * PASO_G),
         max: Math.round((i.gramos * LIMITES.max) / PASO_G) * PASO_G,
       },
     ]
@@ -99,7 +123,7 @@ function error(t: Macros, o: Macros): number {
  * dentro de sus límites, varias vueltas), se redondea de 5 en 5 g y se repasa a pasos de 5 g por si el redondeo empeoró.
  */
 export function ajustar(p: Plato, objetivo: Macros, valores: Valores = []): Ajuste {
-  const mv = movibles(p, valores)
+  const mv = movibles(p, valores, objetivo.fat <= 0)
   const gramos = p.ingredientes.map((i) => i.gramos)
   if (!mv.length) {
     const total = totalCon(p, gramos, valores)

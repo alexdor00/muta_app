@@ -8,6 +8,7 @@ import {
   comidasQueQuedan,
   cuadrarDia,
   faltaDia,
+  grasaDeMas,
   fotos,
   mejoresPara,
   platos,
@@ -89,6 +90,12 @@ export function CuadrarDiaHoja({ onClose, avisar }: Props) {
           Te quedan {quedan.map((c) => comidaDe(c).nombre.toLowerCase()).join(', ')} ·{' '}
           <b>{macrosCortos(falta)}</b>
         </p>
+        {grasaDeMas.value > 0 && (
+          <p class={h.sub}>
+            Llevas {grasaDeMas.value} g de grasa de más: los platos van con menos grasa y menos hidratos para
+            que el día cuadre.
+          </p>
+        )}
         <ul class={h.list}>
           {dia.map((d) => (
             <PlatoFila

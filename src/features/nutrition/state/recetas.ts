@@ -3,7 +3,7 @@
 // guarda use-cases/recipes.ts y menu.ts; aquí no se guarda nada.
 import { computed, signal } from '@preact/signals'
 import { addDays } from '../../../shared/lib/format.ts'
-import { ajustar, mejoresPara, REPARTO, repartir, totalCon } from '../domain/fit.ts'
+import { ajustar, faltaDelDia, mejoresPara, REPARTO, repartir, totalCon } from '../domain/fit.ts'
 import { COMIDAS, type ComidaId, type Macros } from '../domain/food.ts'
 import {
   loDeHoy,
@@ -123,17 +123,19 @@ export function totalDelHueco(h: Hueco): Macros | null {
 /** Lo que suma un día con tu menú. */
 export const totalDeMenu = (fecha: string) => totalDelDia(menu.value, fecha, totalDelHueco)
 
-/** Lo que te falta en el día que ves (nunca menos de 0). */
+/**
+ * Lo que te falta en el día que ves (nunca menos de 0). Si te has pasado de grasa, lo que sobra se quita de los hidratos que
+ * quedan: las recetas que se ajustan a lo que falta vienen con menos grasa y el día cuadra con tus kcal.
+ */
 export const faltaDia = computed<Macros | null>(() => {
   const o = objetivoDia.value
-  if (!o) return null
-  const t = totalDia.value
-  return {
-    kcal: Math.max(0, o.kcal - t.kcal),
-    protein: Math.max(0, o.protein - t.protein),
-    carbs: Math.max(0, o.carbs - t.carbs),
-    fat: Math.max(0, o.fat - t.fat),
-  }
+  return o ? faltaDelDia(o, totalDia.value) : null
+})
+
+/** Cuántos gramos de grasa te has pasado hoy (0 si no). */
+export const grasaDeMas = computed(() => {
+  const o = objetivoDia.value
+  return o ? Math.max(0, Math.round(totalDia.value.fat - o.fat)) : 0
 })
 
 /** Las comidas del día que ves sin nada apuntado. */

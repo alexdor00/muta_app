@@ -15,7 +15,9 @@ alimento), `Desktop/MUTA-Comida-sencilla-funcionalidades.png` (2026-11-06). Nutr
 Tu objetivo se calcula una vez y se **guarda**; solo cambia si tú lo cambias o aceptas una sugerencia («Aplicar desde
 mañana»; «Ahora no» la deja en el historial; la última aceptada se deshace). Con dieta pasa lo mismo con la consulta: sus
 propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si las aplicas, y se deshacen.
-Hidratos según el día (ON/OFF, `onOff` en tus ajustes): con el interruptor, `objetivoDe` da más hidratos los días de
+Si te pasas de grasa (o de proteína), lo que falta del día (`faltaDelDia`, en `domain/fit.ts`) quita lo que sobra de los
+hidratos que quedan y `ajustar` puede dejar a 0 lo que aporta sobre todo grasa: las recetas vienen con menos grasa y el
+día cuadra con tus kcal (`grasaDeMas` lo avisa en «Para la …» y en Cuadrar el día). Hidratos según el día (ON/OFF, `onOff` en tus ajustes): con el interruptor, `objetivoDe` da más hidratos los días de
 entreno y menos los de descanso (`tipoDe`, de tu rutina) con la misma media semanal (`kcalDelDia`, `entrenosDeLaSemana`);
 Tu día lo dice (`hidratosDelDia`). Con dieta cargada manda la dieta. Proteína y grasa van por kilo o en gramos fijos (`Reparto`, `macrosObjetivo`); los hidratos, lo que queda. Fuera de lo que
 dicen los documentos (`avisosReparto`: proteína 1,5–2 g/kg, grasa desde 0,6) solo se avisa; si algo de fuera los contradice,

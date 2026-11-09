@@ -29,6 +29,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- 2026-11-09 (rama `pantalla/recetas`): si te pasas de grasa, las recetas se adaptan: menos grasa (el aceite puede
+  quitarse) y menos hidratos para que el día cuadre con tus kcal; aviso en «Para la …» y en Cuadrar el día.
+
 - 2026-11-09 (rama `pantalla/recetas`): «Tu objetivo» más bonito y cohesionado (secciones con título pequeño, nota corta y
   cajitas); las recomendaciones como «Se recomienda…» sin citar documentos (regla en `docs/rediseno.md`).
 

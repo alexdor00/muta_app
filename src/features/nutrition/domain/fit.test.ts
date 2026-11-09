@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { ajustar, cuadrarDia, desvio, llegaHasta, mejoresPara, repartir, totalCon } from './fit.ts'
+import {
+  ajustar,
+  cuadrarDia,
+  desvio,
+  faltaDelDia,
+  llegaHasta,
+  mejoresPara,
+  repartir,
+  totalCon,
+} from './fit.ts'
 import type { IngredientePlato, Plato } from './recipes.ts'
 
 const ing = (
@@ -89,6 +98,35 @@ describe('ajustar', () => {
   it('un plato sin nada que mover se queda como está', () => {
     const quieto = { ...bowl, ajustable: false }
     expect(ajustar(quieto, { kcal: 300, protein: 20, carbs: 30, fat: 10 }).total).toEqual(bowl.total)
+  })
+})
+
+describe('faltaDelDia', () => {
+  const objetivo = { kcal: 2400, protein: 150, carbs: 280, fat: 70 }
+  it('sin pasarte, lo que falta de cada uno', () => {
+    expect(faltaDelDia(objetivo, { kcal: 1000, protein: 60, carbs: 120, fat: 25 })).toEqual({
+      kcal: 1400,
+      protein: 90,
+      carbs: 160,
+      fat: 45,
+    })
+  })
+  it('si te pasas de grasa, lo que sobra se quita de los hidratos que quedan (el día cuadra con tus kcal)', () => {
+    const f = faltaDelDia(objetivo, { kcal: 1300, protein: 60, carbs: 120, fat: 90 })
+    expect(f.fat).toBe(0)
+    expect(f.kcal).toBe(1100)
+    // 20 g de grasa de más = 180 kcal = 45 g de hidratos menos (160 − 45)
+    expect(f.carbs).toBe(115)
+    expect(f.protein * 4 + f.carbs * 4 + f.fat * 9).toBeLessThanOrEqual(f.kcal)
+  })
+})
+
+describe('ajustar sin grasa', () => {
+  it('sin grasa que comer, lo que aporta sobre todo grasa puede quitarse del todo', () => {
+    const a = ajustar(bowl, { kcal: 500, protein: 40, carbs: 70, fat: 0 })
+    expect(a.gramos[2]).toBe(0)
+    const conGrasa = ajustar(bowl, { kcal: 600, protein: 40, carbs: 70, fat: 10 })
+    expect(conGrasa.gramos[2]).toBeGreaterThanOrEqual(30)
   })
 })
 
