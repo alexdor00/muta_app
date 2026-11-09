@@ -155,3 +155,19 @@ export function cuerpoValido(c: Partial<Cuerpo>): c is Cuerpo {
     c.pesoKg <= 300
   )
 }
+
+/**
+ * Hidratos según el día (ON/OFF, guía de culturismo natural §6, decisión 2026-11-09): los días de entreno comen más y los
+ * de descanso menos, solo en hidratos, con la misma media semanal (tu déficit, volumen o mantenimiento no cambia). La
+ * diferencia entre un día de entreno y uno de descanso, en parte de tus kcal: la guía no da cifra (su gráfica es
+ * ilustrativa, ~20 %; al salir de competir, menos del 10 %). Sugerido: 10 %.
+ */
+export const DIFERENCIAS_ON_OFF = [0.1, 0.15, 0.2] as const
+export const DIFERENCIA_DE_SERIE = 0.1
+
+/** Las kcal de un día con ON/OFF: `diasEntreno` de los 7 de su semana; si entrenas 0 o 7 días, las de siempre. */
+export function kcalDelDia(kcal: number, entreno: boolean, diasEntreno: number, diferencia: number): number {
+  if (diasEntreno <= 0 || diasEntreno >= 7 || diferencia <= 0) return kcal
+  const descanso = kcal - (diasEntreno * diferencia * kcal) / 7
+  return Math.round(entreno ? descanso + diferencia * kcal : descanso)
+}

@@ -157,6 +157,33 @@ test('proteína y grasa por kilo o en gramos: los hidratos son lo que queda y av
   await expect(reparto).toContainText('149 g')
 })
 
+test('hidratos según el día: con el interruptor, más los días de entreno y menos los de descanso; la semana igual', async ({
+  page,
+}) => {
+  await abrirBase(page)
+  await page.goto('/comida')
+  await page.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  const datos = page.getByRole('dialog', { name: 'Tus datos' })
+  await datos.getByText('Hombre').click()
+  await datos.getByLabel('Edad').fill('30')
+  await datos.getByLabel('Altura (cm)').fill('180')
+  await datos.getByLabel('Peso (kg)').fill('80')
+  await datos.getByLabel('Pasos al día').fill('9.000')
+  await datos.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  await page.getByRole('link', { name: 'Tu plan' }).first().click()
+  await page.getByRole('button', { name: 'Editar' }).click()
+  const hoja = page.getByRole('dialog', { name: 'Tu objetivo' })
+  const seccion = hoja.getByRole('region', { name: 'Hidratos según el día' })
+  await seccion.getByRole('switch', { name: 'Hidratos según el día' }).click()
+  await expect(seccion.getByRole('radio', { name: '10 % (sugerido)' })).toBeChecked()
+  await expect(seccion).toContainText('Días de entreno')
+  await expect(seccion).toContainText('Días de descanso')
+  await hoja.getByRole('button', { name: 'Guardar', exact: true }).click()
+  await expect(hoja).toHaveCount(0)
+  await page.goto('/comida')
+  await expect(page.getByText(/^Día de (entreno|descanso): [+−]\d+ g de hidratos/)).toBeVisible()
+})
+
 test('después de la bienvenida, tus datos preguntan qué quieres (viene marcado lo de la bienvenida)', async ({
   page,
 }) => {

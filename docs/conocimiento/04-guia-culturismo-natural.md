@@ -315,7 +315,7 @@ en la app.
 |---|---|---|---|---|---|
 | 1 | Proteína en definición | 1,8–2,2 g/kg muy definido y en déficit fuerte; fase final → hacia 1,9 | Más baja que en volumen; hasta ~2 g/kg solo si el volumen de comida lo obliga | Guía | Hecho: aviso por encima de 2 g/kg, texto de Tu objetivo, y la regla 6 de la consulta ya no sube la proteína |
 | 2 | Suelo de grasa | ~0,6 g/kg, «salud hormonal» | Se puede bajar; lo hormonal depende de las kcal | Se queda | — |
-| 3 | Kcal iguales cada día | Mismo objetivo cada día sin dieta | ON/OFF en todas las fases | Guía, **optativo** | Pendiente de diseño |
+| 3 | Kcal iguales cada día | Mismo objetivo cada día sin dieta | ON/OFF en todas las fases | Guía, **optativo** | Hecho: interruptor «Hidratos según el día» en Tu objetivo (10 % sugerido, 15 o 20 %), solo hidratos, misma media semanal |
 | 4 | Ritmo de definición | Fijo (0,75 %/sem) | Rápido al principio, suave al final | Guía, **optativo** | Pendiente de diseño |
 | 5 | Pausas de dieta | Por calendario (8–12 o 10 semanas) | Refeeds de varios días por indicadores | Guía | Hecho en la consulta con dieta: consejo de recarga con hambre o poca energía en la segunda mitad; sin cifras (la guía no las da) |
 | 6 | Peso parado en volumen | +100/150 kcal por la báscula | Antes: progreso, descanso, ON/OFF, timing, perímetros | Guía | Hecho: si tu fuerza en los básicos no baja, la revisión no sube las kcal |

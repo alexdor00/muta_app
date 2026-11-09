@@ -628,3 +628,15 @@ manteniendo en 8–9 y progresando en 1–2 que 5 progresando en 4» y «progres
 Aclaración del usuario: el entrenador nunca sube nada por sí solo; siempre es una sugerencia, de **1 serie o 2 como mucho**.
 Se quita el tope de «+2 series por músculo en total» (no tenía sentido: no sube solo). Cada sugerencia de subir trae
 «Aplicar: 3 → 4 series» y, si caben (máx. 4/5 por ejercicio y 11 del músculo en la sesión), «3 → 5 series».
+
+## 2026-11-09 · Hidratos según el día (ON/OFF)
+
+Decidido por el usuario (choque 3, optativo): **solo hidratos**, con un **interruptor** en Tu objetivo; la app sabe qué días
+te toca entrenar por tu rutina de Entreno (sin rutina, tus días repartidos) y les da más hidratos, y menos a los de
+descanso, con **las mismas kcal en la semana**: el déficit, el volumen o el mantenimiento no cambian.
+
+- La diferencia entre un día de entreno y uno de descanso, en parte de tus kcal: **10 % (sugerido)**, 15 % o 20 %. La guía
+  no da cifra (su gráfica es ilustrativa, ~20 %; al salir de competir, menos del 10 %).
+- Cálculo: con n días de entreno en la semana, descanso = kcal − n·d·kcal/7 y entreno = descanso + d·kcal. La proteína y
+  la grasa no cambian; los hidratos son lo que queda.
+- Tu día dice «Día de entreno: +N g de hidratos» o «Día de descanso: −N g». Con una dieta cargada manda la dieta.

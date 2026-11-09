@@ -12,6 +12,7 @@ import {
   suelo,
   type Cuerpo,
   type Fase,
+  kcalDelDia,
 } from '../domain/targets.ts'
 import { gastoMedido, tendencia, type Pesaje } from '../domain/weight.ts'
 
@@ -27,6 +28,9 @@ export {
 export type { Alimento, Apunte, ComidaId, Macros, Modo } from '../domain/food.ts'
 export {
   avisosReparto,
+  kcalDelDia,
+  DIFERENCIAS_ON_OFF,
+  DIFERENCIA_DE_SERIE,
   cuerpoValido,
   FASES,
   RITMOS,
@@ -55,6 +59,8 @@ export type Ajustes = {
   /** Proteína y grasa en gramos fijos, si las pones a mano (si no, por kilo). */
   proteinaG?: number | null
   grasaG?: number | null
+  /** Hidratos según el día (ON/OFF): la diferencia entre un día de entreno y uno de descanso (0,1 = 10 % de tus kcal); null o sin poner, apagado. */
+  onOff?: number | null
   /** Tu objetivo de kcal desde `desde`; antes de esa fecha, `kcalAnterior`. */
   kcal: number
   kcalAnterior: number | null
@@ -99,10 +105,36 @@ export const hoy = signal(localDate())
 /** El día que ves en Comida · Hoy (con ‹ › se ven otros); lo que apuntas va a ese día. */
 export const diaVisto = signal(localDate())
 
-/** El objetivo de un día (con su fecha de inicio: una sugerencia aplicada vale desde mañana). */
-export function objetivoDe(a: Ajustes, fecha: string): Macros {
-  const kcal = fecha < a.desde && a.kcalAnterior !== null ? a.kcalAnterior : a.kcal
+/** Días de entreno de la semana (lunes a domingo) de una fecha, según tu rutina. */
+export function entrenosDeLaSemana(fecha: string): number {
+  const dia = (new Date(`${fecha}T12:00:00`).getDay() + 6) % 7
+  let n = 0
+  for (let k = 0; k < 7; k++) if (tipoDe(addDays(fecha, k - dia)) === 'entreno') n++
+  return n
+}
+
+/** Tus kcal de un día sin ON/OFF (con su fecha de inicio: una sugerencia aplicada vale desde mañana). */
+const kcalBase = (a: Ajustes, fecha: string) =>
+  fecha < a.desde && a.kcalAnterior !== null ? a.kcalAnterior : a.kcal
+
+/**
+ * El objetivo de un día. Con hidratos según el día (ON/OFF), los días de entreno llevan más hidratos y los de descanso
+ * menos, con la misma media semanal; la proteína y la grasa no cambian.
+ */
+export function objetivoDe(a: Ajustes, fecha: string, diferencia = a.onOff ?? 0): Macros {
+  const deSiempre = kcalBase(a, fecha)
+  const kcal = diferencia
+    ? kcalDelDia(deSiempre, tipoDe(fecha) === 'entreno', entrenosDeLaSemana(fecha), diferencia)
+    : deSiempre
   return macrosObjetivo(kcal, a.cuerpo.pesoKg, a)
+}
+
+/** Con ON/OFF, cuántos gramos de hidratos más (o menos) lleva ese día frente a tu objetivo de siempre; null si está apagado. */
+export function hidratosDelDia(fecha: string): { entreno: boolean; gramos: number } | null {
+  const a = ajustes.value
+  if (!a?.onOff || dieta.value) return null
+  const gramos = objetivoDe(a, fecha).carbs - objetivoDe(a, fecha, 0).carbs
+  return gramos ? { entreno: tipoDe(fecha) === 'entreno', gramos } : null
 }
 
 /** La dieta que sigues (null si no sigues ninguna). */

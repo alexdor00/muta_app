@@ -5,7 +5,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 ## Tarea actual
 
 - **Guía de culturismo natural**: los 23 choques ya están decididos ([04](docs/conocimiento/04-guia-culturismo-natural.md) §14). Falta
-  lo optativo (kcal ON/OFF, ritmo de definición por fases), la frecuencia por persona (ciclos de 9 o 14 días) y Hoy y
+  lo optativo que queda (ritmo de definición por fases), la frecuencia por persona (ciclos de 9 o 14 días) y Hoy y
   Progreso (check diario, perímetros). Plan completo en
   `Desktop/MUTA-guia-aplicacion.docx`.
 - **Probar Recetas y Menú en un móvil real** (rama `pantalla/recetas`, sale de `pantalla/comida-v2`) con `npm run dev`:
@@ -28,6 +28,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
 ## Hecho
+
+- 2026-11-09 (rama `pantalla/recetas`): hidratos según el día (ON/OFF) con un interruptor en Tu objetivo: más los días
+  de entreno de tu rutina y menos los de descanso, misma media semanal; Tu día dice cuántos gramos cambia.
 
 - 2026-11-09 (rama `pantalla/recetas`): el entrenador sigue el paso a paso de la guía con el segundo cuestionario: mejorar
   = más kilos o reps, solo cuenta con el RIR apuntado, 3 semanas mejorando para subir, un músculo cada vez con +1 o +2

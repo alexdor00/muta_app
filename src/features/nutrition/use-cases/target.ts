@@ -117,6 +117,12 @@ export async function cambiarReparto(r: Reparto): Promise<void> {
   if (previo) await guardarAjustes({ ...previo, ...r })
 }
 
+/** Hidratos según el día (ON/OFF): la diferencia entre entreno y descanso, o null para apagarlo. Las kcal no cambian. */
+export async function cambiarOnOff(diferencia: number | null): Promise<void> {
+  const previo = ajustes.value
+  if (previo) await guardarAjustes({ ...previo, onOff: diferencia })
+}
+
 /** Fija las kcal a mano (entre 1.000 y 6.000). Devuelve false si no son válidas. */
 export async function fijarAMano(kcal: number): Promise<boolean> {
   const previo = ajustes.value

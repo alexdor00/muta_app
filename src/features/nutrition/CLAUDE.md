@@ -15,7 +15,9 @@ alimento), `Desktop/MUTA-Comida-sencilla-funcionalidades.png` (2026-11-06). Nutr
 Tu objetivo se calcula una vez y se **guarda**; solo cambia si tú lo cambias o aceptas una sugerencia («Aplicar desde
 mañana»; «Ahora no» la deja en el historial; la última aceptada se deshace). Con dieta pasa lo mismo con la consulta: sus
 propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si las aplicas, y se deshacen.
-Proteína y grasa van por kilo o en gramos fijos (`Reparto`, `macrosObjetivo`); los hidratos, lo que queda. Fuera de lo que
+Hidratos según el día (ON/OFF, `onOff` en tus ajustes): con el interruptor, `objetivoDe` da más hidratos los días de
+entreno y menos los de descanso (`tipoDe`, de tu rutina) con la misma media semanal (`kcalDelDia`, `entrenosDeLaSemana`);
+Tu día lo dice (`hidratosDelDia`). Con dieta cargada manda la dieta. Proteína y grasa van por kilo o en gramos fijos (`Reparto`, `macrosObjetivo`); los hidratos, lo que queda. Fuera de lo que
 dicen los documentos (`avisosReparto`: proteína 1,5–2 g/kg, grasa desde 0,6) solo se avisa; si algo de fuera los contradice,
 mandan los documentos. En volumen, la revisión semanal no sube kcal si tu fuerza en los básicos no baja (`progresas`,
 `fuerzaBasicos`, cargada de Entreno al abrir); la consulta con dieta no sube la proteína al final y sugiere recargas de

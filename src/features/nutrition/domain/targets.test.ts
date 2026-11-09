@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   avisosReparto,
+  kcalDelDia,
   calcularObjetivo,
   cuerpoValido,
   deficitDiario,
@@ -123,5 +124,16 @@ describe('avisosReparto', () => {
     expect(avisosReparto(80, { protein: 200, fat: 48, carbs: 300 })[0]).toMatch(/por encima de 2 g/)
     expect(avisosReparto(80, { protein: 120, fat: 40, carbs: 300 })[0]).toMatch(/0,6 g\/kg/)
     expect(avisosReparto(80, { protein: 120, fat: 48, carbs: 0 })).toHaveLength(1)
+  })
+})
+
+describe('kcalDelDia (ON/OFF)', () => {
+  it('más los días de entreno y menos los de descanso, con la misma media semanal', () => {
+    const on = kcalDelDia(2800, true, 4, 0.1)
+    const off = kcalDelDia(2800, false, 4, 0.1)
+    expect(on - off).toBe(280)
+    expect(Math.abs(4 * on + 3 * off - 7 * 2800)).toBeLessThanOrEqual(2)
+    expect(kcalDelDia(2800, true, 0, 0.1)).toBe(2800)
+    expect(kcalDelDia(2800, false, 7, 0.1)).toBe(2800)
   })
 })
