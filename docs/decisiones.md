@@ -665,3 +665,9 @@ guía no da van marcadas como «sugerido» aquí.
 - **Base vegetal**: entre recetas que encajan parecido, primero las de más legumbre, verdura, fruta y semillas (hasta un
   15 % menos de error — sugerido).
 - Fuera: los suplementos (no los quiere el usuario) y los perímetros en la revisión (llegan con Progreso).
+
+## 2026-11-09 · El «efecto rebote» tras una definición no se aplica
+
+La guía pide no priorizar ningún músculo al salir de una definición muy profunda (por debajo del ~10 % de grasa, «fase de
+supervivencia»). El usuario decide no aplicarlo: MUTA no lleva a nadie por debajo del ~8 % de grasa, así que ese caso no
+se da aquí. El entrenador sigue igual tras una definición.

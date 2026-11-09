@@ -6,7 +6,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 - **Guía de culturismo natural**: los 23 choques ya están decididos ([04](docs/conocimiento/04-guia-culturismo-natural.md) §14). Falta
   la frecuencia por persona (ciclos de 9 o 14 días) y Hoy y
-  Progreso (check diario, perímetros). Plan completo en
+  Progreso (check diario, perímetros). El «efecto rebote» no se aplica (decisión 2026-11-09). Plan completo en
   `Desktop/MUTA-guia-aplicacion.docx`.
 - **Probar Recetas y Menú en un móvil real** (rama `pantalla/recetas`, sale de `pantalla/comida-v2`) con `npm run dev`:
   el recetario con sus fotos, ajustar un plato a lo que falta (y cuando no llega), cuadrar el día, tu producto, tu menú,

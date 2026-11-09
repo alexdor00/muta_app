@@ -337,6 +337,9 @@ en la app.
 | 22 | Parciales | Tras el fallo en el predicador | Técnicas avanzadas, puntuales | Guía | Hecho: el consejo dice «de forma puntual y casi nunca en definición» |
 | 23 | Frecuencia | 2/sem por músculo en semana de 7 días | La que pida cada grupo, ciclos de 9 o 14 días | Guía: **depende de la persona** | Pendiente de diseño |
 
+**«Efecto rebote» tras una definición** (no priorizar al salir): no se aplica (decisión 2026-11-09): MUTA no lleva por
+debajo del ~8 % de grasa, donde la guía lo plantea.
+
 Coinciden: ~8–11 series por músculo y sesión como techo; descargas solo si la rutina las pauta (decisión 2026-11-02);
 tendencia de 2–3 semanas para el peso; superávit pequeño; más fallo en máquinas y aislamientos.
 
