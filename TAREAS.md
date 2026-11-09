@@ -179,5 +179,16 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Pendiente (por prioridad)
 
+
+1. Hoy y Progreso, en ese orden (cada una con su PNG aprobado antes).
+2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión y la sesión ya dicen «Sugerido»).
+3. Coach: usar las elecciones guardadas (prioridades, puntos débiles) y `adaptVolume`.
+4. Importar/exportar copia de seguridad en CSV/JSON desde Perfil.
+5. Fotos de categoría y miniaturas de ejercicio.
+6. Quitar el número de días del nombre de otras rutinas (Esencial, Frecuencia alta, PPL, Vuelta al gimnasio) si se quiere el
+   mismo criterio que en Powerbuilding.
+
+## Dudas abiertas
+
 - ¿Tercer descanso al final en «Cuerpo completo A/B» (el documento de conocimiento da un ejemplo con descanso doble)?
 - ¿Se publica la app (hosting) antes o después de las pantallas de sesión?
