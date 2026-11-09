@@ -1,7 +1,14 @@
 // Lo que se ve de Comida: tus ajustes, lo apuntado, tus pesajes y lo que propone el entrenador. Lo carga y guarda
 // use-cases/nutritionStore.ts; aquí no se guarda nada.
 import { computed, signal } from '@preact/signals'
-import { addDays, localDate } from '../../../shared/lib/format.ts'
+import { addDays, daysBetween, formatDayDate, localDate } from '../../../shared/lib/format.ts'
+import {
+  enRecarga,
+  finDeRecarga,
+  tocaRecarga,
+  type Recarga,
+  type RendimientoReciente,
+} from '../domain/refeed.ts'
 import { diaDeDieta, repartoSinRutina, type DietaActiva, type TipoDia } from '../domain/diet.ts'
 import { porComida, sumar, type Alimento, type Apunte, type Macros } from '../domain/food.ts'
 import { consejosDeLaSemana, revisar, type Revision } from '../domain/review.ts'
@@ -28,8 +35,12 @@ export {
   pasoDe,
 } from '../domain/food.ts'
 export type { Alimento, Apunte, ComidaId, Macros, Modo } from '../domain/food.ts'
+export { enRecarga, type Recarga } from '../domain/refeed.ts'
 export {
   avisosReparto,
+  RITMO_MAX_FINAL,
+  SEMANA_FINAL,
+  semanaDeLaFase,
   MESETAS_PARON,
   ritmoDeLaSemana,
   SUBIDA_MESETA,
@@ -75,6 +86,9 @@ export type Ajustes = {
   /** En mantenimiento: vuelves de un parón o sales de una definición, y las mesetas que llevas. */
   situacion?: Situacion | null
   mesetas?: number
+  /** La recarga de hidratos (la última o la que llevas) y cuándo dijiste «Ahora no» a la propuesta. */
+  recarga?: Recarga | null
+  recargaDescartada?: string | null
   /** Tu objetivo de kcal desde `desde`; antes de esa fecha, `kcalAnterior`. */
   kcal: number
   kcalAnterior: number | null
@@ -127,9 +141,16 @@ export function entrenosDeLaSemana(fecha: string): number {
   return n
 }
 
-/** Tus kcal de un día sin ON/OFF (con su fecha de inicio: una sugerencia aplicada vale desde mañana). */
+/**
+ * Tus kcal de un día sin ON/OFF (con su fecha de inicio: una sugerencia aplicada vale desde mañana). En una recarga de
+ * hidratos, las de mantenimiento (la proteína y la grasa no cambian: lo de más va a hidratos).
+ */
 const kcalBase = (a: Ajustes, fecha: string) =>
-  fecha < a.desde && a.kcalAnterior !== null ? a.kcalAnterior : a.kcal
+  enRecarga(a.recarga, fecha)
+    ? calcularObjetivo({ ...a, fase: 'mantenimiento' }).kcal
+    : fecha < a.desde && a.kcalAnterior !== null
+      ? a.kcalAnterior
+      : a.kcal
 
 /**
  * El objetivo de un día. Con hidratos según el día (ON/OFF), los días de entreno llevan más hidratos y los de descanso
@@ -149,6 +170,9 @@ export function objetivoDe(a: Ajustes, fecha: string, diferencia = a.onOff ?? 0)
  */
 export function notaHidratos(fecha: string): string | null {
   if (dieta.value || !ajustes.value) return null
+  const r = ajustes.value.recarga
+  if (enRecarga(r, fecha) && r)
+    return `Recarga de hidratos hasta el ${formatDayDate(r.hasta)}: comes lo de mantenimiento, con todo lo de más en hidratos.`
   const h = hidratosDelDia(fecha)
   const cambio = h ? `${h.gramos > 0 ? '+' : '−'}${Math.abs(h.gramos)} g de hidratos. ` : ''
   if (tipoDe(fecha) === 'entreno')
@@ -239,6 +263,33 @@ export const revisionDeHoy = computed<Revision | null>(() => {
     situacion: a.situacion ?? null,
     mesetas: a.mesetas ?? 0,
   })
+})
+
+/** Tu rendimiento sesión a sesión y las sesiones de una vuelta de tu rutina (de Entreno; null hasta cargarlo). */
+export const rendimientoComida = signal<{
+  rendimiento: RendimientoReciente
+  sesionesDelCiclo: number
+} | null>(null)
+
+/** Si hoy toca proponer una recarga de hidratos (y hasta cuándo duraría). null si no. */
+export const recargaPropuesta = computed<{ hasta: string; sesiones: number } | null>(() => {
+  const a = ajustes.value
+  const r = rendimientoComida.value
+  if (!a || !r || dieta.value || enRecarga(a.recarga, hoy.value)) return null
+  if (a.recargaDescartada && daysBetween(a.recargaDescartada, hoy.value) < 7) return null
+  const toca = tocaRecarga({
+    fase: a.fase,
+    semanaFase: semanaDeLaFase(a.faseDesde ?? a.creado, hoy.value),
+    rendimiento: r.rendimiento,
+    ultima: a.recarga ?? null,
+    hoy: hoy.value,
+  })
+  return toca
+    ? {
+        hasta: finDeRecarga(hoy.value, r.sesionesDelCiclo, (f) => tipoDe(f) === 'entreno'),
+        sesiones: r.sesionesDelCiclo,
+      }
+    : null
 })
 
 /** Consejos que acompañan a la revisión de esta semana (si la grasa no baja, la recarga de hidratos). */

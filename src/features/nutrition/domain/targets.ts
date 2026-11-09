@@ -197,3 +197,12 @@ export const semanaDeLaFase = (desde: string, hoy: string) =>
 export type Situacion = 'paron' | 'salida'
 export const SUBIDA_MESETA = 200
 export const MESETAS_PARON = 2
+
+/**
+ * Etapa final de la definición (desde la semana 9, como la fase final de la consulta): ya estás bastante definido y la app
+ * no aprieta: velocidad como mucho −0,75 % por semana y, si hay que bajar, −100 kcal en vez de −150 (decisión 2026-11-09:
+ * apretar mucho con poca grasa cuesta músculo y rendimiento; cifras sugeridas).
+ */
+export const SEMANA_FINAL = 9
+export const RITMO_MAX_FINAL = 0.75
+export const BAJADA_FINAL = 100

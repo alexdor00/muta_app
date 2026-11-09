@@ -40,7 +40,9 @@ export {
   MAX_MENUS,
   menuDelDia,
   NOMBRE_DIA,
+  DIAS_NEVERA,
   paraCocinar,
+  paraCongelar,
   semanaDesde,
 } from '../domain/menu.ts'
 export type { Avisos, Cocinado, Hecho, Hueco, MenuPlan, MenuSemanal, Tarea } from '../domain/menu.ts'

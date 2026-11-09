@@ -134,12 +134,19 @@ describe('mesetas (tras un parón o al salir de una definición)', () => {
 })
 
 describe('consejosDeLaSemana', () => {
-  it('si la grasa no baja, y la recarga en la segunda mitad con la fuerza bajando; solo en definición', () => {
+  it('si la grasa no baja; solo en definición', () => {
     expect(consejosDeLaSemana({ fase: 'definicion', lento: true })[0]).toContain('Si la grasa no baja')
-    expect(
-      consejosDeLaSemana({ fase: 'definicion', lento: false, semanaFase: 10, fuerza: -0.03 })[0],
-    ).toContain('recarga de hidratos')
-    expect(consejosDeLaSemana({ fase: 'definicion', lento: false, semanaFase: 4, fuerza: -0.03 })).toEqual([])
+    expect(consejosDeLaSemana({ fase: 'definicion', lento: false })).toEqual([])
     expect(consejosDeLaSemana({ fase: 'volumen', lento: true })).toEqual([])
+  })
+})
+
+describe('etapa final de la definición', () => {
+  it('desde la semana 9, si hay que bajar, −100 en vez de −150', () => {
+    const lento = { ...base, serie: serie(-0.28) }
+    const antes = revisar(lento)
+    const final = revisar({ ...lento, semanaFase: 10 })
+    expect(antes.tipo === 'cambio' && antes.de - antes.a).toBe(150)
+    expect(final.tipo === 'cambio' && final.de - final.a).toBe(100)
   })
 })

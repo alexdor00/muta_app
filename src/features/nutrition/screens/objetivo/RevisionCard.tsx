@@ -1,5 +1,13 @@
-import { formatChange, formatInt } from '../../../../shared/lib/format.ts'
-import { consejosSemana, MESETAS_PARON, pendiente, revisionDeHoy, SUBIDA_MESETA } from '../../state/comida.ts'
+import { formatChange, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import {
+  consejosSemana,
+  MESETAS_PARON,
+  pendiente,
+  recargaPropuesta,
+  revisionDeHoy,
+  SUBIDA_MESETA,
+} from '../../state/comida.ts'
+import { descartarRecarga, empezarRecarga } from '../../use-cases/target.ts'
 import styles from './Objetivo.module.css'
 
 const pct = (n: number) => formatChange(n / 100, 2)
@@ -44,6 +52,27 @@ export function RevisionCard({ onVer }: { onVer: (() => void) | null }) {
         {p && <span class={styles.badge}>1 sugerencia</span>}
       </div>
       <p class={styles.sub}>{texto}</p>
+      {recargaPropuesta.value && (
+        <div class={styles.recarga}>
+          <p class={styles.sub}>
+            Tu rendimiento baja en varias sesiones y ya llevas semanas en definición: se recomienda una
+            recarga de hidratos hasta el {formatDayDate(recargaPropuesta.value.hasta)} (una vuelta de tu
+            rutina). Comerás lo de mantenimiento, con todo lo de más en hidratos.
+          </p>
+          <div class={styles.recargaBotones}>
+            <button
+              type="button"
+              class={styles.see}
+              onClick={() => void empezarRecarga(recargaPropuesta.value?.hasta ?? '')}
+            >
+              Empezar la recarga
+            </button>
+            <button type="button" class={styles.textButton} onClick={() => void descartarRecarga()}>
+              Ahora no
+            </button>
+          </div>
+        </div>
+      )}
       {consejosSemana.value.map((c) => (
         <p key={c} class={styles.foot}>
           {c}

@@ -671,3 +671,24 @@ guía no da van marcadas como «sugerido» aquí.
 La guía pide no priorizar ningún músculo al salir de una definición muy profunda (por debajo del ~10 % de grasa, «fase de
 supervivencia»). El usuario decide no aplicarlo: MUTA no lleva a nadie por debajo del ~8 % de grasa, así que ese caso no
 se da aquí. El entrenador sigue igual tras una definición.
+
+## 2026-11-09 · Dudas de Nutrición resueltas y recarga de hidratos
+
+Decidido por el usuario:
+
+- **Dietas**: se crean en la app o se cargan de un archivo: el de MUTA (JSON) o un **CSV** con una fila por ingrediente
+  (menú, comida, receta, ingrediente, gramos o gramos de entreno y descanso; valores por 100 g y «días» opcionales: lo
+  que falte se busca en la base). El lector de CSV pasa a `shared/lib/csv.ts` (lo usan rutinas y dietas).
+- **La consulta semanal se queda en Nutrición.** Hoy es solo para lo que hay que hacer hoy; lo semanal y lo mensual, en su
+  pestaña (la propuesta de Hoy quita «Para ti»; como mucho, «Hoy toca tu consulta» ese día).
+- **Lo cocinado aguanta 3–4 días en la nevera** (FoodSafety.gov/USDA, revisado en 2023; no hay tabla oficial de la AESAN
+  y fuentes de consumo españolas dan ~2 días para arroz, pasta y legumbres). Al cocinar para más de 3 días, aviso de
+  congelar esas raciones.
+- **Velocidad de la definición**: lineal o por fases, como un entrenador real; desde la semana 9 (ya bastante definido)
+  no se aprieta: como mucho −0,75 % por semana y, si hay que bajar, −100 kcal (sugerido).
+- **Recarga de hidratos**: desde la semana 8 (segunda mitad), cuando tu rendimiento baja en varias sesiones (2 o más en 10
+  días) tras venir estable o mejorando —una sola sesión mala no cuenta—; dura una vuelta completa de tu rutina (como
+  mucho 14 días); se come lo de mantenimiento con todo lo de más en hidratos (como las pausas de dieta de 01, MATADOR);
+  como mucho una cada 3 semanas. Se propone en Tu día y en la revisión («Empezar» / «Ahora no»: no vuelve en 7 días).
+  Con el check diario de Hoy se sumará la energía.
+- **Hidratos según el día**: se queda 10 · 15 · 20 %.

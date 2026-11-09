@@ -5,7 +5,16 @@ import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
 import { ChevronRightIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
-import { ajustes, RITMOS, type Fase, type Situacion } from '../../state/comida.ts'
+import {
+  ajustes,
+  hoy,
+  RITMO_MAX_FINAL,
+  RITMOS,
+  SEMANA_FINAL,
+  semanaDeLaFase,
+  type Fase,
+  type Situacion,
+} from '../../state/comida.ts'
 import { cambiarFase, cambiarOnOff, cambiarReparto } from '../../use-cases/target.ts'
 import { QUE_QUIERES } from '../comida/DatosHoja.tsx'
 import h from '../comun/Hojas.module.css'
@@ -26,6 +35,11 @@ export function EditarObjetivoHoja({ onClose }: { onClose: () => void }) {
   const [porFases, setPorFases] = useState(a?.porFases ?? false)
   const [situacion, setSituacion] = useState<Situacion | null>(a?.situacion ?? null)
   if (!a || !reparto) return null
+  // Etapa final de la definición (ya bastante definido): no se ofrece ir más rápido de −0,75 %
+  const etapaFinal =
+    a.fase === 'definicion' &&
+    fase === 'definicion' &&
+    semanaDeLaFase(a.faseDesde ?? a.creado, hoy.value) >= SEMANA_FINAL
   const cambiaFase =
     fase !== a.fase ||
     (fase === 'definicion' && (Number(ritmo) !== a.ritmo || porFases !== (a.porFases ?? false))) ||
@@ -75,10 +89,19 @@ export function EditarObjetivoHoja({ onClose }: { onClose: () => void }) {
             name="editar-velocidad"
             legend="Velocidad: de tu peso por semana"
             showLegend
-            options={RITMOS.map((r) => ({ value: String(r), label: `−${formatDecimal(r)} %` }))}
+            options={RITMOS.filter((r) => !etapaFinal || r <= RITMO_MAX_FINAL).map((r) => ({
+              value: String(r),
+              label: `−${formatDecimal(r)} %`,
+            }))}
             value={ritmo}
             onChange={setRitmo}
           />
+        )}
+        {etapaFinal && (
+          <p class={h.foot}>
+            Estás en la etapa final: se recomienda no pasar de −{formatDecimal(RITMO_MAX_FINAL)} % para no
+            perder músculo ni rendimiento.
+          </p>
         )}
         {fase === 'definicion' && (
           <VelocidadPorFases ritmo={Number(ritmo)} valor={porFases} onChange={setPorFases} />

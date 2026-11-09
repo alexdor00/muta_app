@@ -7,7 +7,7 @@ import { logError } from '../../../shared/lib/logger.ts'
 import type { Revision } from '../domain/consult.ts'
 import type { DietaActiva } from '../domain/diet.ts'
 import type { Alimento, Apunte } from '../domain/food.ts'
-import { fuerzaEnBasicos, tiposDeDia } from '../../training/index.ts'
+import { fuerzaEnBasicos, rendimientoReciente, tiposDeDia } from '../../training/index.ts'
 import { tituloCambio } from '../domain/review.ts'
 import {
   ajustes,
@@ -17,6 +17,7 @@ import {
   dieta,
   estado,
   fuerzaBasicos,
+  rendimientoComida,
   guardadas,
   hoy,
   pesajes,
@@ -114,6 +115,7 @@ async function cargarFuerza(): Promise<void> {
   if (ajustes.value?.fase !== 'volumen' && ajustes.value?.fase !== 'definicion') return
   try {
     fuerzaBasicos.value = (await fuerzaEnBasicos(hoy.value))?.cambio ?? null
+    if (ajustes.value?.fase === 'definicion') rendimientoComida.value = await rendimientoReciente(hoy.value)
   } catch (error) {
     logError(error, 'leer tu fuerza en los básicos')
   }

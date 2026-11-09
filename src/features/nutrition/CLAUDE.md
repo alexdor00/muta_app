@@ -15,7 +15,11 @@ alimento), `Desktop/MUTA-Comida-sencilla-funcionalidades.png` (2026-11-06). Nutr
 Tu objetivo se calcula una vez y se **guarda**; solo cambia si tú lo cambias o aceptas una sugerencia («Aplicar desde
 mañana»; «Ahora no» la deja en el historial; la última aceptada se deshace). Con dieta pasa lo mismo con la consulta: sus
 propuestas (kcal, pasos, fase) se añaden como un ajuste desde mañana solo si las aplicas, y se deshacen.
-Velocidad por fases (`porFases`, `ritmoDeLaSemana`) y tu situación en mantenimiento (`situacion`: parón o salida de una
+La dieta se crea en la app o se carga del archivo de MUTA o de un CSV (`domain/dietCsv.ts`, con `shared/lib/csv.ts`). La
+recarga de hidratos (`domain/refeed.ts`: semana ≥ 8, rendimiento cayendo en varias sesiones tras venir estable —lo da
+Entreno—, una cada 3 semanas, una vuelta de tu rutina a mantenimiento) se propone en Tu día y en la revisión. Desde la
+semana 9 de la definición no se aprieta (`SEMANA_FINAL`: −0,75 % como mucho, −100 kcal). Lo cocinado: aviso de congelar a
+partir del 4.º día (`paraCongelar`). Velocidad por fases (`porFases`, `ritmoDeLaSemana`) y tu situación en mantenimiento (`situacion`: parón o salida de una
 definición, con mesetas de +200 kcal) los propone la revisión semanal (`revisar`: `motivo` y `extra` en la sugerencia, que
 `aplicarSugerencia` guarda); `consejosDeLaSemana` añade «si la grasa no baja» y la recarga; `notaHidratos`, en Tu día, los
 hidratos antes y después de entrenar; `mejoresPara` pone primero la base vegetal (`parteVegetal`). Si te pasas de grasa (o de proteína), lo que falta del día (`faltaDelDia`, en `domain/fit.ts`) quita lo que sobra de los

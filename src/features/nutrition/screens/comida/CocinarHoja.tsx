@@ -10,7 +10,9 @@ import {
   enCrudoDe,
   gramosDeHueco,
   menu,
+  DIAS_NEVERA,
   paraCocinar,
+  paraCongelar,
   platoPorId,
   type Cocinado,
 } from '../../state/recetas.ts'
@@ -117,6 +119,16 @@ export function CocinarHoja({ cocinado, onClose, avisar }: Props) {
             <p class={h.sub}>Pon este plato en más comidas de tu menú para cocinarlo de una vez.</p>
           )}
         </fieldset>
+        {paraCongelar(fecha, para).length > 0 && (
+          <p class={h.warn} role="status">
+            Lo cocinado aguanta unos {DIAS_NEVERA}–4 días en la nevera: congela las raciones de{' '}
+            {paraCongelar(fecha, para)
+              .map((k) => formatDayDate(k.split('|')[0]))
+              .filter((d, i, todos) => todos.indexOf(d) === i)
+              .join(', ')}{' '}
+            y sácalas la noche antes.
+          </p>
+        )}
         <section class={h.card} aria-label="Cocinas en total">
           <p class={h.eyebrow}>
             Cocinas en total · {para.length} {para.length === 1 ? 'ración' : 'raciones'}

@@ -1,5 +1,6 @@
-// Lo que Comida necesita de Entreno (por el index.ts del área): qué días son de entreno según tu rutina y cómo va tu fuerza
-// en los básicos. Lee tu plan con cargarPlan(); no guarda nada.
+// Lo que Comida necesita de Entreno (por el index.ts del área): qué días son de entreno según tu rutina, cómo va tu fuerza
+// en los básicos y tu rendimiento sesión a sesión (para la recarga de hidratos). Lee tu plan con cargarPlan(); no guarda nada.
+import { rendimientoReciente, type Rendimiento } from '../domain/rendimiento.ts'
 import { fuerzaEnBasicos, type FuerzaBasicos } from '../domain/strengthTrend.ts'
 import { diasPrevistos, entrenos, tuPlan } from '../state/plan.ts'
 import { porNombre } from './exerciseLibrary.ts'
@@ -25,4 +26,17 @@ export async function tiposDeDia(
 export async function fuerzaParaComida(hoy: string): Promise<FuerzaBasicos | null> {
   await cargarPlan()
   return fuerzaEnBasicos(entrenos.value, hoy, (nombre) => porNombre(nombre)?.kind === 'compound')
+}
+
+/**
+ * Para la recarga de hidratos: tu rendimiento de los últimos 10 días frente a las semanas de antes, y cuántas sesiones
+ * tiene una vuelta de tu rutina (lo que dura la recarga). null sin rutina.
+ */
+export async function rendimientoParaComida(
+  hoy: string,
+): Promise<{ rendimiento: Rendimiento; sesionesDelCiclo: number } | null> {
+  await cargarPlan()
+  const plan = tuPlan.value
+  if (plan.status !== 'ready') return null
+  return { rendimiento: rendimientoReciente(entrenos.value, hoy), sesionesDelCiclo: plan.semana.length }
 }

@@ -16,6 +16,8 @@ import {
   type Fase,
   type Reparto,
   ritmoDeLaSemana,
+  RITMO_MAX_FINAL,
+  SEMANA_FINAL,
   semanaDeLaFase,
   type Situacion,
 } from '../domain/targets.ts'
@@ -103,12 +105,17 @@ export async function guardarDatos(cuerpo: Cuerpo, pasos: number, fase?: Fase): 
  */
 export async function cambiarFase(
   fase: Fase,
-  ritmo: number,
+  ritmoPedido: number,
   opciones: { porFases?: boolean; situacion?: Situacion | null } = {},
 ): Promise<void> {
   const previo = ajustes.value
   if (!previo) return
   const faseDesde = fase !== previo.fase ? hoy.value : (previo.faseDesde ?? previo.creado)
+  // En la etapa final de la definición no se aprieta: como mucho −0,75 % por semana
+  const ritmo =
+    fase === 'definicion' && semanaDeLaFase(faseDesde, hoy.value) >= SEMANA_FINAL
+      ? Math.min(ritmoPedido, RITMO_MAX_FINAL)
+      : ritmoPedido
   const porFases = fase === 'definicion' && (opciones.porFases ?? previo.porFases ?? false)
   const ritmoTramo = porFases ? ritmoDeLaSemana(ritmo, semanaDeLaFase(faseDesde, hoy.value)) : null
   const situacion = fase === 'mantenimiento' ? (opciones.situacion ?? previo.situacion ?? null) : null
@@ -140,6 +147,18 @@ export async function cambiarReparto(r: Reparto): Promise<void> {
 export async function cambiarOnOff(diferencia: number | null): Promise<void> {
   const previo = ajustes.value
   if (previo) await guardarAjustes({ ...previo, onOff: diferencia })
+}
+
+/** Empieza la recarga de hidratos propuesta: desde hoy hasta completar una vuelta de tu rutina. */
+export async function empezarRecarga(hasta: string): Promise<void> {
+  const previo = ajustes.value
+  if (previo) await guardarAjustes({ ...previo, recarga: { desde: hoy.value, hasta } })
+}
+
+/** «Ahora no» a la recarga: no se vuelve a proponer en 7 días. */
+export async function descartarRecarga(): Promise<void> {
+  const previo = ajustes.value
+  if (previo) await guardarAjustes({ ...previo, recargaDescartada: hoy.value })
 }
 
 /** Fija las kcal a mano (entre 1.000 y 6.000). Devuelve false si no son válidas. */

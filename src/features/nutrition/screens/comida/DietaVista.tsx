@@ -78,6 +78,10 @@ export function DietaVista(p: Props) {
             </Button>
           </div>
           <p class={styles.foot}>
+            El archivo puede ser el de MUTA o un CSV con una fila por ingrediente: menú, comida, receta,
+            ingrediente y gramos (o gramos de entreno y de descanso).
+          </p>
+          <p class={styles.foot}>
             La de ejemplo es la del prototipo anterior, para ver cómo funciona: no es una dieta pautada para
             ti.
           </p>

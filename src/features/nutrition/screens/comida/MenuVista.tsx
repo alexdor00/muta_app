@@ -143,7 +143,7 @@ export function MenuVista({
           <span class={v.foot}>
             {dieta.value
               ? 'Sus menús, la consulta semanal y sus recetas'
-              : 'Su archivo de dieta, o la de ejemplo para probar'}
+              : 'Su archivo de dieta (MUTA o CSV), o la de ejemplo para probar'}
           </span>
         </span>
         <ChevronRightIcon />

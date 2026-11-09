@@ -11,11 +11,13 @@ import {
   diaVisto,
   hoy,
   notaHidratos,
+  recargaPropuesta,
   objetivoDia,
   pendiente,
   totalDia,
   type ComidaId,
 } from '../../state/comida.ts'
+import { empezarRecarga } from '../../use-cases/target.ts'
 import { apuntada, menuDelDia, tocaConsulta } from '../../state/dieta.ts'
 import {
   fotoDeApunte,
@@ -113,6 +115,14 @@ export function HoyVista({
           texto="Toca la consulta: báscula, cinta y cómo te has sentido"
           ver="Empezar"
           onVer={onConsulta}
+        />
+      )}
+      {esHoy && recargaPropuesta.value && (
+        <CoachCard
+          titulo="El entrenador · recarga de hidratos"
+          texto={`Tu rendimiento baja: se recomienda una recarga hasta el ${formatDayDate(recargaPropuesta.value.hasta)}`}
+          ver="Empezar"
+          onVer={() => void empezarRecarga(recargaPropuesta.value?.hasta ?? fecha)}
         />
       )}
       {esHoy && !enDieta && sugerencia && onSugerencia && (

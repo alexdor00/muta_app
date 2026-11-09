@@ -227,3 +227,29 @@
   align-items: center;
   gap: var(--space-2);
 }
+
+/* La propuesta de recarga de hidratos dentro de la revisión semanal */
+.recarga {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.recargaBotones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.textButton {
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}

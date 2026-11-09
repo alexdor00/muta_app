@@ -16,8 +16,6 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   ración, el peso de hoy y Tu objetivo; en Dieta, la de ejemplo o la tuya, apuntar del menú, una receta (intercambio y editar), la
   compra, la cocina, la consulta y el escáner con la cámara (necesita https o la red local; Open Food Facts, internet).
   Después, PR a `main` (detrás de los de `pantalla/sesion` y `pantalla/comida`).
-- **Dudas de Comida que siguen abiertas**: ¿una dieta de verdad para cargar (o se crea en la app)? ¿La consulta se queda en
-  Comida o pasa a Hoy cuando exista? ¿Una fuente para cuánto aguanta lo cocinado en la nevera?
 - **Probar la rama `pantalla/sesion` en un móvil real** con `npm run dev` (dirección «Network», mismo wifi): Tu plan (tarjetas
   con «▶ Empezar», «Editar», Tu semana, Hoy descansas), Editar rutina, la sesión (teclado, dropsets, notas), Ver sesión y las
   fichas. Hasta ahora todo se ha visto solo en el móvil simulado. Después, PR a `main` con la CI en verde.
@@ -28,6 +26,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
 ## Hecho
+
+- 2026-11-09 (rama `pantalla/recetas`): dietas también desde CSV; aviso de congelar lo cocinado a partir del 4.º día;
+  la definición no aprieta desde la semana 9; recarga de hidratos propuesta por tu rendimiento (una vuelta de tu rutina a
+  mantenimiento). Propuesta de Hoy actualizada (solo lo de hoy).
 
 - 2026-11-09 (rama `pantalla/recetas`): lo que quedaba de la guía en Nutrición (menos suplementos): velocidad por
   fases, tu situación (parón o salida de una definición) con mesetas, hidratos antes y después de entrenar, «si la grasa no

@@ -383,3 +383,15 @@ export function calendarioDelMenu(
   ]
   return lineas.join('\r\n') + '\r\n'
 }
+
+/**
+ * Lo cocinado aguanta 3–4 días en la nevera (FoodSafety.gov, USDA, revisado en 2023; decisión 2026-11-09): se avisa a
+ * partir del cuarto día. Arroz, pasta y legumbres, mejor antes (unos 2 días, según fuentes de consumo españolas).
+ */
+export const DIAS_NEVERA = 3
+
+/** De las comidas para las que cocinas (`fecha|comida`), las que caen más de 3 días después de cocinar: mejor congelarlas. */
+export function paraCongelar(fecha: string, para: readonly string[]): string[] {
+  const dia = (iso: string) => new Date(`${iso}T12:00:00`).getTime() / 86_400_000
+  return para.filter((k) => dia(k.split('|')[0]) - dia(fecha) > DIAS_NEVERA)
+}

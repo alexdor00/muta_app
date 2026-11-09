@@ -3,7 +3,9 @@
 // kcal se mira si progresas (decisión 2026-11-08, guía G1 §6, 04-guia-culturismo-natural.md).
 import { daysBetween, formatInt } from '../../../shared/lib/format.ts'
 import {
+  BAJADA_FINAL,
   deficitDiario,
+  SEMANA_FINAL,
   MESETAS_PARON,
   PASOS_OBJETIVO,
   ritmoDeLaSemana,
@@ -167,7 +169,9 @@ export function revisar(d: DatosRevision): Revision {
   if (d.fase === 'definicion' && bajar && d.pasos < PASOS_OBJETIVO)
     return { tipo: 'pasos', pct, kgSemana, previsto, pasos: d.pasos }
 
-  const a = bajar ? Math.max(d.suelo, d.kcal - CAMBIO_KCAL) : d.kcal + CAMBIO_KCAL
+  // Etapa final de la definición: no se aprieta tanto (−100 en vez de −150)
+  const final = d.fase === 'definicion' && (d.semanaFase ?? 0) >= SEMANA_FINAL
+  const a = bajar ? Math.max(d.suelo, d.kcal - (final ? BAJADA_FINAL : CAMBIO_KCAL)) : d.kcal + CAMBIO_KCAL
   if (a >= d.kcal && bajar) return { tipo: 'suelo', pct, suelo: d.suelo }
   return {
     tipo: 'cambio',
@@ -207,8 +211,8 @@ export function tituloCambio(
 }
 
 /**
- * Consejos de la semana que acompañan a la revisión (no cambian nada): si la grasa no baja en definición, y en la segunda
- * mitad de una definición, la recarga de hidratos de varios días (guía G1 §7; cuántos días y cuánto, sugerido).
+ * Consejos de la semana que acompañan a la revisión (no cambian nada): si la grasa no baja en definición. La recarga de
+ * hidratos va aparte, como propuesta (domain/refeed.ts).
  */
 export function consejosDeLaSemana(d: {
   fase: Fase
@@ -223,10 +227,6 @@ export function consejosDeLaSemana(d: {
   if (d.lento)
     out.push(
       'Si la grasa no baja: simplifica las fuentes de hidratos, modera la fibra, quita lo que te sienta mal y revisa el estrés.',
-    )
-  if ((d.semanaFase ?? 0) >= 9 && (d.fuerza ?? 0) < 0)
-    out.push(
-      'Llevas semanas en definición y tu fuerza baja: se recomienda una recarga de hidratos de 2–3 días, comiendo lo de mantenimiento (nunca de un solo día).',
     )
   return out
 }

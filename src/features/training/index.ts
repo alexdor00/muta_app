@@ -1,6 +1,7 @@
 // API pública del área Entreno: lo único que otras áreas pueden usar.
 export { TuMaterial } from './screens/material/TuMaterial.tsx'
 export type { FuerzaBasicos } from './domain/strengthTrend.ts'
+export type { Rendimiento } from './domain/rendimiento.ts'
 
 /** Para Comida: qué días son de entreno según tu rutina (null sin rutina). Se descarga aparte al pedirlo. */
 export async function tiposDeDia(hoy: string, inicio: string, n: number) {
@@ -10,4 +11,9 @@ export async function tiposDeDia(hoy: string, inicio: string, n: number) {
 /** Para la consulta de Comida: cómo va tu fuerza en los básicos. Se descarga aparte al pedirlo. */
 export async function fuerzaEnBasicos(hoy: string) {
   return (await import('./use-cases/forComida.ts')).fuerzaParaComida(hoy)
+}
+
+/** Para la recarga de hidratos de Comida: tu rendimiento reciente y las sesiones de una vuelta de tu rutina. */
+export async function rendimientoReciente(hoy: string) {
+  return (await import('./use-cases/forComida.ts')).rendimientoParaComida(hoy)
 }

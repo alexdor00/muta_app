@@ -19,9 +19,10 @@ import {
   type RecetaDelDia,
   type TipoDia,
 } from '../domain/diet.ts'
+import { dietaDesdeCsv } from '../domain/dietCsv.ts'
 import { dietaDeEjemplo } from '../domain/dietSample.ts'
-import { COMIDAS, type Alimento, type ComidaId } from '../domain/food.ts'
-import { diaVisto, dias, dieta, hoy, objetivoHoy } from '../state/comida.ts'
+import { buscarAlimentos, COMIDAS, type Alimento, type ComidaId } from '../domain/food.ts'
+import { diaVisto, dias, dieta, hoy, objetivoHoy, propios } from '../state/comida.ts'
 import { anadir, cargarAlimentos, devolver, quitar } from './foodLog.ts'
 import { guardarCambio, guardarDieta } from './nutritionStore.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
@@ -92,13 +93,26 @@ export function dietaPropia(nombre: string): Dieta {
   return dietaNueva(`mia-${nuevoId()}`, nombre)
 }
 
-/** Elige un archivo de dieta y lo lee. Devuelve la dieta, o por qué no vale (null si no eliges nada). */
+/**
+ * Elige un archivo de dieta y lo lee: el de MUTA (JSON) o un CSV (una fila por ingrediente; lo que no traiga sus valores
+ * se busca en la base). Devuelve la dieta, o por qué no vale (null si no eliges nada).
+ */
 export async function elegirArchivo(): Promise<
   { ok: true; dieta: Dieta } | { ok: false; motivo: string } | null
 > {
-  const file = await platform.pickFile('.json,application/json')
+  const file = await platform.pickFile('.json,application/json,.csv,text/csv')
   if (!file) return null
   try {
+    if (/.csv$/i.test(file.name)) {
+      const lista = [...propios.value, ...(await cargarAlimentos())]
+      const r = dietaDesdeCsv(
+        await file.text(),
+        file.name.replace(/.csv$/i, ''),
+        `csv-${nuevoId()}`,
+        (n) => buscarAlimentos(lista, n, 1)[0] ?? null,
+      )
+      return r.dieta ? { ok: true, dieta: r.dieta } : { ok: false, motivo: r.errores.slice(0, 3).join(' ') }
+    }
     return leerDieta(JSON.parse(await file.text()))
   } catch (error) {
     logError(error, 'leer un archivo de dieta')

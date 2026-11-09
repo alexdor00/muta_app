@@ -21,6 +21,7 @@ import {
   sinMenu,
   totalDelDia,
   type MenuSemanal,
+  paraCongelar,
 } from './menu.ts'
 import type { Plato } from './recipes.ts'
 
@@ -152,5 +153,13 @@ describe('gramos de una comida', () => {
     const m = conAjuste(conPlato(menuVacio(), 'A', 'cena', 'rec-1'), 'A', 'cena', false)
     expect(m.menus[0].fijos).toEqual(['cena'])
     expect(conAjuste(m, 'A', 'cena', true).menus[0].fijos).toEqual([])
+  })
+})
+
+describe('paraCongelar', () => {
+  it('lo que se come más de 3 días después de cocinarlo', () => {
+    expect(paraCongelar('2026-11-09', ['2026-11-10|comida', '2026-11-12|cena', '2026-11-13|comida'])).toEqual(
+      ['2026-11-13|comida'],
+    )
   })
 })
