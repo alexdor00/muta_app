@@ -96,8 +96,10 @@ export function cargarComida(): Promise<void> {
       void cargarTipos()
       propios.value = mios?.alimentos ?? []
       guardadas.value = comidas?.comidas ?? []
-      await cargarFuerza()
-      await revisarSemana()
+      // Sin esperar: la pantalla se pinta ya. La revisión semanal va detrás, cuando se sepa tu fuerza (en volumen la mira)
+      void cargarFuerza()
+        .then(() => revisarSemana())
+        .catch((error: unknown) => logError(error, 'revisar la semana'))
     } catch (error) {
       logError(error, 'cargar Comida')
     } finally {
