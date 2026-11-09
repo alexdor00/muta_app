@@ -11,7 +11,8 @@ import { WorkoutExerciseRow } from '../../components/WorkoutExerciseRow.tsx'
 import { WorkoutKeypad } from '../../components/WorkoutKeypad.tsx'
 import { TipsBanner } from '../../components/SessionTips.tsx'
 import { ConfirmSheet, FinishSheet } from '../../components/WorkoutSheets.tsx'
-import { notaSugerido, sesionDe, type SesionPlan, textoReps } from '../../state/plan.ts'
+import { faseActual } from '../../state/fase.ts'
+import { avisoTecnica, notaSugerido, sesionDe, type SesionPlan, textoReps } from '../../state/plan.ts'
 import {
   calentamientosHoy,
   consejosAlEmpezar,
@@ -87,12 +88,13 @@ export function SesionScreen(props: { sessionId: string }) {
     consejosAlEmpezar.value && !(en && cuentaSeries(en).hechas) ? { tipo: 'consejos' } : null,
   )
 
+  const semanaDelBloque = plan.status === 'ready' ? plan.rotacion.semana : 0
   useEffect(() => {
     // Solo en su dirección: al descartar, el enrutador vuelve a pintar esta pantalla un momento mientras sale, y no
     // debe dejar otra sesión vacía contando
     if (delPlan && !en && path === paths.session(delPlan.sigla.toLowerCase()))
-      guardarSesion(nuevaSesion(delPlan, ahora))
-  }, [delPlan, en, ahora, path])
+      guardarSesion(nuevaSesion(delPlan, ahora, semanaDelBloque))
+  }, [delPlan, en, ahora, path, semanaDelBloque])
 
   if (plan.status === 'loading') return null
   if (plan.status === 'none' && !en) return <SinPlan />
@@ -223,7 +225,14 @@ export function SesionScreen(props: { sessionId: string }) {
               pauta={[...pautaHoy(e, x), ...(enSuperserie(en, i) ? ['Superserie'] : [])]}
               descanso={formatRest(descansoDe(e))}
               onDescanso={() => setHoja({ tipo: 'descanso', ejercicio: e, segundos: descansoDe(e) })}
-              sugerido={x.cambiadoPor ? null : notaSugerido(e)}
+              sugerido={
+                [
+                  x.cambiadoPor ? null : notaSugerido(e),
+                  x.cambiadoPor ? null : avisoTecnica(e, faseActual.value === 'cut'),
+                ]
+                  .filter(Boolean)
+                  .join(' ') || null
+              }
               nota={notaDe(nombre) || x.nota}
               onOpciones={() => setHojaDe(i)}
               calentamiento={calienta.map((c, k) => ({

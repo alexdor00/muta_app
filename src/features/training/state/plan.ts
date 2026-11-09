@@ -148,7 +148,7 @@ export type { EjercicioPlan, SesionPlan } from '../domain/workoutPlan.ts'
 export { nombresDeSesiones, textoReps } from '../domain/workoutPlan.ts'
 export { descansosPorSesion, trasDe } from '../domain/restDays.ts'
 export { progresoDeSesion, semanaDe, seriesPorMusculo } from '../domain/workoutHistory.ts'
-export { notaSugerido } from '../domain/workoutPlan.ts'
+export { avisoTecnica, notaSugerido } from '../domain/workoutPlan.ts'
 export {
   anadir,
   cambiarPauta,

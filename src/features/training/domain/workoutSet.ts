@@ -1,8 +1,17 @@
 // Reglas de una serie en la sesión en curso (las del prototipo anterior: entreno.js · setDone, motivacion.js · vsLast).
 import { e1rm } from './e1rm.ts'
 
-/** Una serie hecha; `extra`, sus bajadas (dropset) o mini-series (rest-pause), si las hubo. */
-export type SerieHecha = { kg: number | null; reps: number; extra?: { kg: number | null; reps: number }[] }
+/**
+ * Una serie hecha; `extra`, sus bajadas (dropset) o mini-series (rest-pause), si las hubo; `rir`, el apuntado, y `fallo`,
+ * si fue fallo de verdad (desde el 2026-11-09; los entrenos de antes no lo llevan).
+ */
+export type SerieHecha = {
+  kg: number | null
+  reps: number
+  extra?: { kg: number | null; reps: number }[]
+  rir?: number
+  fallo?: true
+}
 
 /**
  * Una serie frente a la misma serie de la vez anterior, por su 1RM estimado: 1 mejor, 0 igual (±0,5 %), −1 peor;
@@ -48,6 +57,8 @@ export function teclear(
 ): { valor: string; fresca: boolean } | null {
   const { campo, valor, fresca } = casilla
   if (tecla === 'borrar') return { valor: valor.slice(0, -1), fresca: false }
+  // Fallo de verdad: solo en la casilla del RIR («F»)
+  if (tecla === 'fallo') return campo === 'quedan' ? { valor: 'F', fresca: true } : null
   if (tecla === 'coma') {
     if (campo !== 'kg') return null
     const base = fresca ? '' : valor

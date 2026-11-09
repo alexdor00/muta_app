@@ -122,6 +122,26 @@
         "text": "Cuidado con los dos errores de alineación: demasiado cerca de la línea de la resistencia con el codo muy flexionado, o la resistencia por debajo del codo.",
         "why": "En el primero arden los flexores del codo; en el segundo trabajan de más los extensores.",
         "source": "V2"
+      },
+      {
+        "text": "Jalón para dorsal: agarre neutro y más cerrado, un poco inclinado adelante y «codo hacia el bolsillo», alejándolo del cuerpo.",
+        "why": "Menos abducción y el bíceps no se lleva la serie.",
+        "source": "G1"
+      },
+      {
+        "text": "En el jalón, el pie debajo de la rodilla para pegarte al soporte y el antebrazo alineado con el cable, de lado y de espaldas.",
+        "why": "Sin holgura y con la fuerza en la dirección del cable, trabaja la espalda y no el brazo.",
+        "source": "G1"
+      },
+      {
+        "text": "Pullover: muñequera arriba y cruza un poco el brazo para estirar más.",
+        "why": "Saca el brazo de la ecuación y el dorsal limita la serie.",
+        "source": "G1"
+      },
+      {
+        "text": "En tracciones con ayuda, que te empujen la escápula hacia abajo, sobre todo al bajar.",
+        "why": "Así el dorsal sigue trabajando cuando ya no puedes solo.",
+        "source": "G1"
       }
     ],
     "where": "Primer día de tirón: remo con abducción y apoyo, luego jalón o dominada por aducción. Segundo día: dorsal primero con extensión de hombro y un segundo remo con apoyo."
@@ -173,6 +193,11 @@
         "text": "Trapecio inferior: hombros bajos y la barbilla lo más separada de clavículas y hombros.",
         "why": "Evitas que el trapecio superior se lleve el trabajo.",
         "source": "V2"
+      },
+      {
+        "text": "Jalón para espalda alta: agarre abierto en prono, ligera inclinación atrás que no cambia y exprime con las escápulas atrás.",
+        "why": "El agarre abierto lleva el trabajo a la espalda alta y no al dorsal.",
+        "source": "G1"
       }
     ],
     "where": "Primer día de tirón, con el remo con apoyo al principio; retracciones (Kelso) en la última serie del remo."
@@ -296,6 +321,16 @@
         "text": "El face pull no es un ejercicio de hipertrofia del deltoides posterior.",
         "why": "Mete demasiada rotación externa y movimiento escapular, y se pelean rotadores, romboides y trapecio.",
         "source": "V5"
+      },
+      {
+        "text": "Pájaros y vuelos: empuja «hacia fuera», como un puñetazo con el canto de la mano, no hacia atrás, y sin subir las escápulas.",
+        "why": "Si tiras hacia atrás entran trapecio y romboides.",
+        "source": "G1"
+      },
+      {
+        "text": "A una mano en polea, ponte un poco de espaldas a ella para estirar más; la altura de la polea importa poco.",
+        "why": "Más recorrido en estiramiento para el deltoides posterior.",
+        "source": "G1"
       }
     ],
     "where": "Un hueco opcional en el primer día de tirón (abducción horizontal)."
@@ -520,6 +555,16 @@
         "text": "Prensa tras la sentadilla (por ejemplo 2 + 3 series) si quieres más trabajo en la misma sesión.",
         "why": "Llevas la cadera más flexionada y apuntas más a glúteo y aductores; cargas menos la espalda.",
         "source": "V4"
+      },
+      {
+        "text": "En pendular, hack y extensión, usa una cincha que apriete de verdad (sin cortar la circulación).",
+        "why": "Te pega al respaldo y evita que el glúteo levante la cadera y le robe trabajo al cuádriceps.",
+        "source": "G1"
+      },
+      {
+        "text": "Ajusta siempre el asiento para que el eje de la máquina coincida con tu rodilla.",
+        "why": "Con los ejes alineados la resistencia es la que la máquina promete.",
+        "source": "G1"
       }
     ],
     "where": "Pierna A: aducción, prensa inclinada profunda y extensión de rodilla. Pierna B: hack (pendular si encaja) primero."
@@ -597,6 +642,21 @@
         "text": "Si la fatiga del curl hunde tu rumano, invierte el orden.",
         "why": "La prefatiga empeora la técnica del ejercicio más técnico.",
         "source": "V11"
+      },
+      {
+        "text": "Curl femoral: piensa en hundir las rodillas en la colchoneta, no en subir el peso.",
+        "why": "Así trabaja el isquio y no se lo lleva el gemelo.",
+        "source": "G1"
+      },
+      {
+        "text": "Rumano: cadera atrás, pies no muy lejos, escápulas pegadas, abdomen apretado, pelvis neutra y la barra pegada al cuerpo.",
+        "why": "Con los pies lejos carga la lumbar; con la barra pegada trabajan los isquios.",
+        "source": "G1"
+      },
+      {
+        "text": "En el rumano puedes usar agarre «suicida» (pulgar por encima) para pegar la barra al cuerpo.",
+        "why": "La barra no se separa y la técnica se mantiene igual en todas las series.",
+        "source": "G1"
       }
     ],
     "where": "Curl sentado en pierna A; curl tumbado y rumano o piernas rígidas en el segundo día de tirón."
@@ -648,6 +708,11 @@
         "text": "Si vienes de entrenarlo poco, empieza por el rango bajo de series.",
         "why": "«No pases de cero a atleta Wellness en una semana».",
         "source": "V6"
+      },
+      {
+        "text": "Si una serie de pierna la limita otro músculo antes que el que quieres trabajar, ese ejercicio no es el bueno para ti.",
+        "why": "El músculo que quieres hacer crecer tiene que ser el que limita la serie.",
+        "source": "G1"
       }
     ],
     "where": "Pierna A: hip thrust y abducción sentada; pierna B: segunda abducción y unilateral con mucha flexión de cadera."

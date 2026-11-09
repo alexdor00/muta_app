@@ -31,6 +31,7 @@ import { entrenoDe } from './workoutRecord.ts'
 import { cargarMaterial } from './myEquipment.ts'
 import { cargarMisConsejos } from './myTips.ts'
 import { cargarFotos } from './sessionPhotos.ts'
+import { cargarFase } from './fase.ts'
 import { LEVELS } from './loadRoutines.ts'
 import { BUILT_IN } from './routineDetail.ts'
 
@@ -81,6 +82,7 @@ export function cargarPlan(forzar = false): Promise<void> {
   void cargarMisConsejos()
   void cargarMaterial()
   void cargarNotas()
+  void cargarFase()
   if (!carga || forzar) carga = leer()
   return carga
 }

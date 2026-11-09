@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { LibraryExercise } from './exerciseLibrary.ts'
 import type { ProgramData } from './program.ts'
 import {
+  avisoTecnica,
   avanzar,
   desdeBiblioteca,
   kilosDeHoy,
@@ -341,5 +342,13 @@ describe('cada serie distinta y superserie (A14)', () => {
     expect(letraSuperserie('Superserie + B2: Curl')).toBe('B')
     expect(letraSuperserie('Press francés')).toBeNull()
     expect(ejercicioDelPlan({ name: 'A2: Curl con barra Z' }, null).superserie).toBe('A')
+  })
+})
+
+describe('avisoTecnica', () => {
+  it('solo con técnica y en definición', () => {
+    expect(avisoTecnica({ tecnica: 'dropset' }, true)).toContain('serie recta')
+    expect(avisoTecnica({ tecnica: 'dropset' }, false)).toBeNull()
+    expect(avisoTecnica({}, true)).toBeNull()
   })
 })

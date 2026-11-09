@@ -1,10 +1,11 @@
-import { useRef, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
 import { PencilIcon } from '../../../../shared/ui/icons.tsx'
 import { ScreenHeader } from '../../../../shared/ui/ScreenHeader.tsx'
 import { carouselStep, useDragScroll } from '../../../../shared/ui/useDragScroll.ts'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
+import { CoachCard } from '../../components/CoachCard.tsx'
 import { MusclesCard } from '../../components/MusclesCard.tsx'
 import { SessionCard } from '../../components/SessionCard.tsx'
 import { TuRutinaSheet } from '../../components/TuRutinaSheet.tsx'
@@ -27,6 +28,8 @@ import {
   type Tono,
 } from '../../state/plan.ts'
 import { MUSCLES, type MuscleId } from '../../state/routines.ts'
+import { consejosEntrenador } from '../../state/entrenador.ts'
+import { aplicarConsejo, cargarEntrenador, dejarConsejo } from '../../use-cases/entrenador.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
 import styles from './TuPlanScreen.module.css'
@@ -55,6 +58,9 @@ function TuPlan({ siguiente }: { siguiente: number }) {
   const [lado, setLado] = useState<'front' | 'back'>('front')
   const [musculo, setMusculo] = useState<string | null>(null)
   const [ficha, setFicha] = useState<MuscleId | null>(null)
+  useEffect(() => {
+    void cargarEntrenador()
+  }, [])
   // Hoy toca descanso, pero quieres entrenar: vuelven las sesiones y «Empezar»
   const [entrenarIgual, setEntrenarIgual] = useState(false)
 
@@ -113,6 +119,11 @@ function TuPlan({ siguiente }: { siguiente: number }) {
 
       <div class={styles.blocks}>
         <WeekCard dias={semana} total={sesionesPlan.value.length} />
+        <CoachCard
+          consejos={consejosEntrenador.value}
+          onAplicar={(c) => void aplicarConsejo(c)}
+          onDejar={(c) => void dejarConsejo(c)}
+        />
         <MusclesCard
           periodo={periodo}
           onPeriodo={setPeriodo}

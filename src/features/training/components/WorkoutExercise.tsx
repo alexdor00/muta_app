@@ -77,7 +77,7 @@ export function Estrella() {
 const CAMPOS = [
   { campo: 'kg', gris: 'kgGris', nombre: 'Kilos' },
   { campo: 'reps', gris: 'repsGris', nombre: 'Repeticiones' },
-  { campo: 'quedan', gris: 'quedanGris', nombre: 'RIR (repeticiones en reserva)' },
+  { campo: 'quedan', gris: 'quedanGris', nombre: 'RIR' },
 ] as const
 
 /**

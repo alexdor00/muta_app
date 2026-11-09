@@ -1,4 +1,5 @@
 import { localDate, parseDecimal } from '../../../shared/lib/format.ts'
+import { esfuerzoApuntado } from '../domain/effort.ts'
 import type { Entreno } from '../domain/workoutHistory.ts'
 import { ejerciciosDe, nombreHoy, segundosSesion, type SesionEnCurso } from '../state/sesionEnCurso.ts'
 import { extrasHechos } from '../state/seriesEspeciales.ts'
@@ -25,6 +26,7 @@ export function entrenoDe(en: SesionEnCurso, programId: string, ahora: number): 
           return {
             kg: parseDecimal(s.kg),
             reps: parseDecimal(s.reps) ?? 0,
+            ...esfuerzoApuntado(s.quedan),
             ...(extra.length ? { extra } : {}),
           }
         })

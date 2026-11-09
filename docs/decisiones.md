@@ -568,3 +568,17 @@ El usuario decide los 23 choques entre la guía (G1) y 01/02 (tabla en
 - Biblioteca: al añadir un ejercicio, repeticiones en 5–12 (las rutinas ya hechas no cambian).
 - Consejos de dorsal (descolgar solo un poco) y de parciales (puntuales, casi nunca en definición).
 - Lo demás (ON/OFF, ritmo por fases, frecuencia por persona, el entrenador de Entreno) necesita diseño aprobado.
+
+## 2026-11-09 · La guía de culturismo natural en Entreno
+
+Pedido por el usuario («hazme absolutamente todo esto»), con su frase: casi todas las series mejoran y recuperas →
+**puedes** subir volumen.
+
+- «Casi todas» = 80 % de las series comparadas (sugerido: la guía no da cifra). Con menos de 4 series no se lee nada.
+- **Tu entrenador** (Tu plan): por músculo y en los últimos 7 días, cada serie frente a la misma de la vez anterior. Solo
+  propone (+1 serie, «Aplicar / Ahora no»); nunca cambia ejercicios ni quita series.
+- Para saber cómo vas, cada serie guarda ahora su **RIR** y si fue **fallo** (antes no se guardaba). El entrenador aún no
+  los usa; quedan para la recuperación cuando haya check diario.
+- **RIR progresivo**: las primeras series con uno de margen más y la última al RIR de la rutina; cada semana del bloque,
+  una serie más al objetivo. Es lo que sale en gris: la rutina sigue mandando.
+- Entreno lee tu fase de Nutrición (solo la lee) para el aviso de técnicas en definición y el tono del entrenador.

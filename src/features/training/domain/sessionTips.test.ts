@@ -30,6 +30,7 @@ const IDS: TipId[] = [
   'curlFemoralYBisagra',
   'hackYPrensa',
   'demasiadasSeries',
+  'acortamientoPrimero',
 ]
 // Textos de prueba: el id como texto; los «Bien: …» marcados como ok
 const OK = new Set<TipId>(['bicepsEnEmpuje', 'tricepsEnTiron', 'antebrazoSinTiron'])
@@ -116,5 +117,19 @@ describe('sessionTips', () => {
       id: 'demasiadasSeries',
       text: 'Bíceps: 12',
     })
+  })
+  it('pierna: la extensión o la aducción antes que la hack; el curl femoral y el rumano, con su consejo de siempre', () => {
+    const hack = ej('sentadilla_hack', 'cuadriceps', 'sentadilla')
+    const extension = ej('extension_de_cuadriceps', 'cuadriceps', 'aislamiento', { kind: 'isolation' })
+    expect(sessionTips([hack, extension], TEXTOS).map((t) => t.id)).toContain('acortamientoPrimero')
+    expect(
+      sessionTips([hack, extension], TEXTOS).find((t) => t.id === 'acortamientoPrimero')?.accion,
+    ).toEqual({
+      tipo: 'invertir',
+      a: 0,
+      b: 1,
+    })
+    expect(ids([extension, hack])).not.toContain('acortamientoPrimero')
+    expect(ids([RUMANO, CURL_FEMORAL])).not.toContain('acortamientoPrimero')
   })
 })

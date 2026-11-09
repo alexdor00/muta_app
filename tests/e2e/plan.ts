@@ -76,6 +76,14 @@ export const ENTRENOS = [
   entreno(7, 'B1', 'Isquios, glúteo y pecho', B1),
 ]
 
+/**
+ * B1 hace 10 días y otra vez hace 3 con 2,5 kg más en todo: esta semana mejoras en todas las series (para el entrenador).
+ */
+export const ENTRENOS_MEJORANDO = [
+  entreno(10, 'B1', 'Isquios, glúteo y pecho', antes(2.5, 1)),
+  entreno(3, 'B1', 'Isquios, glúteo y pecho', B1),
+]
+
 /** Guarda el perfil, el plan, la rotación (toca B1) y los entrenos, y deja la app en Tu plan sin nada en memoria. */
 export async function prepararPlan(page: Page, entrenos = ENTRENOS) {
   // La app crea la base al abrirse; después se escribe directamente en ella

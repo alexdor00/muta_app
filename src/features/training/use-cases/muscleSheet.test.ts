@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { consejosDeMusculo, huecosDelPlan } from './muscleSheet.ts'
 
 describe('ficha del músculo con el contenido real', () => {
-  it('cada músculo trae su clave; el glúteo, sus 9 consejos y dónde ponerlo', () => {
+  it('cada músculo trae su clave; el glúteo, sus 9 consejos del método y 1 de la guía G1 y dónde ponerlo', () => {
     const g = consejosDeMusculo('gluteo')
     expect(g?.key).toMatch(/^Piensa en patrones/)
-    expect(g?.tips).toHaveLength(9)
+    expect(g?.tips).toHaveLength(10)
     expect(g?.where).toBeTruthy()
     expect(consejosDeMusculo('cuello')?.tips).toEqual([])
   })

@@ -1,0 +1,92 @@
+/* «Tu entrenador» en Tu plan: un consejo por músculo con sus botones. */
+
+.card {
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.eyebrow {
+  font: var(--text-caption);
+  color: var(--label-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin-top: var(--space-1);
+  font: var(--text-headline);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item + .item {
+  padding-top: var(--space-4);
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.name {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.pct {
+  flex: none;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.text {
+  margin-top: var(--space-1);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.apply,
+.later {
+  min-height: var(--control-sm);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.apply {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.later {
+  background: var(--bg);
+  color: var(--label);
+}
+
+.foot {
+  margin-top: var(--space-4);
+  color: var(--label-2);
+  font: var(--text-caption);
+}

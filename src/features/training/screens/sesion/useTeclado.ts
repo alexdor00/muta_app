@@ -21,7 +21,7 @@ const NOMBRE_CAMPO: Record<CampoSerie, string> = {
 const ETIQUETA_CAMPO: Record<CampoSerie, string> = {
   kg: 'Kilos de la serie',
   reps: 'Repeticiones de la serie',
-  quedan: 'RIR de la serie (repeticiones en reserva)',
+  quedan: 'RIR de la serie',
 }
 const ORDEN: CampoSerie[] = ['kg', 'reps', 'quedan']
 
@@ -88,6 +88,7 @@ export function useTeclado(en: SesionEnCurso | null) {
           titulo: nombreHoy(e, en.ejercicios[activa.ej]),
           detalle: `Serie ${activa.serie + 1} · ${NOMBRE_CAMPO[activa.campo]}`,
           paso: activa.campo === 'kg' ? formatDecimal(e.salto) : '1',
+          rir: activa.campo === 'quedan',
         }
       : null
   return { activa, entrar, tecla, siguiente, teclado, vista }

@@ -66,7 +66,7 @@ test('la ficha del músculo, en Resumen (con el rango a mano abierto) y en Conse
   await hoja.getByText('Ajustar a mano').click()
   await sinFallos(page)
   await hoja.getByText('Consejos', { exact: true }).click()
-  await hoja.getByText('Ver 5 consejos más').click()
+  await hoja.getByText('Ver 8 consejos más').click()
   await sinFallos(page)
 })
 

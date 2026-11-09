@@ -4,7 +4,7 @@ import { ChevronDownIcon, ChevronRightIcon } from '../../../shared/ui/icons.tsx'
 import styles from './WorkoutKeypad.module.css'
 
 export type Tecla =
-  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'coma' | 'borrar' | 'menos' | 'mas'
+  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'coma' | 'borrar' | 'menos' | 'mas' | 'fallo'
 
 type Props = {
   /** «Peso muerto rumano». */
@@ -15,6 +15,8 @@ type Props = {
   descanso: { tiempo: string; quedan: number; onSaltar: () => void } | null
   /** «+ / −» suman o restan esto («2,5»). */
   paso: string
+  /** En la casilla del RIR, la tecla de la coma es «Fallo». */
+  rir?: boolean
   onTecla: (tecla: Tecla) => void
   onSiguiente: () => void
   onCerrar: () => void
@@ -46,7 +48,16 @@ function BorrarIcon() {
  * Teclado numérico de la sesión (C02): números, coma, borrar, − / + con el salto de peso, ⌄ para ocultarlo y › para
  * pasar a la casilla siguiente. Se cierra también arrastrándolo hacia abajo.
  */
-export function WorkoutKeypad({ titulo, detalle, descanso, paso, onTecla, onSiguiente, onCerrar }: Props) {
+export function WorkoutKeypad({
+  titulo,
+  detalle,
+  descanso,
+  paso,
+  rir,
+  onTecla,
+  onSiguiente,
+  onCerrar,
+}: Props) {
   const panel = useRef<HTMLDivElement>(null)
   const cerrarRef = useRef(onCerrar)
   useEffect(() => {
@@ -104,7 +115,13 @@ export function WorkoutKeypad({ titulo, detalle, descanso, paso, onTecla, onSigu
         >
           <div class={styles.restText}>
             <b>{descanso.tiempo}</b>
-            <small>{descanso.quedan <= 0 ? '¡A por ella!' : 'Descanso entre series'}</small>
+            <small>
+              {descanso.quedan <= 0
+                ? '¡A por ella!'
+                : descanso.quedan <= 15
+                  ? 'Prepárate: a por tu registro'
+                  : 'Descanso entre series'}
+            </small>
           </div>
           <button type="button" class={styles.restSkip} onClick={descanso.onSaltar}>
             Omitir
@@ -135,7 +152,9 @@ export function WorkoutKeypad({ titulo, detalle, descanso, paso, onTecla, onSigu
             {i === 2 && tecla('mas', '+', `Más ${paso}`)}
           </Fragment>
         ))}
-        {tecla('coma', ',', 'Coma')}
+        {rir
+          ? tecla('fallo', 'Fallo', 'Fallo: intentaste otra repetición y no salió')
+          : tecla('coma', ',', 'Coma')}
         {tecla('0', '0')}
         <button
           type="button"

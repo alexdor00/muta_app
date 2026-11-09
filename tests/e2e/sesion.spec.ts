@@ -62,6 +62,24 @@ test('el teclado propio escribe, suma el salto de peso y una serie mejor lleva �
   await expect(teclado).toHaveCount(0)
 })
 
+test('el RIR va por serie (la última, la de la rutina) y «Fallo» se apunta aparte de RIR 0', async ({
+  page,
+}) => {
+  await page.goto('/entreno/sesion/b1')
+  // Semana 1 del bloque: las primeras series con uno de margen más que la última
+  const rir1 = page.getByLabel('RIR de la serie 1')
+  const rir3 = page.getByLabel('RIR de la serie 3')
+  const ultimo = Number(await rir3.getAttribute('placeholder'))
+  await expect(rir1).toHaveAttribute('placeholder', String(Math.min(5, ultimo + 1)))
+  await rir1.click()
+  const teclado = page.getByRole('group', { name: 'Teclado numérico' })
+  await expect(teclado.getByRole('button', { name: 'Coma' })).toHaveCount(0)
+  await teclado.getByRole('button', { name: /^Fallo/ }).click()
+  await expect(rir1).toHaveValue('F')
+  await page.getByLabel('Kilos de la serie 1').click()
+  await expect(teclado.getByRole('button', { name: 'Coma' })).toBeVisible()
+})
+
 test('números imposibles no entran y los muy altos se confirman', async ({ page }) => {
   await page.goto('/entreno/sesion/b1')
   const teclado = page.getByRole('group', { name: 'Teclado numérico' })

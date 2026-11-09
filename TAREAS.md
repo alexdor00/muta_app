@@ -5,8 +5,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 ## Tarea actual
 
 - **Guía de culturismo natural**: los 23 choques ya están decididos ([04](docs/conocimiento/04-guia-culturismo-natural.md) §14). Falta
-  diseñar lo optativo (kcal ON/OFF, ritmo de definición por fases, frecuencia por persona) y el entrenador de Entreno con
-  las reglas nuevas (subir volumen con el % de series que mejoras, sin cambiar ejercicios). Plan completo en
+  lo optativo (kcal ON/OFF, ritmo de definición por fases), la frecuencia por persona (ciclos de 9 o 14 días) y Hoy y
+  Progreso (check diario, perímetros). Plan completo en
   `Desktop/MUTA-guia-aplicacion.docx`.
 - **Probar Recetas y Menú en un móvil real** (rama `pantalla/recetas`, sale de `pantalla/comida-v2`) con `npm run dev`:
   el recetario con sus fotos, ajustar un plato a lo que falta (y cuando no llega), cuadrar el día, tu producto, tu menú,
@@ -28,6 +28,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
 ## Hecho
+
+- 2026-11-09 (rama `pantalla/recetas`): la guía en Entreno: «Tu entrenador» en Tu plan (% de series que mejoras y
+  +1 serie con «Aplicar»), RIR progresivo por serie, «Fallo» en el teclado, RIR guardado en cada serie, «Prepárate» en
+  el descanso, aviso de técnicas en definición, orden de pierna, revisar la técnica antes de cambiar y 14 consejos nuevos.
 
 - 2026-11-08 (rama `pantalla/recetas`): guía de culturismo natural completa en el conocimiento y, en la app, lo
   decidido: esfuerzo siempre en RIR, proteína hasta ~2 g/kg, la consulta ya no sube la proteína al final y sugiere

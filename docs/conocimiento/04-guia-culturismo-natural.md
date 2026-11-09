@@ -319,9 +319,9 @@ en la app.
 | 4 | Ritmo de definición | Fijo (0,75 %/sem) | Rápido al principio, suave al final | Guía, **optativo** | Pendiente de diseño |
 | 5 | Pausas de dieta | Por calendario (8–12 o 10 semanas) | Refeeds de varios días por indicadores | Guía | Hecho en la consulta con dieta: consejo de recarga con hambre o poca energía en la segunda mitad; sin cifras (la guía no las da) |
 | 6 | Peso parado en volumen | +100/150 kcal por la báscula | Antes: progreso, descanso, ON/OFF, timing, perímetros | Guía | Hecho: si tu fuerza en los básicos no baja, la revisión no sube las kcal |
-| 7 | Cuándo subir volumen | Con 2–4 semanas estancado | Cuando mejoras en casi todas las series | Guía | Anotado para el entrenador de Entreno (aún no existe) |
-| 8 | Bajar volumen | Si cae el rendimiento | Antes, sueño, estrés y comida | Guía | Anotado para el entrenador |
-| 9 | Cambiar de ejercicio | Prueba del coach | No sirve ante un estancamiento | Guía: **el entrenador no cambia ejercicios** | Anotado para el entrenador |
+| 7 | Cuándo subir volumen | Con 2–4 semanas estancado | Cuando mejoras en casi todas las series | Guía | Hecho: «Tu entrenador» en Tu plan propone +1 serie si mejoras en casi todas (≥ 80 %, sugerido) |
+| 8 | Bajar volumen | Si cae el rendimiento | Antes, sueño, estrés y comida | Guía | Hecho: con rendimiento peor, «revisa sueño, estrés y comida», sin quitar series |
+| 9 | Cambiar de ejercicio | Prueba del coach | No sirve ante un estancamiento | Guía: **el entrenador no cambia ejercicios** | Hecho: estancado → «no cambies de ejercicio»; y en «Cambiar ejercicio», revisa la técnica antes |
 | 10 | Priorizar un músculo | +1 serie en la misma sesión | Un día más o un recordatorio | Se queda | — |
 | 11 | RIR 0 | «al fallo» | RIR 0 ≠ fallo | Guía: **todo en RIR** | Hecho: pauta, sesión, teclado, editar ejercicio y textos del motor dicen «RIR N» |
 | 12 | Repeticiones | 10–15, 12–20 en aislamientos | 5–12 | Guía, **sin tocar las rutinas ya hechas** | Hecho: la biblioteca propone 5–12 al añadir un ejercicio |
@@ -330,7 +330,7 @@ en la app.
 | 15 | Tríceps | El overhead, el que más crece | Prescindible el overhead | Se queda | — |
 | 16 | Pasos | 10.000 | 12.000–15.000 | Guía, **los que pueda cada uno** | Hecho: la revisión pide al menos 10.000 y recomienda 12.000–15.000, los que puedas |
 | 17 | Salir de la dieta | Entrenando duro y ~10.000 pasos | Sin entrenar a tope; bajar actividad | Se queda | — |
-| 18 | En definición | «Mantener los kilos ya es buen resultado» | Se puede ganar músculo; no rendirse | Guía | Anotado para el entrenador (ese texto aún no está en la app) |
+| 18 | En definición | «Mantener los kilos ya es buen resultado» | Se puede ganar músculo; no rendirse | Guía | Hecho: los textos del entrenador en definición animan a progresar |
 | 19 | Recomposición | Objetivo del perfil | Un objetivo cada vez | Se queda | — |
 | 20 | Huevos | En la base y en la dieta de ejemplo | No los pauta | Se queda | — |
 | 21 | Dorsal | «Descuelga el hombro» | No descolgarse del todo | Guía, **solo un poco** | Hecho: el consejo dice descolgar un poco, sin pasar de ~90–100° |

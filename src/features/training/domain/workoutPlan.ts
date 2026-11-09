@@ -376,3 +376,13 @@ export function pautaEnPrograma(
   const r = masUsado(rpe)
   return { reps: rango, rir: r ? rirDe(r) : null }
 }
+
+/**
+ * En definición, un ejercicio con dropset, rest-pause o parciales lleva este aviso (guía de culturismo natural §3: no
+ * superan a una serie recta y castigan la recuperación). null si no toca.
+ */
+export function avisoTecnica(e: Pick<EjercicioPlan, 'tecnica'>, enDefinicion: boolean): string | null {
+  return e.tecnica && enDefinicion
+    ? 'En definición, las técnicas de intensidad casi nunca compensan: si te notas justo, mejor una serie recta más a RIR 1–0.'
+    : null
+}

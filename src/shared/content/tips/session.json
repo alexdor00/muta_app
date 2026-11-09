@@ -100,5 +100,11 @@
     "text": "{musculo}: {series} series directas hoy. No pases de unas 8–11 del mismo músculo por sesión: lleva las de más a otro día.",
     "why": "Si las últimas series salen flojas, mejor redistribuirlas en otro día que subir volumen.",
     "source": "V18 · V19 · V3"
+  },
+  "acortamientoPrimero": {
+    "ok": false,
+    "text": "Haz {primero} antes que {despues}: primero lo de acortamiento y los monoarticulares, después lo pesado en estiramiento.",
+    "why": "El músculo que quieres trabajar limita la serie, mueves algo menos de peso y las articulaciones sufren menos.",
+    "source": "G1"
   }
 }

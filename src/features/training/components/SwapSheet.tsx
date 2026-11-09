@@ -73,6 +73,10 @@ export function SwapSheet(props: {
           ? 'Solo cambia en esta sesión; tu plan sigue igual.'
           : 'Cambia en tu plan las próximas veces, con las mismas series, repeticiones y descanso.'}
       </p>
+      <p class={styles.lead}>
+        ¿Molestias o te has estancado? Antes de cambiarlo, revisa la técnica en vídeo: cambiar de ejercicio no
+        arregla un estancamiento.
+      </p>
       {props.enLugarDe && (
         <ul class={styles.options}>
           <FilaCambio

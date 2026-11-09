@@ -2,7 +2,7 @@
 // sobrevive a recargar la app. Lleva una copia de los ejercicios con los que empezó (con la vez anterior).
 import { signal } from '@preact/signals'
 import { formatDecimal, parseDecimal } from '../../../shared/lib/format.ts'
-import { effortLabel } from '../domain/effort.ts'
+import { effortLabel, rirProgresivo } from '../domain/effort.ts'
 import { planCalentamiento } from '../domain/warmup.ts'
 import {
   kilosDeHoy,
@@ -21,7 +21,7 @@ import { resumenSesion } from '../domain/workoutSummary.ts'
 export type ExtraEnCurso = { kg: string; reps: string }
 
 /**
- * Lo escrito en una serie: kilos, repeticiones y las que quedaban, tal cual se teclean («62,5»); `extra`, sus bajadas o
+ * Lo escrito en una serie: kilos, repeticiones y el RIR («F» si fue fallo de verdad), tal cual se teclean («62,5»); `extra`, sus bajadas o
  * mini-series si el ejercicio lleva dropset o rest-pause.
  */
 export type SerieEnCurso = {
@@ -39,6 +39,8 @@ export type EjercicioEnCurso = {
   nota: string
   /** Si hoy se hace otro en su lugar (solo esta sesión; el plan no cambia). */
   cambiadoPor: string | null
+  /** El RIR que se propone en cada serie (esfuerzo progresivo, guía G1); sin él, el de la rutina. */
+  rirSerie?: number[]
 }
 
 export type SesionEnCurso = {
@@ -93,8 +95,11 @@ export function calentamientos(ejercicios: readonly EjercicioPlan[]) {
   )
 }
 
-/** Al empezar: tantas series vacías como pide cada ejercicio y nada calentado. */
-export function nuevaSesion(sesion: SesionPlan, inicio: number): SesionEnCurso {
+/**
+ * Al empezar: tantas series vacías como pide cada ejercicio, nada calentado y el RIR de cada serie según la semana del
+ * bloque en la que vas (`semana`, desde 0).
+ */
+export function nuevaSesion(sesion: SesionPlan, inicio: number, semana = 0): SesionEnCurso {
   const plan = calentamientos(sesion.ejercicios)
   return {
     sigla: sesion.sigla,
@@ -114,6 +119,7 @@ export function nuevaSesion(sesion: SesionPlan, inicio: number): SesionEnCurso {
       calentamiento: (plan[i] ?? []).map(() => false),
       nota: e.nota ?? '',
       cambiadoPor: null,
+      rirSerie: rirProgresivo(e.rir, e.series, semana),
     })),
   }
 }
@@ -178,14 +184,14 @@ export function cambiarEjercicio(en: SesionEnCurso, ej: number, nombre: string):
   }
 }
 
-/** Lo que se ve en gris en cada casilla vacía: kilos y reps de la vez anterior y las que deben quedar. */
+/** Lo que se ve en gris en cada casilla vacía: kilos y reps de la vez anterior y el RIR que se propone en esa serie. */
 export function grises(e: EjercicioPlan, x: EjercicioEnCurso, j: number): Record<Campo, string> {
   const antes = antesDe(e, x)[j]
   const previa: string = j > 0 ? x.series[j - 1].kg || grises(e, x, j - 1).kg : ''
   return {
     kg: antes?.kg != null ? formatDecimal(antes.kg) : previa,
     reps: antes ? String(antes.reps) : repsDeSerie(e, j),
-    quedan: String(e.rir),
+    quedan: String(x.rirSerie?.[j] ?? e.rir),
   }
 }
 

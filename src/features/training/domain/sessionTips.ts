@@ -21,6 +21,7 @@ export type TipId =
   | 'curlFemoralYBisagra'
   | 'hackYPrensa'
   | 'demasiadasSeries'
+  | 'acortamientoPrimero'
 
 /** Un texto del contenido: `ok` son los «Bien: …», que no se enseñan (como en el prototipo). */
 export type TipText = { ok: boolean; text: string; why: string; source: string }
@@ -30,13 +31,25 @@ export type TipAction = { tipo: 'invertir'; a: number; b: number } | { tipo: 'su
 
 export type SessionTip = { id: TipId; text: string; why: string; source: string; accion: TipAction | null }
 
-type Ejercicio = Pick<LibraryExercise, 'id' | 'name' | 'primary' | 'equipment' | 'pattern'> & { sets: number }
+type Ejercicio = Pick<LibraryExercise, 'id' | 'name' | 'primary' | 'equipment' | 'pattern'> & {
+  sets: number
+  /** Compuesto o aislamiento; sin él, cuenta como compuesto. */
+  kind?: LibraryExercise['kind']
+}
 
 const PUSH = new Set(['empuje_h', 'empuje_inc', 'empuje_v'])
 const PULL = new Set(['traccion_v', 'traccion_h'])
 const LEG = new Set(['sentadilla', 'bisagra', 'unilateral', 'empuje_cadera'])
 /** Más series directas del mismo músculo en una sesión que esto, y sale el aviso (docs/conocimiento: «~8–11»). */
 export const TOPE_SERIES_SESION = 11
+/** Pierna sin el femoral (el curl femoral y la bisagra tienen su propio consejo, que se queda: decisión 2026-11-08). */
+const PIERNA_ORDEN = new Set<MuscleId>(['cuadriceps', 'aductores', 'gluteo'])
+/** Lo que pesa en acortamiento: monoarticulares, empuje de cadera y la pendular (guía de culturismo natural §4). */
+const enAcortamiento = (e: Ejercicio) =>
+  e.kind === 'isolation' || e.pattern === 'empuje_cadera' || /pendular/.test(e.id)
+/** Lo pesado en estiramiento: sentadillas, prensas, unilaterales y bisagras (menos la pendular). */
+const enEstiramiento = (e: Ejercicio) =>
+  !enAcortamiento(e) && (['sentadilla', 'unilateral', 'bisagra'].includes(e.pattern) || /prensa/.test(e.id))
 const BISAGRAS = ['peso_muerto_rumano', 'peso_muerto_piernas_rigidas', 'peso_muerto_rumano_con_mancuernas']
 
 /** Empuje, tirón, pierna o mixta: la que más series suma (los patrones cuentan entero; el músculo, a medias). */
@@ -127,6 +140,18 @@ export function sessionTips(
   const bisagra = idx((e) => BISAGRAS.includes(e.id))
   const curl = idx((e) => /curl_femoral/.test(e.id))
   if (bisagra >= 0 && curl >= 0) add('curlFemoralYBisagra', { tipo: 'invertir', a: bisagra, b: curl })
+  // Pierna: lo de acortamiento y los monoarticulares antes que lo pesado en estiramiento (guía G1 §4)
+  const pesado = idx((e) => PIERNA_ORDEN.has(e.primary) && enEstiramiento(e))
+  const corto = pesado < 0 ? -1 : idx((e) => PIERNA_ORDEN.has(e.primary) && enAcortamiento(e))
+  if (pesado >= 0 && corto > pesado)
+    add(
+      'acortamientoPrimero',
+      { tipo: 'invertir', a: pesado, b: corto },
+      {
+        primero: ejercicios[corto].name,
+        despues: ejercicios[pesado].name,
+      },
+    )
   const prensa = idx((e) => e.id === 'prensa')
   const hack = idx((e) => e.id === 'sentadilla_hack')
   if (prensa >= 0 && hack >= 0)
