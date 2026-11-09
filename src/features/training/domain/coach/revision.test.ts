@@ -173,12 +173,20 @@ describe('revisionEntrenador', () => {
     expect(r.map((c) => c.musculo)).not.toContain('dorsal')
   })
 
-  it('con menos de 3 semanas mejorando, o con 2 series ya subidas, no propone subir', () => {
+  it('con menos de 3 semanas mejorando no propone subir; si caben, ofrece +1 o +2 series', () => {
     const dos = revisionEntrenador({ ...base, semanas: { cuadriceps: semanas(m(6, 6), m(6, 6)) } })
     expect(dos[0]).toMatchObject({ lectura: 'dulce', propuesta: null })
     expect(dos[0].detalle).toContain('2 de 3 semanas')
-    const tope = revisionEntrenador({ ...base, semanas: { cuadriceps: tres }, subidas: { cuadriceps: 2 } })
-    expect(tope[0].detalle).toContain('Editar rutina')
+    const sube = revisionEntrenador({ ...base, semanas: { cuadriceps: tres } })
+    expect(sube[0].propuesta).toMatchObject({ de: 3, a: 4 })
+    expect(sube[0].propuesta?.aMas).toBeUndefined()
+    const dosHuecos = revisionEntrenador({
+      ...base,
+      semana: [sesion('A1', [ej({ series: 2 })])],
+      semanas: { cuadriceps: tres },
+    })
+    expect(dosHuecos[0].propuesta).toMatchObject({ de: 2, a: 3, aMas: 4 })
+    expect(dosHuecos[0].detalle).toContain('una o dos series más')
   })
 
   it('vas peor: primero aviso; si se repite la semana siguiente, −1 serie', () => {

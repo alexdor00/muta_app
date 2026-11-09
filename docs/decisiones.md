@@ -622,3 +622,9 @@ manteniendo en 8–9 y progresando en 1–2 que 5 progresando en 4» y «progres
    básicos.
 7. «Tras una definición, no priorizar» queda pendiente: el usuario no lo tenía claro.
 8. Ir peor: aviso y, si se repite, −1 serie (igual). 9. «Casi todas» = 80 % (igual). 10. Definición: igual.
+
+## 2026-11-09 · El entrenador sugiere 1 o 2 series, sin tope total
+
+Aclaración del usuario: el entrenador nunca sube nada por sí solo; siempre es una sugerencia, de **1 serie o 2 como mucho**.
+Se quita el tope de «+2 series por músculo en total» (no tenía sentido: no sube solo). Cada sugerencia de subir trae
+«Aplicar: 3 → 4 series» y, si caben (máx. 4/5 por ejercicio y 11 del músculo en la sesión), «3 → 5 series».

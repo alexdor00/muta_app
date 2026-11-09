@@ -40,10 +40,10 @@ cargan `use-cases/forComida.ts` en diferido, así Comida no descarga Entreno has
   cada semana, por músculo, cada serie frente a la vez anterior (`compararSerie`: más kilos o más repeticiones); solo
   cuentan los ejercicios con el RIR apuntado a ±1 del de la rutina (`esfuerzoEstandar`). ≥ 10 % peor → aviso y, si se repite,
   −1 serie; ≥ 80 % mejora (sugerido) 3 semanas seguidas → +1 serie en un solo músculo por semana (Prioridad primero; Mantener
-  no sube; como mucho +2 por músculo; «No me interesa» lo pasa a Mantener); estancado → sueño y comida → RIR → RIR +1
+  no sube; cada sugerencia, +1 o +2 series si caben; nunca sube solo; «No me interesa» lo pasa a Mantener); estancado → sueño y comida → RIR → RIR +1
   (`propuestaDeIntensidad`) → −1 serie (en definición, solo aviso). Tras aplicar, una semana de espera. Las kcal no las toca:
   van en la revisión de peso de Nutrición. Estado en `state/entrenador.ts` (cuatro semanas, las pautas del plan y las marcas
-  `aplicado`/`subida`), acciones en `use-cases/entrenador.ts`, tarjeta `CoachCard` en Tu plan.
+  `aplicado`), acciones en `use-cases/entrenador.ts`, tarjeta `CoachCard` en Tu plan.
 - La sesión según la guía: RIR progresivo por serie (`effort.ts · rirProgresivo`, guardado en `rirSerie` al empezar con
   la semana del bloque), «Fallo» en el teclado (casilla RIR = «F»; se guarda `rir` y `fallo` en cada serie con
   `esfuerzoApuntado`), aviso de técnicas en definición

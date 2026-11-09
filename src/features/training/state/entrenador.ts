@@ -20,7 +20,7 @@ export type { ConsejoEntrenador } from '../domain/coach/revision.ts'
 
 /**
  * Lo ya visto: `músculo|lunes|lectura` (aplicado o «Ahora no»), `músculo|lunes|aplicado` (para esperar una semana a ver
- * el efecto) y `músculo|lunes|subida` (cada serie que el entrenador le sumó). Se guarda en `userContent`
+ * el efecto). Se guarda en `userContent`
  * (use-cases/entrenador.ts).
  */
 export const vistosEntrenador = signal<string[]>([])
@@ -29,7 +29,6 @@ export const vistosEntrenador = signal<string[]>([])
 export const marcaDe = (c: Pick<ConsejoEntrenador, 'musculo' | 'lectura'>, hoy = localDate()) =>
   `${c.musculo}|${lunesDe(hoy)}|${c.lectura}`
 export const marcaAplicado = (musculo: MuscleId, hoy = localDate()) => `${musculo}|${lunesDe(hoy)}|aplicado`
-export const marcaSubida = (musculo: MuscleId, hoy = localDate()) => `${musculo}|${lunesDe(hoy)}|subida`
 
 export const consejosEntrenador = computed<ConsejoEntrenador[]>(() => {
   const plan = tuPlan.value
@@ -49,12 +48,6 @@ export const consejosEntrenador = computed<ConsejoEntrenador[]>(() => {
   const aplicadoHace = new Set(
     (Object.keys(s0) as MuscleId[]).filter((m) => vistos.has(marcaAplicado(m, pasada))),
   )
-  const subidas: Partial<Record<MuscleId, number>> = {}
-  for (const v of vistosEntrenador.value)
-    if (v.endsWith('|subida')) {
-      const m = v.split('|')[0] as MuscleId
-      subidas[m] = (subidas[m] ?? 0) + 1
-    }
   const modos = Object.fromEntries(Object.entries(elecciones.value).map(([m, e]) => [m, e?.modo]))
   return revisionEntrenador({
     semanas,
@@ -62,6 +55,5 @@ export const consejosEntrenador = computed<ConsejoEntrenador[]>(() => {
     definicion: faseActual.value === 'cut',
     modos,
     aplicadoHace,
-    subidas,
   }).filter((c) => !vistos.has(marcaDe(c, hoy)))
 })

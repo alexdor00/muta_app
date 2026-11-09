@@ -30,8 +30,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 ## Hecho
 
 - 2026-11-09 (rama `pantalla/recetas`): el entrenador sigue el paso a paso de la guía con el segundo cuestionario: mejorar
-  = más kilos o reps, solo cuenta con el RIR apuntado, 3 semanas mejorando para subir, un músculo y una serie cada vez (2
-  como mucho), estancado → menos intensidad y luego −1 serie, y las kcal fuera del entrenador.
+  = más kilos o reps, solo cuenta con el RIR apuntado, 3 semanas mejorando para subir, un músculo cada vez con +1 o +2
+  series (siempre sugerencia), estancado → menos intensidad y luego −1 serie, y las kcal fuera del entrenador.
 
 - 2026-11-09 (rama `pantalla/recetas`): reglas del entrenador decididas con un cuestionario (doble progresión, 80 %
   sugerido, recuperar = no ir peor en el 10 %, 2 músculos por semana, Mantener no sube, «No me interesa», estancado por

@@ -121,7 +121,7 @@ function TuPlan({ siguiente }: { siguiente: number }) {
         <WeekCard dias={semana} total={sesionesPlan.value.length} />
         <CoachCard
           consejos={consejosEntrenador.value}
-          onAplicar={(c) => void aplicarConsejo(c)}
+          onAplicar={(c, a) => void aplicarConsejo(c, a)}
           onDejar={(c) => void dejarConsejo(c)}
           onNoMeInteresa={(c) => void noMeInteresa(c)}
         />

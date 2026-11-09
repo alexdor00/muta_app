@@ -5,7 +5,8 @@
 // - Solo cuenta un ejercicio si su esfuerzo está estandarizado: el RIR apuntado en todas sus series, a ±1 del de la rutina.
 // - Recuperas = no ir peor en el 10 % o más de las series.
 // - Toca subir con ≥ 80 % de mejoras (sugerido; la guía: mejorar en 4 de 5 indica volumen corto) durante 3 semanas
-//   seguidas: +1 serie, un solo músculo por semana y como mucho +2 series por músculo (el resto, tú en Editar rutina).
+//   seguidas: un solo músculo por semana, con +1 serie o, si cabe, +2 (nunca más en una sugerencia). Siempre es una
+//   sugerencia: el entrenador nunca sube nada solo.
 // - Ir peor: aviso (sueño, estrés, comida); si se repite, −1 serie.
 // - Estancado: sueño, comida y estrés → el RIR → bajar un poco la intensidad (RIR +1) → −1 serie. En definición, mantener
 //   ya vale: solo un aviso suave. Las kcal no las toca el entrenador: van en la revisión de peso de Nutrición.
@@ -28,8 +29,6 @@ export const PEOR_DESDE = 0.1
 export const MIN_COMPARABLES = 4
 /** Semanas seguidas mejorando en casi todas antes de proponer subir. */
 export const SEMANAS_PARA_SUBIR = 3
-/** Lo más que el entrenador sube un músculo, sumando sus propuestas aplicadas. */
-export const MAX_SERIES_SUBIDAS = 2
 /** Lo más que se propone en un ejercicio (compuesto y aislamiento), como el ajuste de volumen. */
 const MAX_SERIES = { compuesto: 4, aislamiento: 5 }
 
@@ -118,6 +117,8 @@ export type Propuesta = {
   campo: 'series' | 'rir'
   de: number
   a: number
+  /** La otra opción de la misma sugerencia: +2 series, si caben. */
+  aMas?: number
 }
 
 export type ConsejoEntrenador = {
@@ -147,9 +148,20 @@ export function propuestaDeSerie(semana: readonly SesionPlan[], musculo: MuscleI
     )
   })
   const { s, e } = huecos.sort((a, b) => a.e.series - b.e.series)[0] ?? {}
-  return s && e
-    ? { sigla: s.sigla, clave: claveDe(e), nombre: e.nombre, campo: 'series', de: e.series, a: e.series + 1 }
-    : null
+  if (!s || !e) return null
+  const total = s.ejercicios.filter((x) => x.musculo === musculo).reduce((n, x) => n + x.series, 0)
+  const caben2 =
+    total + 2 <= TOPE_SERIES_SESION &&
+    e.series + 2 <= (e.compuesto ? MAX_SERIES.compuesto : MAX_SERIES.aislamiento)
+  return {
+    sigla: s.sigla,
+    clave: claveDe(e),
+    nombre: e.nombre,
+    campo: 'series',
+    de: e.series,
+    a: e.series + 1,
+    ...(caben2 ? { aMas: e.series + 2 } : {}),
+  }
 }
 
 /** −1 serie al ejercicio de ese músculo con más series (nunca por debajo de 2). null si ninguno tiene más de 2. */
@@ -192,8 +204,7 @@ const sinRirTexto = (m: Mejora) =>
 
 /**
  * La revisión de la semana: un consejo por músculo con series que comparar, primero los que piden algo.
- * `aplicadoHace`: músculos con un cambio aplicado la semana pasada (se espera a ver su efecto); `subidas`: series que el
- * entrenador ya les sumó.
+ * `aplicadoHace`: músculos con un cambio aplicado la semana pasada (se espera a ver su efecto).
  */
 export function revisionEntrenador(datos: {
   semanas: Partial<Record<MuscleId, Semanas>>
@@ -201,7 +212,6 @@ export function revisionEntrenador(datos: {
   definicion: boolean
   modos: Partial<Record<MuscleId, Mode>>
   aplicadoHace?: ReadonlySet<MuscleId>
-  subidas?: Partial<Record<MuscleId, number>>
 }): ConsejoEntrenador[] {
   const out: ConsejoEntrenador[] = []
   const lista = (Object.entries(datos.semanas) as [MuscleId, Semanas][]).sort(
@@ -223,17 +233,12 @@ export function revisionEntrenador(datos: {
       if (modo === 'maintain') continue
       const titulo = `${nombre}: mejoras en ${de(ahora)} series`
       const semanas = seguidas(s, 'subir')
-      const subidas = datos.subidas?.[musculo] ?? 0
       const dulce = (detalle: string) =>
         out.push({ ...base, lectura: 'dulce', titulo, detalle: detalle + extra })
       if (espera) dulce('Ya le subiste volumen: esta semana vemos cómo responde.')
       else if (semanas < SEMANAS_PARA_SUBIR)
         dulce(
           `Progresas en casi todas (${semanas} de ${SEMANAS_PARA_SUBIR} semanas seguidas). Si sigue así, te propondré subir volumen.`,
-        )
-      else if (subidas >= MAX_SERIES_SUBIDAS)
-        dulce(
-          `Sigues progresando con las ${MAX_SERIES_SUBIDAS} series que ya le subiste. Si quieres más, añádelas tú en Editar rutina.`,
         )
       else if (yaSube)
         dulce('También podrías subir aquí, pero mejor un músculo cada vez: lo vemos la semana que viene.')
@@ -248,7 +253,7 @@ export function revisionEntrenador(datos: {
           noMeInteresa: true,
           detalle:
             (propuesta
-              ? `${semanas} semanas mejorando en casi todas y sin ir peor: toca subir volumen. Te propongo una serie más en ${propuesta.nombre} (${propuesta.sigla}).`
+              ? `${semanas} semanas mejorando en casi todas y sin ir peor: toca subir volumen. Te propongo ${propuesta.aMas ? 'una o dos series más' : 'una serie más'} en ${propuesta.nombre} (${propuesta.sigla}).`
               : `${semanas} semanas mejorando en casi todas: toca subir volumen, pero ya no cabe otra serie. Añade un ejercicio de ${nombre.toLowerCase()} en otra sesión, a 48 h o más de las que ya lo trabajan y sin pisar los músculos de ese día.`) +
             (datos.definicion
               ? ' En definición el margen es más estrecho: si empiezas a ir peor, vuelve atrás.'

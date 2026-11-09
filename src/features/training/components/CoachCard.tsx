@@ -7,13 +7,14 @@ type Consejo = {
   titulo: string
   detalle: string
   mejora: { mejoran: number; comparables: number }
-  propuesta: { campo: 'series' | 'rir'; de: number; a: number } | null
+  propuesta: { campo: 'series' | 'rir'; de: number; a: number; aMas?: number } | null
   noMeInteresa: boolean
 }
 
 type Props<T extends Consejo> = {
   consejos: T[]
-  onAplicar: (c: T) => void
+  /** Con `a`, el valor elegido (la opción de +2 series); sin él, el propuesto. */
+  onAplicar: (c: T, a?: number) => void
   onDejar: (c: T) => void
   /** «No me interesa»: ese músculo pasa a Mantener. */
   onNoMeInteresa: (c: T) => void
@@ -50,6 +51,15 @@ export function CoachCard<T extends Consejo>({ consejos, onAplicar, onDejar, onN
                       ? `Aplicar: RIR ${c.propuesta.de} → ${c.propuesta.a}`
                       : `Aplicar: ${c.propuesta.de} → ${c.propuesta.a} series`}
                   </button>
+                  {c.propuesta.aMas !== undefined && (
+                    <button
+                      type="button"
+                      class={styles.apply}
+                      onClick={() => onAplicar(c, c.propuesta?.aMas)}
+                    >
+                      {`${c.propuesta.de} → ${c.propuesta.aMas} series`}
+                    </button>
+                  )}
                   <button type="button" class={styles.later} onClick={() => onDejar(c)}>
                     Ahora no
                   </button>
@@ -69,9 +79,10 @@ export function CoachCard<T extends Consejo>({ consejos, onAplicar, onDejar, onN
         ))}
       </ul>
       <p class={styles.foot}>
-        Cada serie frente a la misma de la vez anterior, en los últimos 7 días: mejora si llegas al máximo del
-        rango o subes el peso. Toca subir volumen desde el 80 % (sugerido) y sin ir peor en ninguna; como
-        mucho 2 músculos por semana.
+        Solo son sugerencias: nada cambia hasta que lo aplicas. Cada serie frente a la misma de la vez
+        anterior, en los últimos 7 días: mejora si subes kilos o repeticiones, y solo cuentan los ejercicios
+        con el RIR apuntado. Toca subir volumen tras 3 semanas mejorando en casi todas (80 %, sugerido) sin ir
+        peor: un músculo cada vez, una o dos series.
       </p>
     </section>
   )
