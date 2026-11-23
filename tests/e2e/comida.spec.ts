@@ -274,11 +274,17 @@ test('añadir un alimento con su ración, verlo en su comida y deshacerlo', asyn
   await page.getByRole('button', { name: 'Añadir a la cena' }).click()
   const hoja = page.getByRole('dialog', { name: 'Añadir' })
   await hoja.getByLabel('Buscar un alimento').fill('salmon plancha')
-  await hoja
-    .getByRole('button', { name: /^Salmón a la plancha/ })
-    .first()
-    .click()
   const racion = page.getByRole('dialog', { name: 'Salmón a la plancha' })
+  // La lista se redibuja al llegar los productos de supermercado (en la CI, a veces justo al tocar): si la hoja no se
+  // abre, se vuelve a tocar
+  await expect(async () => {
+    if (!(await racion.isVisible()))
+      await hoja
+        .getByRole('button', { name: /^Salmón a la plancha/ })
+        .first()
+        .click({ timeout: 2000 })
+    await expect(racion).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15_000 })
   await expect(racion).toContainText('Después te quedarán')
   await racion.getByRole('button', { name: 'Más' }).click()
   await racion.getByRole('button', { name: 'Añadir a la cena' }).click()
