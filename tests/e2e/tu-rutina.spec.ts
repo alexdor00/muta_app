@@ -24,6 +24,9 @@ async function editar(page: import('@playwright/test').Page) {
   return page.getByRole('dialog', { name: 'Editar rutina' })
 }
 
+/** Las fotos de serie de las sesiones (las que salen si no pones la tuya). */
+const DE_SERIE = /\/photos\/sesiones\//
+
 test('foto de la sesión (en Editar rutina): se pone, sale en la tarjeta, sigue al recargar y se quita', async ({
   page,
 }) => {
@@ -45,15 +48,23 @@ test('foto de la sesión (en Editar rutina): se pone, sale en la tarjeta, sigue 
       .getByRole('button', { name: 'Cambiar la foto de Isquios, glúteo y pecho' }),
   ).toBeVisible()
   await page.goto('/entreno')
-  await expect(page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img')).toHaveCount(1)
+  await expect(
+    page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img'),
+  ).not.toHaveAttribute('src', DE_SERIE)
   await page.reload()
-  await expect(page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img')).toHaveCount(1)
+  await expect(
+    page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img'),
+  ).not.toHaveAttribute('src', DE_SERIE)
 
   await (await editar(page)).getByRole('button', { name: /foto (a|de) Isquios, glúteo y pecho/ }).click()
   await page.getByRole('button', { name: 'Quitar la foto' }).click()
   await expect(page.getByText('Foto quitada')).toBeVisible()
   await page.goto('/entreno')
-  await expect(page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img')).toHaveCount(0)
+  // Sin tu foto vuelve la de serie (desde el 2026-11-14 toda sesión tiene una)
+  await expect(page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img')).toHaveAttribute(
+    'src',
+    DE_SERIE,
+  )
 })
 
 test('en «Consejos de hoy» los de antes de empezar se marcan y ya no se ocultan', async ({ page }) => {
