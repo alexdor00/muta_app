@@ -3,6 +3,7 @@ import {
   addDays,
   daysBetween,
   formatInt,
+  letraDia,
   formatChange,
   formatRange,
   localDate,
@@ -10,6 +11,8 @@ import {
   formatRest,
   formatDayDate,
   formatDecimal,
+  formatLongDate,
+  formatMonthName,
   formatShortDate,
   formatTons,
   parseDecimal,
@@ -45,6 +48,16 @@ describe('fechas', () => {
     expect(formatShortDate('2026-09-18')).toBe('18 sep')
     expect(formatDayDate('2026-10-23')).toBe('Vie 23 oct')
     expect(formatDayDate('2026-01-04')).toBe('Dom 4 ene')
+  })
+
+  it('fecha larga, con el día de la semana y el mes enteros', () => {
+    expect(formatLongDate('2026-11-09')).toBe('Lunes, 9 de noviembre')
+    expect(formatLongDate('2026-03-01')).toBe('Domingo, 1 de marzo')
+  })
+
+  it('el nombre del mes, con mayúscula', () => {
+    expect(formatMonthName('2026-11')).toBe('Noviembre')
+    expect(formatMonthName('2026-01-15')).toBe('Enero')
   })
 })
 
@@ -116,5 +129,20 @@ describe('formatInt', () => {
     expect(formatInt(2260)).toBe('2.260')
     expect(formatInt(891.4)).toBe('891')
     expect(formatInt(12500)).toBe('12.500')
+  })
+})
+
+describe('letraDia', () => {
+  it('la letra de cada día, de lunes a domingo', () => {
+    const semana = [
+      '2026-11-02',
+      '2026-11-03',
+      '2026-11-04',
+      '2026-11-05',
+      '2026-11-06',
+      '2026-11-07',
+      '2026-11-08',
+    ]
+    expect(semana.map(letraDia)).toEqual(['L', 'M', 'X', 'J', 'V', 'S', 'D'])
   })
 })

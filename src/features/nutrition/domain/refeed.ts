@@ -19,7 +19,11 @@ export type RendimientoReciente = {
   antes: number
 }
 
-export type Recarga = { desde: string; hasta: string }
+/**
+ * Una recarga: desde cuándo y hasta cuándo. Con `sesiones` (usuario, 2026-11-22), acaba cuando has hecho de verdad esas
+ * sesiones de tu rutina (los días que no entrenas no cuentan; como mucho 14 días) y solo sube los días que entrenas.
+ */
+export type Recarga = { desde: string; hasta: string; sesiones?: number }
 
 /** Tu rendimiento baja en varias sesiones recientes cuando antes venías estable o mejorando. */
 export function rendimientoCae(r: RendimientoReciente | null): boolean {
@@ -33,8 +37,12 @@ export function tocaRecarga(d: {
   rendimiento: RendimientoReciente | null
   ultima: Recarga | null
   hoy: string
+  /** Semanas seguidas con señales (hambre, sueño, energía, estrés; usuario, 2026-11-22: también por cómo estás). */
+  semanasConSenales?: number
 }): boolean {
-  if (d.fase !== 'definicion' || d.semanaFase < SEMANA_RECARGA || !rendimientoCae(d.rendimiento)) return false
+  const porTi = (d.semanasConSenales ?? 0) >= 2
+  if (d.fase !== 'definicion' || d.semanaFase < SEMANA_RECARGA || !(rendimientoCae(d.rendimiento) || porTi))
+    return false
   return !d.ultima || daysBetween(d.ultima.hasta, d.hoy) >= DIAS_ENTRE_RECARGAS
 }
 
@@ -52,3 +60,12 @@ export function finDeRecarga(desde: string, sesiones: number, esEntreno: (fecha:
 /** Si una fecha cae dentro de la recarga. */
 export const enRecarga = (r: Recarga | null | undefined, fecha: string) =>
   !!r && fecha >= r.desde && fecha <= r.hasta
+
+/** La recarga con su fin de verdad: con sus sesiones, cuando las has hecho (lo pasado, lo que entrenaste; lo que viene, tu rutina). */
+export function recargaEfectiva(
+  r: Recarga | null | undefined,
+  esEntreno: (fecha: string) => boolean,
+): Recarga | null {
+  if (!r) return null
+  return r.sesiones ? { ...r, hasta: finDeRecarga(r.desde, r.sesiones, esEntreno) } : r
+}

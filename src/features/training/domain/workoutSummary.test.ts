@@ -47,6 +47,9 @@ describe('resumenSesion', () => {
   it('marca las series que superan la misma serie de la vez anterior y las cuenta', () => {
     const r = resumenSesion([rumano])
     expect(r.ejercicios[0].series.map((s) => s.mejor)).toEqual([false, true])
+    // Cada serie lleva la misma de la vez anterior y cómo queda frente a ella
+    expect(r.ejercicios[0].series.map((s) => s.frente)).toEqual([-1, 1])
+    expect(r.ejercicios[0].series[1].antes).not.toBeNull()
     expect(r.superadas).toBe(1)
     expect(r.comparables).toBe(2)
   })

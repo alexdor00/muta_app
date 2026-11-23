@@ -7,7 +7,9 @@ import {
   macrosDe,
   macrosIncompletos,
   modoInicial,
+  nombreRacion,
   pasoDe,
+  unidadDe,
   porComida,
   recientes,
   sumar,
@@ -70,11 +72,33 @@ describe('comidaPorHora', () => {
 })
 
 describe('cantidades', () => {
+  it('lo que se bebe, en mililitros; el aceite y la leche en polvo, en gramos', () => {
+    const x = (name: string, category: string, servingLabel = 'ración') =>
+      unidadDe({ name, category, servingLabel })
+    expect(x('Leche desnatada', 'Huevos y lácteos', 'vaso')).toBe('ml')
+    expect(x('Caldo de pollo', 'Platos', 'taza')).toBe('ml')
+    expect(x('Aceite de oliva', 'Grasas', 'cucharada')).toBe('g')
+    expect(x('Leche en polvo entera', 'Huevos y lácteos', 'cucharada')).toBe('g')
+    expect(x('Atún claro en lata', 'Pescados', 'lata')).toBe('g')
+  })
+
+  it('la cantidad en su unidad y en plural (usuario, 2026-11-21)', () => {
+    expect(nombreRacion({ servingLabel: 'huevo L' }, 1)).toBe('1 huevo L')
+    expect(nombreRacion({ servingLabel: 'huevo L' }, 2)).toBe('2 huevos L')
+    expect(nombreRacion({ servingLabel: 'ración' }, 1.5)).toBe('1,5 raciones')
+    expect(nombreRacion({ servingLabel: 'unidad' }, 3)).toBe('3 unidades')
+    expect(nombreRacion({ servingLabel: 'lata pequeña' }, 2)).toBe('2 latas pequeñas')
+    expect(nombreRacion({ servingLabel: 'media pizza' }, 2)).toBe('2 × media pizza')
+    expect(nombreRacion({ servingLabel: '2 onzas' }, 2)).toBe('2 × 2 onzas')
+  })
+
   it('raciones o gramos, con su paso y al cambiar de modo', () => {
     const pollo = alimento('Pollo', { servingG: 150 })
     expect(gramosDe(pollo, 1.5, 'racion')).toBe(225)
     expect(gramosDe(pollo, 80, 'gramos')).toBe(80)
     expect(pasoDe('racion')).toBe(0.5)
+    expect(pasoDe('racion', { servingLabel: 'huevo L' })).toBe(1)
+    expect(pasoDe('racion', { servingLabel: 'ración' })).toBe(0.5)
     expect(pasoDe('gramos')).toBe(10)
     expect(cantidadAlCambiar(pollo, 1.5, 'gramos')).toBe(225)
     expect(cantidadAlCambiar(pollo, 200, 'racion')).toBe(1.25)

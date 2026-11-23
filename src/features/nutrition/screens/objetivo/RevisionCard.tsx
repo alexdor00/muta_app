@@ -1,69 +1,69 @@
-import { formatChange, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
-import {
-  consejosSemana,
-  MESETAS_PARON,
-  pendiente,
-  recargaPropuesta,
-  revisionDeHoy,
-  SUBIDA_MESETA,
-} from '../../state/comida.ts'
+import { useEffect } from 'preact/hooks'
+import { formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import { cargarCuerpo } from '../../use-cases/nutritionStore.ts'
+import { ajustes, pendiente } from '../../state/comida.ts'
+import { consejosSemana, cuerpoProgreso, recargaPropuesta, revisionDeHoy } from '../../state/entrenador.ts'
+import { resumenRevision, type Resumen } from './textoRevision.ts'
 import { descartarRecarga, empezarRecarga } from '../../use-cases/target.ts'
 import styles from './Objetivo.module.css'
 
-const pct = (n: number) => formatChange(n / 100, 2)
-
-/** Qué dice hoy la revisión semanal: la sugerencia que espera, o en vivo lo que falta o cómo vas. */
-export function RevisionCard({ onVer }: { onVer: (() => void) | null }) {
+/** Qué dice hoy la revisión semanal, como un informe: estado, titular, cifras y una recomendación. */
+export function RevisionCard({ onVer, historial }: { onVer: (() => void) | null; historial?: string }) {
+  // Lo que apuntaste en Hoy (cómo estás, tus medidas) llega a la revisión al abrirla, sin recargar la app
+  useEffect(() => void cargarCuerpo(), [])
   const p = pendiente.value
-  const r = revisionDeHoy.value
-  let texto = 'Cada semana miro tu peso y lo que comes. Si hace falta, te propongo un cambio y tú decides.'
-  if (p) texto = `${p.texto}: te propongo ${formatInt(p.a)} kcal en lugar de ${formatInt(p.de ?? 0)}.`
-  else if (r?.tipo === 'faltan') {
-    const partes = [
-      r.faltanPesajes
-        ? `${r.faltanPesajes} ${r.faltanPesajes === 1 ? 'pesaje' : 'pesajes'} más (llevas ${r.pesajes} en 14 días)`
-        : '',
-      r.faltanDias
-        ? `${r.faltanDias} ${r.faltanDias === 1 ? 'día' : 'días'} más de comida apuntada (llevas ${r.dias} en 4 semanas)`
-        : '',
-    ].filter(Boolean)
-    texto = `Para revisar tu semana me faltan ${partes.join(' y ')}.`
-  } else if (r?.tipo === 'cumplir')
-    texto = `Comes el ${Math.round(r.cumplido * 100)} % de tu objetivo: primero, comer lo que marca el plan; después vemos si hay que cambiarlo.`
-  else if (r?.tipo === 'bien') texto = `Vas al ritmo previsto (${pct(r.pct)} por semana). No toco nada.`
-  else if (r?.tipo === 'esperar')
-    texto = `Dejo 10 días entre cambios para ver su efecto: vuelvo a mirar en ${r.dias} ${r.dias === 1 ? 'día' : 'días'}.`
-  else if (r?.tipo === 'pasos')
-    texto = `Bajas más despacio de lo previsto (${pct(r.pct)} por semana). Antes de comer menos, muévete más: llega al menos a 10.000 pasos al día y, si puedes, a 12.000–15.000, repartidos en varios ratos (ahora, ${formatInt(r.pasos)}). Cámbialo en tus datos cuando lo hagas.`
-  else if (r?.tipo === 'progresas')
-    texto = `Subes más despacio de lo previsto (${pct(r.pct)} por semana), pero tu fuerza en los básicos ${r.fuerza > 0 ? 'sube' : 'se mantiene'}: no toco las calorías. Antes de comer más, revisa el descanso y tus medidas.`
-  else if (r?.tipo === 'meseta')
-    texto = `Esperando a que tu peso se estabilice (${pct(r.pct)} por semana) para subir +${SUBIDA_MESETA} kcal en hidratos. Llevas ${r.hechas} ${r.hechas === 1 ? 'meseta' : 'mesetas'}.`
-  else if (r?.tipo === 'mesetasHechas')
-    texto = `Ya llevas ${MESETAS_PARON} mesetas: ya puedes empezar a definir o seguir subiendo poco a poco.`
-  else if (r?.tipo === 'suelo')
-    texto = `Ya estás en el mínimo (${formatInt(r.suelo)} kcal): no bajo más. Mejor más pasos o paciencia.`
+  const fase = ajustes.value?.fase ?? null
+  // Las semanas que te quedan hasta tu objetivo de grasa, en definición (02-reglas § 8, «Peso objetivo»)
+  const semanas = fase === 'definicion' ? cuerpoProgreso.value?.semanas : null
+  const base: Resumen = p
+    ? {
+        estado: '1 sugerencia',
+        titulo: p.texto,
+        datos:
+          p.a === p.de
+            ? []
+            : [
+                ['Ahora', `${formatInt(p.de ?? 0)} kcal`],
+                ['Propuesta', `${formatInt(p.a)} kcal`],
+              ],
+      }
+    : resumenRevision(revisionDeHoy.value, fase)
+  const datos = semanas
+    ? [...base.datos, ['Hasta tu objetivo de grasa', `~${semanas} semanas`] as [string, string]]
+    : base.datos
+  const consejos = consejosSemana.value
+  const recarga = recargaPropuesta.value
   return (
     <section class={styles.review} aria-labelledby="revision">
       <div class={styles.reviewHead}>
-        <h2 id="revision" class={styles.reviewTitle}>
+        <h2 id="revision" class={styles.reviewEyebrow}>
           Revisión semanal
         </h2>
-        {p && <span class={styles.badge}>1 sugerencia</span>}
+        <span class={p ? styles.badge : styles.estado}>{base.estado}</span>
       </div>
-      <p class={styles.sub}>{texto}</p>
-      {recargaPropuesta.value && (
+      <p class={styles.reviewTitle}>{base.titulo}</p>
+      {datos.length > 0 && (
+        <dl class={styles.reviewDatos}>
+          {datos.map(([k, v]) => (
+            <div key={k}>
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {base.nota && <p class={styles.foot}>{base.nota}</p>}
+      {recarga && (
         <div class={styles.recarga}>
-          <p class={styles.sub}>
-            Tu rendimiento baja en varias sesiones y ya llevas semanas en definición: se recomienda una
-            recarga de hidratos hasta el {formatDayDate(recargaPropuesta.value.hasta)} (una vuelta de tu
-            rutina). Comerás lo de mantenimiento, con todo lo de más en hidratos.
+          <p class={styles.reviewEyebrow}>Recarga de hidratos</p>
+          <p class={styles.foot}>
+            Rendimiento a la baja. Hasta el {formatDayDate(recarga.hasta)}, mantenimiento los días de entreno.
           </p>
           <div class={styles.recargaBotones}>
             <button
               type="button"
               class={styles.see}
-              onClick={() => void empezarRecarga(recargaPropuesta.value?.hasta ?? '')}
+              onClick={() => void empezarRecarga(recarga.hasta, recarga.sesiones)}
             >
               Empezar la recarga
             </button>
@@ -73,15 +73,26 @@ export function RevisionCard({ onVer }: { onVer: (() => void) | null }) {
           </div>
         </div>
       )}
-      {consejosSemana.value.map((c) => (
-        <p key={c} class={styles.foot}>
-          {c}
-        </p>
-      ))}
+      {consejos.length > 0 && (
+        <div class={styles.reviewConsejos}>
+          <p class={styles.reviewEyebrow}>Esta semana</p>
+          <ul>
+            {consejos.map((c) => (
+              <li key={c}>{c}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       {p && onVer && (
         <button type="button" class={styles.see} onClick={onVer}>
           Ver la sugerencia
         </button>
+      )}
+      {historial && (
+        // El historial va con la revisión: es lo que fue cambiando (usuario, 2026-11-19)
+        <a class={styles.verHistorial} href={historial}>
+          Ver el historial ›
+        </a>
       )}
     </section>
   )

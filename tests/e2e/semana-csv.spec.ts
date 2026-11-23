@@ -16,7 +16,7 @@ test('Tu semana: hoy con la sesión que toca y, si queda semana, el descanso de 
   page,
 }) => {
   await page.goto('/entreno')
-  const semana = page.getByRole('region', { name: 'Tu semana' })
+  const semana = page.getByRole('region', { name: 'Tu semana', exact: true })
   await expect(semana.getByRole('img', { name: /: hoy$/ })).toContainText('B1')
   // MUTA Cuerpo completo: A1 · B1 · descanso · A2 · B2 · descanso
   const diaHoy = (new Date().getDay() + 6) % 7
@@ -40,14 +40,16 @@ test('si hoy toca descanso, sale «Hoy descansas» y se puede entrenar igualment
     .getByRole('dialog', { name: 'Tu rutina' })
     .getByRole('button', { name: /Editar rutina/ })
     .click()
-  await page.getByRole('button', { name: 'Añadir un día de descanso' }).click()
-  await page
-    .getByRole('dialog', { name: '¿Después de qué sesión?' })
-    .getByText('1. Cuádriceps y espalda', { exact: true })
-    .click()
-  await expect(
-    page.getByRole('button', { name: 'Quitar el día de descanso después de Cuádriceps y espalda' }),
-  ).toBeVisible()
+  // El «+» lo pone al final (A1 · B1 · descanso · A2 · B2 · descanso · descanso); con el asa sube a después de A1
+  await page.getByRole('button', { name: 'Añadir un día' }).click()
+  await page.getByRole('menuitem', { name: 'Día de descanso' }).click()
+  const dias = page.getByRole('list', { name: 'Tu semana' }).getByRole('listitem')
+  for (let k = 6; k >= 2; k--) {
+    await dias.nth(k).getByRole('button', { name: 'Mover Descanso' }).press('ArrowUp')
+    await expect(dias.nth(k - 1)).toContainText('Descanso')
+  }
+  await expect(dias.nth(0)).toContainText('Cuádriceps y espalda')
+  await expect(dias.nth(1)).toContainText('Descanso')
   await page.goto('/entreno')
   await expect(page.getByRole('heading', { name: 'Hoy descansas' })).toBeVisible()
   await expect(page.getByText('La siguiente: B1 · Isquios, glúteo y pecho.')).toBeVisible()

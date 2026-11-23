@@ -357,7 +357,7 @@ Cada hueco: músculo · series · opciones en orden (se elige la primera disponi
 | Medida | Cómo tomarla |
 |---|---|
 | Cintura | Altura del ombligo, relajado, al soltar el aire. Sin meter tripa. |
-| Brazo | Bíceps relajado, punto más ancho, mitad entre hombro y codo. |
+| Brazo | Bíceps contraído, en el punto más ancho, a mitad entre hombro y codo (usuario, 2026-11-10; antes «relajado»). |
 | Pecho | Altura de los pezones, bajo axilas, tras soltar el aire. |
 | Muslo | Mitad entre ingle y rodilla, de pie, peso repartido. |
 | Gemelo | Parte más ancha, de pie. |

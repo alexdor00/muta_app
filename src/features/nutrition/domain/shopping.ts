@@ -82,6 +82,23 @@ export type RecetaParaComprar = {
   lista: readonly { alimentoId: string | null; nombre: string; categoria: string; g: number | null }[]
 }
 
+/**
+ * Cómo se llama en la compra un ingrediente: su clave (el alimento de la base o, si no hay, su nombre sin tildes), su
+ * nombre sin «(crudo)» y su sección. La compra lo cuenta así.
+ */
+export function productoDe(i: { alimentoId: string | null; nombre: string; categoria: string }): {
+  clave: string
+  nombre: string
+  seccion: string
+} {
+  return {
+    clave: i.alimentoId ?? plainText(i.nombre),
+    nombre: i.nombre.replace(/\s*\((en )?crud[oa]\)/i, ''),
+    // Sin alimento de la base, su categoría no dice nada (el recetario les pone «Platos»): manda el nombre
+    seccion: seccionDe(i.alimentoId ? i.categoria : '', i.nombre),
+  }
+}
+
 export function listaDeLaCompra(
   dias: readonly { recetas: readonly RecetaParaComprar[] }[],
   extra: Readonly<Record<string, number>> = {},
@@ -91,12 +108,11 @@ export function listaDeLaCompra(
     for (const r of dia.recetas) {
       const veces = 1 + (extra[r.id] ?? 0)
       for (const i of r.lista) {
-        const clave = i.alimentoId ?? plainText(i.nombre)
+        const { clave, nombre, seccion } = productoDe(i)
         const p = productos.get(clave) ?? {
           clave,
-          nombre: i.nombre.replace(/\s*\((en )?crud[oa]\)/i, ''),
-          // Sin alimento de la base, su categoría no dice nada (el recetario les pone «Platos»): manda el nombre
-          seccion: seccionDe(i.alimentoId ? i.categoria : '', i.nombre),
+          nombre,
+          seccion,
           gramos: null,
           usos: [],
           menus: [],
@@ -123,17 +139,33 @@ export function textoDeLaCompra(
   propios: readonly { id: string; nombre: string; seccion: string }[],
   cantidad: (g: number) => string,
 ): string {
-  const lineas: string[] = []
-  for (const s of SECCIONES) {
-    const de = [
+  return seccionesDeLaCompra(productos, tienes, propios)
+    .flatMap((s) => [
+      s.nombre.toUpperCase(),
+      ...s.cosas.map((p) => `· ${p.nombre}${p.gramos ? `: ${cantidad(p.gramos)}` : ''}`),
+      '',
+    ])
+    .join('\n')
+    .trim()
+}
+
+/** Lo que queda por comprar, por secciones en su orden (sin las vacías): lo del menú y lo que añadiste tú. */
+export function seccionesDeLaCompra(
+  productos: readonly Producto[],
+  tienes: ReadonlySet<string>,
+  propios: readonly { id: string; nombre: string; seccion: string }[],
+): { nombre: string; cosas: { clave: string; nombre: string; gramos: number | null }[] }[] {
+  return SECCIONES.map((s) => ({
+    nombre: s.nombre,
+    cosas: [
       ...productos
         .filter((p) => p.seccion === s.id && !tienes.has(p.clave))
-        .map((p) => `· ${p.nombre}${p.gramos ? `: ${cantidad(p.gramos)}` : ''}`),
-      ...propios.filter((p) => p.seccion === s.id && !tienes.has(p.id)).map((p) => `· ${p.nombre}`),
-    ]
-    if (de.length) lineas.push(s.nombre.toUpperCase(), ...de, '')
-  }
-  return lineas.join('\n').trim()
+        .map((p) => ({ clave: p.clave, nombre: p.nombre, gramos: p.gramos || null })),
+      ...propios
+        .filter((p) => p.seccion === s.id && !tienes.has(p.id))
+        .map((p) => ({ clave: p.id, nombre: p.nombre, gramos: null })),
+    ],
+  })).filter((s) => s.cosas.length > 0)
 }
 
 /** Emoticonos por palabra del nombre (lo primero que encaja manda) y, si no, el de su sección. Solo decoran la lista. */
@@ -218,4 +250,22 @@ const REGLAS_EMOJI = EMOJI_NOMBRE.map(([lista, e]) => [palabra(lista), e] as con
 export function emojiDe(nombre: string, seccion: string): string {
   const n = nombre.toLowerCase()
   return REGLAS_EMOJI.find(([re]) => re.test(n))?.[1] ?? EMOJI_SECCION[seccion] ?? '🛒'
+}
+
+/** Un producto de la compra, con lo que falta y si ya lo compraste. */
+export type PorComprar = Producto & { comprado: boolean }
+
+/**
+ * La lista de la compra con lo que ya compraste para ella (`compradas`, sale marcado con lo que pusiste). Sin despensa
+ * (usuario, 2026-11-21: borrada): la lista es todo lo de tus menús; lo que tengas en casa, lo tachas.
+ */
+export function porComprar(
+  productos: readonly Producto[],
+  compradas: Readonly<Record<string, number | null>>,
+): PorComprar[] {
+  return productos.map((p) =>
+    p.clave in compradas
+      ? { ...p, gramos: compradas[p.clave] ?? p.gramos, comprado: true }
+      : { ...p, comprado: false },
+  )
 }

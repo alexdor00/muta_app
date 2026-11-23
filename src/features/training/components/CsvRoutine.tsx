@@ -7,8 +7,11 @@ import styles from './CsvRoutine.module.css'
 /** La tarjeta de abajo en Elegir rutina: cargar tu rutina desde un CSV y descargar la plantilla. */
 export function CsvRoutineCard(props: {
   plantilla: string
+  /** Copia las instrucciones para una IA; dice si se pudo. */
+  onCopiar: () => Promise<boolean>
   onArchivo: (nombre: string, texto: string) => void
 }) {
+  const [copiado, setCopiado] = useState<boolean | null>(null)
   return (
     <section class={styles.card} aria-labelledby="tu-propia-rutina">
       <h2 id="tu-propia-rutina" class={styles.title}>
@@ -17,6 +20,17 @@ export function CsvRoutineCard(props: {
       <p class={styles.text}>
         Cárgala desde un CSV: una fila por ejercicio con su sesión, series, repeticiones, RIR y descanso.
       </p>
+      <p class={styles.text}>
+        ¿Está en Word, PDF o en una foto? Copia las instrucciones, pégalas en ChatGPT, Claude u otra IA con tu
+        rutina debajo y guarda lo que te dé como .csv.
+      </p>
+      <button type="button" class={styles.template} onClick={async () => setCopiado(await props.onCopiar())}>
+        {copiado
+          ? 'Instrucciones copiadas ✓'
+          : copiado === false
+            ? 'No se pudo copiar: prueba otra vez'
+            : 'Copiar instrucciones para una IA'}
+      </button>
       <label class={styles.load}>
         <PlusIcon />
         Cargar desde CSV

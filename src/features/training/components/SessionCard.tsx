@@ -1,7 +1,7 @@
 import { paths } from '../../../shared/lib/paths.ts'
 import { PlayIcon } from '../../../shared/ui/icons.tsx'
 import styles from './SessionCard.module.css'
-import tones from './sessionTone.module.css'
+import tones from '../../../shared/ui/sessionTone.module.css'
 
 type Props = {
   sigla: string
@@ -13,20 +13,22 @@ type Props = {
   tono: 1 | 2 | 3 | 4
   /** Tu foto de la sesión (A29–A30): de fondo, oscurecida para que se lea. */
   foto?: string | null
+  /** Dónde está centrada la foto («50% 30%»). */
+  encuadre?: string
 }
 
 /**
  * Tarjeta de color de una sesión, con la sigla de fondo (o tu foto): al tocarla se abre Ver sesión; la píldora blanca
  * «▶ Empezar» de abajo la empieza.
  */
-export function SessionCard({ sigla, nombre, detalle, estado, tono, foto }: Props) {
+export function SessionCard({ sigla, nombre, detalle, estado, tono, foto, encuadre }: Props) {
   return (
     <div class={styles.wrap}>
       <a
         class={`${styles.card} ${tones[`tone${tono}`]} ${tono === 2 || foto ? styles.noGhost : ''} ${foto ? styles.withPhoto : ''}`}
         href={paths.sessionView(sigla.toLowerCase())}
       >
-        {foto && <img class={styles.photo} src={foto} alt="" />}
+        {foto && <img class={styles.photo} src={foto} alt="" style={{ objectPosition: encuadre }} />}
         <span class={styles.ghost} aria-hidden="true">
           {sigla}
         </span>

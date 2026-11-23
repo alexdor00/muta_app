@@ -23,6 +23,41 @@ export const KCAL_POR_KG = 7_700
 
 export type Cuerpo = { sexo: Sexo; edad: number; alturaCm: number; pesoKg: number }
 
+/**
+ * Tu actividad fuera de los pasos y del gimnasio (usuario, 2026-11-19: «tiene en cuenta los pasos pero no el trabajo ni
+ * otros deportes»; como otras apps, que separan la vida diaria del ejercicio). Solo para la primera estimación del gasto:
+ * después manda lo que se aprende de tus datos (`aprenderGasto`).
+ */
+export type Trabajo = 'sentado' | 'de-pie' | 'fisico'
+export const TRABAJOS: { id: Trabajo; nombre: string; detalle: string }[] = [
+  { id: 'sentado', nombre: 'Sentado', detalle: 'Oficina' },
+  { id: 'de-pie', nombre: 'De pie', detalle: 'Tienda' },
+  { id: 'fisico', nombre: 'Físico', detalle: 'Obra' },
+]
+/** Lo que el trabajo suma al factor de actividad (sugerido: ningún documento lo fija; los pasos ya cuentan lo que andas). */
+const POR_TRABAJO: Record<Trabajo, number> = { sentado: 0, 'de-pie': 0.05, fisico: 0.15 }
+
+export type Intensidad = 'suave' | 'media' | 'intensa'
+/** Otros deportes (fútbol, correr, nadar…): horas a la semana y cómo de fuerte. */
+export type Deporte = { horas: number; intensidad: Intensidad }
+/** MET de cada intensidad (sugerido, del compendio de actividades: suave como andar rápido, intensa como correr). */
+export const MET: Record<Intensidad, number> = { suave: 4, media: 6, intensa: 8 }
+
+/** Las kcal al día de otros deportes: MET × kg × horas a la semana ÷ 7 (02-reglas, «Cardio»). */
+export function kcalDeDeporte(pesoKg: number, d: Deporte | null | undefined): number {
+  if (!d || d.horas <= 0) return 0
+  return Math.round((MET[d.intensidad] * pesoKg * d.horas) / 7)
+}
+
+/**
+ * Lo que se aprende de tus datos (02-reglas, «Revisión semanal automática»): nuevo gasto = 0,6 × el anterior + 0,4 × lo
+ * observado, entre basal × 1,1 y × 2,6. Así sigue a tu metabolismo cuando cambia, sin saltos de una semana a otra.
+ */
+export function aprenderGasto(anterior: number, observado: number, basal: number): number {
+  const nuevo = 0.6 * anterior + 0.4 * observado
+  return Math.round(Math.min(basal * 2.6, Math.max(basal * 1.1, nuevo)))
+}
+
 /** Mifflin-St Jeor: 10 × kg + 6,25 × cm − 5 × edad + 5 (hombre) o − 161 (mujer). */
 export function gastoEnReposo(c: Cuerpo): number {
   return Math.round(10 * c.pesoKg + 6.25 * c.alturaCm - 5 * c.edad + (c.sexo === 'hombre' ? 5 : -161))
@@ -30,12 +65,13 @@ export function gastoEnReposo(c: Cuerpo): number {
 
 /**
  * Factor de actividad: 1,25 + 0,045 por cada 1.000 pasos sobre 3.000 (hasta 8.000 más) + 0,03 por día de entreno,
- * entre 1,3 y 1,95. Con dos decimales.
+ * entre 1,3 y 1,95; y encima, lo de tu trabajo (sugerido). Con dos decimales.
  */
-export function factorActividad(pasos: number, diasEntreno: number): number {
+export function factorActividad(pasos: number, diasEntreno: number, trabajo: Trabajo = 'sentado'): number {
   const miles = Math.min(8, Math.max(0, (pasos - 3000) / 1000))
   const f = 1.25 + 0.045 * miles + 0.03 * diasEntreno
-  return Math.round(Math.min(1.95, Math.max(1.3, f)) * 100) / 100
+  // El trabajo, encima de lo de los pasos y los entrenos (sugerido)
+  return Math.round((Math.min(1.95, Math.max(1.3, f)) + POR_TRABAJO[trabajo]) * 100) / 100
 }
 
 /** Lo mínimo que se come en definición: el mayor de basal × 1,1 y 1.500 (hombre) o 1.200 (mujer). */
@@ -48,15 +84,27 @@ export function deficitDiario(pesoKg: number, ritmo: number): number {
   return Math.round(((ritmo / 100) * pesoKg * KCAL_POR_KG) / 7)
 }
 
-/** Superávit diario en volumen: el mayor de 75 kcal y el 0,375 % del peso al mes. */
-export function superavitDiario(pesoKg: number): number {
-  return Math.round(Math.max(75, (0.00375 * pesoKg * KCAL_POR_KG) / 30))
+/**
+ * Velocidad del volumen, en % del peso al mes (usuario, 2026-11-19: «con mucha precaución para no ponerse gordo»): la
+ * normal, 0,375 %, es la de 02-reglas; la lenta y la rápida son sugeridas, y la rápida no pasa del 0,5 %: subir más
+ * deprisa no gana más músculo, solo más grasa.
+ */
+export const RITMOS_VOLUMEN = [0.25, 0.375, 0.5] as const
+export const RITMO_VOLUMEN_DE_SERIE = 0.375
+
+/** Superávit diario en volumen: el mayor de 75 kcal y `ritmoMes` % del peso al mes (de serie, 0,375 %). */
+export function superavitDiario(pesoKg: number, ritmoMes: number = RITMO_VOLUMEN_DE_SERIE): number {
+  return Math.round(Math.max(75, ((ritmoMes / 100) * pesoKg * KCAL_POR_KG) / 30))
 }
 
 export type Calculo = {
   basal: number
   factor: number
+  /** Las kcal al día de otros deportes (ya sumadas en el gasto). */
+  deporte: number
   gasto: number
+  /** El gasto sale de tus datos (lo aprendido), no de la fórmula. */
+  aprendido: boolean
   /** Lo que la fase quita (negativo) o suma al gasto. */
   cambio: number
   suelo: number
@@ -72,20 +120,38 @@ export function calcularObjetivo(datos: {
   diasEntreno: number
   fase: Fase
   ritmo: number
+  trabajo?: Trabajo
+  deporte?: Deporte | null
+  /** En volumen, % del peso al mes (de serie, 0,375). */
+  ritmoVolumen?: number
+  /** Lo que gastas según tus datos; manda sobre la fórmula (02-reglas: «hasta aprender el real»). */
+  gastoAprendido?: number | null
 }): Calculo {
   const basal = gastoEnReposo(datos.cuerpo)
-  const factor = factorActividad(datos.pasos, datos.diasEntreno)
-  const gasto = Math.round(basal * factor)
+  const factor = factorActividad(datos.pasos, datos.diasEntreno, datos.trabajo)
+  const deporte = kcalDeDeporte(datos.cuerpo.pesoKg, datos.deporte)
+  const aprendido = !!datos.gastoAprendido
+  const gasto = datos.gastoAprendido || Math.round(basal * factor) + deporte
   const minimo = suelo(basal, datos.cuerpo.sexo)
   const cambio =
     datos.fase === 'definicion'
       ? -deficitDiario(datos.cuerpo.pesoKg, datos.ritmo)
       : datos.fase === 'volumen'
-        ? superavitDiario(datos.cuerpo.pesoKg)
+        ? superavitDiario(datos.cuerpo.pesoKg, datos.ritmoVolumen)
         : 0
   const pedido = gasto + cambio
   const enSuelo = datos.fase === 'definicion' && pedido < minimo
-  return { basal, factor, gasto, cambio, suelo: minimo, kcal: enSuelo ? minimo : pedido, enSuelo }
+  return {
+    basal,
+    factor,
+    deporte,
+    gasto,
+    aprendido,
+    cambio,
+    suelo: minimo,
+    kcal: enSuelo ? minimo : pedido,
+    enSuelo,
+  }
 }
 
 /**

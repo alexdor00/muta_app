@@ -1,4 +1,4 @@
-/* Un ejercicio de la sesión en curso (C01). Una insignia con el número a la izquierda; en el abierto, el calentamiento
+/* Un ejercicio de la sesión en curso (C01), en su tarjeta blanca (propuesta «tarjetas», 2026-11-12). Una insignia con el número a la izquierda; en el abierto, el calentamiento
    en píldoras centradas y las series en filas de casillas iguales. Todas las cifras, misma letra y tamaño. */
 
 .exercise {
@@ -7,10 +7,11 @@
   align-items: center;
   column-gap: var(--space-3);
   width: 100%;
-  padding: var(--space-5) 0;
+  padding: var(--space-4);
   border: 0;
-  border-bottom: var(--hairline) solid var(--separator);
-  background: none;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
   color: var(--label);
   text-align: left;
   scroll-margin-top: calc(var(--control-lg) + var(--space-6));
@@ -31,21 +32,21 @@
   width: var(--control-sm);
   height: var(--control-sm);
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  background: var(--bg);
   color: var(--label-2);
   font: var(--text-headline);
   font-variant-numeric: tabular-nums;
 }
 
+/* ✓, ★ o corona de un ejercicio plegado: grandes, que se vean (usuario, 2026-11-14) */
 .badge svg {
-  width: var(--icon-xs);
-  height: var(--icon-xs);
+  width: var(--icon-sm);
+  height: var(--icon-sm);
 }
 
 .open .badge,
 .finished .badge {
-  background: var(--accent);
-  color: var(--on-accent);
+  color: var(--label);
 }
 
 .text {
@@ -64,12 +65,12 @@
   color: var(--label-2);
 }
 
-/* La pauta en etiquetas: series, reps, esfuerzo y descanso */
+/* La pauta en texto gris, separada por puntos: series, reps, esfuerzo y descanso (sin píldoras) */
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
-  margin: var(--space-1) 0 0;
+  gap: 0 var(--space-1);
+  margin: calc(var(--space-1) / 2) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -78,13 +79,20 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  height: calc(var(--control-sm) - var(--space-2));
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  font: var(--text-footnote);
-  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  font: var(--text-subhead);
   font-variant-numeric: tabular-nums;
+}
+
+/* Las cifras de la pauta, en negro: se leen de un vistazo sin quitarle sitio al número del ejercicio */
+.chips b,
+.restChip {
+  color: var(--label);
+  font-weight: var(--weight-semibold);
+}
+
+.chips li + li::before {
+  content: '·';
 }
 
 .restChip {
@@ -112,8 +120,8 @@
 }
 
 .chips svg {
-  width: var(--icon-xs);
-  height: var(--icon-xs);
+  width: var(--icon-sm);
+  height: var(--icon-sm);
 }
 
 /* Lo que no dice la rutina (sugerido) */
@@ -173,33 +181,35 @@
   height: var(--icon-xs);
 }
 
-/* Calentamiento: rótulo y píldoras centradas, todas del mismo ancho */
+/* Calentamiento: una línea, el rótulo a la izquierda y cada serie en una píldora gris; la hecha, tachada */
 .warmup {
   grid-column: 1 / -1;
-  margin-top: var(--space-5);
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-4);
 }
 
+/* El calentamiento, del mismo tamaño que la pauta («3 series · 8–12 reps…») */
 .warmupLabel {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  font: var(--text-footnote);
+  font: var(--text-subhead);
   font-weight: var(--weight-semibold);
   color: var(--label-2);
 }
 
 .warmupLabel svg {
-  width: var(--icon-xs);
-  height: var(--icon-xs);
-  color: var(--streak);
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2); /* el calentamiento no es un logro: sin naranja (usuario, 2026-11-20) */
 }
 
 .warmupSets {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-2);
-  margin-top: var(--space-2);
+  display: flex;
+  gap: var(--space-1);
 }
 
 .warmupSet {
@@ -207,9 +217,10 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  height: var(--control);
-  padding: 0 var(--space-1) 0 var(--space-3);
-  border: var(--border) solid var(--separator);
+  position: relative;
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
   border-radius: var(--radius-pill);
   background: var(--bg);
   color: var(--label);
@@ -224,30 +235,24 @@
 }
 
 .warmupSet small {
-  font: var(--text-caption);
+  font: inherit;
   color: var(--label-2);
 }
 
+/* Se ve pequeña, pero la zona de toque llega a 44 */
+.warmupSet::after {
+  position: absolute;
+  inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;
+  content: '';
+}
+
 .tick {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: calc(var(--control-sm) - var(--space-2));
-  height: calc(var(--control-sm) - var(--space-2));
-  margin-left: auto;
-  border: var(--border) solid var(--separator);
-  border-radius: var(--radius-pill);
+  display: none;
 }
 
-.tick svg {
-  width: var(--icon-xs);
-  height: var(--icon-xs);
-}
-
-.warmupSet.done .tick {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
+.warmupSet.done {
+  color: var(--label-2);
+  text-decoration: line-through;
 }
 
 /* Series: Nº · Kg · Reps · Quedan · círculo; las tres casillas del mismo ancho */
@@ -266,7 +271,7 @@
   align-items: center;
   gap: var(--space-2);
   border-radius: var(--radius-control);
-  background: var(--surface-2);
+  background: var(--surface);
   transition: transform var(--duration-sheet) var(--ease);
   touch-action: pan-y;
   user-select: none;
@@ -313,6 +318,7 @@
   visibility: visible;
 }
 
+/* Las cifras, en la letra de un título de fila: claras, sin ser agresivas (usuario, 2026-11-12) */
 .index,
 .cell {
   font: var(--text-headline);
@@ -331,13 +337,29 @@
   padding: 0;
   border: 0;
   border-radius: var(--radius-control);
-  background: none;
+  background: var(--bg);
   color: var(--label);
   caret-color: transparent;
 }
 
+/* La serie que toca: casillas blancas sin filo (las demás, grises) y su número en negro */
+.actual .cell {
+  background: var(--surface);
+}
+
+.actual .index {
+  color: var(--label);
+  font-weight: var(--weight-semibold);
+}
+
+/* Hecha: sin fondo, las cifras en negro */
+.doneRow .cell {
+  background: none;
+}
+
+/* La vez anterior, en gris suave: al escribir encima se queda lo nuevo */
 .cell::placeholder {
-  color: var(--label-2);
+  color: var(--label-3);
   font-weight: var(--weight-regular);
   text-align: center;
 }
@@ -356,8 +378,8 @@
   padding: 0;
   border: var(--border) solid var(--separator);
   border-radius: var(--radius-pill);
-  background: var(--bg);
-  color: var(--on-accent);
+  background: var(--surface);
+  color: var(--label);
   cursor: pointer;
   transition:
     background var(--duration-tap) var(--ease),
@@ -369,14 +391,17 @@
   height: var(--icon-sm);
 }
 
+/* Hecha: ✓ (o ★ si mejora la vez anterior) en negro sobre un círculo gris suave, no negro (usuario, 2026-11-12) */
 .check.done {
-  border-color: var(--accent);
-  background: var(--accent);
+  border-color: var(--surface-2);
+  background: var(--surface-2);
 }
 
-/* Cada serie es una fila gris; la hecha, un tono más oscuro */
-.doneRow {
-  background: var(--surface-3);
+/* Tu mejor marca de siempre: el trofeo en blanco sobre naranja (un logro; usuario, 2026-11-20) */
+.check.done.trofeo {
+  border-color: var(--streak);
+  background: var(--streak);
+  color: var(--on-accent);
 }
 
 .add {
@@ -386,12 +411,12 @@
   align-items: center;
   gap: var(--space-1);
   height: var(--control-sm);
-  margin-top: var(--space-4);
+  margin-top: var(--space-2);
   padding: 0 var(--space-4);
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--label);
+  background: none;
+  color: var(--label-2);
   font: var(--text-subhead);
   font-weight: var(--weight-semibold);
   cursor: pointer;
@@ -432,7 +457,7 @@
 
 .extra .cell {
   height: var(--control-sm);
-  background: var(--surface);
+  background: var(--bg);
 }
 
 .extraMark {
@@ -484,4 +509,51 @@
 .note {
   text-align: justify;
   hyphens: auto;
+}
+
+/* Los ejercicios cerrados seguidos van juntos en una sola tarjeta, separados por una raya fina (propuesta 6) */
+.row + .row {
+  margin-top: calc(var(--space-3) * -1);
+  border-top: var(--hairline) solid var(--separator);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.row:has(+ .row) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* La corona: entra girando y creciendo un poco, como si la estrella se convirtiera en ella */
+.corona {
+  display: grid;
+  place-items: center;
+  animation: corona var(--duration-sheet) var(--ease) both;
+}
+
+.corona svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+@keyframes corona {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-30deg);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.25) rotate(8deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .corona {
+    animation: none;
+  }
 }

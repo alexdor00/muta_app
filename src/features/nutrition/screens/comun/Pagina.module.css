@@ -20,7 +20,7 @@
 }
 
 .title {
-  font: var(--text-title-2);
+  font: var(--text-titulo-pantalla);
 }
 
 .card {
@@ -32,6 +32,7 @@
   background: var(--surface);
   /* Las opciones (chips) dentro, en blanco: en gris sobre gris no se ven */
   --choice-bg: var(--bg);
+  box-shadow: var(--card-shadow);
 }
 
 .cardTitle {
@@ -63,7 +64,7 @@
 .count {
   font: var(--text-title-2);
   font-style: italic;
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
 }
 
 .number {
@@ -228,6 +229,7 @@
   padding: 0 var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .seccionTitulo {
@@ -266,6 +268,11 @@
   width: var(--icon-xs);
   height: var(--icon-xs);
   color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.seccionAbrir[aria-expanded='true'] svg {
+  transform: rotate(180deg);
 }
 
 .seccion .list {

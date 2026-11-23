@@ -17,7 +17,7 @@
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-control);
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
   font: var(--text-subhead);
   text-align: center;
 }

@@ -3,7 +3,7 @@ import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { anadir, nombresDeSesiones, quitar, sesiones } from '../../state/plan.ts'
 import type { LibraryExercise } from '../../state/routines.ts'
 import { idPorNombre } from '../../use-cases/exerciseLibrary.ts'
-import { editarSesion } from '../../use-cases/training.ts'
+import { editarSesion } from '../../use-cases/editPlan.ts'
 
 /**
  * «¿En qué sesión va …?»: añade un ejercicio de la biblioteca a la sesión que elijas, al final y para todas las semanas

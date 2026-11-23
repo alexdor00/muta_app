@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import { formatClock, formatDecimal, formatRest } from '../../../../shared/lib/format.ts'
-import { paths } from '../../../../shared/lib/paths.ts'
+import { paths, vieneDeHoy } from '../../../../shared/lib/paths.ts'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { RestBar } from '../../components/RestBar.tsx'
@@ -11,8 +11,7 @@ import { WorkoutExerciseRow } from '../../components/WorkoutExerciseRow.tsx'
 import { WorkoutKeypad } from '../../components/WorkoutKeypad.tsx'
 import { TipsBanner } from '../../components/SessionTips.tsx'
 import { ConfirmSheet, FinishSheet } from '../../components/WorkoutSheets.tsx'
-import { faseActual } from '../../state/fase.ts'
-import { avisoTecnica, notaSugerido, sesionDe, type SesionPlan, textoReps } from '../../state/plan.ts'
+import { notaSugerido, sesionDe, type SesionPlan } from '../../state/plan.ts'
 import {
   calentamientosHoy,
   consejosAlEmpezar,
@@ -39,6 +38,7 @@ import {
   pautaHoy,
   sesionEnCurso,
   tomarPedido,
+  textoAntes,
   textoSerie,
   type EjercicioEnCurso,
   type SerieEnCurso,
@@ -53,7 +53,8 @@ import { HojasSesion, type HojaSesion } from './HojasSesion.tsx'
 import { useAviso } from './useAviso.ts'
 import { useReloj } from './useReloj.ts'
 import { useTeclado } from './useTeclado.ts'
-import { cambiarDesdeSesion, terminarEntreno } from '../../use-cases/training.ts'
+import { cambiarDesdeSesion } from '../../use-cases/editPlan.ts'
+import { terminarEntreno } from '../../use-cases/training.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
 import { usePlan } from '../comun/usePlan.ts'
 import { irAEjercicio } from './desplazar.ts'
@@ -66,7 +67,7 @@ import styles from './SesionScreen.module.css'
  * Lo apuntado se guarda en IndexedDB a cada cambio (use-cases/training.ts).
  */
 export function SesionScreen(props: { sessionId: string }) {
-  const { route, path } = useLocation()
+  const { route, path, query } = useLocation()
   const plan = usePlan()
   const delPlan = sesionDe(props.sessionId)
   const guardada = sesionEnCurso.value
@@ -77,7 +78,16 @@ export function SesionScreen(props: { sessionId: string }) {
     : delPlan
   const [abierto, setAbierto] = useState(() => tomarPedido() ?? primeroSinTerminar(en))
   const { activa, entrar, tecla, siguiente, teclado, vista } = useTeclado(en)
-  const { ahora, descanso, setDescanso, quedanDescanso, tiempoDescanso } = useReloj()
+  const {
+    ahora,
+    descanso,
+    setDescanso,
+    quedanDescanso,
+    tiempoDescanso,
+    parteDescanso,
+    pausarDescanso,
+    descansoParado,
+  } = useReloj()
   const { aviso, setAviso, deshacer, setDeshacer, decir } = useAviso()
   const [confirmar, setConfirmar] = useState<{ ej: number; serie: number } | null>(null)
   // El ejercicio cuyo «···» está abierto, y el aviso de terminar con series sin marcar
@@ -122,7 +132,7 @@ export function SesionScreen(props: { sessionId: string }) {
   const salirSinGuardar = () => {
     guardarSesion(null)
     setDescanso(null)
-    route(paths.training)
+    route(vieneDeHoy(query) ? paths.today : paths.training)
   }
 
   /** Termina la sesión (se guarda solo lo hecho) y abre el resumen. */
@@ -172,8 +182,6 @@ export function SesionScreen(props: { sessionId: string }) {
       <WorkoutBar
         tiempo={formatClock(segundosSesion(en, ahora))}
         progreso={`${sesion.sigla} · ${hechas} de ${total} series`}
-        hechas={hechas}
-        total={total}
         salirHref={paths.sessionView(id)}
         pausada={en.pausadaEn !== null}
         onPausa={() => guardarSesion(alternarPausa(en, ahora))}
@@ -200,7 +208,7 @@ export function SesionScreen(props: { sessionId: string }) {
         )}
         {en.orden.map((i, pos) => {
           const e = ejercicios[i]
-          const pauta = `${e.series} series de ${textoReps(e)} reps, ${effortLabel(e.rir)}`
+          const pauta = `${e.series} series de ${e.reps} reps, ${effortLabel(e.rir)}`
           const x = en.ejercicios[i]
           const nombre = nombreHoy(e, x)
           if (i !== abierto) {
@@ -224,15 +232,10 @@ export function SesionScreen(props: { sessionId: string }) {
               nombre={nombre}
               pauta={[...pautaHoy(e, x), ...(enSuperserie(en, i) ? ['Superserie'] : [])]}
               descanso={formatRest(descansoDe(e))}
+              antes={textoAntes(e, x)}
               onDescanso={() => setHoja({ tipo: 'descanso', ejercicio: e, segundos: descansoDe(e) })}
-              sugerido={
-                [
-                  x.cambiadoPor ? null : notaSugerido(e),
-                  x.cambiadoPor ? null : avisoTecnica(e, faseActual.value === 'cut'),
-                ]
-                  .filter(Boolean)
-                  .join(' ') || null
-              }
+              // Sin el aviso de técnicas en definición (usuario, 2026-11-14)
+              sugerido={x.cambiadoPor ? null : notaSugerido(e)}
               nota={notaDe(nombre) || x.nota}
               onOpciones={() => setHojaDe(i)}
               calentamiento={calienta.map((c, k) => ({
@@ -284,7 +287,14 @@ export function SesionScreen(props: { sessionId: string }) {
       </div>
 
       {descanso && !activa && (
-        <RestBar quedan={quedanDescanso} tiempo={tiempoDescanso} onSaltar={() => setDescanso(null)} />
+        <RestBar
+          quedan={quedanDescanso}
+          tiempo={tiempoDescanso}
+          parte={parteDescanso}
+          parado={descansoParado}
+          onPausar={pausarDescanso}
+          onSaltar={() => setDescanso(null)}
+        />
       )}
 
       {vista && (
@@ -296,6 +306,8 @@ export function SesionScreen(props: { sessionId: string }) {
                 ? {
                     tiempo: tiempoDescanso,
                     quedan: quedanDescanso,
+                    parado: descansoParado,
+                    onPausar: pausarDescanso,
                     onSaltar: () => setDescanso(null),
                   }
                 : null

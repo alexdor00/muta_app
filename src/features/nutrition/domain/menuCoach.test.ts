@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { totalCon } from './fit.ts'
 import { conPlato, menuVacio, type Hueco } from './menu.ts'
-import { propuestasDelMenu, type Contexto } from './menuCoach.ts'
+import { opcionesPara, propuestasDelMenu, type Contexto } from './menuCoach.ts'
 import type { IngredientePlato, Plato } from './recipes.ts'
 
 const ing = (gramos: number, por100: [number, number, number, number], macro: IngredientePlato['macro']) => ({
@@ -86,5 +86,19 @@ describe('propuestasDelMenu', () => {
     expect(p.tipo).toBe('kcal')
     expect(p.despues[0]).toMatchObject({ comida: 'merienda' })
     expect(p.titulo).toContain('te faltan 800 kcal')
+  })
+})
+
+describe('opcionesPara', () => {
+  const xs = [
+    { plato: pollo, error: 1 },
+    { plato: pasta, error: 1.2 },
+    { plato: tostada, error: 5 },
+  ]
+  it('primero tus guardadas, luego lo que más usas, y fuera lo que encaja mucho peor', () => {
+    const r = opcionesPara(xs, new Set(['pasta']), () => 0)
+    expect(r.map((x) => x.plato.id)).toEqual(['pasta', 'pollo'])
+    const u = opcionesPara(xs, new Set(), (id) => (id === 'pasta' ? 3 : 0))
+    expect(u[0].plato.id).toBe('pasta')
   })
 })

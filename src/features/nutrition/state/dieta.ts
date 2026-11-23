@@ -1,11 +1,12 @@
 // Lo que se ve de tu dieta: el menú de cada día, tu semana, la compra y la consulta semanal. Lo carga y guarda
 // use-cases/nutritionStore.ts (y lo cambian use-cases/diet.ts, shopping.ts y consult.ts); aquí no se guarda nada.
 import { computed, signal } from '@preact/signals'
-import { addDays, daysBetween } from '../../../shared/lib/format.ts'
+import { addDays, daysBetween, letraDia } from '../../../shared/lib/format.ts'
 import type { Propuesta, Revision } from '../domain/consult.ts'
 import {
   ajusteDe,
   diaDeDieta,
+  PASOS,
   faseDe,
   kcalExtra,
   mediaDelTipo,
@@ -16,11 +17,13 @@ import {
   type RecetaDelDia,
   type TipoDia,
 } from '../domain/diet.ts'
-import { letraDia } from '../domain/week.ts'
 import { diaVisto, dias, dieta, hoy, tipoDe } from './comida.ts'
 
 // Lo que las pantallas necesitan del dominio
 export { TIPOS_DIA, FACTOR_ARROZ, PASOS, recetaDelDia, siguienteMenu } from '../domain/diet.ts'
+export { PLANTILLA_DIETA } from '../domain/dietCsv.ts'
+export { INSTRUCCIONES_IA_DIETA } from '../domain/dietPrompt.ts'
+export { resumenDeDieta } from '../domain/dietResumen.ts'
 export { mismoCodigo } from '../domain/barcode.ts'
 export type {
   Dieta,
@@ -32,8 +35,8 @@ export type {
   TipoDia,
 } from '../domain/diet.ts'
 export { intercambios, NOMBRE_MACRO, COMPENSAR } from '../domain/swaps.ts'
-export { arrozDe, factorDe, platoPor100, racionDeOlla } from '../domain/kitchen.ts'
-export { emojiDe, SECCIONES } from '../domain/shopping.ts'
+export { arrozDe, factorDe, platoPor100, racionDeOlla, repartirOlla } from '../domain/kitchen.ts'
+export { emojiDe, seccionDe, SECCIONES } from '../domain/shopping.ts'
 export { CINTURA, ESCALAS, SUENO } from '../domain/consult.ts'
 export type { Decision, Propuesta, Revision } from '../domain/consult.ts'
 
@@ -117,10 +120,18 @@ export type Compra = {
   /** Raciones de más por receta (alguien más come ese plato). */
   extra: Record<string, number>
   propios: { id: string; nombre: string; seccion: string }[]
-  /** Por días (lo de tu semana) o por menús (los que elijas, cuántas veces cada uno). */
-  modo?: 'dias' | 'menus'
+  /**
+   * Por días (lo de tu semana), por menús (los que elijas, cuántas veces cada uno) o hasta tu próxima compra (tu semana
+   * resuelta.
+   */
+  modo?: 'dias' | 'menus' | 'semana'
+  /** Tu semana resuelta: el día de la compra de esta lista y lo que ya compraste para ella. */
+  semanaDe?: string
+  compradas?: Record<string, number | null>
   /** Por menús: cuántas veces entra cada menú. */
   menus?: Record<string, number>
+  /** Especias y básicos que te faltan (salen tachados: los destachas si no te quedan; usuario, 2026-11-19). */
+  faltanBasicos?: string[]
 }
 
 export const compra = signal<Compra | null>(null)
@@ -148,6 +159,9 @@ export type Consulta = {
 }
 
 export const consultas = signal<Consulta[]>([])
+
+/** Tus pasos al día: los de tu dieta (los cambia la consulta) o, sin dieta, los de la regla (10.000). */
+export const objetivoPasos = computed(() => (dieta.value ? ajusteDe(dieta.value, hoy.value).pasos : PASOS))
 
 /** Cada cuántos días toca la consulta. */
 export const CADA_CONSULTA = 7

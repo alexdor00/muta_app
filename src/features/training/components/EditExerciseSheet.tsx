@@ -1,9 +1,9 @@
 import { useState } from 'preact/hooks'
 import { formatRange, formatRest } from '../../../shared/lib/format.ts'
-import { ChevronLeftIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
+import { ChevronDownIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
-import { ChoiceList } from '../../../shared/ui/Choice.tsx'
 import { Switch } from '../../../shared/ui/Switch.tsx'
+import { ChoiceList } from '../../../shared/ui/Choice.tsx'
 import { Desplegable } from './Desplegable.tsx'
 import styles from './EditExerciseSheet.module.css'
 
@@ -22,11 +22,14 @@ export type PautaEdicion = {
 const MAX_RIR = 5
 /** Las repeticiones, mínimo y máximo de 1 en 1 (hasta 50); el descanso, de 15 en 15 s (hasta 5 min). */
 const MAX_REPS = 50
+const MAX_SERIES = 10
 const PASO_DESCANSO = 15
 const MAX_DESCANSO = 300
 
+/** Una fila de la pauta: su nombre (y una nota debajo) a la izquierda y − valor + a la derecha. */
 function Contador(p: {
   nombre: string
+  nota?: string
   texto: string
   puedeMenos: boolean
   puedeMas: boolean
@@ -34,7 +37,10 @@ function Contador(p: {
 }) {
   return (
     <div class={styles.line}>
-      <span>{p.nombre}</span>
+      <span class={styles.etiqueta}>
+        {p.nombre}
+        {p.nota && <small class={styles.nota}>{p.nota}</small>}
+      </span>
       <span class={styles.counter}>
         <button
           type="button"
@@ -59,11 +65,8 @@ function Contador(p: {
 }
 
 /**
- * Editar ejercicio (A12–A14): «Cada serie distinta» (un rango por serie), «Superserie con» el de al lado y la técnica de
- * intensidad (dropset, rest-pause…), además de series, descanso entre series y RIR con − / + (cada uno con una
- * línea que lo explica);
- * repeticiones (mínimo y máximo) en un desplegable.
- * Cada toque se guarda solo. «Cambiar por otro» y «Quitar».
+ * Editar ejercicio (A12–A14): series, repeticiones (mínimo y máximo), descanso entre series y RIR con − / +, y a la vista
+ * «Cada serie distinta» (un rango por serie). Plegado en «Más opciones»: superserie con el de al lado y técnica. Cada toque se guarda solo. Abajo, «Cambiar por otro» y «Quitar».
  */
 export function EditExerciseSheet(props: {
   nombre: string
@@ -88,6 +91,8 @@ export function EditExerciseSheet(props: {
   const [p, setP] = useState(props.pauta)
   const [abierto, setAbierto] = useState<string | null>(null)
   const [distintas, setDistintas] = useState(props.seriesDistintas)
+  // «Más opciones» sale abierto si ya usas alguna
+  const [mas, setMas] = useState(props.superserie.valor !== 'ninguno' || props.tecnica.valor !== 'ninguna')
   const ponDistintas = (d: [number, number][] | null) => {
     setDistintas(d)
     props.onSeriesDistintas(d)
@@ -99,19 +104,23 @@ export function EditExerciseSheet(props: {
     props.onCambio(nueva)
   }
   const [min, max] = p.reps
+  const superserie =
+    props.superserie.opciones.find((o) => o.value === props.superserie.valor)?.label ?? 'Ninguno'
+  const tecnica = props.tecnica.opciones.find((o) => o.value === props.tecnica.valor)?.label ?? 'Ninguna'
   return (
-    <Sheet title={props.nombre} onClose={props.onClose} large>
-      <button type="button" class={styles.back} onClick={props.onVolver}>
-        <ChevronLeftIcon />
-        {props.sesion}
-      </button>
-
+    <Sheet
+      alta
+      title={props.nombre}
+      onClose={props.onClose}
+      large
+      atras={{ label: props.sesion, onClick: props.onVolver }}
+    >
       <section class={styles.card} aria-label="Pauta">
         <Contador
           nombre="Series"
           texto={String(p.series)}
           puedeMenos={p.series > 1}
-          puedeMas={p.series < 10}
+          puedeMas={p.series < MAX_SERIES}
           onPaso={(paso) => {
             const series = p.series + paso
             cambia({ series })
@@ -122,8 +131,12 @@ export function EditExerciseSheet(props: {
               )
           }}
         />
+        {/* A la vista, no en «Más opciones»: con él, cada serie lleva sus repeticiones */}
         <div class={styles.line}>
-          <span>Cada serie distinta</span>
+          <span class={styles.etiqueta}>
+            Cada serie distinta
+            <small class={styles.nota}>Repeticiones diferentes en cada serie</small>
+          </span>
           <Switch
             checked={Boolean(distintas)}
             label="Cada serie distinta"
@@ -156,12 +169,7 @@ export function EditExerciseSheet(props: {
             </Desplegable>
           ))
         ) : (
-          <Desplegable
-            titulo="Repeticiones"
-            valor={formatRange(p.reps)}
-            abierto={abierto === 'reps'}
-            onAbrir={abre('reps')}
-          >
+          <>
             <Contador
               nombre="Mínimo de reps"
               texto={String(min)}
@@ -176,7 +184,7 @@ export function EditExerciseSheet(props: {
               puedeMas={max < MAX_REPS}
               onPaso={(paso) => cambia({ reps: [min, max + paso] })}
             />
-          </Desplegable>
+          </>
         )}
         <Contador
           nombre="Descanso entre series"
@@ -192,68 +200,75 @@ export function EditExerciseSheet(props: {
             })
           }
         />
-        <small class={styles.hint}>Lo que paras entre una serie y la siguiente.</small>
-        {props.superserie.opciones.length > 1 && (
-          <Desplegable
-            titulo="Superserie con"
-            valor={
-              props.superserie.opciones.find((o) => o.value === props.superserie.valor)?.label ?? 'Ninguno'
-            }
-            abierto={abierto === 'superserie'}
-            onAbrir={abre('superserie')}
-          >
-            <small class={styles.hint}>
-              Se hacen alternos: 20 s entre los dos y el descanso al terminar la pareja.
-            </small>
-            <ChoiceList
-              name="superserie"
-              legend="Superserie con"
-              options={props.superserie.opciones}
-              value={props.superserie.valor}
-              onChange={(v) => {
-                props.onSuperserie(v)
-                setAbierto(null)
-              }}
-            />
-          </Desplegable>
-        )}
         <Contador
-          nombre="RIR (repeticiones en reserva)"
+          nombre="RIR"
+          nota={p.rir === 0 ? 'Hasta el fallo' : `Terminas con ${p.rir} en reserva`}
           texto={String(p.rir)}
           puedeMenos={p.rir > 0}
           puedeMas={p.rir < MAX_RIR}
           onPaso={(paso) => cambia({ rir: p.rir + paso })}
         />
-        <small class={styles.hint}>
-          {p.rir === 0
-            ? 'Cada serie, hasta el fallo: hasta que no puedas hacer otra repetición bien.'
-            : `Termina cada serie cuando aún podrías hacer ${p.rir === 1 ? '1 repetición más' : `${p.rir} repeticiones más`}.`}
-        </small>
-        <Desplegable
-          titulo="Técnica"
-          valor={props.tecnica.opciones.find((o) => o.value === props.tecnica.valor)?.label ?? 'Ninguna'}
-          abierto={abierto === 'tecnica'}
-          onAbrir={abre('tecnica')}
-        >
-          <small class={styles.hint}>
-            {props.tecnica.explica && `${props.tecnica.explica} `}
-            Mejor en la última serie del último ejercicio de un músculo. Si tienes tiempo, rinde más una serie
-            normal de más, siempre que sigas ganando fuerza.
-          </small>
-          <ChoiceList
-            name="tecnica"
-            legend="Técnica"
-            options={props.tecnica.opciones}
-            value={props.tecnica.valor}
-            onChange={(v) => {
-              props.onTecnica(v)
-              setAbierto(null)
-            }}
-          />
-        </Desplegable>
       </section>
 
-      <div class={styles.links}>
+      <button
+        type="button"
+        class={styles.mas}
+        aria-expanded={mas}
+        aria-controls="mas-opciones"
+        onClick={() => setMas(!mas)}
+      >
+        Más opciones
+        <ChevronDownIcon />
+      </button>
+      {mas && (
+        <section id="mas-opciones" class={styles.card} aria-label="Más opciones">
+          {props.superserie.opciones.length > 1 && (
+            <Desplegable
+              titulo="Superserie con"
+              valor={superserie}
+              abierto={abierto === 'superserie'}
+              onAbrir={abre('superserie')}
+            >
+              <small class={styles.hint}>
+                Se hacen alternos: 20 s entre los dos y el descanso al terminar la pareja.
+              </small>
+              <ChoiceList
+                name="superserie"
+                legend="Superserie con"
+                options={props.superserie.opciones}
+                value={props.superserie.valor}
+                onChange={(v) => {
+                  props.onSuperserie(v)
+                  setAbierto(null)
+                }}
+              />
+            </Desplegable>
+          )}
+          <Desplegable
+            titulo="Técnica"
+            valor={tecnica}
+            abierto={abierto === 'tecnica'}
+            onAbrir={abre('tecnica')}
+          >
+            <small class={styles.hint}>
+              {props.tecnica.explica && `${props.tecnica.explica} `}
+              Mejor en la última serie del último ejercicio de un músculo.
+            </small>
+            <ChoiceList
+              name="tecnica"
+              legend="Técnica"
+              options={props.tecnica.opciones}
+              value={props.tecnica.valor}
+              onChange={(v) => {
+                props.onTecnica(v)
+                setAbierto(null)
+              }}
+            />
+          </Desplegable>
+        </section>
+      )}
+
+      <div class={styles.botones}>
         <button type="button" onClick={props.onCambiar}>
           <SwapIcon />
           Cambiar por otro

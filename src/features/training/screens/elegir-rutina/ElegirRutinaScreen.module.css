@@ -11,9 +11,40 @@
   margin-top: var(--space-8);
 }
 
+/* Rótulos como los de la bienvenida: pequeños, en mayúsculas y en gris */
 .sectionTitle {
   margin: 0 var(--gutter) var(--gap-inside);
-  font: var(--text-headline);
+  color: var(--label-2);
+  font: var(--text-caption);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.recomendada {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 var(--gutter);
+  padding: var(--space-2) var(--space-2) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.datos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0 var(--space-2);
+  color: var(--label-2);
+  font: var(--text-subhead);
+  list-style: none;
+}
+
+.recomendada > a:last-child {
+  width: auto;
+  margin: 0 var(--space-2);
 }
 
 .page {

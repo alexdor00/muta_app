@@ -1,43 +1,45 @@
 // Lo que se ve de Comida: tus ajustes, lo apuntado, tus pesajes y lo que propone el entrenador. Lo carga y guarda
 // use-cases/nutritionStore.ts; aquí no se guarda nada.
 import { computed, signal } from '@preact/signals'
-import { addDays, daysBetween, formatDayDate, localDate } from '../../../shared/lib/format.ts'
-import {
-  enRecarga,
-  finDeRecarga,
-  tocaRecarga,
-  type Recarga,
-  type RendimientoReciente,
-} from '../domain/refeed.ts'
+import { addDays, formatDayDate, localDate } from '../../../shared/lib/format.ts'
+import { enRecarga, recargaEfectiva, type Recarga } from '../domain/refeed.ts'
 import { diaDeDieta, repartoSinRutina, type DietaActiva, type TipoDia } from '../domain/diet.ts'
 import { porComida, sumar, type Alimento, type Apunte, type Macros } from '../domain/food.ts'
-import { consejosDeLaSemana, revisar, type Revision } from '../domain/review.ts'
+import type { Revision } from '../domain/review.ts'
 import {
+  type Deporte,
+  type Trabajo,
   calcularObjetivo,
-  gastoEnReposo,
   macrosObjetivo,
-  suelo,
   type Cuerpo,
   type Fase,
   kcalDelDia,
-  semanaDeLaFase,
   type Situacion,
 } from '../domain/targets.ts'
-import { gastoMedido, tendencia, type Pesaje } from '../domain/weight.ts'
+import { tendencia, type Pesaje } from '../domain/weight.ts'
+import { conTiposDeDia } from '../domain/menu.ts'
 
 // Lo que las pantallas necesitan del dominio (no lo importan directamente)
 export {
   cantidadAlCambiar,
   COMIDAS,
   comidaPorHora,
+  macrosDe,
   macrosIncompletos,
   modoInicial,
+  nombreRacion,
   pasoDe,
+  porPiezas,
+  unidadDe,
 } from '../domain/food.ts'
 export type { Alimento, Apunte, ComidaId, Macros, Modo } from '../domain/food.ts'
 export { enRecarga, type Recarga } from '../domain/refeed.ts'
 export {
   avisosReparto,
+  RITMOS_VOLUMEN,
+  RITMO_VOLUMEN_DE_SERIE,
+  TRABAJOS,
+  type Intensidad,
   RITMO_MAX_FINAL,
   SEMANA_FINAL,
   semanaDeLaFase,
@@ -89,6 +91,28 @@ export type Ajustes = {
   /** La recarga de hidratos (la última o la que llevas) y cuándo dijiste «Ahora no» a la propuesta. */
   recarga?: Recarga | null
   recargaDescartada?: string | null
+  /** Tus kcal al empezar la fase en que estás, y cómo fue tu última definición (usuario, 2026-11-22: para empezar la
+   * siguiente con eso en cuenta; la guía, § 7: «si se atraganta, empezar más abajo la siguiente vez»). */
+  kcalAlEmpezar?: number | null
+  ultimaDefinicion?: {
+    desde: string
+    hasta: string
+    kcalInicio: number | null
+    kcalFinal: number
+    atragantada?: boolean
+  } | null
+  /** En volumen, a qué velocidad: % del peso al mes (RITMOS_VOLUMEN; de serie, 0,375). */
+  ritmoVolumen?: number
+  /** Quitaste «Aún no tienes menú para hoy»: no quieres seguir un menú y no vuelve a salir (usuario, 2026-11-19). */
+  sinAvisoMenu?: boolean
+  /** Tu trabajo y otros deportes (usuario, 2026-11-19): solo para la primera estimación del gasto. */
+  trabajo?: Trabajo
+  deporte?: Deporte | null
+  /** Lo que gastas según tus datos (se aprende cada semana: `aprenderDeTusDatos`) y cuándo se aprendió por última vez. */
+  gastoAprendido?: number | null
+  gastoFecha?: string | null
+  /** Los días que cambiaste a mano, de entreno o de descanso, sin dieta cargada (con dieta, los guarda ella). */
+  tipoElegido?: Record<string, TipoDia>
   /** Tu objetivo de kcal desde `desde`; antes de esa fecha, `kcalAnterior`. */
   kcal: number
   kcalAnterior: number | null
@@ -111,7 +135,10 @@ export type Cambio = {
   /** Solo en las sugerencias: lo que vio el entrenador. */
   revision?: Extract<Revision, { tipo: 'cambio' }>
   /** Para deshacer: el objetivo de antes. */
-  antes?: Pick<Ajustes, 'kcal' | 'kcalAnterior' | 'desde' | 'aMano'>
+  antes?: Pick<Ajustes, 'kcal' | 'kcalAnterior' | 'desde' | 'aMano'> &
+    Partial<
+      Pick<Ajustes, 'fase' | 'faseDesde' | 'situacion' | 'mesetas' | 'kcalAlEmpezar' | 'ultimaDefinicion'>
+    >
   createdAt: string
   updatedAt: string
 }
@@ -119,9 +146,16 @@ export type Cambio = {
 export type ComidaGuardada = { id: string; nombre: string; apuntes: Apunte[] }
 
 export const ajustes = signal<Ajustes | null>(null)
+
+/** La recarga de hidratos con su fin de verdad (cuenta tus entrenos hechos); null si no hay. */
+export function recargaActiva(a: Ajustes | null = ajustes.value): Recarga | null {
+  return recargaEfectiva(a?.recarga, (f) => tipoDe(f) === 'entreno')
+}
 /** Lo apuntado por día (las últimas 5 semanas). */
 export const dias = signal<Record<string, Apunte[]>>({})
 export const pesajes = signal<Pesaje[]>([])
+/** Tus pasos de cada día (los apuntas en Hoy). */
+export const pasosDias = signal<Record<string, number>>({})
 export const cambios = signal<Cambio[]>([])
 export const propios = signal<Alimento[]>([])
 export const guardadas = signal<ComidaGuardada[]>([])
@@ -146,7 +180,8 @@ export function entrenosDeLaSemana(fecha: string): number {
  * hidratos, las de mantenimiento (la proteína y la grasa no cambian: lo de más va a hidratos).
  */
 const kcalBase = (a: Ajustes, fecha: string) =>
-  enRecarga(a.recarga, fecha)
+  // Solo los días que entrenas (usuario, 2026-11-22): los de descanso, y los que no entrenas, siguen en definición
+  enRecarga(recargaActiva(a), fecha) && tipoDe(fecha) === 'entreno'
     ? calcularObjetivo({ ...a, fase: 'mantenimiento' }).kcal
     : fecha < a.desde && a.kcalAnterior !== null
       ? a.kcalAnterior
@@ -164,15 +199,25 @@ export function objetivoDe(a: Ajustes, fecha: string, diferencia = a.onOff ?? 0)
   return macrosObjetivo(kcal, a.cuerpo.pesoKg, a)
 }
 
+/** Tus kcal de un día de entreno y de uno de descanso esa semana (con ON/OFF, distintas; sin él, las mismas). */
+export function kcalPorTipo(a: Ajustes, fecha: string): Record<'entreno' | 'descanso', number> {
+  const deSiempre = kcalBase(a, fecha)
+  const n = entrenosDeLaSemana(fecha)
+  const dif = a.onOff ?? 0
+  return { entreno: kcalDelDia(deSiempre, true, n, dif), descanso: kcalDelDia(deSiempre, false, n, dif) }
+}
+
 /**
- * La nota de los hidratos de un día en Tu día: los días de entreno, ponerlos sobre todo antes y después de entrenar (guía:
+ * La nota de los hidratos de un día (en Tu objetivo, usuario 2026-11-17): los días de entreno, ponerlos sobre todo antes y después de entrenar (guía:
  * timing de hidratos) y, con ON/OFF, cuántos gramos más o menos lleva. null si no hay nada que decir (o sigues una dieta).
  */
 export function notaHidratos(fecha: string): string | null {
   if (dieta.value || !ajustes.value) return null
-  const r = ajustes.value.recarga
+  const r = recargaActiva()
   if (enRecarga(r, fecha) && r)
-    return `Recarga de hidratos hasta el ${formatDayDate(r.hasta)}: comes lo de mantenimiento, con todo lo de más en hidratos.`
+    return tipoDe(fecha) === 'entreno'
+      ? `Recarga de hidratos hasta el ${formatDayDate(r.hasta)}: hoy entrenas, comes lo de mantenimiento con todo lo de más en hidratos.`
+      : `Recarga de hidratos hasta el ${formatDayDate(r.hasta)}: hoy no entrenas, tus kcal de definición.`
   const h = hidratosDelDia(fecha)
   const cambio = h ? `${h.gramos > 0 ? '+' : '−'}${Math.abs(h.gramos)} g de hidratos. ` : ''
   if (tipoDe(fecha) === 'entreno')
@@ -197,10 +242,14 @@ export const tiposEntreno = signal<Record<string, TipoDia> | null>(null)
 export function tipoDe(fecha: string): TipoDia {
   return (
     dieta.value?.tipoElegido[fecha] ??
+    ajustes.value?.tipoElegido?.[fecha] ??
     tiposEntreno.value?.[fecha] ??
     repartoSinRutina(fecha, ajustes.value?.diasEntreno ?? 4)
   )
 }
+
+// Tus platos de descanso (domain/menu.ts) siguen a este tipo de día
+conTiposDeDia((f) => tipoDe(f) === 'descanso')
 
 /** El objetivo de un día: con dieta, lo que suman sus recetas (si ya tiene); si no, tu objetivo de kcal. */
 export function objetivoDelDia(fecha: string): Macros | null {
@@ -214,6 +263,8 @@ export const objetivoHoy = computed(() => objetivoDelDia(hoy.value))
 export const objetivoDia = computed(() => objetivoDelDia(diaVisto.value))
 export const apuntesDia = computed(() => dias.value[diaVisto.value] ?? [])
 export const totalDia = computed(() => sumar(apuntesDia.value))
+/** Lo que llevas un día cualquiera (las tarjetas del carrusel de días). */
+export const totalDe = (fecha: string) => sumar(dias.value[fecha] ?? [])
 export const serie = computed(() => tendencia(pesajes.value))
 
 export const totales = computed(() =>
@@ -224,86 +275,6 @@ export const totales = computed(() =>
 export const calculo = computed(() => {
   const a = ajustes.value
   return a ? calcularObjetivo(a) : null
-})
-
-/** Lo que gastas medido con tus datos (null hasta tener 8 pesajes y 8 días de comida en 14). */
-export const gastoReal = computed(() => {
-  const a = ajustes.value
-  if (!a) return null
-  return gastoMedido({
-    serie: serie.value,
-    dias: Object.entries(totales.value).map(([date, t]) => ({ date, kcal: t.kcal })),
-    hoy: hoy.value,
-    basal: gastoEnReposo(a.cuerpo),
-  })
-})
-
-/** Cambio de tu fuerza en los básicos (de Entreno); null hasta cargarlo o sin datos. */
-export const fuerzaBasicos = signal<number | null>(null)
-
-/** Lo que vería hoy la revisión semanal (en vivo: faltan datos, vas bien, pasos…). */
-export const revisionDeHoy = computed<Revision | null>(() => {
-  const a = ajustes.value
-  if (!a) return null
-  return revisar({
-    hoy: hoy.value,
-    fase: a.fase,
-    ritmo: a.ritmo,
-    kcal: a.kcal,
-    suelo: suelo(gastoEnReposo(a.cuerpo), a.cuerpo.sexo),
-    pasos: a.pasos,
-    serie: serie.value,
-    dias: Object.entries(totales.value).map(([date, t]) => ({ date, kcal: t.kcal })),
-    ultimoCambio: a.desde,
-    fuerza: fuerzaBasicos.value,
-    pesoKg: a.cuerpo.pesoKg,
-    semanaFase: semanaDeLaFase(a.faseDesde ?? a.creado, hoy.value),
-    porFases: a.porFases ?? false,
-    ritmoAplicado: a.ritmoTramo ?? a.ritmo,
-    situacion: a.situacion ?? null,
-    mesetas: a.mesetas ?? 0,
-  })
-})
-
-/** Tu rendimiento sesión a sesión y las sesiones de una vuelta de tu rutina (de Entreno; null hasta cargarlo). */
-export const rendimientoComida = signal<{
-  rendimiento: RendimientoReciente
-  sesionesDelCiclo: number
-} | null>(null)
-
-/** Si hoy toca proponer una recarga de hidratos (y hasta cuándo duraría). null si no. */
-export const recargaPropuesta = computed<{ hasta: string; sesiones: number } | null>(() => {
-  const a = ajustes.value
-  const r = rendimientoComida.value
-  if (!a || !r || dieta.value || enRecarga(a.recarga, hoy.value)) return null
-  if (a.recargaDescartada && daysBetween(a.recargaDescartada, hoy.value) < 7) return null
-  const toca = tocaRecarga({
-    fase: a.fase,
-    semanaFase: semanaDeLaFase(a.faseDesde ?? a.creado, hoy.value),
-    rendimiento: r.rendimiento,
-    ultima: a.recarga ?? null,
-    hoy: hoy.value,
-  })
-  return toca
-    ? {
-        hasta: finDeRecarga(hoy.value, r.sesionesDelCiclo, (f) => tipoDe(f) === 'entreno'),
-        sesiones: r.sesionesDelCiclo,
-      }
-    : null
-})
-
-/** Consejos que acompañan a la revisión de esta semana (si la grasa no baja, la recarga de hidratos). */
-export const consejosSemana = computed<string[]>(() => {
-  const a = ajustes.value
-  const r = revisionDeHoy.value
-  if (!a || !r || dieta.value) return []
-  const lento = r.tipo === 'pasos' || (r.tipo === 'cambio' && r.lento && !r.motivo)
-  return consejosDeLaSemana({
-    fase: a.fase,
-    lento,
-    semanaFase: semanaDeLaFase(a.faseDesde ?? a.creado, hoy.value),
-    fuerza: fuerzaBasicos.value,
-  })
 })
 
 /** La sugerencia que espera tu respuesta. */

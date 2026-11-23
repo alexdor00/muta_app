@@ -79,3 +79,11 @@ describe('secciones de un tipo', () => {
     expect(tabOf(paths.routineSection('mujer', 'todas'))).toBe('training')
   })
 })
+
+describe('Progreso', () => {
+  it('un día de entreno va a pantalla completa y marca la pestaña Progreso', () => {
+    expect(paths.progressDay('2026-10-29')).toBe('/progreso/dia/2026-10-29')
+    expect(isFullScreen(paths.progressDay('2026-10-29'))).toBe(true)
+    expect(tabOf(paths.progressDay('2026-10-29'))).toBe('progress')
+  })
+})

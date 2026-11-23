@@ -93,6 +93,7 @@
   color: var(--label);
   text-align: left;
   cursor: pointer;
+  box-shadow: var(--card-shadow);
 }
 
 .quickTitle {
@@ -271,15 +272,18 @@
   border: 0;
   background: none;
   color: var(--label);
-  font: var(--text-session-hero);
+  font: var(--text-cifra); /* la letra de las cifras de la app (usuario, 2026-11-19) */
   text-align: center;
 }
 
 /* Cuatro cifras en tarjeta */
+/* Las cifras (kcal y macros): una sola tarjeta con sus columnas separadas por una raya fina (usuario, 2026-11-17) */
 .tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .tres {
@@ -292,12 +296,16 @@
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-3) var(--space-1);
-  border-radius: var(--radius-control);
-  background: var(--surface);
 }
 
+.tile + .tile {
+  border-left: var(--hairline) solid var(--separator);
+}
+
+/* Las cifras de lo que aporta, del tamaño de un dato de fila: sin tapar lo demás (usuario, 2026-11-17) */
 .tileValue {
-  font: var(--text-session-value);
+  font: var(--text-dato-fila);
+  font-variant-numeric: tabular-nums;
 }
 
 .card {
@@ -307,6 +315,7 @@
   padding: var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .line {
@@ -487,4 +496,14 @@
   color: var(--label);
   font: var(--text-body);
   resize: vertical;
+}
+
+/* Solo para el lector de pantalla */
+.oculto {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

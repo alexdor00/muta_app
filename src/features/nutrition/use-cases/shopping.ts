@@ -1,14 +1,19 @@
 // La lista de la compra: para cuántos días y desde cuándo, lo que ya tienes, lo que añades y las raciones de más.
 // Sale siempre de las recetas (domain/shopping.ts): no hay otra copia que se desactualice.
-import { addDays, formatDecimal, formatInt } from '../../../shared/lib/format.ts'
+import { libroExcel, TIPO_EXCEL } from '../../../shared/lib/excel.ts'
+import { addDays, formatDecimal, formatInt, formatLongDate } from '../../../shared/lib/format.ts'
 import { platform } from '../../../shared/platform/index.ts'
-import { huecosDelDia, recetasDelMenu } from '../domain/menu.ts'
-import { listaDeLaCompra, textoDeLaCompra, type Producto } from '../domain/shopping.ts'
-import { hoy } from '../state/comida.ts'
-import { gramosDeHueco, menu, platoPorId } from '../state/recetas.ts'
+import { huecosDelDia, platosDe } from '../domain/menu.ts'
+import { recetasDelMenu } from '../domain/menuCocina.ts'
+import { extrasDeDias } from '../domain/menuExtras.ts'
+import { listaDeLaCompra, seccionesDeLaCompra, textoDeLaCompra, type Producto } from '../domain/shopping.ts'
+import { hoy, tipoDe } from '../state/comida.ts'
+import { enCrudo, gramosDeHueco, menu, platoPorId } from '../state/recetas.ts'
 import { COMIDAS } from '../domain/food.ts'
 import { compra, diaDe, type Compra } from '../state/dieta.ts'
 import { guardarCompra } from './nutritionStore.ts'
+import { compraDeLaSemana, piloto, type PorComprar } from '../state/autopilot.ts'
+import { guardarMenu } from './menu.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
 
 /** Para cuántos días se puede hacer la lista (los del prototipo). */
@@ -29,8 +34,10 @@ export function compraActual(): Compra {
 }
 
 /** Los platos de tu menú en esos días (con tus cambios y sus gramos de cada día). */
-const delMenu = (fechas: readonly string[]) =>
-  recetasDelMenu(menu.value, fechas, (id) => platoPorId(id), gramosDeHueco)
+const delMenu = (fechas: readonly string[]) => [
+  ...recetasDelMenu(menu.value, fechas, (id) => platoPorId(id), gramosDeHueco),
+  ...extrasDeDias(menu.value, fechas, (id) => platoPorId(id)),
+]
 
 /** Los menús que elijas, cada uno las veces que digas (con sus gramos para tu objetivo de hoy). */
 /** Cuántas veces va un menú en la compra «por menús»: una, si no lo has cambiado (con ×0, la lista salía vacía). */
@@ -41,9 +48,20 @@ function deMenus(veces: Record<string, number>) {
   return menu.value.menus.flatMap((m) =>
     Array.from({ length: vecesEnLaCompra(veces, m.id) }, () =>
       COMIDAS.flatMap(({ id: comida }) => {
-        const id = m.platos[comida]
+        // El plato del tipo de día de hoy; si el menú solo lleva uno (de entreno o de descanso), ese
+        const id =
+          platosDe(m, tipoDe(hoy.value) === 'descanso')[comida] ?? m.platos[comida] ?? m.descanso?.[comida]
         const p = id ? platoPorId(id) : null
-        if (!p) return []
+        const extras = (m.extras?.[comida] ?? []).map((x) => ({
+          alimentoId: x.alimentoId,
+          nombre: x.nombre,
+          categoria: x.categoria,
+          g: x.gramos,
+        }))
+        const ademas = extras.length
+          ? [{ id: `extras-${comida}`, nombre: 'Además del plato', deMenu: m.nombre, lista: extras }]
+          : []
+        if (!p) return ademas
         const g = gramosDeHueco({ fecha: hoy.value, comida, menu: m.id, plato: p.id, cocinado: null }, p)
         return [
           {
@@ -57,13 +75,31 @@ function deMenus(veces: Record<string, number>) {
               g: i.cuenta && i.gramos !== null ? Math.round(g[k] ?? i.gramos) : null,
             })),
           },
+          ...ademas,
         ]
       }),
     ).flat(),
   )
 }
 
-export const modoDeCompra = (modo: 'dias' | 'menus') => cambiar({ modo })
+export const modoDeCompra = (modo: 'dias' | 'menus' | 'semana') => cambiar({ modo })
+
+/** Cómo sale la lista: la que elegiste o, con día de compra en tu semana resuelta, hasta tu próxima compra. */
+export function modoActual(c: Compra): 'dias' | 'menus' | 'semana' {
+  if (c.modo === 'semana' && !piloto.value?.compra) return 'dias'
+  return c.modo ?? (piloto.value?.compra ? 'semana' : 'dias')
+}
+
+/**
+ * Tu semana resuelta: marca algo de tu próxima compra como comprado o lo desmarca.
+ */
+export async function marcarComprado(p: PorComprar, fecha: string): Promise<void> {
+  const c = compraActual()
+  const compradas = c.semanaDe === fecha ? { ...(c.compradas ?? {}) } : {}
+  if (p.clave in compradas) delete compradas[p.clave]
+  else compradas[p.clave] = p.gramos
+  await cambiar({ semanaDe: fecha, compradas })
+}
 
 /** Cuántas veces entra un menú en la compra (0 a 7). */
 export function vecesDeMenu(id: string, cambio: 1 | -1): Promise<void> {
@@ -141,8 +177,58 @@ export function racionesDeMas(recetaId: string, cambio: 1 | -1): Promise<void> {
 }
 
 /** Comparte la lista como texto (Notas, WhatsApp); si no se puede, la copia. */
-export async function compartirCompra(): Promise<'shared' | 'copied' | 'none'> {
+export async function compartirCompra(): Promise<'shared' | 'saved' | 'copied' | 'none'> {
   const c = compraActual()
-  const texto = textoDeLaCompra(productosDe(c).productos, new Set(c.tienes), c.propios, cantidad)
-  return platform.share('La compra', texto)
+  const semana = modoActual(c) === 'semana' ? compraDeLaSemana.value : null
+  const productos = semana ? semana.faltan : productosDe(c).productos
+  const tienes = semana
+    ? new Set([...semana.faltan.filter((x) => x.comprado).map((x) => x.clave), ...c.tienes])
+    : new Set(c.tienes)
+  const secciones = seccionesDeLaCompra(productos, tienes, c.propios)
+  const cosas = secciones.reduce((n, s) => n + s.cosas.length, 0)
+  const fecha = semana?.fecha ?? c.desde
+  const libro = libroExcel(
+    'La compra',
+    [5, 36, 12, 24],
+    [
+      { tipo: 'titulo', celdas: ['La compra'] },
+      {
+        tipo: 'subtitulo',
+        celdas: [`${formatLongDate(fecha)} · ${cosas} ${cosas === 1 ? 'cosa' : 'cosas'} · MUTA`],
+      },
+      { tipo: 'vacia', celdas: [] },
+      ...secciones.flatMap((s) => [
+        { tipo: 'seccion' as const, celdas: [`${s.nombre} · ${s.cosas.length}`] },
+        ...s.cosas.map((x) => ({
+          tipo: 'fila' as const,
+          celdas: [
+            '☐',
+            x.nombre,
+            x.gramos ? cantidad(x.gramos) : 'al gusto',
+            (x.gramos && enCrudo(x.clave, x.gramos)) || '',
+          ],
+        })),
+        { tipo: 'vacia' as const, celdas: [] },
+      ]),
+    ],
+  )
+  const archivo = new File([libro], `La compra ${fecha}.xlsx`, { type: TIPO_EXCEL })
+  const r = await platform.shareFile('La compra', archivo)
+  if (r !== 'none') return r
+  // Si no se pudo con el archivo, el texto de siempre
+  return platform.share('La compra', textoDeLaCompra(productos, tienes, c.propios, cantidad))
+}
+
+/** Especias y básicos: salen tachados; destachar uno es que te falta (y entra en «Te faltan»). */
+export function basicoFalta(clave: string): Promise<void> {
+  const c = compraActual()
+  const xs = c.faltanBasicos ?? []
+  return cambiar({ faltanBasicos: xs.includes(clave) ? xs.filter((x) => x !== clave) : [...xs, clave] })
+}
+
+/** Cada cuántas semanas compras (1, 2 o 4): la lista lleva todo lo de tus menús hasta la siguiente. */
+export async function cadaCuantoCompras(semanas: number): Promise<void> {
+  const p = piloto.value
+  if (!p?.compra) return
+  await guardarMenu({ ...menu.value, piloto: { ...p, compra: { ...p.compra, semanas } } })
 }

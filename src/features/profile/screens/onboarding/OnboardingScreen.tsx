@@ -5,8 +5,8 @@ import { logError } from '../../../../shared/lib/logger.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceCards, ChoiceCircles, ChoicePills } from '../../../../shared/ui/Choice.tsx'
+import { Pasos } from '../../../../shared/ui/Pasos.tsx'
 import { DumbbellIcon, FlameIcon, HeartIcon } from '../../components/GoalIcons.tsx'
-import { OnboardingLayout } from '../../components/OnboardingLayout.tsx'
 import {
   answer,
   daysOptionsFor,
@@ -17,7 +17,8 @@ import {
 } from '../../state/onboarding.ts'
 import { completeOnboarding } from '../../use-cases/completeOnboarding.ts'
 
-const STEPS = 2
+/** Cuatro pasos: los dos de entreno (aquí) y los dos de comida (en Nutrición, que se pueden saltar). */
+const STEPS = 4
 
 const GOAL_ICONS: Record<Goal, () => JSX.Element> = {
   gain_muscle: DumbbellIcon,
@@ -36,12 +37,12 @@ function Next(props: { href?: string; onClick?: () => void; disabled?: boolean }
 /** A03 · Define tu objetivo. */
 function StepGoal() {
   return (
-    <OnboardingLayout
-      step={1}
+    <Pasos
+      paso={1}
       total={STEPS}
-      title="Define tu objetivo"
+      titulo="Define tu objetivo"
       intro="Elige qué quieres conseguir. Puedes cambiarlo más adelante."
-      action={<Next href={paths.onboarding(2)} />}
+      accion={<Next href={paths.onboarding(2)} />}
     >
       <ChoiceCards
         name="objetivo"
@@ -53,11 +54,11 @@ function StepGoal() {
           return { value: goal.id, label: goal.title, detail: goal.detail, icon: <Icon /> }
         })}
       />
-    </OnboardingLayout>
+    </Pasos>
   )
 }
 
-/** A04 · Personaliza tu plan. Al terminar guarda el perfil y lleva a elegir la rutina. */
+/** A04 · Personaliza tu plan. Al terminar guarda el perfil y sigue con la comida (que se puede saltar). */
 function StepPlan() {
   const { route } = useLocation()
   const [saving, setSaving] = useState(false)
@@ -66,7 +67,7 @@ function StepPlan() {
     setSaving(true)
     try {
       await completeOnboarding()
-      route(paths.chooseRoutine, true)
+      route(paths.welcomeFood(1))
     } catch (error) {
       logError(error, 'guardar bienvenida')
       setSaving(false)
@@ -74,12 +75,12 @@ function StepPlan() {
   }
 
   return (
-    <OnboardingLayout
-      step={2}
+    <Pasos
+      paso={2}
       total={STEPS}
-      title="Personaliza tu plan"
+      titulo="Personaliza tu plan"
       intro="Cuéntanos tu nivel y disponibilidad para crear el plan perfecto."
-      action={<Next onClick={finish} disabled={saving} />}
+      accion={<Next onClick={finish} disabled={saving} />}
     >
       <ChoicePills
         name="nivel"
@@ -100,23 +101,23 @@ function StepPlan() {
           label: String(days),
         }))}
       />
-    </OnboardingLayout>
+    </Pasos>
   )
 }
 
-/** A03–A04: un paso por ruta (/bienvenida/1, /2). */
+/** A03–A04: un paso por ruta (/bienvenida/1, /2); los de comida, en Nutrición (/bienvenida/comida/1, /2). */
 export function OnboardingScreen(props: { step: string }) {
   if (props.step === '1') return <StepGoal />
   if (props.step === '2') return <StepPlan />
   return (
-    <OnboardingLayout
-      step={1}
+    <Pasos
+      paso={1}
       total={STEPS}
-      title="Este paso no existe"
+      titulo="Este paso no existe"
       intro=""
-      action={<Next href={paths.welcome} />}
+      accion={<Next href={paths.welcome} />}
     >
       {null}
-    </OnboardingLayout>
+    </Pasos>
   )
 }

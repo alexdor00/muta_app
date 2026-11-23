@@ -1,0 +1,751 @@
+/* El modo cocina (rediseño 33 a 35): lo que sacas, un paso cada vez y repartir lo de varios días. */
+.pantalla {
+  padding-bottom: calc(var(--control-lg) + var(--space-10) + var(--safe-bottom));
+}
+
+.cabeza {
+  display: grid;
+  grid-template-columns: var(--tap-min) 1fr var(--tap-min);
+  align-items: center;
+}
+
+.cabeza h1 {
+  margin: 0;
+  font: var(--text-headline);
+  text-align: center;
+}
+
+.icono {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.cabeza .icono {
+  background: none;
+}
+
+.icono svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.barra {
+  height: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.barra i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.foto {
+  flex: none;
+  width: var(--meal-thumb);
+  height: var(--meal-thumb);
+  border-radius: var(--radius-control);
+  background: var(--surface-2) center / cover;
+}
+
+.nombre {
+  font: var(--text-headline);
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.seccion li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 var(--space-1);
+}
+
+.titulo h2 {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.titulo span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.circulo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border: var(--border) solid var(--label-3);
+  border-radius: var(--radius-pill);
+  color: var(--on-accent);
+}
+
+.circulo svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.marcado .circulo,
+.circuloOn {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.itemNombre {
+  flex: 1;
+  font: var(--text-body);
+}
+
+.cantidad {
+  flex: none;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.nota {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-2);
+  font: var(--text-subhead);
+}
+
+.nota svg {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.abajo {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: var(--app-max-width);
+  padding: var(--space-3) var(--gutter) calc(var(--space-4) + var(--safe-bottom));
+  border-top: var(--hairline) solid var(--separator);
+  background: var(--bg);
+  transform: translateX(-50%);
+}
+
+.abajo > :last-child {
+  flex: 1;
+}
+
+.atras {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-lg);
+  height: var(--control-lg);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.atras:disabled {
+  opacity: 0.4;
+}
+
+.paso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.platoPaso {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.platoPaso .foto {
+  border-radius: var(--radius-pill);
+}
+
+/* El paso, con la letra de los pasos de la receta: sin negrita (usuario, 2026-11-20) */
+.textoPaso {
+  margin: 0;
+  font: var(--text-body);
+  text-align: justify; /* justificado, como en un Word (usuario, 2026-11-22) */
+  hyphens: auto;
+}
+
+.restoPaso {
+  margin: 0;
+  color: var(--label-2);
+  font: var(--text-body);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Lo que lleva el paso, en pastillas discretas (usuario, 2026-11-20) */
+.fichas li {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  font: var(--text-subhead);
+}
+
+.gris {
+  flex: none;
+  min-height: var(--control);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.texto {
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-subhead);
+  cursor: pointer;
+}
+
+/* Una comida al momento (rediseño 36) */
+.receta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.recetaCabeza {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.recetaFoto {
+  flex: none;
+  width: var(--dish-thumb);
+  height: var(--dish-thumb);
+  border-radius: var(--radius-control);
+  background: var(--surface-2) center / cover;
+}
+
+.recetaCabeza h2 {
+  margin: 0;
+}
+
+.detalleReceta {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.titulo h3 {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.lista {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.pasosLista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+  font: var(--text-body);
+}
+
+.pasosLista li {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.numeroPaso {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+/* Arriba, la «×» para salir, del tamaño de la flecha (usuario, 2026-11-19) */
+.salir svg {
+  color: var(--label);
+}
+
+/* Repartir (usuario, 2026-11-19): un plato por tarjeta, un recipiente por día que se toca al llenarlo */
+.repartirCabeza h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font: var(--text-titulo-seccion);
+}
+
+.repartirCabeza p {
+  margin: var(--space-1) 0 0;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.repartirPlato {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.repartirTitulo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.repartirTitulo > span:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.repartirTitulo b {
+  font: var(--text-headline);
+}
+
+.repartirTitulo small,
+.recipiente small,
+.pesoCaja small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.recipientes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.recipiente {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.recipiente > span:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.recipiente b {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.pesos {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.pesoCaja {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.pesoCaja span {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  font: var(--text-headline);
+}
+
+.pesoCaja input {
+  width: 6ch;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-headline);
+  outline: none;
+}
+
+.pesar {
+  display: flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.pesar svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Los minutos de un paso de tu receta */
+.minutosPaso {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.minutosPaso svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* Repartir con tus ollas: en qué olla, y «pésala luego» */
+
+.pesos > small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.ollas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ollaPill {
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-footnote);
+  cursor: pointer;
+}
+
+.ollaPill[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: var(--weight-semibold);
+}
+
+.ollaLuego {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-footnote);
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Pesar la olla, en tres pasos: la olla, el peso y el resultado */
+.pasoOlla {
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+.resultadoOlla {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.resultadoOlla b {
+  font: var(--text-cifra);
+}
+
+.resultadoOlla b small,
+.resultadoOlla > small,
+.avisoOlla {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.recipiente .gramosRecipiente {
+  font: var(--text-headline);
+}
+
+/* Cómo lo repartes: todo mezclado o cada cosa aparte */
+.modoReparto {
+  display: flex;
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+}
+
+.modoReparto button {
+  flex: 1;
+  height: var(--control-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--label);
+  font: var(--text-footnote);
+  cursor: pointer;
+}
+
+.modoReparto button[aria-pressed='true'] {
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  font-weight: var(--weight-semibold);
+}
+
+.notaReparto {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+/* Por partes, cada cosa en su línea y más pequeña */
+.recipiente .gramosRecipiente + .gramosRecipiente,
+.recipiente small + .gramosRecipiente {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+/* Los macros por 100 g de lo cocinado */
+.por100 {
+  font: var(--text-footnote);
+}
+
+.por100 b {
+  font: var(--text-cifra);
+}
+
+.por100 small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+/* Lo que aporta lo de cada recipiente */
+.macrosRecipiente {
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+/* Un plato en «Hoy cocinas» (usuario, 2026-11-22: «más bonita»): foto, nombre y raciones arriba; debajo, lo que aporta
+   una ración en una franja de cuatro cifras */
+.platoCocina {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.platoCocina + .platoCocina {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.platoArriba {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.fotoGrande {
+  flex: none;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-control);
+  background: var(--surface-2) center / cover no-repeat;
+}
+
+.platoCifras {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: var(--space-2) 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.platoCifras span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.platoCifras span + span {
+  border-left: var(--hairline) solid var(--separator);
+}
+
+.platoCifras b {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.platoCifras small {
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+/* El paso, en una tarjeta: el plato arriba, el número en un círculo y el texto justificado; lo que usas en filas */
+.pasoTarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.pasoCuerpo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.pasoNumero {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.pasoTextos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  padding-top: var(--space-1);
+}
+
+.usas {
+  margin: 0;
+  padding: 0;
+  border-top: var(--hairline) solid var(--separator);
+  list-style: none;
+}
+
+.usas li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  font: var(--text-body);
+}
+
+.usas li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.usas b {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lo que viene después, en gris */
+.siguientePaso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0 var(--space-2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-align: justify;
+}
+
+/* Con contraste suficiente (axe: --label-3 no llega a 4,5:1 en letra pequeña) */
+.siguientePaso small {
+  color: var(--label-2);
+  font: var(--text-caption);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

@@ -142,24 +142,48 @@
   color: var(--label-2);
 }
 
-.total {
-  display: block;
-  width: 100%;
-  height: calc(var(--control-lg) * 1.4);
-  border: 0;
+/* Discos: «Peso total 111 kg» en una pastilla gris, solo lo que ocupa (no a todo el ancho) */
+.pesoFila {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-lg);
+  padding: 0 var(--space-4);
   border-radius: var(--radius-control);
   background: var(--surface);
+  font: var(--text-body);
+}
+
+.pesoFila span:first-child {
+  margin-right: var(--space-2);
+  color: var(--label-2);
+}
+
+.pesoFila input {
+  width: 6ch;
+  border: 0;
+  background: none;
   color: var(--label);
-  font: var(--text-session-value);
-  font-style: normal;
-  text-align: center;
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  caret-color: var(--label);
+}
+
+.pesoFila input:focus-visible {
+  outline: none;
+}
+
+.unidadKg {
+  color: var(--label-2);
 }
 
 .bars > fieldset > div {
   width: 100%;
 }
 
-/* La barra de lado: manguito, discos (más altos cuanto más pesan), tope y el final */
+/* La barra de lado: manguito, discos (más altos cuanto más pesan) y el final; sin tope, que parecía otro disco */
 .barbell {
   display: flex;
   align-items: center;
@@ -182,14 +206,6 @@
   width: var(--space-10);
 }
 
-.collar {
-  width: var(--space-3);
-  height: var(--space-8);
-  margin: 0 var(--space-1);
-  border-radius: var(--space-1);
-  background: var(--label-2);
-}
-
 .plate {
   display: grid;
   place-items: center;
@@ -197,8 +213,10 @@
   height: var(--control-lg);
   margin-left: var(--space-1);
   border-radius: var(--space-1);
-  background: var(--accent);
-  color: var(--on-accent);
+  /* Su color olímpico, con un borde fino para el blanco */
+  background: var(--plate-bg);
+  box-shadow: inset 0 0 0 var(--hairline) var(--separator);
+  color: var(--plate-fg);
   font: var(--text-caption);
   font-weight: var(--weight-bold);
   writing-mode: vertical-rl;
@@ -227,7 +245,6 @@
 .plate[data-kg='1.25'] {
   width: var(--space-5);
   height: var(--control);
-  background: var(--label-2);
 }
 
 .perSide {
@@ -370,4 +387,80 @@
 /* Lo que no se hace con tu material: al final y en gris */
 .dim .title {
   color: var(--label-2);
+}
+
+/* Cada disco con su color olímpico (tokens.css: --plate-*) */
+[data-kg='25'] {
+  --plate-bg: var(--plate-25);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='20'] {
+  --plate-bg: var(--plate-20);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='15'] {
+  --plate-bg: var(--plate-15);
+  --plate-fg: var(--plate-on-light);
+}
+
+[data-kg='10'] {
+  --plate-bg: var(--plate-10);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='5'] {
+  --plate-bg: var(--plate-5);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='2.5'] {
+  --plate-bg: var(--plate-2-5);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='1.25'] {
+  --plate-bg: var(--plate-1-25);
+  --plate-fg: var(--plate-on-light);
+}
+
+/* Cambiar ejercicio: el aviso en su tarjeta y cada grupo en una tarjeta blanca */
+.swapAviso {
+  margin-top: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.swapAviso svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label);
+}
+
+.swapTitulo {
+  margin: var(--space-5) 0 var(--space-2);
+  padding: 0 var(--space-4);
+  font: var(--text-caption);
+  color: var(--label-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.swapCard {
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.swapAviso + .swapCard {
+  margin-top: var(--space-4);
 }

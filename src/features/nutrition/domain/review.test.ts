@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { addDays } from '../../../shared/lib/format.ts'
-import { consejosDeLaSemana, revisar, ritmoPrevisto, tituloCambio, type DatosRevision } from './review.ts'
+import { revisar, ritmoPrevisto, tituloCambio, type DatosRevision } from './review.ts'
 
 const HOY = '2026-11-05'
 
@@ -133,14 +133,6 @@ describe('mesetas (tras un parón o al salir de una definición)', () => {
   })
 })
 
-describe('consejosDeLaSemana', () => {
-  it('si la grasa no baja; solo en definición', () => {
-    expect(consejosDeLaSemana({ fase: 'definicion', lento: true })[0]).toContain('Si la grasa no baja')
-    expect(consejosDeLaSemana({ fase: 'definicion', lento: false })).toEqual([])
-    expect(consejosDeLaSemana({ fase: 'volumen', lento: true })).toEqual([])
-  })
-})
-
 describe('etapa final de la definición', () => {
   it('desde la semana 9, si hay que bajar, −100 en vez de −150', () => {
     const lento = { ...base, serie: serie(-0.28) }
@@ -148,5 +140,77 @@ describe('etapa final de la definición', () => {
     const final = revisar({ ...lento, semanaFase: 10 })
     expect(antes.tipo === 'cambio' && antes.de - antes.a).toBe(150)
     expect(final.tipo === 'cambio' && final.de - final.a).toBe(100)
+  })
+})
+
+describe('como un entrenador real (usuario, 2026-11-22)', () => {
+  const dias = (n: number, a: Record<string, number>) =>
+    Array.from({ length: n }, (_, i) => ({ date: addDays(HOY, -i), ...a }))
+
+  it('una sola semana fuera del margen: se espera (regla 7)', () => {
+    // 14 días bajando bien y la última semana parado
+    const s = Array.from({ length: 21 }, (_, i) => {
+      const kg = i < 14 ? 82 - 0.09 * i : 82 - 0.09 * 13
+      return { date: addDays(HOY, i - 20), kg, tendencia: kg }
+    })
+    expect(revisar({ ...base, serie: s }).tipo).toBe('unaSemana')
+  })
+
+  it('lento pero la cintura baja 0,5 cm o más: nada (regla 5)', () => {
+    const medidas = [
+      { date: addDays(HOY, -18), cintura: 86 },
+      { date: addDays(HOY, -1), cintura: 85.3 },
+    ]
+    const r = revisar({ ...base, medidas })
+    expect(r.tipo === 'cintura' && r.cm).toBe(-0.7)
+  })
+
+  it('lento pero con 2 señales esta semana: no se aprieta (regla 8)', () => {
+    const r = revisar({ ...base, animo: dias(4, { sueno: 0, hambre: 2 }) })
+    expect(r.tipo === 'senales' && r.senales).toEqual(['sueno', 'hambre'])
+  })
+
+  it('3 semanas con señales y lento: pausa en mantenimiento (la guía, § 7)', () => {
+    const animo = Array.from({ length: 21 }, (_, i) => ({ date: addDays(HOY, -i), sueno: 0, energia: 0 }))
+    const r = revisar({ ...base, animo, mantenimiento: 2700 })
+    expect(r.tipo === 'cambio' && [r.a, r.extra?.fase]).toEqual([2700, 'mantenimiento'])
+  })
+
+  it('fines de semana de más: no se baja', () => {
+    const conFindes = Array.from({ length: 14 }, (_, i) => {
+      const date = addDays(HOY, -i)
+      const dia = new Date(`${date}T12:00:00Z`).getUTCDay()
+      return { date, kcal: dia === 0 || dia === 6 ? 3000 : 2200, protein: 150, objetivo: 2260 }
+    })
+    expect(revisar({ ...base, comida: conFindes }).tipo).toBe('findes')
+  })
+
+  it('déficit de más del 25 %: no se baja más (§ 5)', () => {
+    const r = revisar({
+      ...base,
+      comida: base.dias.map((d) => ({ ...d, protein: 150, objetivo: 2260 })),
+      gasto: 3100,
+    })
+    expect(r.tipo === 'deficit' && r.parte).toBe(0.71)
+  })
+
+  it('la fuerza baja un 3 %: +150 kcal en hidratos, aunque vayas a tu ritmo (regla 4)', () => {
+    const r = revisar({ ...base, serie: serie(-0.6), fuerza: -0.04 })
+    expect(r.tipo === 'cambio' && r.a - r.de).toBe(150)
+  })
+
+  it('más rápido que tu margen pero menos del 1,2 %: vas bien; más del 1,2 %: +150 (§ 5)', () => {
+    expect(revisar({ ...base, serie: serie(-0.85) }).tipo).toBe('bien')
+    expect(revisar({ ...base, serie: serie(-1.2) }).tipo).toBe('cambio')
+  })
+
+  it('a 3 puntos de tu grasa objetivo: fase final (−100); por debajo, salir de la definición', () => {
+    const final = revisar({ ...base, grasa: { actual: 14, objetivo: 12 } })
+    expect(final.tipo === 'cambio' && final.de - final.a).toBe(100)
+    const llegaste = revisar({ ...base, grasa: { actual: 11.8, objetivo: 12 } })
+    expect(llegaste.tipo === 'cambio' && llegaste.extra).toEqual({
+      fase: 'mantenimiento',
+      situacion: 'salida',
+    })
   })
 })

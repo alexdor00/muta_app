@@ -26,10 +26,11 @@ export function SlidersIcon() {
   )
 }
 
+/** Guardar (recetas, rutinas): una estrella, la misma de «★ Guardar esta comida» (usuario, 2026-11-21). */
 export function BookmarkIcon(props: { filled?: boolean }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke} fill={props.filled ? 'currentColor' : 'none'}>
-      <path d="M6 3h12v18l-6-4.5L6 21z" />
+      <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" />
     </svg>
   )
 }
@@ -108,6 +109,7 @@ export function SwapIcon() {
 }
 
 /** Escribir una nota. */
+/** Dos hojas, una sobre otra: duplicar. */
 export function PencilIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
@@ -195,6 +197,15 @@ export function PlusIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
       <path d="M12 5v14M5 12h14" />
+    </svg>
+  )
+}
+
+/** Corazón (favoritos); relleno si está marcado. */
+export function HeartIcon({ lleno = false }: { lleno?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke} fill={lleno ? 'currentColor' : 'none'}>
+      <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
     </svg>
   )
 }
@@ -359,6 +370,25 @@ export function GripIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
       <path d="M5 8h14M5 12h14M5 16h14" />
+    </svg>
+  )
+}
+
+/** Calendario: tu plan de comidas. */
+export function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <rect x="4" y="5" width="16" height="15" rx="3" />
+      <path d="M4 10h16M8 3v4M16 3v4" />
+    </svg>
+  )
+}
+
+/** Hoja de papel: un archivo (tu dieta en CSV). */
+export function FileIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
+      <path d="M7 3h7l4 4v14H7zM14 3v4h4" />
     </svg>
   )
 }

@@ -2,10 +2,10 @@
 // calendario del móvil: la app no tiene servidor) y lo que propone tu nutricionista («Aplicar», «Ahora no», «Deshacer»).
 import { getDb } from '../../../shared/data/db.ts'
 import { platform } from '../../../shared/platform/index.ts'
+import { calendarioDelMenu, type EventoExtra } from '../domain/menuCalendar.ts'
 import {
-  calendarioDelMenu,
   clave,
-  conCocinado,
+  conCambioDelDia,
   conCuantos,
   conAjuste,
   conDia,
@@ -13,28 +13,38 @@ import {
   huecoDe,
   conSinPlato,
   conReparto,
-  diaSemana,
   duplicado,
-  huecosDelDia,
   renombrado,
   semanaDesde,
-  sinCocinado,
   sinMenu,
   type Avisos,
   type CambioMenu,
   type Cocinado,
-  type Hueco,
+  type ExtraMenu,
   type MenuSemanal,
+  MAX_MENUS,
 } from '../domain/menu.ts'
 import type { PropuestaMenu } from '../domain/menuCoach.ts'
-import { menu, platoPorId } from '../state/recetas.ts'
-import { addDays } from '../../../shared/lib/format.ts'
-import { menuDe } from '../domain/diet.ts'
-import { COMIDAS, type ComidaId } from '../domain/food.ts'
-import { platoDeReceta } from '../domain/recipes.ts'
-import { dias, dieta, hoy } from '../state/comida.ts'
-import { devolver, quitar } from './foodLog.ts'
-import { guardarPlatosTuyos, ID_MENU } from './recipes.ts'
+import { conExtra, conGramosDeExtra, extrasDe, sinExtra } from '../domain/menuExtras.ts'
+import { diasDeCompra, paraQueDias, piloto, platosDeTanda, tandas } from '../state/autopilot.ts'
+import {
+  gramosDeHueco,
+  menu,
+  menusDeLaSemana,
+  platoPorId,
+  platosQueQuieres,
+  platosTuyos,
+  repartoActual,
+  editandoDescanso,
+  platosDelMenu,
+} from '../state/recetas.ts'
+import { menuPropuesto, type ComoComes } from '../domain/fit.ts'
+import { macrosDe, type ComidaId } from '../domain/food.ts'
+import { menusDesdeDieta, platoDeReceta } from '../domain/dietaAMenus.ts'
+import { dias, dieta, hoy, objetivoDelDia, tipoDe } from '../state/comida.ts'
+import { anadir, devolver, quitar } from './foodLog.ts'
+import { apuntarPlato, desapuntar, guardarPlatosTuyos, ID_MENU, platoApuntado } from './recipes.ts'
+import { conPlatoDescanso } from '../domain/menuPlan.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
 
 async function guardar(m: MenuSemanal): Promise<void> {
@@ -42,12 +52,122 @@ async function guardar(m: MenuSemanal): Promise<void> {
   await (await getDb()).put('userContent', { ...m, id: ID_MENU })
 }
 
+/** Guarda tu menú tal cual (lo usa tu semana resuelta, que vive dentro). */
+export const guardarMenu = guardar
+
+/**
+ * El tick de una comida con plato de tu menú: lo apunta con sus gramos de ese día o, si ya estaba, lo quita. Devuelve lo apuntado (para «Deshacer»); null si lo quitó.
+ */
+export async function tickDelMenu(
+  fecha: string,
+  comida: ComidaId,
+  /** Solo el plato o solo una cosa de más (su número): cada una con su tick en tu día (usuario, 2026-11-20). */
+  solo?: 'plato' | number,
+): Promise<{ nombre: string; ids: string[] } | null> {
+  const todo = solo === undefined
+  const h = todo || solo === 'plato' ? huecoDe(menu.value, fecha, comida) : null
+  const p = h ? platoPorId(h.plato, fecha) : null
+  // Lo que va además (una fruta, un yogur) se apunta y se quita con el plato, o cada cosa con su tick
+  const todas = extrasDe(menu.value, fecha, comida, tipoDe)
+  const extras = todo ? todas : typeof solo === 'number' && todas[solo] ? [todas[solo]] : []
+  if ((!h || !p) && !extras.length) return null
+  const apuntes = (dias.value[fecha] ?? []).filter((a) => a.comida === comida)
+  const hecho = p
+    ? platoApuntado(p.id, comida, fecha)
+    : extras.every((x) => apuntes.some((a) => esDeExtra(a, x)))
+  if (hecho) {
+    const deExtras = new Set(extras.flatMap((x) => (x.alimentoId ? [x.alimentoId] : [])))
+    const platosExtra = new Set(extras.flatMap((x) => (x.platoId ? [x.platoId] : [])))
+    const ids = (dias.value[fecha] ?? [])
+      .filter(
+        (a) =>
+          a.comida === comida &&
+          ((p && a.receta === p.id) ||
+            (a.receta && platosExtra.has(a.receta)) ||
+            (!a.receta && a.alimentoId && deExtras.has(a.alimentoId))),
+      )
+      .map((a) => a.id)
+    await desapuntar(ids, fecha)
+    return null
+  }
+  const ids = h && p ? await apuntarPlato(p, comida, gramosDeHueco(h, p), 1, fecha) : []
+  for (const x of extras) {
+    const otro = x.platoId ? platoPorId(x.platoId, fecha) : null
+    if (otro) ids.push(...(await apuntarPlato(otro, comida, null, 1, fecha)))
+    else if (!x.platoId) ids.push(await anadir(apunteDeExtra(x, comida), fecha))
+  }
+  return { nombre: p?.nombre ?? extras.map((x) => x.nombre).join(' y '), ids }
+}
+
+/** Un extra del menú como apunte. */
+const apunteDeExtra = (x: ExtraMenu, comida: ComidaId) => ({
+  comida,
+  nombre: x.nombre,
+  alimentoId: x.alimentoId,
+  gramos: x.gramos,
+  raciones: null,
+  racion: null,
+  ...macrosDe(x, x.gramos),
+})
+
+/** Si todo lo que va además del plato en esa comida ya está apuntado (las comidas que solo llevan extras). */
+export function extrasApuntados(fecha: string, comida: ComidaId): boolean {
+  const xs = extrasDe(menu.value, fecha, comida, tipoDe)
+  const apuntes = (dias.value[fecha] ?? []).filter((a) => a.comida === comida)
+  return xs.length > 0 && xs.every((x) => apuntes.some((a) => esDeExtra(a, x)))
+}
+
+/** Si un apunte es esa cosa de más del menú (su plato o su alimento). */
+const esDeExtra = (a: { receta?: string | null; alimentoId?: string | null }, x: ExtraMenu) =>
+  x.platoId ? a.receta === x.platoId : !a.receta && a.alimentoId === x.alimentoId
+
+/** Lo de más de una comida que aún no apuntaste, con su número (para su tick en tu día). */
+export function extrasPorApuntar(fecha: string, comida: ComidaId): { extra: ExtraMenu; i: number }[] {
+  const apuntes = (dias.value[fecha] ?? []).filter((a) => a.comida === comida)
+  return extrasDe(menu.value, fecha, comida, tipoDe)
+    .map((extra, i) => ({ extra, i }))
+    .filter(({ extra }) => !apuntes.some((a) => esDeExtra(a, extra)))
+}
+
+/** Cómo sueles comer (el reparto de tu objetivo entre comidas). Devuelve cómo estaba (para «Deshacer»). */
+export async function cambiarComoComes(c: ComoComes): Promise<MenuSemanal> {
+  const antes = menu.value
+  await guardar({ ...antes, comoComes: c })
+  return antes
+}
+
+/** Añade algo más (una fruta, un yogur…) a una comida de un menú. Devuelve cómo estaba (para «Deshacer»). */
+export async function anadirExtra(menuId: string, comida: ComidaId, x: ExtraMenu): Promise<MenuSemanal> {
+  const antes = menu.value
+  await guardar(conExtra(antes, menuId, comida, x))
+  return antes
+}
+
+/** Quita lo que va además en una comida de un menú. Devuelve cómo estaba (para «Deshacer»). */
+export async function quitarExtra(menuId: string, comida: ComidaId, i: number): Promise<MenuSemanal> {
+  const antes = menu.value
+  await guardar(sinExtra(antes, menuId, comida, i))
+  return antes
+}
+
+/** Cambia los gramos de lo que va además en una comida de un menú. Devuelve cómo estaba (para «Deshacer»). */
+export async function gramosDeExtra(
+  menuId: string,
+  comida: ComidaId,
+  i: number,
+  gramos: number,
+): Promise<MenuSemanal> {
+  const antes = menu.value
+  await guardar(conGramosDeExtra(antes, menuId, comida, i, gramos))
+  return antes
+}
+
 /** Vuelve a como estaba (para «Deshacer»). */
 export const volverA = (m: MenuSemanal) => guardar(m)
 
 export const cuantosMenus = (n: number) => guardar(conCuantos(menu.value, n))
 export const repartoDeMenus = (r: MenuSemanal['reparto']) => guardar(conReparto(menu.value, r))
-export const menuEnDia = (dia: number, id: string) => guardar(conDia(menu.value, dia, id))
+export const menuEnDia = (dia: number, id: string) => guardar(conDia(menu.value, dia, id, hoy.value))
 export const ajustarComida = (id: string, comida: ComidaId, ajustada: boolean) =>
   guardar(conAjuste(menu.value, id, comida, ajustada))
 export const renombrarMenu = (id: string, nombre: string) => guardar(renombrado(menu.value, id, nombre))
@@ -73,21 +193,68 @@ export async function ponerPlato(
   comida: ComidaId,
   platoId: string | null,
 ): Promise<string | null> {
-  const antes = menu.value.menus.find((x) => x.id === menuId)?.platos[comida] ?? null
-  await guardar(conPlato(menu.value, menuId, comida, platoId))
+  const x = menu.value.menus.find((k) => k.id === menuId)
+  const antes = (x && platosDelMenu(x)[comida]) ?? null
+  // Mirando un día de descanso, el plato es solo de descanso (null: el mismo que en entreno)
+  await guardar(
+    editandoDescanso.value
+      ? conPlatoDescanso(menu.value, menuId, comida, platoId)
+      : conPlato(menu.value, menuId, comida, platoId),
+  )
   return antes
+}
+
+/** Cambia el plato de una comida solo ese día (null: vuelve al de su menú). Devuelve cómo deshacerlo. */
+export async function cambiarEseDia(
+  fecha: string,
+  comida: ComidaId,
+  plato: string | null,
+): Promise<() => Promise<void>> {
+  const antes = menu.value.cambiados[clave(fecha, comida)] ?? null
+  await guardar(conCambioDelDia(menu.value, fecha, comida, plato, hoy.value))
+  return () => guardar(conCambioDelDia(menu.value, fecha, comida, antes, hoy.value))
+}
+
+/**
+ * «Proponme un menú» (sugerido): un plato por comida que encaja con tu objetivo de hoy, en tu primer menú vacío (o en uno
+ * nuevo). Devuelve el menú y cómo deshacerlo; null si no hay objetivo o platos.
+ */
+export async function proponerMenu(): Promise<{ menu: string; deshacer: () => Promise<void> } | null> {
+  const o = objetivoDelDia(hoy.value)
+  if (!o) return null
+  const propuesto = menuPropuesto(platosQueQuieres.value, o, repartoActual.value)
+  if (!Object.keys(propuesto).length) return null
+  const antes = menu.value
+  let m = antes
+  let destino = m.menus.find((x) => !Object.keys(x.platos).length)
+  if (!destino) {
+    if (m.menus.length >= MAX_MENUS) return null
+    m = conCuantos(m, m.menus.length + 1)
+    destino = m.menus.at(-1)!
+  }
+  for (const [c, p] of Object.entries(propuesto)) m = conPlato(m, destino.id, c as ComidaId, p)
+  await guardar(m)
+  return { menu: destino.id, deshacer: () => guardar(antes) }
 }
 
 /** Quita el plato del menú de una comida solo ese día (o lo vuelve a poner, para «Deshacer»). */
 export const sinPlatoEseDia = (fecha: string, comida: ComidaId, sinEl = true) =>
   guardar(conSinPlato(menu.value, fecha, comida, sinEl, hoy.value))
 
+/** El nombre del plato de tu menú en una comida de un día (para el aviso al quitarlo); null si no lleva. */
+export const platoEseDia = (fecha: string, comida: ComidaId) =>
+  platoPorId(huecoDe(menu.value, fecha, comida)?.plato ?? '', fecha)?.nombre ?? null
+
 /**
- * Quita una comida de un día: lo apuntado en ella y el plato del menú (solo ese día). Devuelve cómo deshacerlo.
+ * Quita el plato del menú de una comida, solo ese día (y su apunte, si ya lo apuntaste). Lo demás que apuntaste y lo de más
+ * del menú se quedan (usuario, 2026-11-21). Devuelve cómo deshacerlo.
  */
 export async function quitarDeEseDia(comida: ComidaId, fecha: string): Promise<() => Promise<void>> {
-  const ids = (dias.value[fecha] ?? []).filter((a) => a.comida === comida).map((a) => a.id)
-  const teniaPlato = huecoDe(menu.value, fecha, comida) !== null
+  const h = huecoDe(menu.value, fecha, comida)
+  const ids = (dias.value[fecha] ?? [])
+    .filter((a) => a.comida === comida && h && a.receta === h.plato)
+    .map((a) => a.id)
+  const teniaPlato = h !== null
   const quitados = ids.length ? await quitar(ids, fecha) : []
   if (teniaPlato) await sinPlatoEseDia(fecha, comida)
   return async () => {
@@ -102,26 +269,25 @@ export async function quitarDelMenu(menuId: string, comida: ComidaId): Promise<(
   return () => ponerPlato(menuId, comida, antes)
 }
 
-/** Guarda cuándo cocinas un plato y para qué comidas (si no queda ninguna, se quita). */
-export function guardarCocinado(c: Cocinado): Promise<void> {
-  return guardar(c.para.length ? conCocinado(menu.value, c) : sinCocinado(menu.value, c.id))
+/** Marca lo que cocinas a la vez como cocinado (o no): lo mismo desde su hoja, desde tu día de Nutrición y desde Hoy. */
+export function marcarCocinados(ids: readonly string[], hecho: boolean): Promise<void> {
+  return guardar({
+    ...menu.value,
+    cocinados: menu.value.cocinados.map((c) => (ids.includes(c.id) ? { ...c, hecho } : c)),
+  })
 }
 
-export const quitarCocinado = (id: string) => guardar(sinCocinado(menu.value, id))
+/** Cocinar aparte: cambia los platos que cocinas a la vez (quita los de antes, `ids`, y pone estos; vacío, los quita). */
+export function guardarSesion(ids: readonly string[], nuevos: readonly Cocinado[]): Promise<void> {
+  const resto = menu.value.cocinados.filter((c) => !ids.includes(c.id))
+  return guardar({ ...menu.value, cocinados: [...resto, ...nuevos.filter((c) => c.para.length)] })
+}
 
 /** Un cocinado nuevo para una comida: ese día, a una hora sugerida, solo para ella. */
 export function cocinadoNuevo(fecha: string, comida: ComidaId, platoId: string): Cocinado {
   return { id: nuevoId(), plato: platoId, fecha, hora: '18:00', para: [clave(fecha, comida)] }
 }
 
-/** Las comidas con ese plato en los 7 días desde una fecha (las que puede cubrir un cocinado). */
-export function comidasDelPlato(platoId: string, desde: string): Hueco[] {
-  return semanaDesde(desde).flatMap((f) => huecosDelDia(menu.value, f).filter((h) => h.plato === platoId))
-}
-
-export const diaDeCompra = (fecha: string, hora: string) =>
-  guardar({ ...menu.value, compraEl: { fecha, hora } })
-export const sinDiaDeCompra = () => guardar({ ...menu.value, compraEl: null })
 export const cambiarAvisos = (a: Partial<Avisos>) =>
   guardar({ ...menu.value, avisos: { ...menu.value.avisos, ...a } })
 
@@ -131,12 +297,33 @@ export async function alCalendario(desde = hoy.value): Promise<'shared' | 'saved
     .toISOString()
     .replace(/[-:]/g, '')
     .replace(/\.\d+Z$/, 'Z')
-  const texto = calendarioDelMenu(
-    menu.value,
-    semanaDesde(desde),
-    (id) => platoPorId(id)?.nombre ?? 'Plato',
-    sello,
-  )
+  const fechas = semanaDesde(desde)
+  const nombreDe = (id: string) => platoPorId(id)?.nombre ?? 'Plato'
+  // Tu semana resuelta: tus tandas y tu compra de cada semana
+  const p = piloto.value
+  const extra: EventoExtra[] = tandas.value
+    .filter((t) => t.huecos.length)
+    .map((t) => ({
+      uid: `tanda-${t.fecha}`,
+      tipo: 'cocinar' as const,
+      fecha: t.fecha,
+      hora: t.hora,
+      titulo: `Cocinar ${paraQueDias(t)}`,
+      detalle: `${platosDeTanda(t)
+        .map((x) => `${nombreDe(x.plato)} ×${x.raciones}`)
+        .join(', ')}. Los gramos y los pasos están en MUTA.`,
+    }))
+  if (p?.compra)
+    for (const f of diasDeCompra(p, fechas, tandas.value))
+      extra.push({
+        uid: `compra-semana-${f}`,
+        tipo: 'compra',
+        fecha: f,
+        hora: p.compra!.hora,
+        titulo: 'Hacer la compra',
+        detalle: 'La lista, con lo que ya tienes en casa, está en MUTA · Nutrición · Tu plan',
+      })
+  const texto = calendarioDelMenu(menu.value, fechas, nombreDe, sello, extra)
   const archivo = new File([texto], 'muta-semana.ics', { type: 'text/calendar' })
   return platform.shareFile('Tu semana en MUTA', archivo)
 }
@@ -183,32 +370,19 @@ export async function menusDeTuDieta(): Promise<MenuSemanal | null> {
   if (!a) return null
   const antes = menu.value
   const d = a.dieta
-  await guardarPlatosTuyos(
-    d.recetas.map((r) => ({
+  const platoDe = (r: { id: string }) => `dieta-${r.id}`
+  // Cada receta, un plato tuyo con sus gramos de entreno y de descanso
+  await guardarPlatosTuyos([
+    ...platosTuyos.value.filter((p) => !p.id.startsWith('dieta-')),
+    ...d.recetas.map((r) => ({
       ...platoDeReceta(r),
-      id: `dieta-${r.id}`,
+      id: platoDe(r),
       categoria: 'tuyos',
       origen: 'tuyo' as const,
     })),
-  )
-  const letras = 'ABCDEFG'
-  const menus = d.menus.slice(0, 7).map((m, i) => ({
-    id: letras[i],
-    nombre: m.nombre,
-    platos: Object.fromEntries(
-      COMIDAS.flatMap(({ id: c }) => {
-        const r =
-          d.recetas.find((x) => x.comida === c && x.menu === m.id) ??
-          d.recetas.find((x) => x.comida === c && !x.menu)
-        return r ? [[c, `dieta-${r.id}`]] : []
-      }),
-    ),
-  }))
-  const lunes = addDays(hoy.value, -diaSemana(hoy.value))
-  const semana = Array.from({ length: 7 }, (_, i) => {
-    const k = d.menus.findIndex((m) => m.id === menuDe(d, a.inicio, addDays(lunes, i)).id)
-    return letras[Math.max(0, Math.min(menus.length - 1, k))]
-  })
-  await guardar({ ...antes, menus, semana, reparto: 'elegidos' })
+  ])
+  const { menus, ciclo } = menusDesdeDieta(d, a.inicio, platoDe)
+  const conCiclo: MenuSemanal = { ...antes, menus, ciclo, reparto: 'elegidos', diasPorMenu: undefined }
+  await guardar({ ...conCiclo, semana: menusDeLaSemana(conCiclo, hoy.value) })
   return antes
 }

@@ -1,0 +1,79 @@
+/* Cómo se calcula, como una cuenta (usuario, 2026-11-19): el signo en su columna, qué es con su detalle y la cifra a la
+   derecha; al final, el total en negrita sobre una raya. */
+.cuenta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cuenta ul {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.cuenta li {
+  display: grid;
+  grid-template-columns: var(--space-5) 1fr auto;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+}
+
+.signo {
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.que {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.que b {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.que small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+/* Las cifras, un poco más pequeñas (usuario, 2026-11-19) */
+.cifra {
+  font: var(--text-headline);
+  white-space: nowrap;
+}
+
+.total {
+  margin-top: var(--space-1);
+  border-top: var(--border) solid var(--label);
+}
+
+.total .que b {
+  font: var(--text-headline);
+}
+
+.enlace {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.nota {
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}

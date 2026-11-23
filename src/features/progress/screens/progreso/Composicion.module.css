@@ -1,0 +1,91 @@
+/* Composición: el círculo de la grasa (tres cuartos de vuelta) y, al lado, masa magra, grasa y FFMI */
+.composicion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.anillo {
+  position: relative;
+  flex: none;
+  width: var(--ring);
+  height: var(--ring);
+}
+
+.anillo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(135deg);
+}
+
+.anilloBase,
+.anilloLleno {
+  fill: none;
+  stroke-width: var(--ring-stroke);
+  stroke-linecap: round;
+}
+
+.anilloBase {
+  stroke: var(--bg);
+}
+
+.anilloLleno {
+  stroke: var(--accent);
+  transition: stroke-dasharray var(--duration-draw) var(--ease);
+}
+
+.anilloObjetivo {
+  position: absolute;
+  width: var(--rail-dot);
+  height: var(--rail-dot);
+  border: var(--border) solid var(--surface);
+  border-radius: var(--radius-pill);
+  background: var(--label);
+  transform: translate(-50%, -50%);
+}
+
+.anilloCentro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.anilloCentro b {
+  font: var(--text-session-value);
+}
+
+.anilloCentro span {
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+.datos {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  margin: 0;
+}
+
+.datos div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.datos dt {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.datos dd {
+  margin: 0;
+  font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
+}

@@ -12,8 +12,8 @@ function platosDeTusMenus() {
   const vistos = new Map<string, { id: string; menu: string; comida: (typeof COMIDAS)[number]['id'] }>()
   for (const m of menu.value.menus)
     for (const c of COMIDAS) {
-      const id = m.platos[c.id]
-      if (id && !vistos.has(id)) vistos.set(id, { id, menu: m.id, comida: c.id })
+      for (const id of [m.platos[c.id], m.descanso?.[c.id]])
+        if (id && !vistos.has(id)) vistos.set(id, { id, menu: m.id, comida: c.id })
     }
   return [...vistos.values()]
 }

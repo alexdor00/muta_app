@@ -2,3 +2,4 @@
 export { webPlatform as platform } from './web.ts'
 export { feedback, FEEDBACK, type FeedbackPrefs, type Moment } from './feedback.ts'
 export type { Haptic, Platform, Sound } from './platform.ts'
+export { reducirImagen } from './imagen.ts'

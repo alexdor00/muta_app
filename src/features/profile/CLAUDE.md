@@ -2,9 +2,9 @@
 
 Bienvenida (A01–A04: objetivo, nivel y días por semana) y, más adelante, el perfil.
 
-- `screens/` — `bienvenida`, `onboarding` (pasos 1 y 2), `perfil` (por ahora solo «Tu material», la pieza `TuMaterial` del
+- `screens/` — `bienvenida`, `onboarding` (pasos 1 y 2 de 4, con `shared/ui/Pasos`: al terminar guarda el perfil y sigue con los pasos 3 y 4, de comida, que pone Nutrición en `/bienvenida/comida/1` y `/2` y se pueden saltar —usuario, 2026-11-17—), `perfil` (por ahora solo «Tu material», la pieza `TuMaterial` del
   `index.ts` de Entreno; tus datos, rehacer el plan y la copia de seguridad, pendientes de diseño).
-- `components/` — `OnboardingLayout`, iconos de objetivo.
+- `components/` — iconos de objetivo.
 - `state/onboarding.ts` — señales con las respuestas en curso.
 - `use-cases/completeOnboarding.ts` — guarda el perfil en el almacén `profile` (un solo registro).
 - `domain/onboarding.ts` — reglas de los pasos (con su prueba).

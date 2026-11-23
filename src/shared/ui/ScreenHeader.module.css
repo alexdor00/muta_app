@@ -42,7 +42,6 @@
 .title {
   margin-top: var(--space-5);
   font: var(--text-large-title);
-  font-weight: var(--weight-regular);
 }
 
 .intro {
@@ -54,9 +53,29 @@
 /* Título y avatar en una fila (Entrenamiento): título en negrita, del tamaño del diseño */
 .inline {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
+}
+
+/* «‹ Hoy»: solo si llegaste desde Hoy; en su propia línea, encima del título */
+.volver {
+  display: inline-flex;
+  flex-basis: 100%;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  margin: calc(var(--space-2) * -1) 0 calc(var(--space-2) * -1) calc(var(--space-2) * -1);
+  color: var(--label);
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.volver svg {
+  width: var(--icon);
+  height: var(--icon);
 }
 
 .inlineTitle {

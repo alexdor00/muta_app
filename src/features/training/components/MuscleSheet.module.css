@@ -1,3 +1,4 @@
+/* Todo el texto de la ficha del músculo, del mismo tamaño (16; usuario, 2026-11-14); los títulos y las cifras, aparte. */
 /* Ficha del músculo: barra del rango en una tarjeta gris, pestañas, los tres objetivos y las listas. */
 
 .siblings {
@@ -14,14 +15,14 @@
   border-radius: var(--radius-pill);
   background: var(--surface);
   color: var(--label);
-  font: var(--text-subhead);
+  font: var(--text-body);
   font-weight: var(--weight-semibold);
   cursor: pointer;
 }
 
 .chip.on {
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 /* La barra */
@@ -29,6 +30,7 @@
   padding: var(--space-5) var(--space-5) var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .value {
@@ -38,11 +40,11 @@
 }
 
 .value b {
-  font: var(--text-session-hero);
+  font: var(--text-cifra);
 }
 
 .value span {
-  font: var(--text-subhead);
+  font: var(--text-body);
   color: var(--label-2);
 }
 
@@ -62,7 +64,7 @@
   background: var(--label);
 }
 
-/* Tu plan: punto naranja con borde blanco, centrado en su valor */
+/* Tu plan: punto negro con borde blanco, centrado en su valor */
 .dot {
   position: absolute;
   top: 50%;
@@ -89,7 +91,7 @@
 
 .verdict {
   margin-top: var(--space-2);
-  font: var(--text-subhead);
+  font: var(--text-body);
   font-weight: var(--weight-semibold);
 }
 
@@ -117,17 +119,20 @@
   border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--label);
-  font: var(--text-subhead);
+  font: var(--text-body);
   cursor: pointer;
 }
 
+/* Su rango con la letra de las cantidades de la compra (normal, seminegrita), no la condensada */
 .mode b {
-  font: var(--text-session-label);
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
 }
 
 .mode.on {
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .manual {
@@ -143,14 +148,14 @@
   justify-content: space-between;
   min-height: var(--control);
   padding: 0 var(--space-4);
-  font: var(--text-subhead);
+  font: var(--text-body);
   list-style: none;
   cursor: pointer;
 }
 
 .fold summary {
   padding: 0;
-  font: var(--text-subhead);
+  font: var(--text-body);
   color: var(--label-2);
 }
 
@@ -184,7 +189,7 @@
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-control);
   background: var(--surface);
-  font: var(--text-footnote);
+  font: var(--text-body);
   color: var(--label-2);
 }
 
@@ -222,14 +227,14 @@
 }
 
 .note {
-  font: var(--text-subhead);
+  font: var(--text-body);
   color: var(--label-2);
 }
 
 .label {
   margin-top: var(--space-6);
   margin-bottom: var(--space-2);
-  font: var(--text-footnote);
+  font: var(--text-body);
   font-weight: var(--weight-semibold);
   letter-spacing: 0.06em;
   color: var(--label-2);
@@ -257,17 +262,17 @@
 
 .rowName {
   flex: 1;
-  font: var(--text-subhead);
+  font: var(--text-body);
 }
 
 .rowName small {
   margin-left: var(--space-1);
-  font: var(--text-footnote);
+  font: var(--text-body);
   color: var(--label-2);
 }
 
 .rowSets {
-  font: var(--text-footnote);
+  font: var(--text-body);
   color: var(--label-2);
 }
 
@@ -296,6 +301,7 @@
   padding: var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .key .label {
@@ -304,7 +310,7 @@
 
 /* La clave del músculo: 15, sin negrita (no compite con los consejos) */
 .key p {
-  font: var(--text-subhead);
+  font: var(--text-body);
 }
 
 /* «Añadir un ejercicio» de este músculo a tu plan */

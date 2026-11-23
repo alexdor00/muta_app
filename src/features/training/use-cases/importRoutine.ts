@@ -2,6 +2,8 @@ import { getDb, runTx } from '../../../shared/data/db.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import { leerRutinaCsv, PREFIJO_MIA, type RutinaMia } from '../domain/csvRoutine.ts'
 import type { ProgramData } from '../domain/program.ts'
+import { platform } from '../../../shared/platform/index.ts'
+import { INSTRUCCIONES_IA_RUTINA } from '../domain/routinePrompt.ts'
 import { cargarPlan } from './training.ts'
 
 /** La plantilla que se descarga: los títulos y unas filas de ejemplo para ver el formato (se cambian por las tuyas). */
@@ -64,3 +66,6 @@ export function vistaCsv(texto: string) {
     ].join(' · '),
   }
 }
+
+/** «Copiar instrucciones para una IA»: el texto que pasa cualquier rutina al CSV de MUTA (dice si se pudo copiar). */
+export const copiarInstruccionesRutina = () => platform.copy(INSTRUCCIONES_IA_RUTINA)

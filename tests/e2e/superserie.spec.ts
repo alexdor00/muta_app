@@ -28,7 +28,7 @@ async function editarBrazos(page: import('@playwright/test').Page) {
     .click()
   await page
     .getByRole('list', { name: 'Tu semana' })
-    .getByRole('button', { name: /^1 Brazos/ })
+    .getByRole('button', { name: /^Brazos/ })
     .click()
   return page.getByRole('list', { name: 'Ejercicios de Brazos' })
 }
@@ -36,7 +36,7 @@ async function editarBrazos(page: import('@playwright/test').Page) {
 test('en Editar rutina: cada serie distinta («4 · 6 · 8») y la superserie unida', async ({ page }) => {
   await cargar(page)
   const lista = await editarBrazos(page)
-  await expect(lista.getByRole('listitem').nth(0)).toContainText('3 × 4 · 6 · 8 · 3:00')
+  await expect(lista.getByRole('listitem').nth(0)).toContainText('3 series · 4–8 reps · 3:00')
   await expect(lista).toContainText('Superserie')
   await expect(lista.getByRole('listitem').nth(1)).toContainText('pasa al siguiente')
 
@@ -86,6 +86,7 @@ test('técnica de intensidad: se pone a cualquier ejercicio en Editar rutina y s
   await editarBrazos(page)
   await page.getByRole('button', { name: /^Sentadilla hack/ }).click()
   const hack = page.getByRole('dialog', { name: 'Sentadilla hack' })
+  await hack.getByRole('button', { name: 'Más opciones' }).click()
   const tecnica = hack.locator('summary', { hasText: 'Técnica' })
   await expect(tecnica).toContainText('Ninguna')
   await tecnica.click()

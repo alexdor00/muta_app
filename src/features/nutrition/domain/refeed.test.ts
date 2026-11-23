@@ -31,3 +31,12 @@ describe('la recarga de hidratos', () => {
     expect(enRecarga({ desde: '2026-11-09', hasta: '2026-11-13' }, '2026-11-14')).toBe(false)
   })
 })
+
+describe('la recarga también por cómo estás (usuario, 2026-11-22; la guía, § 7)', () => {
+  const d = { fase: 'definicion' as const, semanaFase: 9, rendimiento: null, ultima: null, hoy: '2026-11-22' }
+  it('con 2 semanas seguidas de señales, aunque el rendimiento no caiga', () => {
+    expect(tocaRecarga({ ...d, semanasConSenales: 2 })).toBe(true)
+    expect(tocaRecarga({ ...d, semanasConSenales: 1 })).toBe(false)
+    expect(tocaRecarga({ ...d, semanaFase: 6, semanasConSenales: 2 })).toBe(false)
+  })
+})

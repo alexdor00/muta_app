@@ -1,0 +1,114 @@
+/* Poner y centrar tu foto: cómo queda (se arrastra), galería, cámara y quitar (Entreno y Nutrición). */
+
+.preview {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  height: calc(var(--photo-card-height) * 0.9);
+  overflow: hidden;
+  margin: var(--space-4) 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--label);
+  box-shadow: var(--card-shadow);
+}
+
+.preview img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.withPhoto {
+  background: var(--photo-placeholder);
+  color: var(--on-photo);
+}
+
+.withPhoto::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--photo-scrim);
+  content: '';
+}
+.primary,
+.secondary {
+  display: grid;
+  place-items: center;
+  min-height: var(--control);
+  margin-top: var(--space-2);
+  border-radius: var(--radius-pill);
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.primary {
+  background: var(--label);
+  color: var(--on-accent);
+}
+
+.secondary {
+  background: var(--surface);
+  color: var(--label);
+}
+
+.primary input,
+.secondary input {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.primary:focus-within,
+.secondary:focus-within {
+  outline: var(--border) solid var(--label);
+  outline-offset: var(--space-1);
+}
+
+.remove {
+  display: block;
+  width: 100%;
+  min-height: var(--tap-min);
+  margin-top: var(--space-2);
+  border: 0;
+  background: none;
+  color: var(--critical-label);
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.note {
+  margin: var(--space-3) 0 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* Los textos de información y consejos, justificados (rectos por los dos lados) y con palabras partidas si hace falta */
+.note {
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* La vista previa se arrastra con el dedo para centrar la foto */
+.arrastrable {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.centrarAyuda {
+  margin: var(--space-2) 0 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: center;
+}

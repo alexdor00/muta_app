@@ -14,7 +14,7 @@ import {
   type EjercicioEnCurso,
   type SesionEnCurso,
 } from '../../state/sesionEnCurso.ts'
-import { discosPorLado } from '../../state/routines.ts'
+import { discosPorLado, MAX_TOTAL_DISCOS } from '../../state/routines.ts'
 import { equivalentesDe, idPorNombre } from '../../use-cases/exerciseLibrary.ts'
 import { notaDe } from '../../use-cases/exerciseNotes.ts'
 import { discosDelGimnasio, fueraDeTuMaterial, tenerDisco } from '../../use-cases/myEquipment.ts'
@@ -102,7 +102,8 @@ export function HojasEjercicio(props: Props) {
     return (
       <PlatesSheet
         total={total}
-        onTotal={setTotal}
+        // Hasta 1000 kg: lo que pase, se queda en 1000
+        onTotal={(v) => setTotal((parseDecimal(v) ?? 0) > MAX_TOTAL_DISCOS ? String(MAX_TOTAL_DISCOS) : v)}
         barra={barra}
         onBarra={setBarra}
         discos={discos}

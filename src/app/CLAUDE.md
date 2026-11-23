@@ -7,8 +7,13 @@ Es la única parte que puede usar todo lo demás.
 - `ScreenErrorBoundary.tsx` — si una pantalla falla se ve un aviso con «Volver» y el resto sigue.
 - `updates.ts`, `updatePolicy.ts` — la versión nueva se descarga sola y se aplica al abrir, **nunca durante un entreno**.
 - Comida: `/comida` (pestaña, con `?vista=dieta`) y, a pantalla completa como la ficha del ejercicio,
-  todo lo que cuelga de ella: `/comida/objetivo`, `/comida/receta/:id`, `/comida/compra`, `/comida/cocina` y `/comida/consulta`.
-- `dev/` — páginas solo para desarrollo (`/dev/ui` con todos los componentes en claro y oscuro).
+  todo lo que cuelga de ella: `/comida/objetivo`, `/comida/receta/:id`, `/comida/compra`, `/comida/cocina`, `/comida/consulta`,
+  el modo cocina de una tanda (`/comida/tanda/:fecha`), una comida al momento (`/comida/al-momento/:fecha/:comida`) y tu despensa (`/comida/despensa`).
+- Progreso: `/progreso` (pestaña, con `?mes=AAAA-MM&ver=dias|cuerpo|fuerza`; de serie, el mes de hoy y Días) y, a pantalla
+  completa, un día de entreno (`/progreso/dia/:fecha`, desde su calendario).
+- `dev/` — páginas solo para desarrollo (`/dev/ui` con todos los componentes en claro y oscuro; `/dev/demo` carga un perfil
+  inventado de unos 100 días —`perfilDemo.ts` y, su menú, `perfilDemoMenu.ts`: entrenos, tres mesociclos, pesajes, medidas y fotos dibujadas de cada mes,
+  consultas y comidas— para ver la app como de verdad; borra lo del dispositivo y pregunta antes).
 
 Convenciones: las rutas y sus patrones salen de `shared/lib/paths.ts`; no escribir rutas a mano. Una pantalla
 nueva se añade aquí con `lazy` y su ruta. Las pestañas se ven siempre salvo durante una sesión.

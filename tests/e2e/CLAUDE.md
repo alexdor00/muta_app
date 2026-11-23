@@ -2,7 +2,7 @@
 
 Playwright en un iPhone 13 simulado, sobre la app construida **sin rutinas privadas** (como la CI).
 
-- `bienvenida.spec.ts` — bienvenida completa, elegir rutina, detalle y empezar; guarda capturas en `capturas/` (ignoradas por git).
+- `bienvenida.spec.ts` — bienvenida completa (con los pasos de comida: tus datos y tu objetivo, que queda guardado), saltar la comida con «Ahora no, solo entreno», elegir rutina, detalle y empezar; guarda capturas en `capturas/` (ignoradas por git).
 - `plan.ts` — punto de partida de los recorridos de Entreno: perfil, rutina MUTA Cuerpo completo guardada, toca B1 y un
   historial escrito a mano (B1 hace 7, 14 y 21 días). Los recorridos de Entreno importan `test` de aquí, no de Playwright.
 - `tu-plan.spec.ts` — Tu plan con tu plan: carrusel y «Empezar», hoja Tu rutina, tocar un músculo, barra al bajar, sin rutina.
@@ -14,8 +14,18 @@ Playwright en un iPhone 13 simulado, sobre la app construida **sin rutinas priva
 - `comida.spec.ts` — Comida con datos de prueba escritos a mano: calcular tu objetivo, añadir con su ración y «Deshacer»,
   solo kcal y proteína, repetir lo de ayer, la semana y tu peso, la sugerencia del entrenador (aplicar, deshacer, «Ahora no»)
   y axe en sus pantallas y hojas (con capturas en `capturas/`).
-- `recetas.spec.ts` — Recetas y Menú sin el recetario privado (salen los platos «De ejemplo»): ajustar un plato a lo que
-  falta y apuntarlo, un plato en el menú con cuándo cocinarlo, lo de hoy, la compra del menú, cuadrar el día y axe.
+- `progreso.spec.ts` — Progreso mes a mes: sin datos (dónde empezar); lo que toca en Hoy (la hoja del mes con medidas y foto);
+  tu mes (Días y la pantalla de un día con cada serie frente a la vez anterior, Cuerpo con su foto, una medida en su gráfica y la composición con su calibración, Fuerza por
+  grupo y la hoja de la etapa con constancia, músculos, rutina y comida; sigue al recargar); renombrar, empezar otra y
+  comparar; una medida imposible; las fotos del mes con la cámara (sin cámara en la prueba: de la galería, postura a
+  postura); axe y capturas `progreso*.png`.
+- `demo.spec.ts` — el perfil de prueba de `/dev/demo` se carga y se ve en Progreso (Días y un día, Cuerpo con la foto partida y «Ver tu cambio», Fuerza con un ejercicio abierto y la etapa) y en Hoy (capturas `demo-*.png`).
+- `recetas.spec.ts` — Recetas y Menú sin el recetario privado (salen los platos «De ejemplo»):
+  apuntar un plato con su hoja, un plato en el menú y su tick en Hoy, la compra del menú, quitar un ingrediente de la receta
+  (con «Deshacer»), tus menús por días de la semana, cuadrar el día y axe.
+- `semana-resuelta.spec.ts` — tu semana resuelta (piloto de compra y cocina): elegir el día de la compra y cocinar hoy,
+  verla en Mi plan · Cocina y en Hoy, tachar en la compra (sin despensa), el modo cocina hasta «Hecho» y pasar a hoy una tanda que no
+  hiciste; axe en cada pantalla. `nutricion.ts` — un perfil con su objetivo y escribir tu menú (lo usan las de Nutrición).
 - `accesibilidad.spec.ts` — axe (WCAG 2 A y AA) en las pantallas reales y en `/dev/ui` (claro y oscuro). Falla ante fallos graves.
 - `sistema-diseno.spec.ts` — las piezas de `/dev/ui` miden lo que dicen los tokens.
 - `zz-galeria.spec.ts` — genera la galería de pantallas (solo local).

@@ -10,7 +10,7 @@ test('desde la ficha del ejercicio: rango en barra, objetivo, a mano y dónde lo
     .getByRole('region', { name: 'Músculos que trabaja' })
     .getByRole('button', { name: 'Femoral' })
     .click()
-  const hoja = page.getByRole('dialog', { name: 'Femoral' })
+  const hoja = page.getByRole('main')
   // Rumano 3 y curl femoral tumbado 2 (B1) y curl femoral sentado 2 (B2): 7, dentro de 6–10
   await expect(
     hoja.getByRole('img', { name: /^7 series por semana en tu plan\. Tu rango es 6–10\. Vas bien/ }),
@@ -47,7 +47,7 @@ test('la pestaña Consejos: la clave, 3 consejos, los demás plegados y cómo di
     .getByRole('region', { name: 'Músculos que trabaja' })
     .getByRole('button', { name: 'Glúteo' })
     .click()
-  const hoja = page.getByRole('dialog', { name: 'Glúteo' })
+  const hoja = page.getByRole('main')
   await hoja.getByText('Consejos', { exact: true }).click()
   await expect(hoja.getByText(/^Piensa en patrones/)).toBeVisible()
   await expect(hoja.getByRole('listitem').filter({ visible: true })).toHaveCount(3)
@@ -65,35 +65,11 @@ test('desde Tu plan, «Ver ficha» en la burbuja; en hombros se pasa de uno a ot
     .first()
     .click()
   await page.getByRole('button', { name: 'Ver ficha' }).click()
-  const hoja = page.getByRole('dialog', { name: 'Hombro lateral' })
+  const hoja = page.getByRole('main')
   await expect(hoja.getByRole('button', { name: 'Hombro lateral', exact: true })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
   await hoja.getByRole('button', { name: 'Hombro posterior', exact: true }).click()
-  await expect(page.getByRole('dialog', { name: 'Hombro posterior' })).toBeVisible()
-})
-
-test('«Añadir un ejercicio» elige uno del músculo y la sesión, y sale en «Dónde lo entrenas»', async ({
-  page,
-}) => {
-  await page.goto('/entreno/ejercicio/peso_muerto_rumano')
-  await page
-    .getByRole('region', { name: 'Músculos que trabaja' })
-    .getByRole('button', { name: 'Femoral' })
-    .click()
-  await page
-    .getByRole('dialog', { name: 'Femoral' })
-    .getByRole('button', { name: 'Añadir un ejercicio' })
-    .click()
-  const bib = page.getByRole('dialog', { name: 'Elegir ejercicio' })
-  await bib.getByRole('searchbox').fill('buenos días')
-  await bib
-    .getByRole('button', { name: /^Buenos días/ })
-    .first()
-    .click()
-  const donde = page.getByRole('dialog', { name: /^¿En qué sesión va Buenos días/ })
-  await donde.getByText('Espalda y cuádriceps', { exact: true }).click()
-  const hoja = page.getByRole('dialog', { name: 'Femoral' })
-  await expect(hoja.getByRole('link', { name: /^Buenos días.* A2/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Hombro posterior' })).toBeVisible()
 })

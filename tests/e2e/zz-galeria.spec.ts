@@ -56,7 +56,7 @@ base('galería · bienvenida y elegir rutina', async ({ page }) => {
   await shot(
     page,
     '02-objetivo',
-    'A03 · Define tu objetivo (1/2)',
+    'A03 · Define tu objetivo (1/4)',
     'Viene marcado «Ganar músculo». El objetivo decide la fase: volumen, definición o mantenimiento.',
   )
   await page.getByRole('link', { name: 'Siguiente' }).click()
@@ -64,12 +64,13 @@ base('galería · bienvenida y elegir rutina', async ({ page }) => {
   await shot(
     page,
     '03-nivel-y-dias',
-    'A04 · Personaliza tu plan (2/2)',
+    'A04 · Personaliza tu plan (2/4)',
     'Nivel y días por semana. Con Principiante, de 2 a 5 días; con Intermedio o Avanzado, también 6.',
   )
   await page.getByText('Intermedio', { exact: true }).click()
   await page.getByText('4', { exact: true }).click()
   await page.getByRole('button', { name: 'Siguiente' }).click()
+  await page.getByRole('link', { name: 'Ahora no, solo entreno' }).click()
   await expect(page).toHaveURL('/entreno/rutinas')
   await expect(page.getByRole('region', { name: 'Para ti' })).toBeVisible()
   await shot(
@@ -229,9 +230,14 @@ conPlan('galería · Entreno con tu plan', async ({ page }) => {
       'Buscar y filtrar por músculo.',
     ],
     ['/perfil', '24-perfil', 'Perfil · Tu material', 'Tu material y los discos del gimnasio.'],
-    ['/hoy', '25-hoy', 'Hoy (pendiente)', 'La siguiente área por diseñar.'],
+    ['/hoy', '25-hoy', 'Hoy', 'Lo que te queda por hacer hoy.'],
     ['/comida', '26-comida', 'Comida (pendiente)', 'Pendiente de diseño.'],
-    ['/progreso', '27-progreso', 'Progreso (pendiente)', 'Pendiente de diseño.'],
+    [
+      '/progreso',
+      '27-progreso',
+      'Progreso',
+      'Cuerpo (peso, medidas, composición, fotos y recuperación), Comida y Entreno (mesociclo, calendario y récords).',
+    ],
     ['/no-existe', '28-404', 'Pantalla que no existe', 'Cualquier dirección desconocida.'],
   ]
   for (const [url, f, title, why] of resto) {

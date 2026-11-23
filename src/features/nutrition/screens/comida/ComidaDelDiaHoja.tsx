@@ -1,5 +1,6 @@
 import { useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
+import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChevronRightIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
@@ -20,6 +21,7 @@ import { PlatoDelDia } from './PlatoDelDia.tsx'
 import type { Aviso } from '../comun/useAviso.ts'
 import { Deslizable } from '../../../../shared/ui/Deslizable.tsx'
 import h from '../comun/Hojas.module.css'
+import an from './Anadir.module.css'
 
 type Props = {
   comida: ComidaId
@@ -40,6 +42,8 @@ export function ComidaDelDiaHoja({ comida, onClose, onAnadir, onEditar, avisar }
   const fecha = diaVisto.value
   const hueco = huecoDe(menu.value, fecha, comida)
   const plato = hueco ? platoPorId(hueco.plato, fecha) : null
+  // Lo apuntado del plato de tu menú no se repite en la lista: ya sale abajo, con sus ingredientes (usuario, 2026-11-22)
+  const delPlato = plato ? c.apuntes.filter((a) => a.receta === plato.id) : []
   if (cual !== null && hueco && plato)
     return (
       <CambiarHoja
@@ -64,7 +68,13 @@ export function ComidaDelDiaHoja({ comida, onClose, onAnadir, onEditar, avisar }
       large
       footer={
         <div class={h.actions}>
-          <Button onClick={onAnadir}>Añadir {c.al}</Button>
+          {/* Como «Lo que llevas» en Mi plan y Tus menús (usuario, 2026-11-21): sin «Cocinar ahora» ni «Añadir» (el «+» de la tarjeta) */}
+          {hueco && plato && (
+            <Button variant="secondary" href={paths.dish(plato.id, { comida, fecha })}>
+              Ver la receta
+            </Button>
+          )}
+          {!c.apuntes.length && !plato && <Button onClick={onAnadir}>Añadir {c.al}</Button>}
           {c.apuntes.length > 0 && (
             <Button
               variant="secondary"
@@ -87,41 +97,70 @@ export function ComidaDelDiaHoja({ comida, onClose, onAnadir, onEditar, avisar }
     >
       <div class={h.stack}>
         {c.apuntes.length > 0 && <Cifras total={c.total} />}
-        <ul class={h.list}>
-          {c.apuntes.map((a) => (
-            <li key={a.id}>
-              <Deslizable
-                ariaLabel={`Quitar ${a.nombre}`}
-                onQuitar={async () => {
-                  const quitados = await quitar([a.id], fecha)
-                  avisar(`${a.nombre}: quitado`, {
+        {c.apuntes.length > delPlato.length && (
+          <div class={an.tarjeta}>
+            <ul class={h.list}>
+              {c.apuntes
+                .filter((a) => !delPlato.includes(a))
+                .map((a) => (
+                  <li key={a.id}>
+                    <Deslizable
+                      fondo="surface"
+                      ariaLabel={`Quitar ${a.nombre}`}
+                      onQuitar={async () => {
+                        const quitados = await quitar([a.id], fecha)
+                        avisar(`${a.nombre}: quitado`, {
+                          label: 'Deshacer',
+                          onClick: () => void devolver(quitados, fecha),
+                        })
+                      }}
+                    >
+                      <div class={h.row}>
+                        <button
+                          type="button"
+                          class={h.rowMain}
+                          onClick={async () => {
+                            if (a.alimentoId) await cargarAlimentos()
+                            onEditar(a, a.alimentoId ? alimentoPorId(a.alimentoId) : null)
+                          }}
+                        >
+                          <span class={h.rowTitle}>{a.nombre}</span>
+                          <span class={h.rowDetail}>
+                            {[textoCantidad(a), `${formatInt(a.protein)} g prot.`]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </span>
+                        </button>
+                        <span class={h.rowKcal}>{formatInt(a.kcal)} kcal</span>
+                        <ChevronRightIcon />
+                      </div>
+                    </Deslizable>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
+        <PlatoDelDia
+          comida={comida}
+          fecha={fecha}
+          onCambiar={setCual}
+          avisar={avisar}
+          sinCifras={c.apuntes.length > 0}
+          onQuitar={
+            delPlato.length
+              ? async () => {
+                  const quitados = await quitar(
+                    delPlato.map((a) => a.id),
+                    fecha,
+                  )
+                  avisar(`${plato?.nombre ?? 'Plato'}: quitado`, {
                     label: 'Deshacer',
                     onClick: () => void devolver(quitados, fecha),
                   })
-                }}
-              >
-                <div class={h.row}>
-                  <button
-                    type="button"
-                    class={h.rowMain}
-                    onClick={async () => {
-                      if (a.alimentoId) await cargarAlimentos()
-                      onEditar(a, a.alimentoId ? alimentoPorId(a.alimentoId) : null)
-                    }}
-                  >
-                    <span class={h.rowTitle}>{a.nombre}</span>
-                    <span class={h.rowDetail}>
-                      {[textoCantidad(a), `${formatInt(a.protein)} g prot.`].filter(Boolean).join(' · ')}
-                    </span>
-                  </button>
-                  <span class={h.rowKcal}>{formatInt(a.kcal)} kcal</span>
-                  <ChevronRightIcon />
-                </div>
-              </Deslizable>
-            </li>
-          ))}
-        </ul>
-        <PlatoDelDia comida={comida} fecha={fecha} onCambiar={setCual} avisar={avisar} />
+                }
+              : undefined
+          }
+        />
       </div>
     </Sheet>
   )

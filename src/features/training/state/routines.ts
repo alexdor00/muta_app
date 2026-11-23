@@ -92,7 +92,13 @@ export { avisoDeOrden, cambioDesdePrimera } from '../domain/exerciseProgress.ts'
 export type { SessionTip } from '../domain/sessionTips.ts'
 export { teclear } from '../domain/workoutSet.ts'
 export { diasDeRacha } from '../domain/streak.ts'
-export { CADENCIAS, discosPorLado, faseCadencia, type Cadencia } from '../domain/workoutTools.ts'
+export {
+  CADENCIAS,
+  discosPorLado,
+  faseCadencia,
+  MAX_TOTAL_DISCOS,
+  type Cadencia,
+} from '../domain/workoutTools.ts'
 export { MUSCLE_IDS, MUSCLES, rangeFor, type Mode, type MuscleId } from '../domain/muscles.ts'
 export { barMax, muscleInPlan, stepRange, verdict } from '../domain/muscleInPlan.ts'
 export { libraryLine, type LibraryExercise } from '../domain/exerciseLibrary.ts'

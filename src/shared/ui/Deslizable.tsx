@@ -11,6 +11,8 @@ type Props = {
   onQuitar: () => void
   /** El fondo de la fila (el de lo que tiene detrás): blanco o el gris de una tarjeta. */
   fondo?: 'bg' | 'surface'
+  /** Sin esquinas redondas: una fila dentro de una tarjeta con más filas (Editar rutina). */
+  plano?: boolean
   children: ComponentChildren
 }
 
@@ -18,13 +20,20 @@ type Props = {
  * Una fila que se desliza a la izquierda para descubrir «Quitar» (como en la sesión de Entreno), sin una X a la vista.
  * Tocar la fila abierta la cierra; con el teclado, el botón se alcanza con Tab cuando está abierta.
  */
-export function Deslizable({ label = 'Quitar', ariaLabel, onQuitar, fondo = 'bg', children }: Props) {
+export function Deslizable({
+  label = 'Quitar',
+  ariaLabel,
+  onQuitar,
+  fondo = 'bg',
+  plano = false,
+  children,
+}: Props) {
   const [abierta, setAbierta] = useState(false)
   const fila = useDeslizar(abierta, setAbierta)
   // Un toque que empezó con la fila ya abierta la cierra (el «clic» de soltar al deslizar no cuenta)
   const tocaAbiertaRef = useRef(false)
   return (
-    <div class={styles.swipe}>
+    <div class={`${styles.swipe} ${plano ? styles.plano : ''}`}>
       <button
         type="button"
         class={styles.quitar}

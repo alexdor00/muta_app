@@ -1,0 +1,158 @@
+/* 3 Cocina (usuario, 2026-11-19): la semana con sus iconos y el día elegido en tarjetas, como las comidas del Menú */
+.iconos {
+  display: flex;
+  gap: var(--space-1);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.iconos svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+[aria-pressed='true'] > .iconos {
+  color: var(--on-accent);
+}
+
+.titulo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
+}
+
+.titulo h3 {
+  margin: 0;
+  font: var(--text-title-2);
+}
+
+.titulo span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.card {
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.cabeza {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--label);
+}
+
+.icono svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  text-align: left;
+}
+
+button.texto {
+  cursor: pointer;
+}
+
+.texto b {
+  font: var(--text-headline);
+}
+
+.texto small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.accion {
+  flex: none;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.fila:last-child {
+  padding-bottom: var(--space-3);
+}
+
+.momento {
+  margin: 0;
+  padding: var(--space-2) 0 var(--space-3);
+  border-top: var(--hairline) solid var(--separator);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+/* Solo ese día: cocinar o no */
+.soloDia {
+  align-self: center;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+/* Raciones de más, debajo del plato */
+
+/* Un plato o una comida que se toca: abre lo que lleva (usuario, 2026-11-21) */
+.tocar {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+button.fila {
+  width: 100%;
+}
+
+.tocar:disabled {
+  cursor: default;
+}

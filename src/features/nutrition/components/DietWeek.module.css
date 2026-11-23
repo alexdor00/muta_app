@@ -5,6 +5,7 @@
   padding: var(--space-5);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .head {

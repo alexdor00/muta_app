@@ -1,0 +1,73 @@
+/* Tendencia del peso: línea negra, pesajes en gris y la banda de lo previsto. */
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--separator);
+  stroke-width: var(--hairline);
+}
+
+.axis {
+  font: var(--text-chart-axis);
+  fill: var(--label-2);
+}
+
+.band {
+  fill: var(--surface-3);
+}
+
+.dot {
+  fill: var(--label-2);
+  opacity: 0.6;
+}
+
+.line {
+  fill: none;
+  stroke: var(--label);
+  stroke-width: var(--border);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.last {
+  fill: var(--label);
+}
+
+/* Los tramos (las etapas de Progreso): bandas alternas con su nombre arriba */
+.tramo {
+  fill: var(--surface-2);
+}
+
+.tramoOtro {
+  fill: var(--surface);
+}
+
+.tramoNombre {
+  font: var(--text-chart-axis);
+  fill: var(--label-2);
+  text-transform: uppercase;
+}
+
+/* Al tocar: deja deslizar la página en vertical y el dedo elige el día en horizontal */
+.chart {
+  touch-action: pan-y;
+  cursor: crosshair;
+}
+
+.tocadoRaya {
+  stroke: var(--label-3);
+  stroke-width: var(--hairline);
+  vector-effect: non-scaling-stroke;
+}
+
+.tocadoTexto {
+  fill: var(--label);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}

@@ -21,7 +21,7 @@ async function abrirBase(page: Page) {
 async function empezarEjemplo(page: Page) {
   await abrirBase(page)
   await page.goto('/comida?vista=dieta')
-  await page.getByRole('button', { name: 'Probar la dieta de ejemplo' }).click()
+  await page.getByRole('button', { name: /^Probar una de ejemplo/ }).click()
   const hoja = page.getByRole('dialog', { name: 'Empezar la dieta' })
   await expect(hoja).toContainText('Dieta de ejemplo')
   await expect(hoja).toContainText('menús')
@@ -31,7 +31,7 @@ async function empezarEjemplo(page: Page) {
 
 test('empezar la dieta de ejemplo y apuntar el menú de hoy de un toque', async ({ page }) => {
   await empezarEjemplo(page)
-  await expect(page.getByRole('heading', { name: 'Tu semana' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Tu semana', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: /Pollo con arroz y verduras/ })).toBeVisible()
   // De Tu dieta a tu día (Nutrición abre en tu día)
   await page.goto('/comida')
@@ -40,18 +40,22 @@ test('empezar la dieta de ejemplo y apuntar el menú de hoy de un toque', async 
   await expect(page.getByRole('status')).toContainText('Batido: apuntada')
   await expect(page.getByRole('button', { name: 'Batido: apuntada, quitar' })).toBeVisible()
   // Lo apuntado sale también en su comida
-  await expect(page.getByRole('button', { name: /^Desayuno.*Batido/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^Batido \d/ }).first()).toBeVisible()
   await page.getByRole('button', { name: 'Batido: apuntada, quitar' }).click()
   await expect(page.getByRole('button', { name: 'Apuntar Batido' })).toBeVisible()
 })
 
-test('el día que ves: ‹ › para ver y apuntar en otro día', async ({ page }) => {
+test('el día que ves: deslizando la tarjeta se ve y se apunta en otro día', async ({ page }) => {
   await empezarEjemplo(page)
   await page.goto('/comida')
-  await expect(page.getByRole('navigation', { name: 'Día' })).toContainText('Hoy')
-  await expect(page.getByRole('button', { name: 'Día siguiente' })).toBeDisabled()
-  await page.getByRole('button', { name: 'Día anterior' }).click()
-  await expect(page.getByRole('navigation', { name: 'Día' })).toContainText('Ayer')
+  await expect(page.getByRole('region', { name: 'Lo que llevas hoy' })).toBeVisible()
+  // Deslizar la tarjeta del día a la derecha: el día anterior
+  const tarjeta = page.getByRole('region', { name: 'Lo que llevas hoy' })
+  const caja = (await tarjeta.boundingBox())!
+  await page.mouse.move(caja.x + caja.width / 3, caja.y + caja.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(caja.x + caja.width / 3 + 160, caja.y + caja.height / 2, { steps: 8 })
+  await page.mouse.up()
   // Ayer fue el día 7 del ciclo de la dieta (menú A)
   await expect(page.getByText(/día 7 del menú/)).toBeVisible()
 })
@@ -81,12 +85,8 @@ test('la receta: versión de descanso, un intercambio para siempre y editar sus 
 test('la compra: sale de las recetas, se marca lo que tienes y se añade lo tuyo', async ({ page }) => {
   await empezarEjemplo(page)
   await page.goto('/comida/compra')
-  // Por pasillos: la primera con algo por comprar viene abierta; la carne se abre
+  // Por pasillos, cada uno en su tarjeta (rediseño 23)
   await expect(page.getByRole('heading', { name: /^Carne/ })).toBeVisible()
-  await expect(page.locator('main button[aria-expanded="true"]').first()).toBeVisible()
-  const carne = page.getByRole('button', { name: /^Carne/ })
-  if ((await carne.getAttribute('aria-expanded')) === 'false') await carne.click()
-  await expect(carne).toHaveAttribute('aria-expanded', 'true')
   const pollo = page.getByRole('button', { name: /^Pechuga de pollo/ })
   await pollo.click()
   await expect(pollo).toHaveAttribute('aria-pressed', 'true')
@@ -99,13 +99,18 @@ test('la compra: sale de las recetas, se marca lo que tienes y se añade lo tuyo
 
 test('la cocina: repartir una olla y guardar un plato propio por 100 g', async ({ page }) => {
   await empezarEjemplo(page)
+  // Cocinar: el centro ya no lista las herramientas (usuario, 2026-11-21); cada una sigue en su pantalla
   await page.goto('/comida/cocina')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await page.goto('/comida/cocina?h=crudo')
   await expect(page.getByRole('heading', { name: 'La olla de arroz' })).toBeVisible()
+  await page.goto('/comida/cocina?h=repartir')
   const olla = page.getByRole('region', { name: 'Repartir una olla' })
   await olla.getByLabel('Olla vacía (g)').fill('1250')
   await olla.getByLabel('Llena (g)').fill('2890')
   await olla.getByLabel('Raciones').fill('3')
   await expect(olla).toContainText('547 g')
+  await page.goto('/comida/cocina?h=plato')
   const plato = page.getByRole('region', { name: 'Calcular un plato' })
   await plato.getByLabel('Nombre').fill('Mis lentejas')
   await plato.getByLabel('Buscar un ingrediente del plato').fill('lentejas cocidas')
@@ -131,6 +136,71 @@ test('la consulta semanal: la semana 1 no cambia nada y queda guardada', async (
   await expect(page.getByText(/proteína repartida/)).toBeVisible()
   await expect(page.getByText('Sin señales de cansancio')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Aplicar desde mañana' })).toHaveCount(0)
+})
+
+test('cambiar tu objetivo siguiendo una dieta propone ajustarla; nada cambia hasta aplicarlo y se deshace', async ({
+  page,
+}) => {
+  test.slow() // un recorrido largo: con todos a la vez pasa de 30 s
+  await abrirBase(page)
+  await page.goto('/comida')
+  await page.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  const datos = page.getByRole('dialog', { name: 'Tus datos' })
+  await datos.getByText('Hombre').click()
+  await datos.getByLabel('Edad').fill('30')
+  await datos.getByLabel('Altura (cm)').fill('180')
+  await datos.getByLabel('Peso (kg)').fill('80')
+  await datos.getByLabel('Pasos al día').fill('9.000')
+  await datos.getByRole('button', { name: 'Calcular mi objetivo' }).click()
+  await page.goto('/comida?vista=dieta')
+  await page.getByRole('button', { name: /^Probar una de ejemplo/ }).click()
+  await page
+    .getByRole('dialog', { name: 'Empezar la dieta' })
+    .getByRole('button', { name: 'Empezar hoy' })
+    .click()
+  await page.goto('/comida')
+  const meta = page
+    .getByRole('region', { name: 'Lo que llevas hoy' })
+    .getByText(/^Llevas [\d.]+ de [\d.]+ kcal\.$/)
+  const deLaDieta = await meta.innerText()
+
+  // «Ahora no»: la dieta sigue igual
+  await page.goto('/comida/objetivo?ver=cambiar')
+  let hoja = page.getByRole('region', { name: 'Editar tu objetivo' })
+  await hoja.getByRole('group', { name: '¿Qué quieres?' }).getByText('Volumen').click()
+  await hoja.getByRole('button', { name: 'Guardar y recalcular' }).click()
+  let propuesta = page.getByRole('dialog', { name: '¿Ajustar tu dieta?' })
+  await expect(propuesta).toContainText('Sigues una dieta')
+  await expect(propuesta).toContainText('tu objetivo')
+  await sinAnimaciones(page)
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+  await page.screenshot({ path: 'tests/e2e/capturas/ajustar-dieta.png' })
+  await propuesta.getByRole('button', { name: 'Ahora no' }).click()
+  await expect(propuesta).toHaveCount(0)
+  await page.goto('/comida')
+  await expect(meta).toHaveText(deLaDieta)
+
+  // «Ajustar mi dieta»: tu día va con las kcal nuevas; «Deshacer» la deja como estaba
+  await page.goto('/comida/objetivo?ver=cambiar')
+  hoja = page.getByRole('region', { name: 'Editar tu objetivo' })
+  await hoja.getByRole('group', { name: '¿Qué quieres?' }).getByText('Definir').click()
+  await hoja.getByRole('button', { name: 'Guardar y recalcular' }).click()
+  propuesta = page.getByRole('dialog', { name: '¿Ajustar tu dieta?' })
+  await propuesta.getByRole('button', { name: 'Ajustar mi dieta' }).click()
+  await expect(page.getByRole('status')).toContainText('Tu dieta va con tus kcal nuevas')
+  await page.getByRole('status').getByRole('button', { name: 'Deshacer' }).click()
+  await page.goto('/comida')
+  await expect(meta).toHaveText(deLaDieta)
+  await page.goto('/comida/objetivo?ver=cambiar')
+  hoja = page.getByRole('region', { name: 'Editar tu objetivo' })
+  await hoja.getByRole('group', { name: 'Velocidad: de tu peso por semana' }).getByText('−1 %').click()
+  await hoja.getByRole('button', { name: 'Guardar y recalcular' }).click()
+  await page
+    .getByRole('dialog', { name: '¿Ajustar tu dieta?' })
+    .getByRole('button', { name: 'Ajustar mi dieta' })
+    .click()
+  await page.goto('/comida')
+  await expect(meta).not.toHaveText(deLaDieta)
 })
 
 test('el escáner: el código en Open Food Facts y la misma hoja de la ración', async ({ page }) => {
@@ -180,8 +250,13 @@ test('accesibilidad: Dieta, la receta, la compra, la cocina y la consulta', asyn
   await expect(page.getByRole('heading', { name: /^Carne/ })).toBeVisible()
   await revisar('La compra')
   await page.goto('/comida/cocina')
-  await expect(page.getByRole('heading', { name: 'Repartir una olla' })).toBeVisible()
-  await revisar('Cocina')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await revisar('Cocinar')
+  for (const h of ['crudo', 'repartir', 'plato', 'pesar']) {
+    await page.goto(`/comida/cocina?h=${h}`)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    await revisar(`Cocinar · ${h}`)
+  }
   await page.goto('/comida/consulta')
   await expect(page.getByRole('heading', { name: 'La cinta' })).toBeVisible()
   await revisar('Consulta')

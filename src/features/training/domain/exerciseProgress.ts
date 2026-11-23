@@ -9,19 +9,42 @@ export type VezEjercicio = {
   puesto?: number
 }
 
-export type PuntoProgreso = { fecha: string; maximo: number; volumen: number; puesto: number | null }
+export type PuntoProgreso = {
+  fecha: string
+  maximo: number
+  volumen: number
+  puesto: number | null
+  /** La serie que dio el máximo de ese día (kilos y repeticiones). */
+  mejor: { kg: number | null; reps: number }
+}
 
-/** Un punto por cada vez, en su orden. `rir` es el del plan: el que se da por hecho si no se apuntó. */
+/**
+ * Un punto por día, en su orden (si lo hiciste dos veces el mismo día, cuenta como uno: su mejor serie y todo su
+ * tonelaje). `rir` es el del plan: el que se da por hecho si no se apuntó.
+ */
 export function progresoDe(veces: VezEjercicio[], rir: number): PuntoProgreso[] {
-  return veces
-    .filter((v) => v.series.some((s) => s.reps > 0))
-    .map((v) => ({
+  const puntos: PuntoProgreso[] = []
+  for (const v of veces) {
+    const hechas = v.series.filter((s) => s.reps > 0)
+    if (!hechas.length) continue
+    const mejor = hechas.reduce((m, s) => (e1rm(s.kg, s.reps, rir) > e1rm(m.kg, m.reps, rir) ? s : m))
+    const punto: PuntoProgreso = {
       fecha: v.fecha,
-      maximo: Math.round(Math.max(...v.series.map((s) => e1rm(s.kg, s.reps, rir))) * 10) / 10,
+      maximo: Math.round(e1rm(mejor.kg, mejor.reps, rir) * 10) / 10,
       // El tonelaje: kilos × repeticiones de todas las series, con sus bajadas o mini-series
       volumen: v.series.flatMap((s) => [s, ...(s.extra ?? [])]).reduce((t, s) => t + (s.kg ?? 0) * s.reps, 0),
       puesto: v.puesto ?? null,
-    }))
+      mejor: { kg: mejor.kg, reps: mejor.reps },
+    }
+    const mismoDia = puntos.at(-1)
+    if (mismoDia?.fecha !== v.fecha) puntos.push(punto)
+    else
+      puntos[puntos.length - 1] = {
+        ...(punto.maximo > mismoDia.maximo ? punto : mismoDia),
+        volumen: mismoDia.volumen + punto.volumen,
+      }
+  }
+  return puntos
 }
 
 /** Cuánto cambió el último valor desde el primero, en tanto por uno; null si hay menos de dos o el primero es 0. */

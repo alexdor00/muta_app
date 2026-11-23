@@ -1,11 +1,10 @@
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import { formatDayDate, formatDecimal, formatTons, localDate } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { WorkoutSummary } from '../../components/WorkoutSummary.tsx'
-import { descansosPorSemana, entrenos, semanaDe, sesiones } from '../../state/plan.ts'
+import { descansosPorSemana, entrenos, recordsDelEntreno, semanaDe, sesiones } from '../../state/plan.ts'
 import { guardarSesion, resumenDe, segundosSesion, sesionEnCurso } from '../../state/sesionEnCurso.ts'
 import { diasDeRacha } from '../../state/routines.ts'
 import { reabrirEntreno } from '../../use-cases/training.ts'
@@ -39,17 +38,23 @@ function cambioDe(hoy: Serie, antes: Serie | null) {
  * sesión (y deshace su guardado).
  */
 export function ResumenScreen(props: { sessionId: string }) {
-  const { route } = useLocation()
+  const { route, path } = useLocation()
   const [aviso, setAviso] = useState<string | null>(null)
-  usePlan()
+  const plan = usePlan()
   const en = sesionEnCurso.value
-  if (!en || en.sigla.toLowerCase() !== props.sessionId.toLowerCase() || en.terminada === null) {
-    return (
-      <Pending code="C24" title="No hay ninguna sesión terminada">
-        <a href={paths.training}>Volver a Tu plan</a>
-      </Pending>
-    )
-  }
+  const sinResumen = !en || en.sigla.toLowerCase() !== props.sessionId.toLowerCase() || en.terminada === null
+  // El resumen vive solo mientras la app sigue abierta: si vuelves más tarde (o recargas), te lleva al día de ese
+  // entreno en Progreso; si no hay ninguno, a Tu plan
+  const ultimo = entrenos.value
+    .filter((x) => x.sigla.toLowerCase() === props.sessionId.toLowerCase())
+    .sort((a, b) => b.inicio - a.inicio)[0]
+  // Solo mientras sigues en el resumen: al tocar «Hecho» ya vas a Tu plan (la pantalla sigue un momento mientras carga)
+  const enResumen = path.endsWith('/resumen')
+  useEffect(() => {
+    if (sinResumen && enResumen && plan.status !== 'loading')
+      route(ultimo ? paths.progressDay(ultimo.fecha) : paths.training, true)
+  }, [sinResumen, enResumen, plan.status, ultimo, route])
+  if (sinResumen || !en || en.terminada === null) return null
   const sesion = en
   const r = resumenDe(en)
   const hoy = localDate(new Date(en.terminada))
@@ -64,6 +69,8 @@ export function ResumenScreen(props: { sessionId: string }) {
   }))
   const racha = diasDeRacha([...entrenos.value.map((x) => x.fecha), hoy], descansosPorSemana.value, hoy)
   const comparados = r.ejercicios.filter((e) => e.cambio !== null)
+  // Los récords de hoy: tu mejor marca de siempre, frente a todos los entrenos de antes (el de hoy ya está guardado)
+  const records = ultimo && ultimo.fecha === hoy ? recordsDelEntreno(ultimo, entrenos.value) : []
 
   return (
     <>
@@ -75,14 +82,19 @@ export function ResumenScreen(props: { sessionId: string }) {
         semana={semana}
         cifras={[
           { valor: String(r.superadas), unidad: `de ${r.comparables}`, nombre: 'Series superadas' },
-          { valor: String(r.records.length), unidad: '', nombre: 'Récords' },
+          { valor: String(records.length), unidad: '', nombre: 'Récords' },
           { valor: formatTons(r.volumen / 1000).replace(' t', ''), unidad: 't', nombre: 'Volumen' },
           { valor: String(minutos), unidad: 'min', nombre: 'Duración' },
         ]}
         suben={`${r.suben} de ${comparados.length} suben`}
+        records={records.map((x) => ({ nombre: x.nombre, marca: serieTexto(x.serie) }))}
         ejercicios={r.ejercicios.map((e) => ({
           nombre: e.nombre,
-          series: e.series.map((s) => ({ texto: serieTexto(s), mejor: s.mejor })),
+          series: e.series.map((s) => ({
+            texto: serieTexto(s),
+            antes: s.antes ? serieTexto(s.antes) : null,
+            frente: s.frente,
+          })),
           cambio: cambioDe(e.mejor, e.mejorAntes),
         }))}
         onHecho={() => {

@@ -1,21 +1,52 @@
 // Tus menús: de 1 a 7 (A, B, C…), cada uno con un plato por comida, y tu semana (qué menú va cada día, de lunes a
 // domingo: seguidos o elegidos por ti). Lo que comes un día sale del menú de ese día; cuándo cocinas cada plato (un día,
 // a una hora, para varias comidas), el día de la compra y tus avisos. De aquí salen lo de hoy, la compra y el .ics.
-import { addDays } from '../../../shared/lib/format.ts'
-import { COMIDAS, sumar, type ComidaId, type Macros } from './food.ts'
-import type { Plato } from './recipes.ts'
+import { addDays, daysBetween } from '../../../shared/lib/format.ts'
+import { COMIDAS, type ComidaId, type Macros } from './food.ts'
+import { leerPiloto, type Piloto } from './autopilot.ts'
+import type { ComoComes } from './fit.ts'
 
 /** Un menú: su nombre y el plato de cada comida (las que no tiene, sin plato). */
 export type MenuPlan = {
   id: string
   nombre: string
   platos: Partial<Record<ComidaId, string>>
+  descanso?: Partial<Record<ComidaId, string>> // los días de descanso, otro plato; sin él, el mismo (2026-11-19)
   /** Las comidas que van con los gramos de la receta (las demás, ajustadas a tu objetivo). */
   fijos?: ComidaId[]
+  /** Lo que va además del plato en cada comida: una fruta, un yogur… (usuario, 2026-11-17). */
+  extras?: Partial<Record<ComidaId, ExtraMenu[]>>
 }
 
-/** Un plato que cocinas un día, a una hora, para varias comidas (fecha|comida). */
-export type Cocinado = { id: string; plato: string; fecha: string; hora: string; para: string[] }
+/**
+ * Lo que va además del plato: un alimento con sus gramos (los macros, por 100 g, para no depender de la base) u otro plato
+ * del recetario (`platoId`: una ración, con los macros de esa ración).
+ */
+export type ExtraMenu = Macros & {
+  alimentoId: string | null
+  platoId?: string
+  nombre: string
+  categoria: string
+  gramos: number
+  /** Solo los días de entreno (el preentreno de una dieta) o solo los de descanso. */
+  solo?: 'entreno' | 'descanso'
+}
+
+/**
+ * Tus menús en un ciclo (usuario, 2026-11-17: «que no se descuadre cada semana»): el menú de cada día del ciclo (A A B B C
+ * C), desde qué día cuenta y, si lo dice tu dieta, los días del ciclo en que se cocina. Manda sobre `semana`.
+ */
+export type CicloMenus = { menus: string[]; inicio: string; cocinar?: number[] }
+
+/** Un plato que cocinas un día, a una hora, para varias comidas (fecha|comida); `hecho`, si ya lo cocinaste. */
+export type Cocinado = {
+  id: string
+  plato: string
+  fecha: string
+  hora: string
+  para: string[]
+  hecho?: boolean
+}
 
 /** Un cambio de un menú (lo que propone el nutricionista), para deshacerlo. */
 export type CambioMenu = { menu: string; comida: ComidaId; plato: string | null }
@@ -35,18 +66,39 @@ export type MenuSemanal = {
   id: 'menu'
   target: 'nutricion'
   menus: MenuPlan[]
-  /** El menú de cada día de la semana (0 = lunes). */
-  semana: string[]
-  /** Seguidos: A B C A B C A; elegidos: los pones tú. */
-  reparto: 'seguidos' | 'elegidos'
+  /** Lo de «Hoy toca» que quitaste con la «×» (cocinar, compra), solo ese día (usuario, 2026-11-19). */
+  quitadoHoy?: { fecha: string; ids: string[] }
+  semana: string[] // el menú de cada día de la semana (0 = lunes)
+  reparto: 'seguidos' | 'elegidos' // seguidos: A B C A B C A; elegidos: los pones tú
+  /** Con «seguidos», cuántos días seguidos va cada menú (A A B B C C A con 2; usuario, 2026-11-17). Sin decir, 1. */
+  diasPorMenu?: number
+  /** Tus menús en un ciclo que no mira el día de la semana (ver `CicloMenus`); sin él, `semana`. */
+  ciclo?: CicloMenus
+  /** Cómo sueles comer: cómo se reparte tu objetivo entre las comidas (sin elegir, repartido; usuario, 2026-11-17). */
+  comoComes?: ComoComes
   cocinados: Cocinado[]
   compraEl: { fecha: string; hora: string } | null
   avisos: Avisos
-  /** Propuestas a las que dijiste «Ahora no». */
-  descartadas: string[]
+  descartadas: string[] // las propuestas a las que dijiste «Ahora no»
   hechos: Hecho[]
   /** Las comidas de un día en que quitaste el plato del menú (solo ese día): `fecha|comida`. */
   sinPlato: string[]
+  /** El plato cambiado en una comida de un día, solo ese día (`fecha|comida` → plato; usuario, 2026-11-17). */
+  cambiados: Record<string, string>
+  /** Tu semana resuelta: el día de la compra y cómo cocinas (null: sin piloto). Ver domain/autopilot.ts. */
+  piloto: Piloto | null
+  /** Plan (usuario, 2026-11-18; ver domain/menuPlan.ts): el menú de un día concreto (fecha → menú) y tus días libres. */
+  porDia?: Record<string, string>
+  libres?: string[]
+  /** El nombre y la hora de cada comida, si no son los de serie. */
+  comidas?: Partial<Record<ComidaId, { nombre?: string; hora?: string }>>
+  /** «Según el entreno»: los menús de tus días de entreno y de descanso (se alternan si hay varios). */
+  porTipo?: { entreno: string[]; descanso: string[] }
+  /** Para cuántas personas cocinas (la olla y la compra; lo que comes tú no cambia) y lo que no quieres comer. */
+  personas?: number
+  noQuiero?: string[]
+  /** Las comidas iguales en todos tus menús (el batido): se cambian una vez y cambian en todos. */
+  comunes?: ComidaId[]
 }
 
 /** Lo que comes en una comida de un día: el plato de su menú. */
@@ -68,6 +120,8 @@ export function menuVacio(): MenuSemanal {
     descartadas: [],
     hechos: [],
     sinPlato: [],
+    cambiados: {},
+    piloto: null,
   }
 }
 
@@ -88,15 +142,55 @@ export function conSinPlato(
   return { ...m, sinPlato: quitar ? [...resto, k] : resto }
 }
 
+/**
+ * Cambia el plato de una comida de un día, solo ese día (null: vuelve al del menú). Se olvidan los días de hace más de
+ * una semana.
+ */
+export function conCambioDelDia(
+  m: MenuSemanal,
+  fecha: string,
+  comida: ComidaId,
+  plato: string | null,
+  hoyEs: string,
+): MenuSemanal {
+  const k = clave(fecha, comida)
+  const desde = addDays(hoyEs, -7)
+  const resto = Object.fromEntries(
+    Object.entries(m.cambiados).filter(([x]) => x !== k && x.split('|')[0] >= desde),
+  )
+  return { ...m, cambiados: plato ? { ...resto, [k]: plato } : resto }
+}
+
 /** Lo guardado con la forma de antes (huecos por día) no se puede leer: se empieza de nuevo. */
 export function leerMenu(x: unknown): MenuSemanal {
   const m = x as Partial<MenuSemanal> | null
   if (!m || !Array.isArray(m.menus) || !m.menus.length || !Array.isArray(m.semana)) return menuVacio()
   // Lo guardado antes de `sinPlato` no lo trae
-  return { ...menuVacio(), ...m, sinPlato: Array.isArray(m.sinPlato) ? m.sinPlato : [] } as MenuSemanal
+  return {
+    ...menuVacio(),
+    ...m,
+    sinPlato: Array.isArray(m.sinPlato) ? m.sinPlato : [],
+    cambiados: m.cambiados && typeof m.cambiados === 'object' ? m.cambiados : {},
+    piloto: leerPiloto(m.piloto),
+    ciclo: leerCiclo(m.ciclo),
+    porDia: m.porDia && typeof m.porDia === 'object' ? m.porDia : undefined,
+    libres: Array.isArray(m.libres) ? m.libres.filter((f) => typeof f === 'string') : undefined,
+  } as MenuSemanal
 }
 
 export const clave = (fecha: string, comida: ComidaId) => `${fecha}|${comida}`
+
+/** El ciclo guardado, si se puede leer (si no, sin ciclo: va por semanas). */
+function leerCiclo(x: unknown): CicloMenus | undefined {
+  const c = x as Partial<CicloMenus> | null | undefined
+  if (!c || !Array.isArray(c.menus) || !c.menus.length || typeof c.inicio !== 'string') return undefined
+  const cocinar = Array.isArray(c.cocinar) ? c.cocinar.filter((n) => typeof n === 'number') : undefined
+  return {
+    menus: c.menus.filter((s) => typeof s === 'string'),
+    inicio: c.inicio,
+    ...(cocinar?.length ? { cocinar } : {}),
+  }
+}
 
 /** El día de la semana de una fecha (0 = lunes). */
 export function diaSemana(fecha: string): number {
@@ -104,21 +198,51 @@ export function diaSemana(fecha: string): number {
 }
 
 export const NOMBRE_DIA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+export const DIA_LARGO = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
+/** Una letra por día, de lunes a domingo (la X, el miércoles, para no repetir la M). */
+export const LETRA_DIA = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 
-const seguidos = (ids: readonly string[]) => Array.from({ length: 7 }, (_, i) => ids[i % ids.length])
+/** La semana con los menús seguidos, cada uno `n` días (A A B B C C A con n = 2). */
+const seguidos = (ids: readonly string[], n = 1) =>
+  Array.from({ length: 7 }, (_, i) => ids[Math.floor(i / Math.max(1, n)) % ids.length])
 
 /** El menú de un día. */
 export function menuDelDia(m: MenuSemanal, fecha: string): MenuPlan | null {
-  return m.menus.find((x) => x.id === m.semana[diaSemana(fecha)]) ?? m.menus[0] ?? null
+  const id =
+    m.porDia?.[fecha] ??
+    (m.ciclo?.menus.length ? m.ciclo.menus[diaDelCicloDe(m.ciclo, fecha) - 1] : m.semana[diaSemana(fecha)])
+  return m.menus.find((x) => x.id === id) ?? m.menus[0] ?? null
 }
+
+/** El día del ciclo de tus menús de una fecha (1 = el día que empieza). */
+export function diaDelCicloDe(c: CicloMenus, fecha: string): number {
+  const n = Math.max(1, c.menus.length)
+  return (((daysBetween(c.inicio, fecha) % n) + n) % n) + 1
+}
+
+/** ¿Se cocina este día, según tu dieta? (los días del ciclo que diga `cocinar`). */
+export const seCocinaEl = (c: CicloMenus, fecha: string) => !!c.cocinar?.includes(diaDelCicloDe(c, fecha))
 
 /** Deja estos menús y rehace la semana (seguidos) o cambia los días de los que ya no están. */
 function conMenus(m: MenuSemanal, menus: MenuPlan[]): MenuSemanal {
   const ids = menus.map((x) => x.id)
   const semana =
-    m.reparto === 'seguidos' ? seguidos(ids) : m.semana.map((d) => (ids.includes(d) ? d : ids[0]))
-  return { ...m, menus, semana }
+    m.reparto === 'seguidos'
+      ? seguidos(ids, m.diasPorMenu)
+      : m.semana.map((d) => (ids.includes(d) ? d : ids[0]))
+  // En ciclo: con días por menú, se rehace con los menús de ahora (desde el mismo día); el de tu dieta, sin los que ya
+  // no están
+  const ciclo = m.ciclo
+    ? m.diasPorMenu
+      ? { ...m.ciclo, menus: enBloques(ids, m.diasPorMenu) }
+      : { ...m.ciclo, menus: m.ciclo.menus.map((d) => (ids.includes(d) ? d : ids[0])) }
+    : undefined
+  return { ...m, menus, semana, ciclo }
 }
+
+/** Cada menú, `n` días seguidos, una vuelta: A A B B C C con n = 2. */
+const enBloques = (ids: readonly string[], n: number) =>
+  ids.flatMap((id) => Array(Math.max(1, n)).fill(id) as string[])
 
 /** Cambia cuántos menús tienes (1 a 7): los nuevos, vacíos; quitar quita los últimos. */
 export function conCuantos(m: MenuSemanal, n: number): MenuSemanal {
@@ -133,12 +257,52 @@ export function conCuantos(m: MenuSemanal, n: number): MenuSemanal {
 }
 
 export function conReparto(m: MenuSemanal, reparto: MenuSemanal['reparto']): MenuSemanal {
-  return { ...m, reparto, semana: reparto === 'seguidos' ? seguidos(m.menus.map((x) => x.id)) : m.semana }
+  return {
+    ...m,
+    reparto,
+    semana:
+      reparto === 'seguidos'
+        ? seguidos(
+            m.menus.map((x) => x.id),
+            m.diasPorMenu,
+          )
+        : m.semana,
+  }
+}
+
+/**
+ * Cada menú, `n` días seguidos (1 a 7), en un ciclo que empieza `desde` (hoy): A A B B C C y vuelta a empezar, sin mirar
+ * el día de la semana (usuario, 2026-11-17).
+ */
+export function conDiasPorMenu(m: MenuSemanal, n: number, desde: string): MenuSemanal {
+  const dias = Math.min(7, Math.max(1, Math.round(n)))
+  const ids = m.menus.map((x) => x.id)
+  return {
+    ...m,
+    diasPorMenu: dias,
+    reparto: 'seguidos',
+    semana: seguidos(ids, dias),
+    ciclo: { menus: enBloques(ids, dias), inicio: desde },
+  }
 }
 
 /** Pone un menú en un día de la semana (y el reparto pasa a «elegidos»). */
-export function conDia(m: MenuSemanal, dia: number, menu: string): MenuSemanal {
-  return { ...m, reparto: 'elegidos', semana: m.semana.map((d, i) => (i === dia ? menu : d)) }
+export function conDia(m: MenuSemanal, dia: number, menu: string, hoy?: string): MenuSemanal {
+  // Elegir el menú de un día de la semana deja el ciclo: la semana de ahora pasa a ser la tuya
+  const base = m.ciclo && hoy ? menusDeLaSemana(m, hoy) : m.semana
+  return {
+    ...m,
+    reparto: 'elegidos',
+    ciclo: undefined,
+    diasPorMenu: undefined,
+    semana: base.map((d, i) => (i === dia ? menu : d)),
+  }
+}
+
+/** El menú de cada día de esta semana (de lunes a domingo), con el ciclo si lo hay. */
+export function menusDeLaSemana(m: MenuSemanal, hoy: string): string[] {
+  const lunes = addDays(hoy, -diaSemana(hoy))
+  return Array.from({ length: 7 }, (_, i) => menuDelDia(m, addDays(lunes, i))?.id ?? m.semana[i])
 }
 
 /** Pone o quita el plato de una comida de un menú. */
@@ -146,7 +310,7 @@ export function conPlato(m: MenuSemanal, menu: string, comida: ComidaId, plato: 
   return {
     ...m,
     menus: m.menus.map((x) => {
-      if (x.id !== menu) return x
+      if (x.id !== menu && !m.comunes?.includes(comida)) return x
       const platos = { ...x.platos }
       if (plato) platos[comida] = plato
       else delete platos[comida]
@@ -177,7 +341,10 @@ export function duplicado(m: MenuSemanal, menu: string): MenuSemanal | null {
   const origen = m.menus.find((x) => x.id === menu)
   const letra = [...LETRAS].find((l) => !m.menus.some((x) => x.id === l))
   if (!origen || !letra) return null
-  return conMenus(m, [...m.menus, { id: letra, nombre: `Menú ${letra}`, platos: { ...origen.platos } }])
+  return conMenus(m, [
+    ...m.menus,
+    { id: letra, nombre: `Menú ${letra}`, platos: { ...origen.platos }, extras: { ...origen.extras } },
+  ])
 }
 
 /** Quita un menú (siempre queda uno). */
@@ -189,12 +356,18 @@ export function sinMenu(m: MenuSemanal, menu: string): MenuSemanal {
   )
 }
 
+/** ¿Día de descanso? Lo pone el estado al cargar (`conTiposDeDia`). Y los platos de un menú ese tipo de día. */
+let esDescanso: (fecha: string) => boolean = () => false
+export const conTiposDeDia = (f: (fecha: string) => boolean) => void (esDescanso = f)
+export const platosDe = (x: MenuPlan, descanso: boolean) =>
+  descanso && x.descanso ? { ...x.platos, ...x.descanso } : x.platos
+
 /** Lo que comes en una comida de un día (null si su menú no tiene plato ahí). */
 export function huecoDe(m: MenuSemanal, fecha: string, comida: ComidaId): Hueco | null {
   const menu = menuDelDia(m, fecha)
-  const plato = menu?.platos[comida]
-  if (!menu || !plato) return null
   const k = clave(fecha, comida)
+  const plato = m.cambiados[k] ?? (menu && platosDe(menu, esDescanso(fecha))[comida])
+  if (!menu || !plato || m.libres?.includes(fecha)) return null
   if (m.sinPlato.includes(k)) return null
   const cocinado = m.cocinados.find((c) => c.plato === plato && c.para.includes(k))
   return { fecha, comida, menu: menu.id, plato, cocinado: cocinado?.id ?? null }
@@ -223,175 +396,4 @@ export function conCocinado(m: MenuSemanal, c: Cocinado): MenuSemanal {
 
 export function sinCocinado(m: MenuSemanal, id: string): MenuSemanal {
   return { ...m, cocinados: m.cocinados.filter((c) => c.id !== id) }
-}
-
-/** Lo que suma un día con tu menú (`totalDe`: lo de cada comida). */
-export function totalDelDia(m: MenuSemanal, fecha: string, totalDe: (h: Hueco) => Macros | null): Macros {
-  return sumar(
-    huecosDelDia(m, fecha).flatMap((h) => {
-      const t = totalDe(h)
-      return t ? [t] : []
-    }),
-  )
-}
-
-/** Gramos de cada ingrediente de un plato en una comida de un día (los ajustados). */
-export type GramosDe = (h: Hueco, p: Plato) => (number | null)[]
-
-/** Lo que cocinas de una vez: los gramos de cada ingrediente sumando las comidas (lo que no cuenta, sin cantidad). */
-export function paraCocinar(m: MenuSemanal, c: Cocinado, plato: Plato, gramosDe: GramosDe) {
-  const huecos = c.para.flatMap((k) => {
-    const [fecha, comida] = k.split('|') as [string, ComidaId]
-    const h = huecoDe(m, fecha, comida)
-    return h && h.plato === plato.id ? [h] : []
-  })
-  const gramos = huecos.map((h) => gramosDe(h, plato))
-  return plato.ingredientes.map((i, k) => ({
-    nombre: i.nombre,
-    alimentoId: i.alimentoId,
-    texto: i.texto,
-    macro: i.macro,
-    gramos:
-      i.gramos === null || !i.cuenta
-        ? null
-        : Math.round(gramos.reduce((s, g) => s + (g[k] ?? i.gramos ?? 0), 0)),
-  }))
-}
-
-/** Algo que toca hoy, con su hora. */
-export type Tarea =
-  | { id: string; tipo: 'compra'; hora: string }
-  | { id: string; tipo: 'cocinar'; hora: string; cocinado: Cocinado; raciones: number }
-
-/** Lo de hoy con hora: la compra y lo que cocinas, por hora. */
-export function loDeHoy(m: MenuSemanal, fecha: string): Tarea[] {
-  const tareas: Tarea[] = []
-  if (m.compraEl?.fecha === fecha) tareas.push({ id: 'compra', tipo: 'compra', hora: m.compraEl.hora })
-  for (const c of m.cocinados)
-    if (c.fecha === fecha)
-      tareas.push({
-        id: `cocinar-${c.id}`,
-        tipo: 'cocinar',
-        hora: c.hora,
-        cocinado: c,
-        raciones: c.para.length,
-      })
-  return tareas.sort((x, y) => x.hora.localeCompare(y.hora))
-}
-
-/** Los platos de tu menú en unos días, con sus ingredientes en gramos (lo que pide la lista de la compra). */
-export function recetasDelMenu(
-  m: MenuSemanal,
-  fechas: readonly string[],
-  platoDe: (id: string) => Plato | null,
-  gramosDe: GramosDe,
-): {
-  id: string
-  nombre: string
-  deMenu: string
-  lista: { alimentoId: string | null; nombre: string; categoria: string; g: number | null }[]
-}[] {
-  const nombreDe = (id: string) => m.menus.find((x) => x.id === id)?.nombre ?? `Menú ${id}`
-  return fechas.flatMap((f) =>
-    huecosDelDia(m, f).flatMap((h) => {
-      const p = platoDe(h.plato)
-      if (!p) return []
-      const gramos = gramosDe(h, p)
-      return [
-        {
-          id: p.id,
-          nombre: p.nombre,
-          deMenu: nombreDe(h.menu),
-          lista: p.ingredientes.map((i, k) => ({
-            alimentoId: i.alimentoId,
-            nombre: i.nombre,
-            categoria: i.categoria,
-            g: i.cuenta && i.gramos !== null ? Math.round((gramos[k] ?? i.gramos) / p.raciones) : null,
-          })),
-        },
-      ]
-    }),
-  )
-}
-
-// --- Calendario (.ics): lo único que avisa a una hora con la app cerrada (la app no tiene servidor) ---
-
-const HORA_COMIDA: Record<ComidaId, string> = {
-  desayuno: '08:00',
-  comida: '14:00',
-  merienda: '17:30',
-  cena: '21:00',
-}
-
-const ics = (s: string) => s.replace(/[\\,;]/g, (c) => `\\${c}`).replace(/\n/g, '\\n')
-const fechaIcs = (fecha: string, hora: string) => `${fecha.replace(/-/g, '')}T${hora.replace(':', '')}00`
-
-/** Un archivo de calendario con tus horas de estos días (y su alarma antes). Las horas de las comidas son sugeridas. */
-export function calendarioDelMenu(
-  m: MenuSemanal,
-  fechas: readonly string[],
-  nombreDe: (platoId: string) => string,
-  sello: string,
-): string {
-  const eventos: { uid: string; inicio: string; titulo: string; detalle: string }[] = []
-  const a = m.avisos
-  if (a.compra && m.compraEl && fechas.includes(m.compraEl.fecha))
-    eventos.push({
-      uid: `compra-${m.compraEl.fecha}`,
-      inicio: fechaIcs(m.compraEl.fecha, m.compraEl.hora),
-      titulo: 'Hacer la compra',
-      detalle: 'La lista está en MUTA · Nutrición · Tu plan · La compra',
-    })
-  if (a.cocinar)
-    for (const c of m.cocinados)
-      if (fechas.includes(c.fecha))
-        eventos.push({
-          uid: `cocinar-${c.id}`,
-          inicio: fechaIcs(c.fecha, c.hora),
-          titulo: `Cocinar: ${nombreDe(c.plato)}`,
-          detalle: `${c.para.length} ${c.para.length === 1 ? 'ración' : 'raciones'}. Los gramos están en MUTA.`,
-        })
-  if (a.comidas)
-    for (const f of fechas)
-      for (const h of huecosDelDia(m, f))
-        eventos.push({
-          uid: `comida-${h.fecha}-${h.comida}`,
-          inicio: fechaIcs(h.fecha, HORA_COMIDA[h.comida]),
-          titulo: `${COMIDAS.find((c) => c.id === h.comida)?.nombre ?? ''}: ${nombreDe(h.plato)}`,
-          detalle: 'Apúntalo en MUTA al comerlo.',
-        })
-  const lineas = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//MUTA//Comida//ES',
-    ...eventos.flatMap((e) => [
-      'BEGIN:VEVENT',
-      `UID:${e.uid}@muta`,
-      `DTSTAMP:${sello}`,
-      `DTSTART:${e.inicio}`,
-      'DURATION:PT30M',
-      `SUMMARY:${ics(e.titulo)}`,
-      `DESCRIPTION:${ics(e.detalle)}`,
-      'BEGIN:VALARM',
-      'ACTION:DISPLAY',
-      `DESCRIPTION:${ics(e.titulo)}`,
-      `TRIGGER:-PT${a.antesMin}M`,
-      'END:VALARM',
-      'END:VEVENT',
-    ]),
-    'END:VCALENDAR',
-  ]
-  return lineas.join('\r\n') + '\r\n'
-}
-
-/**
- * Lo cocinado aguanta 3–4 días en la nevera (FoodSafety.gov, USDA, revisado en 2023; decisión 2026-11-09): se avisa a
- * partir del cuarto día. Arroz, pasta y legumbres, mejor antes (unos 2 días, según fuentes de consumo españolas).
- */
-export const DIAS_NEVERA = 3
-
-/** De las comidas para las que cocinas (`fecha|comida`), las que caen más de 3 días después de cocinar: mejor congelarlas. */
-export function paraCongelar(fecha: string, para: readonly string[]): string[] {
-  const dia = (iso: string) => new Date(`${iso}T12:00:00`).getTime() / 86_400_000
-  return para.filter((k) => dia(k.split('|')[0]) - dia(fecha) > DIAS_NEVERA)
 }

@@ -1,35 +1,42 @@
-/* Interruptor: pista gris con borde (se ve también sobre una tarjeta gris), negra si está encendido, con el círculo blanco */
+/* Interruptor: pista gris, negra si está encendido, con el círculo blanco. Pequeño (40 × 24, usuario 2026-11-12: «muy
+   grande»); la zona de toque llega a 44 por fuera. */
 .switch {
   position: relative;
   flex: none;
-  width: calc(var(--tap-min) + var(--space-1));
-  height: calc(var(--tap-min) * 0.6);
+  width: calc(var(--control-sm) + var(--space-1));
+  height: var(--space-6);
   padding: 0;
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--surface-3);
-  box-shadow: inset 0 0 0 var(--hairline) var(--label-2);
   cursor: pointer;
   transition: background var(--duration-tap);
+}
+
+.switch::before {
+  position: absolute;
+  inset: calc((var(--tap-min) - var(--space-6)) / -2) calc(var(--space-1) * -1);
+  content: '';
 }
 
 .switch::after {
   position: absolute;
   top: calc(var(--space-1) / 2);
   left: calc(var(--space-1) / 2);
-  width: calc(var(--tap-min) * 0.6 - var(--space-1));
-  height: calc(var(--tap-min) * 0.6 - var(--space-1));
+  width: calc(var(--space-6) - var(--space-1));
+  height: calc(var(--space-6) - var(--space-1));
   border-radius: 50%;
-  background: var(--bg);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
   content: '';
   transition: transform var(--duration-tap);
 }
 
 .switch[aria-checked='true'] {
   background: var(--label);
-  box-shadow: none;
 }
 
 .switch[aria-checked='true']::after {
-  transform: translateX(calc(var(--tap-min) * 0.4 + var(--space-1)));
+  background: var(--on-accent);
+  transform: translateX(calc(var(--control-sm) + var(--space-1) - var(--space-6)));
 }

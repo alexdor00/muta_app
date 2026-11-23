@@ -9,8 +9,14 @@ export function useSheet(name: string) {
   const open = query.hoja === name
 
   function show() {
+    showWith({})
+  }
+
+  /** Abre la hoja con más parámetros (?hoja=medida&m=brazo): la hoja los lee de `query`. */
+  function showWith(datos: Record<string, string>) {
     const params = new URLSearchParams(query)
     params.set('hoja', name)
+    for (const [k, v] of Object.entries(datos)) params.set(k, v)
     route(`${path}?${params}`)
   }
 
@@ -29,5 +35,5 @@ export function useSheet(name: string) {
     else route(path, true)
   }
 
-  return { open, show, showInstead, close }
+  return { open, show, showWith, showInstead, close }
 }

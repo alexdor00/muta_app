@@ -49,6 +49,7 @@
 
 .tagline {
   margin-top: var(--space-2);
+  text-align: center; /* centrado como «MUTA» (usuario, 2026-11-17) */
   font: var(--text-title-2);
   font-weight: var(--weight-regular);
 }

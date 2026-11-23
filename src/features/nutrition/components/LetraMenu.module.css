@@ -1,0 +1,64 @@
+/* La letra de un menú con su color: siempre letra oscura sobre el tono suave (igual en claro y en oscuro). */
+.letra {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  color: var(--on-menu);
+}
+
+.pequena {
+  min-width: var(--space-6);
+  height: var(--space-5);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+}
+
+.etiqueta {
+  height: var(--space-6);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+.grande {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: var(--radius-control);
+  font: var(--text-headline);
+  font-weight: var(--weight-bold);
+}
+
+.elegida {
+  box-shadow: 0 0 0 var(--focus-ring) var(--label);
+}
+
+.m1 {
+  background: var(--menu-1);
+}
+
+.m2 {
+  background: var(--menu-2);
+}
+
+.m3 {
+  background: var(--menu-3);
+}
+
+.m4 {
+  background: var(--menu-4);
+}
+
+.m5 {
+  background: var(--menu-5);
+}
+
+.m6 {
+  background: var(--menu-6);
+}
+
+.m7 {
+  background: var(--menu-7);
+}

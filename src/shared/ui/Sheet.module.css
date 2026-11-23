@@ -22,11 +22,42 @@
   animation: rise var(--duration-sheet) var(--ease) both;
 }
 
+/* Siempre del mismo alto */
+.alta {
+  height: var(--sheet-max);
+}
+
 .header {
   display: grid;
   grid-template-columns: var(--control) 1fr var(--control);
   align-items: center;
   padding: var(--space-2) var(--space-2) 0;
+}
+
+/* «‹ Tu semana»: encima del título, a la izquierda */
+.atras {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  margin: var(--space-2) 0 calc(var(--space-2) * -1);
+  padding: 0 var(--gutter);
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-subhead);
+  cursor: pointer;
+}
+
+.atras svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* Con «‹» encima, el título va pegado a él */
+.atras + .large {
+  padding-top: 0;
 }
 
 .title {
@@ -39,8 +70,19 @@
   padding: var(--space-4) var(--space-2) 0 var(--gutter);
 }
 
+.large.conAccion {
+  grid-template-columns: 1fr auto;
+}
+
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Nada más grande que el título de la pantalla (usuario, 2026-11-17): el de la hoja, de sección */
 .large .title {
-  font: var(--text-title-1);
+  font: var(--text-title-2);
   text-align: left;
 }
 
@@ -53,6 +95,22 @@
 .footer {
   padding: var(--space-3) var(--gutter) calc(var(--space-6) + var(--safe-bottom));
   border-top: var(--hairline) solid var(--separator);
+}
+
+/* Una hoja que sustituye a otra: ni el fondo ni la hoja se mueven; su contenido aparece con un fundido muy corto */
+.encadenada,
+.encadenada .sheet {
+  animation: none;
+}
+
+.encadenada .sheet > * {
+  animation: entra var(--duration-tap) var(--ease) both;
+}
+
+@keyframes entra {
+  from {
+    opacity: 0;
+  }
 }
 
 @keyframes fade {
@@ -68,6 +126,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  @keyframes entra {
+    from {
+      opacity: 0;
+    }
+  }
+
   @keyframes rise {
     from {
       opacity: 0;

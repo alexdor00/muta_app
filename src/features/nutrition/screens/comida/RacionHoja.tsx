@@ -2,13 +2,15 @@ import { useState } from 'preact/hooks'
 import { formatDecimal, formatInt, parseDecimal } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
-import { CheckIcon, MinusIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
+import { HeartIcon, MinusIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import {
   cantidadAlCambiar,
   COMIDAS,
   macrosIncompletos,
   modoInicial,
+  nombreRacion,
+  unidadDe,
   objetivoDia,
   pasoDe,
   totalDia,
@@ -17,23 +19,47 @@ import {
   type ComidaId,
   type Modo,
 } from '../../state/comida.ts'
-import { anadir, apunteDe, cambiar, devolver, quitar } from '../../use-cases/foodLog.ts'
+import {
+  alternarFavorito,
+  anadir,
+  apunteDe,
+  cambiar,
+  devolver,
+  favoritoDe,
+  quitar,
+} from '../../use-cases/foodLog.ts'
 import type { Aviso } from '../comun/useAviso.ts'
 import h from '../comun/Hojas.module.css'
+import a from './Anadir.module.css'
+import { CifrasRacion } from './CifrasRacion.tsx'
+import r from './Racion.module.css'
 
 type Props = {
   alimento: Alimento
   comida: ComidaId
+  onComida?: (c: ComidaId) => void
   /** Un apunte que se cambia (o null si se añade). */
   editando: Apunte | null
   onClose: () => void
+  /** «‹ Volver»: a la hoja de antes (Añadir o la comida), por si cambias de opinión. */
+  onAtras?: () => void
   avisar: (texto: string, accion?: Aviso['accion']) => void
 }
 
-const parte = (n: number, de: number) => `${Math.min(100, de ? (n / de) * 100 : 0)}%`
-
-/** La ración: en raciones o en gramos, con − / +; sus cifras y cómo queda tu día antes de añadirla. */
-export function RacionHoja({ alimento, comida, editando, onClose, avisar }: Props) {
+/**
+ * La cantidad (rediseño, pantalla 15; usuario, 2026-11-17): el nombre con su corazón, la cifra grande con − / + y sus
+ * atajos (una ración, 100 g, 200 g), sus kcal y macros, la comida y lo que te quedará. Acción en negro.
+ */
+export function RacionHoja({
+  alimento,
+  comida: inicial,
+  onComida,
+  editando,
+  onClose,
+  onAtras,
+  avisar,
+}: Props) {
+  const [comida, setComida] = useState<ComidaId>(inicial)
   const [modo, setModo] = useState<Modo>(
     editando ? (editando.raciones !== null ? 'racion' : 'gramos') : modoInicial(alimento),
   )
@@ -47,23 +73,31 @@ export function RacionHoja({ alimento, comida, editando, onClose, avisar }: Prop
   const [escrito, setEscrito] = useState<string | null>(null)
   const apunte = apunteDe(alimento, cantidad, modo, comida)
   const objetivo = objetivoDia.value
-  // Lo del día sin este apunte (si se está cambiando) y con él
   const antes = {
     kcal: totalDia.value.kcal - (editando?.kcal ?? 0),
     protein: totalDia.value.protein - (editando?.protein ?? 0),
   }
-  const despues = { kcal: antes.kcal + apunte.kcal, protein: antes.protein + apunte.protein }
+  const quedan = objetivo
+    ? {
+        kcal: objetivo.kcal - antes.kcal - apunte.kcal,
+        protein: objetivo.protein - antes.protein - apunte.protein,
+      }
+    : null
   const al = COMIDAS.find((c) => c.id === comida)?.al ?? comida
+  const favorito = favoritoDe(alimento.id)
 
-  function cambiarModo(m: Modo) {
-    if (m === modo) return
-    setCantidad(cantidadAlCambiar(alimento, cantidad, m))
+  function poner(m: Modo, n: number) {
     setModo(m)
+    setCantidad(n)
     setEscrito(null)
   }
   function paso(signo: 1 | -1) {
-    setCantidad((c) => Math.max(0, Math.round((c + signo * pasoDe(modo)) * 100) / 100))
+    setCantidad((c) => Math.max(0, Math.round((c + signo * pasoDe(modo, alimento)) * 100) / 100))
     setEscrito(null)
+  }
+  const elegirComida = (c: ComidaId) => {
+    setComida(c)
+    onComida?.(c)
   }
 
   async function guardar() {
@@ -87,11 +121,27 @@ export function RacionHoja({ alimento, comida, editando, onClose, avisar }: Prop
     avisar('Quitado', { label: 'Deshacer', onClick: () => void devolver(quitados) })
   }
 
+  const enGramos = modo === 'gramos'
+  const u = unidadDe(alimento)
+
   return (
     <Sheet
       title={alimento.name}
       onClose={onClose}
+      atras={onAtras ? { label: 'Volver', onClick: onAtras } : undefined}
       large
+      accion={
+        <button
+          type="button"
+          class={h.round}
+          aria-pressed={!!favorito}
+          aria-label={favorito ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+          // Sin aviso: el corazón relleno ya lo dice (usuario, 2026-11-17)
+          onClick={() => void alternarFavorito(apunte)}
+        >
+          <HeartIcon lleno={!!favorito} />
+        </button>
+      }
       footer={
         <div class={h.actions}>
           <Button onClick={() => void guardar()}>{editando ? 'Guardar' : `Añadir ${al}`}</Button>
@@ -103,91 +153,90 @@ export function RacionHoja({ alimento, comida, editando, onClose, avisar }: Prop
         </div>
       }
     >
-      <div class={h.stack}>
-        <p class={`${h.foot} ${h.datos}`}>
-          Por 100 g: {formatInt(alimento.kcal)} kcal · P {formatDecimal(alimento.protein)} · H{' '}
-          {formatDecimal(alimento.carbs)} · G {formatDecimal(alimento.fat)}
-          {alimento.id.startsWith('u_') ? ' · tu etiqueta' : ' · valores medios (BEDCA y USDA)'}
-        </p>
-        <ChoiceSegmented<Modo>
-          name="modo-racion"
-          legend="Cantidad en"
-          options={[
-            { value: 'racion', label: `${alimento.servingLabel} (${formatInt(alimento.servingG)} g)` },
-            { value: 'gramos', label: 'Gramos' },
-          ]}
-          value={modo}
-          onChange={cambiarModo}
-        />
-        <div class={h.stepper}>
-          <button type="button" class={h.round} aria-label="Menos" onClick={() => paso(-1)}>
-            <MinusIcon />
-          </button>
-          <label class={h.amount}>
-            <input
-              inputMode="decimal"
-              aria-label={modo === 'racion' ? `Cantidad en ${alimento.servingLabel}` : 'Gramos'}
-              value={escrito ?? formatDecimal(cantidad)}
-              onInput={(e) => {
-                setEscrito(e.currentTarget.value)
-                const n = parseDecimal(e.currentTarget.value)
-                setCantidad(n !== null && n >= 0 ? n : 0)
-              }}
+      <div class={a.hoja}>
+        <section class={r.tarjeta} aria-label="Cantidad">
+          <div class={r.paso}>
+            <button type="button" class={r.redondo} aria-label="Menos" onClick={() => paso(-1)}>
+              <MinusIcon />
+            </button>
+            <label class={r.cifra}>
+              <input
+                inputMode="decimal"
+                aria-label={
+                  enGramos ? (u === 'ml' ? 'Mililitros' : 'Gramos') : `Cantidad en ${alimento.servingLabel}`
+                }
+                value={escrito ?? formatDecimal(cantidad)}
+                onInput={(e) => {
+                  setEscrito(e.currentTarget.value)
+                  const n = parseDecimal(e.currentTarget.value)
+                  setCantidad(n !== null && n >= 0 ? n : 0)
+                }}
+              />
+              <span>{enGramos ? u : nombreRacion(alimento, cantidad).replace(/^[^ ]+ /, '')}</span>
+            </label>
+            <button type="button" class={r.redondo} aria-label="Más" onClick={() => paso(1)}>
+              <PlusIcon />
+            </button>
+          </div>
+          {/* La cantidad, en sus unidades o en gramos a mano (usuario, 2026-11-21: sin atajos de 100 y 200 g) */}
+          {/* De una cadena: solo raciones (se sabe lo que aporta, no lo que pesa) */}
+          {!alimento.porRacion && (
+            <ChoiceSegmented
+              name="modo"
+              legend="Cómo apuntas"
+              options={[
+                {
+                  value: 'racion',
+                  label: nombreRacion(alimento, 2)
+                    .replace(/^2 /, '')
+                    .replace(/^./, (l) => l.toUpperCase()),
+                },
+                { value: 'gramos', label: u === 'ml' ? 'Mililitros' : 'Gramos' },
+              ]}
+              value={modo}
+              onChange={(m) => poner(m, cantidadAlCambiar(alimento, cantidad, m))}
             />
-            <span class={h.sub}>
-              {modo === 'racion' ? `${alimento.servingLabel} · ${formatInt(apunte.gramos ?? 0)} g` : 'gramos'}
-            </span>
-          </label>
-          <button type="button" class={h.round} aria-label="Más" onClick={() => paso(1)}>
-            <PlusIcon />
-          </button>
-        </div>
-        <div class={h.tiles}>
-          {[
-            [formatInt(apunte.kcal), 'kcal'],
-            [formatDecimal(apunte.protein), 'proteína'],
-            [formatDecimal(apunte.carbs), 'hidratos'],
-            [formatDecimal(apunte.fat), 'grasa'],
-          ].map(([v, l]) => (
-            <div key={l} class={h.tile}>
-              <span class={h.tileValue}>{v}</span>
-              <span class={h.foot}>{l}</span>
-            </div>
+          )}
+          {!enGramos && !alimento.porRacion && (
+            <p class={r.equivale}>
+              {formatInt(apunte.gramos ?? 0)} {u}
+            </p>
+          )}
+        </section>
+
+        <CifrasRacion m={apunte} />
+        {/* Comida de cadenas: cifras de FatSecret España (usuario, 2026-11-21: «marcado aproximado») */}
+        {alimento.aproximado && <p class={h.foot}>Cifras aproximadas (FatSecret España).</p>}
+
+        <div class={a.pastillas} role="group" aria-label="Comida">
+          {COMIDAS.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              class={`${a.pastilla} ${c.id === comida ? a.on : ''}`}
+              aria-pressed={c.id === comida}
+              onClick={() => elegirComida(c.id)}
+            >
+              {c.nombre}
+            </button>
           ))}
         </div>
+
         {macrosIncompletos(alimento) && (
           <p class={h.warn}>
             Este alimento no trae todos los hidratos o la grasa: las kcal cuentan, pero los macros pueden
             quedar cortos.
           </p>
         )}
-        {objetivo && (
-          <section class={h.card} aria-label="Así queda tu día">
-            <span class={h.eyebrow}>Así queda tu día</span>
-            <p class={h.line}>
-              <span>{despues.kcal <= objetivo.kcal ? 'Por comer' : 'De más'}</span>
-              <span class={h.foot}>{formatInt(Math.abs(objetivo.kcal - antes.kcal))} →</span>
-              <b>{formatInt(Math.abs(objetivo.kcal - despues.kcal))} kcal</b>
-            </p>
-            <div class={h.track} aria-hidden="true">
-              <i style={{ width: parte(despues.kcal, objetivo.kcal) }} />
-            </div>
-            <p class={h.line}>
-              <span>Proteína</span>
-              <span class={h.foot}>{formatInt(antes.protein)} →</span>
-              <b>
-                {formatInt(despues.protein)} / {formatInt(objetivo.protein)} g
-              </b>
-              {despues.protein >= objetivo.protein && (
-                <span class={h.check} aria-label="Llegas a la proteína">
-                  <CheckIcon />
-                </span>
-              )}
-            </p>
-            <div class={h.track} aria-hidden="true">
-              <i style={{ width: parte(despues.protein, objetivo.protein) }} />
-            </div>
-          </section>
+        {quedan && (
+          <p class={r.despues}>
+            {quedan.kcal >= 0
+              ? `Después te quedarán ${formatInt(quedan.kcal)} kcal`
+              : `Te pasarás ${formatInt(-quedan.kcal)} kcal`}
+            {quedan.protein > 0
+              ? ` y ${formatInt(quedan.protein)} g de proteína.`
+              : ' y llegas a tu proteína.'}
+          </p>
         )}
       </div>
     </Sheet>

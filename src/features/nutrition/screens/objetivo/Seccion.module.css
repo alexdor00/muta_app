@@ -7,6 +7,54 @@
   padding: var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+/* Filas sueltas («Poner mis kcal», «Mis datos»): en una tarjeta como las secciones */
+.lista {
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+/* Dentro de una tarjeta, dos grupos de opciones seguidos van a la distancia de la tarjeta (no a la de la página) */
+.card > fieldset + fieldset {
+  margin-top: var(--space-2);
+}
+
+/* «Más ajustes»: una fila blanca que despliega lo avanzado debajo */
+.mas summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--row);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  font: var(--text-headline);
+  list-style: none;
+  cursor: pointer;
+}
+
+.mas summary::-webkit-details-marker {
+  display: none;
+}
+
+.mas summary svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.mas[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.mas[open] > :not(summary) {
+  margin-top: var(--space-4);
 }
 
 .cabecera {
@@ -41,7 +89,9 @@
 .cajas li {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-1);
+  text-align: center;
   padding: var(--space-3);
   border-radius: var(--radius-control);
   background: var(--bg);
@@ -49,8 +99,10 @@
   color: var(--label-2);
 }
 
+/* Cifras pequeñas, como el resto de la pantalla (usuario, 2026-11-19) */
 .cajas b {
-  font: var(--text-headline);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
   color: var(--label);
   font-variant-numeric: tabular-nums;
 }

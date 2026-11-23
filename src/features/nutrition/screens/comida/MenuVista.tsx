@@ -1,329 +1,258 @@
+import { useLocation } from 'preact-iso'
 import { useEffect, useState } from 'preact/hooks'
-import { formatInt } from '../../../../shared/lib/format.ts'
+import { addDays, formatInt } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { ChevronDownIcon, ChevronRightIcon, DotsIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
-import { PlatoFoto } from '../../components/Platos.tsx'
-import { COMIDAS, dieta, hoy, type ComidaId } from '../../state/comida.ts'
+import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
+import { DotsIcon } from '../../../../shared/ui/icons.tsx'
+import type { Origen } from '../../components/FilaComida.tsx'
+import { GrupoComida, GrupoVacio, ListaGrupos } from '../../components/GrupoComida.tsx'
+import { piloto, preparacion } from '../../state/autopilot.ts'
+import { COMIDAS, dieta, hoy, tipoDe, type ComidaId } from '../../state/comida.ts'
 import {
-  diaSemana,
-  diasDelMenu,
+  editandoDescanso,
+  platosDelMenu,
   estadoRecetas,
+  esComun,
+  extrasDelDia,
   fotos,
+  horaDeComida,
   huecoDe,
   MAX_MENUS,
   menu,
   menuDelDia,
-  NOMBRE_DIA,
+  nombreDeComida,
   platoPorId,
   propuestas,
-  semanaDesde,
-  totalDeMenu,
+  totalDeExtras,
   totalDelHueco,
-  type MenuPlan,
+  totalDeMenu,
 } from '../../state/recetas.ts'
-import { cuantosMenus, menuEnDia } from '../../use-cases/menu.ts'
-import styles from './Menu.module.css'
-import { Deslizable } from '../../../../shared/ui/Deslizable.tsx'
-import v from './Vistas.module.css'
+import { cuantosMenus } from '../../use-cases/menu.ts'
+import { TiraDelMenu } from './TiraDelMenu.tsx'
+import styles from './Semana.module.css'
 
 type Props = {
+  /** Tocar una comida: su hoja (nombre, hora, qué días va, lo que lleva). */
+  onComida: (menu: string, comida: ComidaId) => void
+  /** Tocar el plato: lo que lleva, con tus gramos (usuario, 2026-11-21). */
   onPlato: (menu: string, comida: ComidaId) => void
-  /** Deslizar un plato: quitarlo del menú (se deshace). */
-  onQuitarPlato: (menu: string, comida: ComidaId) => void
+  /** Tocar un alimento que va de más: su cantidad. */
+  onExtra: (menu: string, comida: ComidaId, i: number) => void
+  /** El «+» de una comida: algo más (con plato) o su hoja (sin él). */
   onAnadir: (menu: string, comida: ComidaId) => void
+  /** Deslizar una cosa: el plato (null) o lo de más (su número), con «Deshacer». */
+  onQuitar: (menu: string, comida: ComidaId, extra: number | null) => void
   onOpciones: (menu: string) => void
-  onCuantos: () => void
-  onAvisos: () => void
   onDeDieta: () => void
+  /** El menú que se abre (el que tocaste en Tu dieta). */
+  inicial?: string
+  /** Mantener pulsado un día: ese día suelto. */
+  onDia: (fecha: string) => void
 }
 
-const DIA_LARGO = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
+type Tipo = 'entreno' | 'descanso'
 
-/** «hoy y lunes», «sábado y martes», «ningún día». */
-function cuando(dias: readonly string[], hoyEs: string): string {
-  const n = dias.map((f) => (f === hoyEs ? 'hoy' : DIA_LARGO[diaSemana(f)]))
-  if (!n.length) return 'ningún día'
-  return n.length === 1 ? n[0] : `${n.slice(0, -1).join(', ')} y ${n.at(-1)}`
-}
+/** La opción «+» del control de menús: añade uno. */
+const MAS = '+'
+
+/** Hasta dónde se busca un día de este menú (y de cada tipo) para enseñar sus kcal. */
+const BUSCA = 28
 
 /**
- * Tus menús: arriba tu semana (qué menú va cada día; tócalo para cambiarlo) y debajo cada menú cerrado con sus kcal y las
- * fotos de sus platos. Abierto, sus cuatro comidas.
+ * Un menú (Plan, usuario 2026-11-18): A · B · C · +, cómo es un día de entreno o de descanso (sus kcal y macros), qué
+ * días va y sus comidas en orden, cada una con su hora, su plato, sus kcal y si se cocina con antelación o al momento.
+ * Tocar una comida abre su hoja; las que no tienen nada, «Añadir». Como en tu día (usuario, 2026-11-20): el «+» añade y
+ * deslizar quita (vale para todos los días con este menú).
  */
 export function MenuVista({
+  onComida,
   onPlato,
-  onQuitarPlato,
+  onExtra,
   onAnadir,
+  onQuitar,
   onOpciones,
-  onCuantos,
-  onAvisos,
   onDeDieta,
+  inicial,
+  onDia,
 }: Props) {
-  // Sin tocar nada, abierto el primer menú sin platos (cerrado no se ve por dónde empezar)
-  const [abierto, setAbierto] = useState<string | null | undefined>(undefined)
-  // Se elige una vez, al cargar: si no, al poner el primer plato el menú se cerraría solo
-  const listo = estadoRecetas.value === 'listo'
+  const { query, route } = useLocation()
+  const [elegido, setElegido] = useState<string | null>(inicial ?? null)
+  const [tipo, setTipo] = useState<Tipo>(() => tipoDe(hoy.value))
+  // Lo que cambias en sus comidas va al tipo de día que miras; al salir, otra vez entreno
   useEffect(() => {
-    if (listo && abierto === undefined)
-      setAbierto(menu.value.menus.find((x) => !Object.values(x.platos).some(Boolean))?.id ?? null)
-  }, [listo, abierto])
-  if (!listo) return null
+    editandoDescanso.value = tipo === 'descanso'
+    return () => void (editandoDescanso.value = false)
+  }, [tipo])
+  if (estadoRecetas.value !== 'listo') return null
   const m = menu.value
-  const dias = semanaDesde(hoy.value)
-  const siguienteMenu = (actual: string) => {
-    const i = m.menus.findIndex((x) => x.id === actual)
-    return m.menus[(i + 1) % m.menus.length].id
-  }
-  return (
-    <div class={v.stack}>
-      <section class={styles.semanaCard} aria-labelledby="tu-semana">
-        <div class={styles.diaHead}>
-          <h2 id="tu-semana" class={styles.diaTitulo}>
-            Tu semana
-          </h2>
-          <button type="button" class={styles.enlace} onClick={onCuantos}>
-            Cambiar
-          </button>
-        </div>
-        <ol class={styles.dias}>
-          {dias.map((f) => {
-            const id = menuDelDia(m, f)?.id ?? ''
-            const nombre = f === hoy.value ? 'Hoy' : NOMBRE_DIA[diaSemana(f)]
-            return (
-              <li key={f}>
-                <span class={styles.diaNombre}>{nombre}</span>
-                <button
-                  type="button"
-                  class={`${styles.letra} ${f === hoy.value ? styles.letraHoy : ''}`}
-                  aria-label={`${nombre}: menú ${id}${m.menus.length > 1 ? ', cambiar' : ''}`}
-                  disabled={m.menus.length < 2}
-                  onClick={() => void menuEnDia(diaSemana(f), siguienteMenu(id))}
-                >
-                  {id}
-                </button>
-              </li>
-            )
-          })}
-        </ol>
-      </section>
-      <div class={styles.menus}>
-        {m.menus.map((x) => (
-          <TarjetaMenu
-            key={x.id}
-            menu={x}
-            abierto={abierto === x.id}
-            onAbrir={() => setAbierto(abierto === x.id ? null : x.id)}
-            onPlato={onPlato}
-            onQuitarPlato={onQuitarPlato}
-            onAnadir={onAnadir}
-            onOpciones={onOpciones}
-          />
-        ))}
-        {m.menus.length < MAX_MENUS && (
-          <button
-            type="button"
-            class={styles.nuevoMenu}
-            onClick={async () => {
-              await cuantosMenus(m.menus.length + 1)
-              setAbierto(menu.value.menus.at(-1)?.id ?? null)
-            }}
-          >
-            <PlusIcon /> Añadir menú
-          </button>
-        )}
-      </div>
-      <a class={`${styles.herramienta} ${styles.dietaFila}`} href={`${paths.nutrition}?vista=dieta`}>
-        <span class={styles.hIcono} aria-hidden="true">
-          📋
-        </span>
-        <span class={styles.hTexto}>
-          <span class={styles.hNombre}>
-            {dieta.value ? `Tu dieta: ${dieta.value.dieta.nombre}` : 'Cargar la dieta de tu nutricionista'}
-          </span>
-          <span class={v.foot}>
-            {dieta.value
-              ? 'Sus menús, la consulta semanal y sus recetas'
-              : 'Su archivo de dieta (MUTA o CSV), o la de ejemplo para probar'}
-          </span>
-        </span>
-        <ChevronRightIcon />
-      </a>
-      {dieta.value && (
-        <p class={`${v.pad} ${v.foot}`}>
-          <button type="button" class={styles.enlace} onClick={onDeDieta}>
-            Pasar sus menús a tus menús
-          </button>
-        </p>
-      )}
-      <section class={v.pad} aria-labelledby="herramientas">
-        <h2 id="herramientas" class={styles.herramientasTitulo}>
-          Herramientas
-        </h2>
-        <ul class={styles.herramientas}>
-          <li>
-            <a class={styles.herramienta} href={paths.shopping}>
-              <span class={styles.hIcono} aria-hidden="true">
-                🛒
-              </span>
-              <span class={styles.hTexto}>
-                <span class={styles.hNombre}>Lista de la compra</span>
-                <span class={v.foot}>Lo que hace falta para tus menús</span>
-              </span>
-              <ChevronRightIcon />
-            </a>
-          </li>
-          <li>
-            <a class={styles.herramienta} href={`${paths.kitchen}?desde=menu`}>
-              <span class={styles.hIcono} aria-hidden="true">
-                ⚖️
-              </span>
-              <span class={styles.hTexto}>
-                <span class={styles.hNombre}>Cocinar y pesar</span>
-                <span class={v.foot}>En crudo y cocinado, cuánto servirte y repartir una olla</span>
-              </span>
-              <ChevronRightIcon />
-            </a>
-          </li>
-          <li>
-            <button type="button" class={styles.herramienta} onClick={onAvisos}>
-              <span class={styles.hIcono} aria-hidden="true">
-                🔔
-              </span>
-              <span class={styles.hTexto}>
-                <span class={styles.hNombre}>Recordatorios</span>
-                <span class={v.foot}>El día de la compra y cuándo cocinar, en tu calendario</span>
-              </span>
-              <ChevronRightIcon />
-            </button>
-          </li>
-        </ul>
-      </section>
-    </div>
-  )
-}
-
-function TarjetaMenu(props: {
-  menu: MenuPlan
-  abierto: boolean
-  onAbrir: () => void
-  onPlato: (menu: string, comida: ComidaId) => void
-  /** Deslizar un plato: quitarlo del menú (se deshace). */
-  onQuitarPlato: (menu: string, comida: ComidaId) => void
-  onAnadir: (menu: string, comida: ComidaId) => void
-  onOpciones: (menu: string) => void
-}) {
-  const { menu: x, abierto } = props
+  const x = m.menus.find((k) => k.id === elegido) ?? m.menus[0]
   const hoyEs = hoy.value
-  const dias = diasDelMenu(menu.value, x.id, hoyEs)
-  const primero = dias[0] ?? hoyEs
-  const total = dias.length ? totalDeMenu(primero) : null
-  const faltan = COMIDAS.filter((c) => !x.platos[c.id])
-  const ids = COMIDAS.flatMap((c) => (x.platos[c.id] ? [x.platos[c.id]!] : []))
-  const detalle = !ids.length
-    ? 'Sin platos aún'
-    : `${total && total.kcal ? `${formatInt(total.kcal)} kcal · ` : ''}${cuando(dias, hoyEs)}`
-  const cuerpo = `cuerpo-${x.id}`
-  // Lo que propone tu nutricionista para este menú («Menú A: no llegas a la proteína» → «No llegas a la proteína»)
-  const titulo = propuestas.value.find((p) => p.menu === x.id)?.titulo.replace(/^[^:]*:\s*/, '')
-  const propuesta = titulo ? titulo.charAt(0).toUpperCase() + titulo.slice(1) : null
+  // Un día de este menú del tipo que miras (si no hay, cualquiera de este menú)
+  const dias = Array.from({ length: BUSCA }, (_, i) => addDays(hoyEs, i)).filter(
+    (f) => menuDelDia(m, f)?.id === x.id,
+  )
+  const dia = dias.find((f) => tipoDe(f) === tipo) ?? dias[0] ?? null
+  const total = dia ? totalDeMenu(dia) : null
+  const p = piloto.value
+  const comoSeCocina = (c: ComidaId, plato: string | null): Origen | null => {
+    if (!p || p.cocina.modo === 'no') return null
+    if (!plato) return { tipo: 'momento', texto: 'Al momento' }
+    const como = preparacion(p, { fecha: dia ?? hoyEs, comida: c, menu: x.id, plato, cocinado: null })
+    return como === 'momento'
+      ? { tipo: 'momento', texto: 'Al momento' }
+      : { tipo: 'olla', texto: 'Con antelación' }
+  }
+  // Desde «Tu nutricionista» (Ver dónde se edita): lo que propone, arriba, y su comida marcada
+  const marca = x.id === query.menu ? query.marca : undefined
+  const consejo = marca ? propuestas.value.find((k) => k.id === query.p) : undefined
+  const titulo = propuestas.value.find((k) => k.menu === x.id)?.titulo.replace(/^[^:]*:\s*/, '')
+
   return (
-    <section class={styles.menuCard} aria-label={x.nombre}>
-      <div class={styles.menuHead}>
+    <div class={`${styles.stack} ${styles.dentro}`}>
+      <div class={styles.pestanas}>
+        <div class={styles.letras}>
+          <ChoiceSegmented<string>
+            name="tus-menus"
+            legend="Tus menús"
+            options={[
+              ...m.menus.map((k) => ({
+                value: k.id,
+                label: k.id === x.id && m.menus.length <= 4 ? k.nombre : k.id,
+              })),
+              ...(m.menus.length < MAX_MENUS ? [{ value: MAS, label: '+' }] : []),
+            ]}
+            value={x.id}
+            onChange={async (v) => {
+              if (v !== MAS) return setElegido(v)
+              await cuantosMenus(m.menus.length + 1)
+              setElegido(menu.value.menus.at(-1)?.id ?? null)
+            }}
+          />
+        </div>
         <button
           type="button"
-          class={styles.menuAbrir}
-          aria-expanded={abierto}
-          aria-controls={cuerpo}
-          onClick={props.onAbrir}
+          class={styles.opciones}
+          aria-label={`Opciones de ${x.nombre}`}
+          onClick={() => onOpciones(x.id)}
         >
-          <span class={styles.filaTexto}>
-            <span class={styles.menuNombre}>{x.nombre}</span>
-            <span class={v.foot}>
-              {detalle}
-              {ids.length > 0 && faltan.length > 0 && !abierto ? ` · le falta ${faltan[0].el}` : ''}
-            </span>
-          </span>
-          {!abierto && ids.length > 0 && (
-            <span class={styles.fotos} aria-hidden="true">
-              {ids.slice(0, 4).map((id, i) => (
-                <span key={`${id}-${i}`} class={styles.mini}>
-                  <PlatoFoto foto={fotos.value[id] ?? null} />
-                </span>
-              ))}
-            </span>
-          )}
-          <span class={`${styles.flechaMenu} ${abierto ? styles.flechaArriba : ''}`} aria-hidden="true">
-            <ChevronDownIcon />
-          </span>
+          <DotsIcon />
         </button>
-        {abierto && (
-          <button
-            type="button"
-            class={styles.opciones}
-            aria-label={`Opciones de ${x.nombre}`}
-            onClick={() => props.onOpciones(x.id)}
-          >
-            <DotsIcon />
-          </button>
-        )}
       </div>
-      {propuesta && (
-        <a class={styles.avisoMenu} href={paths.nutritionist}>
-          <span class={styles.punto} aria-hidden="true" />
-          <span class={styles.hTexto}>
-            <span class={styles.avisoTexto}>{propuesta}</span>
-            <span class={v.foot}>Tu nutricionista te propone un cambio</span>
-          </span>
-          <span class={styles.ver}>Ver ›</span>
+
+      {marca && (
+        <p class={styles.marcaAviso}>
+          {consejo ? `${consejo.detalle} ` : ''}Toca la comida marcada y cámbiala.
+        </p>
+      )}
+      <TiraDelMenu menuId={x.id} onDia={onDia} />
+
+      <ChoiceSegmented<Tipo>
+        name="tipo-menu"
+        legend="Cómo es este menú un día de"
+        value={tipo}
+        onChange={setTipo}
+        options={[
+          { value: 'entreno', label: 'Día de entreno' },
+          { value: 'descanso', label: 'Día de descanso' },
+        ]}
+      />
+
+      <div class={styles.pie}>
+        <span class={styles.vaDias}>
+          {total && total.kcal > 0 && (
+            <small>
+              {formatInt(total.protein)} g prot. · {formatInt(total.carbs)} g hidr. · {formatInt(total.fat)} g
+              grasa
+            </small>
+          )}
+        </span>
+        <span class={styles.kcal}>
+          {total && total.kcal ? formatInt(total.kcal) : '—'} <small>kcal</small>
+        </span>
+      </div>
+      {dia && tipoDe(dia) !== tipo && (
+        <p class={styles.nota}>Este menú no cae en un día de {tipo} en las próximas semanas.</p>
+      )}
+
+      <ListaGrupos etiqueta={x.nombre}>
+        {COMIDAS.map((c) => {
+          const id = platosDelMenu(x)[c.id]
+          const pl = id ? platoPorId(id, dia ?? hoyEs) : null
+          const extras = dia ? extrasDelDia(dia, c.id) : (x.extras?.[c.id] ?? [])
+          const todos = x.extras?.[c.id] ?? []
+          const nombre = nombreDeComida(m, c.id)
+          if (!pl && !todos.length)
+            return (
+              <GrupoVacio
+                key={c.id}
+                marcada={marca === c.id}
+                titulo={nombre}
+                meta={horaDeComida(m, c.id)}
+                onClick={() => onComida(x.id, c.id)}
+              />
+            )
+          const h = dia ? huecoDe(m, dia, c.id) : null
+          const kcalPlato = h && h.menu === x.id ? (totalDelHueco(h)?.kcal ?? 0) : (pl?.total.kcal ?? 0)
+          const solo =
+            todos.length && !pl && todos.every((e) => e.solo === todos[0].solo) ? todos[0].solo : undefined
+          const meta = [
+            horaDeComida(m, c.id),
+            esComun(m, c.id) ? 'en todos los menús' : null,
+            solo ? `solo ${solo}` : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')
+          const cosas = [
+            ...(pl
+              ? [
+                  {
+                    nombre: pl.nombre,
+                    foto: fotos.value[pl.id] ?? null,
+                    kcal: Math.round(kcalPlato),
+                    onQuitar: () => onQuitar(x.id, c.id, null),
+                    // Tocar el plato abre su receta (usuario, 2026-11-21: lo de la comida, en su cabecera)
+                    onTocar: () => onPlato(x.id, c.id),
+                  },
+                ]
+              : []),
+            ...extras.map((e) => ({
+              nombre: e.nombre,
+              foto: e.platoId ? (fotos.value[e.platoId] ?? null) : null,
+              kcal: Math.round(totalDeExtras([e]).kcal),
+              onQuitar: () => onQuitar(x.id, c.id, todos.indexOf(e)),
+              onTocar: e.platoId
+                ? () => route(paths.dish(e.platoId!, { comida: c.id }))
+                : () => onExtra(x.id, c.id, todos.indexOf(e)),
+            })),
+          ]
+          return (
+            <GrupoComida
+              key={c.id}
+              marcada={marca === c.id}
+              titulo={nombre}
+              meta={meta}
+              kcal={Math.round(kcalPlato + totalDeExtras(extras).kcal)}
+              cosas={cosas}
+              origen={comoSeCocina(c.id, id ?? null)}
+              etiquetaAccesible={`${nombre}: ${cosas.map((k) => k.nombre).join(', ')}`}
+              onClick={() => onComida(x.id, c.id)}
+              onAnadir={() => onAnadir(x.id, c.id)}
+            />
+          )
+        })}
+      </ListaGrupos>
+
+      {titulo && (
+        <a class={styles.propuesta} href={`${paths.nutrition}?vista=plan&paso=come`}>
+          Tu nutricionista te propone un cambio: {titulo.charAt(0).toLowerCase() + titulo.slice(1)}.{' '}
+          <b>Ver ›</b>
         </a>
       )}
-      {abierto && (
-        <ul id={cuerpo} class={styles.filas}>
-          {COMIDAS.map((c) => {
-            const id = x.platos[c.id]
-            const p = id ? platoPorId(id, primero) : null
-            const h = huecoDe(menu.value, primero, c.id)
-            const t = h && h.menu === x.id ? totalDelHueco(h) : p ? p.total : null
-            const cocinado = h?.cocinado ? menu.value.cocinados.find((k) => k.id === h.cocinado) : null
-            return (
-              <li key={c.id} class={styles.filaMenu}>
-                {id ? (
-                  <Deslizable
-                    fondo="surface"
-                    ariaLabel={`Quitar ${p?.nombre ?? 'el plato'} de ${x.nombre}`}
-                    onQuitar={() => props.onQuitarPlato(x.id, c.id)}
-                  >
-                    <button type="button" class={styles.fila} onClick={() => props.onPlato(x.id, c.id)}>
-                      <PlatoFoto foto={fotos.value[id] ?? null} />
-                      <span class={styles.filaTexto}>
-                        <span class={styles.comida}>{c.nombre}</span>
-                        <span class={styles.plato}>{p?.nombre ?? 'Plato que ya no está'}</span>
-                      </span>
-                      {cocinado ? (
-                        <span class={styles.cocinar}>
-                          {NOMBRE_DIA[diaSemana(cocinado.fecha)]} {cocinado.hora}
-                        </span>
-                      ) : (
-                        t && <span class={v.foot}>{formatInt(t.kcal)} kcal</span>
-                      )}
-                    </button>
-                  </Deslizable>
-                ) : (
-                  <button type="button" class={styles.fila} onClick={() => props.onAnadir(x.id, c.id)}>
-                    <span class={styles.mas} aria-hidden="true">
-                      <PlusIcon />
-                    </span>
-                    <span class={styles.filaTexto}>
-                      <span class={styles.comida}>{c.nombre}</span>
-                      <span class={v.foot}>Añadir plato</span>
-                    </span>
-                  </button>
-                )}
-              </li>
-            )
-          })}
-        </ul>
+      {dieta.value && (
+        <button type="button" class={styles.deDieta} onClick={onDeDieta}>
+          Pasar los menús de tu dieta a tus menús
+        </button>
       )}
-    </section>
+    </div>
   )
 }

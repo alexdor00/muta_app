@@ -22,7 +22,7 @@ test('la vez anterior sale en gris y un toque la apunta; el descanso empieza', a
   await page.getByRole('button', { name: 'Serie 1 hecha' }).click()
   await expect(kg).toHaveValue('60')
   await expect(page.getByLabel('Repeticiones de la serie 1')).toHaveValue('10')
-  await expect(page.getByRole('progressbar', { name: 'Series hechas' })).toHaveAttribute('aria-valuenow', '1')
+  await expect(page.getByRole('button', { name: /^Esta sesión: B1 · 1 de/ })).toBeVisible()
   // La siguiente sigue con lo suyo de la vez anterior (no cambiaste el peso) y el calentamiento se quita
   await expect(page.getByLabel('Kilos de la serie 2')).toHaveValue('')
   await expect(page.getByLabel('Kilos de la serie 2')).toHaveAttribute('placeholder', '62,5')
@@ -36,7 +36,7 @@ test('la vez anterior sale en gris y un toque la apunta; el descanso empieza', a
 
   // Volver a tocar la deshace
   await page.getByRole('button', { name: 'Serie 1 hecha' }).click()
-  await expect(page.getByRole('progressbar', { name: 'Series hechas' })).toHaveAttribute('aria-valuenow', '0')
+  await expect(page.getByRole('button', { name: /^Esta sesión: B1 · 0 de/ })).toBeVisible()
 })
 
 test('el teclado propio escribe, suma el salto de peso y una serie mejor lleva ★', async ({ page }) => {
@@ -179,9 +179,9 @@ test('tocar el tiempo lo para y lo vuelve a poner en marcha', async ({ page }) =
   const antes = (await tiempo.boundingBox())!
   await tiempo.click()
   await expect(page.getByText('En pausa', { exact: true })).toBeVisible()
-  // El tiempo se queda en su sitio, centrado (no se va a la izquierda)
+  // El tiempo se queda en su sitio (a la izquierda, junto a ‹)
   const despues = (await tiempo.boundingBox())!
-  expect(Math.abs(despues.x + despues.width / 2 - (antes.x + antes.width / 2))).toBeLessThan(1)
+  expect(Math.abs(despues.x - antes.x)).toBeLessThan(1)
   const parado = await tiempo.textContent()
   await page.waitForTimeout(1500)
   await expect(tiempo).toHaveText(parado!)
@@ -221,20 +221,6 @@ test('«···»: tus notas (para siempre, en la sesión y en la ficha), cambiar
   await expect(page.getByRole('heading', { name: 'Hiperextensión' })).toBeVisible()
   // Sin vez anterior: los kilos salen vacíos
   await expect(page.getByLabel('Kilos de la serie 1')).toHaveAttribute('placeholder', '')
-})
-
-test('el cronómetro de serie cuenta y guarda el tiempo', async ({ page }) => {
-  await page.goto('/entreno/sesion/b1')
-  await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
-  await page.getByRole('button', { name: 'Cronómetro' }).click()
-  const crono = page.getByRole('dialog', { name: 'Cronómetro de la serie' })
-  await expect(crono).toContainText('Serie 1 de 3')
-  await crono.getByRole('button', { name: 'Empezar en 3' }).click()
-  await expect(crono).toContainText('Prepárate')
-  await expect(crono).toContainText('En marcha', { timeout: 5000 })
-  await crono.getByRole('button', { name: 'Terminar' }).click()
-  await expect(crono).toHaveCount(0)
-  await expect(page.getByRole('status')).toContainText('Márcala como hecha')
 })
 
 test('terminar con series sin marcar pregunta y abre el resumen', async ({ page }) => {

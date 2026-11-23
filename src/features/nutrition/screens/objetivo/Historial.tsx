@@ -34,10 +34,8 @@ function detalle(c: Cambio): string {
 export function Historial({ cambios, deshacible, onDeshacer }: Props) {
   if (!cambios.length) return null
   return (
+    // Su título va en el plegable de la pantalla
     <section aria-labelledby="historial">
-      <h2 id="historial" class={styles.title}>
-        Historial
-      </h2>
       <ul class={styles.list}>
         {cambios.map((c) => (
           <li key={c.id} class={styles.row}>

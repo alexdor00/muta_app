@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  calendarioDelMenu,
   clave,
   conAjuste,
   conCocinado,
@@ -13,16 +12,15 @@ import {
   duplicado,
   huecosDelDia,
   leerMenu,
-  loDeHoy,
   menuDelDia,
   menuVacio,
-  paraCocinar,
-  recetasDelMenu,
   sinMenu,
-  totalDelDia,
+  platosDe,
   type MenuSemanal,
-  paraCongelar,
 } from './menu.ts'
+import { loDeHoy, paraCocinar, recetasDelMenu, pasanDeLaNevera } from './menuCocina.ts'
+import { totalDelDia } from './menuExtras.ts'
+import { tienePlatos } from './menuPlan.ts'
 import type { Plato } from './recipes.ts'
 
 const plato: Plato = {
@@ -127,25 +125,6 @@ describe('tus menús', () => {
     const r = recetasDelMenu(m, [lunes], platoDe, () => [280, null])
     expect(r[0].lista.map((x) => x.g)).toEqual([280, null])
   })
-
-  it('el calendario lleva cada hora con su alarma antes', () => {
-    let m: MenuSemanal = {
-      ...conPlato(menuVacio(), 'A', 'comida', plato.id),
-      compraEl: { fecha: lunes, hora: '11:00' },
-    }
-    m = conCocinado(m, {
-      id: 'c1',
-      plato: plato.id,
-      fecha: lunes,
-      hora: '18:00',
-      para: [clave(lunes, 'comida')],
-    })
-    const ics = calendarioDelMenu(m, [lunes], () => plato.nombre, '20261106T120000Z')
-    expect(ics).toContain('DTSTART:20261109T110000')
-    expect(ics).toContain('SUMMARY:Cocinar: Pollo al chipotle')
-    expect(ics).toContain('TRIGGER:-PT30M')
-    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(2)
-  })
 })
 
 describe('gramos de una comida', () => {
@@ -156,10 +135,23 @@ describe('gramos de una comida', () => {
   })
 })
 
-describe('paraCongelar', () => {
+describe('pasanDeLaNevera', () => {
   it('lo que se come más de 3 días después de cocinarlo', () => {
-    expect(paraCongelar('2026-11-09', ['2026-11-10|comida', '2026-11-12|cena', '2026-11-13|comida'])).toEqual(
-      ['2026-11-13|comida'],
-    )
+    expect(
+      pasanDeLaNevera('2026-11-09', ['2026-11-10|comida', '2026-11-12|cena', '2026-11-13|comida']),
+    ).toEqual(['2026-11-13|comida'])
+  })
+})
+
+describe('un menú con platos solo para los días de descanso', () => {
+  const m = { id: 'A', nombre: 'Menú A', platos: {}, descanso: { cena: 'salmon' } }
+  it('cuenta como menú con platos', () => {
+    expect(tienePlatos(m)).toBe(true)
+    expect(tienePlatos({ ...m, descanso: undefined })).toBe(false)
+    expect(tienePlatos({ ...m, descanso: {} })).toBe(false)
+  })
+  it('el día de descanso lleva su plato; el de entreno, ninguno', () => {
+    expect(platosDe(m, true)).toEqual({ cena: 'salmon' })
+    expect(platosDe(m, false)).toEqual({})
   })
 })

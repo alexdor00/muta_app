@@ -1,0 +1,185 @@
+/* Las listas de Editar rutina (tu semana y los ejercicios de una sesión): una tarjeta blanca, una fila por cosa. */
+
+.card {
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Entre fila y fila, una raya fina que empieza donde el texto */
+.lista > li + li .fila::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: calc(var(--space-4) + var(--control-sm) + var(--space-3));
+  border-top: var(--hairline) solid var(--separator);
+  content: '';
+}
+
+/* La fila que se está moviendo: se levanta */
+.levantada {
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--float-shadow);
+}
+
+.fila {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  padding-left: var(--space-4);
+  background: var(--surface);
+}
+
+/* A la izquierda, su número en un círculo gris claro, como en Ver sesión (ExerciseList), o un icono */
+.insignia {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.insignia svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.insigniaTenue {
+  color: var(--label-3);
+}
+
+/* Superserie: una raya une los círculos de los ejercicios que van juntos */
+.inicio::after,
+.medio::after,
+.medio::before,
+.fin::before {
+  position: absolute;
+  left: 50%;
+  width: var(--border);
+  height: calc((var(--row) - var(--control-sm)) / 2);
+  background: var(--label);
+  content: '';
+}
+
+.inicio::after,
+.medio::after {
+  top: 100%;
+}
+
+.medio::before,
+.fin::before {
+  bottom: 100%;
+}
+
+.texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(var(--space-1) / 2);
+  min-width: 0;
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+}
+
+button.texto {
+  align-self: stretch;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.etiqueta {
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.titulo {
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+.tituloTenue {
+  font-weight: var(--weight-regular);
+  color: var(--label-2);
+}
+
+.detalle {
+  font: var(--text-subhead);
+  color: var(--label-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.nota {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* Desde «Tu entrenador»: lo que entrena ese músculo, con un filo negro */
+.marcada {
+  box-shadow: inset var(--border) 0 0 var(--accent);
+}
+
+.marca {
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  color: var(--label);
+}
+
+/* El asa: se arrastra sin esperar (no hace falta mantener pulsado) */
+.asa {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  margin-right: var(--space-1);
+  border: 0;
+  background: none;
+  color: var(--label-3);
+  cursor: grab;
+  touch-action: none;
+}
+
+.asa svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* La última fila: «+ Añadir ejercicio» */
+.anadir {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--control-lg);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-top: var(--hairline) solid var(--separator);
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+  text-align: left;
+  cursor: pointer;
+}

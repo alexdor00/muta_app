@@ -15,8 +15,9 @@ import {
   llegaHasta,
   MACROS,
   mejoresPara,
-  platos,
+  platosQueQuieres,
   repartir,
+  repartoActual,
   type Plato,
 } from '../../state/recetas.ts'
 import { apuntarPlato, desapuntar } from '../../use-cases/recipes.ts'
@@ -54,14 +55,17 @@ export function AjustarHoja({ plato, comida, fecha, onClose, onVer, avisar }: Pr
       </Sheet>
     )
   }
-  const objetivo = modo === 'repartir' && puedeRepartir ? repartir(falta, quedan)[comida] : falta
+  const objetivo =
+    modo === 'repartir' && puedeRepartir ? repartir(falta, quedan, repartoActual.value)[comida] : falta
   const a = ajustar(plato, objetivo)
   const cambian = plato.ingredientes.flatMap((i, k) =>
     i.macro && i.gramos !== null ? [{ i, k, antes: i.gramos, despues: a.gramos[k] ?? i.gramos }] : [],
   )
   const quietos = plato.ingredientes.filter((i) => i.cuenta && !i.macro).map((i) => i.nombre.toLowerCase())
   const nombre = (m: string) => MACROS.find((x) => x.id === m)?.nombre.toLowerCase() ?? m
-  const otras = a.corto.length ? mejoresPara(platos.value, comida, objetivo, 3, [plato.id]).slice(0, 2) : []
+  const otras = a.corto.length
+    ? mejoresPara(platosQueQuieres.value, comida, objetivo, 3, [plato.id]).slice(0, 2)
+    : []
   const corto = a.corto[0]
 
   const aplicar = async () => {

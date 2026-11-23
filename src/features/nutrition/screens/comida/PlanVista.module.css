@@ -1,0 +1,450 @@
+/* Plan (usuario, 2026-11-18): las dos miradas, la tira de días con sus menús, el día y la agenda de cocina. */
+.vista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--gutter) var(--space-6);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 var(--space-1);
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+/* «Editar», una pastilla gris con su lápiz (usuario, 2026-11-19: «más grande y bonito») */
+.cabecera a,
+.cabecera button {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cabecera a svg,
+.cabecera button svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.tira {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.dia b {
+  font: var(--text-headline);
+}
+
+.dia[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.letra {
+  color: inherit;
+  font: var(--text-caption);
+  opacity: 0.75;
+}
+
+.libre {
+  height: var(--space-5);
+  font: var(--text-caption);
+}
+
+.dh {
+  display: flex;
+  align-items: center; /* las kcal, a media altura del día y sus etiquetas (usuario, 2026-11-19) */
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 var(--space-1);
+}
+
+.diaBoton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--text-titulo-seccion);
+}
+
+.titulo svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-3);
+}
+
+.etiquetas {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.etiqueta {
+  display: inline-grid;
+  place-items: center;
+  height: var(--space-6);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+/* Las kcal del día, del tamaño de un dato (como en tu día; usuario, 2026-11-17) */
+.kcal {
+  display: flex;
+  gap: var(--space-1);
+  align-items: baseline; /* «1.323 kcal» en una línea */
+  font: var(--text-cifra);
+  white-space: nowrap;
+}
+
+.kcal b {
+  font: inherit;
+}
+
+.kcal small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.tarjeta {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.nota {
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.mas {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  padding-top: var(--space-2);
+}
+
+.mas a {
+  color: var(--label-2);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+/* «Cuándo cocinas»: un día por fila con su fecha a la izquierda */
+.agendaDia {
+  display: grid;
+  grid-template-columns: var(--badge) 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.agendaDia + .agendaDia {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.fecha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: start;
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+}
+
+.fecha small {
+  color: var(--label-2);
+  font: var(--text-caption);
+  text-transform: uppercase;
+}
+
+.fecha b {
+  font: var(--text-cifra-fila);
+}
+
+.fechaHoy {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.fechaHoy small {
+  color: inherit;
+}
+
+.agendaCosas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.evento {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  text-decoration: none;
+}
+
+.evento svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.evento span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.sesion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.platoSesion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-left: var(--space-6);
+}
+
+.platoSesion > span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.platoSesion b {
+  overflow: hidden;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.platoSesion small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.momento {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.momento svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  margin-top: var(--space-1);
+}
+
+.tarjetaTexto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.tarjetaTexto span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.boton {
+  align-self: flex-start;
+  min-height: var(--control);
+  margin-top: var(--space-2);
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+/* Sin menú: tres caminos */
+.vacioTexto h2 {
+  margin: var(--space-2) 0 var(--space-2);
+  font: var(--text-titulo-pantalla);
+}
+
+.vacioTexto p {
+  margin: 0;
+  color: var(--label-2);
+  font: var(--text-body);
+}
+
+.caminos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.camino {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.camino > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-3);
+}
+
+.icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+}
+
+.icono svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.caminoTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.caminoTexto b {
+  font: var(--text-headline);
+}
+
+.caminoTexto span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+/* Mi plan · 1 Objetivo: sus filas (revisión y cambiarlo) */
+.tarjeta > li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.enlaceFila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  color: var(--label);
+  text-decoration: none;
+}
+
+.enlaceFila > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-3);
+}
+
+/* El número de cada paso, en su circulito gris; en el elegido, blanco (usuario, 2026-11-19: «más bonito») */
+.numPaso {
+  display: grid;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  border-radius: var(--radius-pill);
+  background: var(--label-3);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  color: var(--on-accent);
+}
+
+[aria-checked='true'] .numPaso,
+:checked ~ * .numPaso {
+  background: var(--on-accent);
+  color: var(--label);
+}
+
+.botones {
+  display: flex;
+  gap: var(--space-2);
+}

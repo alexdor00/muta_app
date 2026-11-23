@@ -1,0 +1,270 @@
+/* Tu semana (rediseño 17 y 22): la tira de días, tarjetas blancas con sombra y acciones en negro o gris. */
+.vista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--gutter) var(--space-6);
+}
+
+.tira {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  cursor: pointer;
+}
+
+.letra {
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+.numero {
+  display: grid;
+  place-items: center;
+  width: var(--control);
+  height: var(--control);
+  border-radius: var(--radius-pill);
+  font: var(--text-headline);
+}
+
+.elegido {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.marca {
+  display: grid;
+  place-items: center;
+  height: var(--icon-sm);
+  color: var(--label);
+}
+
+.marca svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.organizada {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.organizada > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+}
+
+.organizadaTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.organizadaTexto b {
+  font: var(--text-headline);
+}
+
+.organizadaTexto span,
+.cabeza span span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.gris {
+  flex: none;
+  min-height: var(--control);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.cabeza {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 var(--space-1);
+}
+
+.cabeza > span:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.cabeza b {
+  font: var(--text-headline);
+}
+
+/* Las kcal del día, del tamaño de un dato (como en tu día; usuario, 2026-11-17) */
+.kcal {
+  font: var(--text-dato-fila);
+  white-space: nowrap;
+}
+
+.kcal small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.tarjeta {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.tarjeta > li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.fila,
+.enlace,
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nombre {
+  overflow: hidden;
+  font: var(--text-headline);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detalle {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.vacio {
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.cifra {
+  font: var(--text-headline);
+}
+
+.hueco,
+.icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--meal-thumb);
+  height: var(--meal-thumb);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+/* El «+» de una comida vacía, pequeño (usuario, 2026-11-17) */
+.hueco svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.enlace b {
+  flex: 1;
+  font: var(--text-headline);
+}
+
+.enlace span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.enlace svg,
+.opcion > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+}
+
+.opcion b {
+  font: var(--text-headline);
+}
+
+.vaciaTexto h2 {
+  margin: var(--space-6) 0 var(--space-2);
+  font: var(--text-title-1);
+}
+
+.vaciaTexto p {
+  color: var(--label-2);
+  font: var(--text-subhead); /* lo secundario en gris, a 15 como en toda la app (usuario, 2026-11-20) */
+}
+
+.principal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-lg);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-headline);
+  cursor: pointer;
+}
+
+.principal svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* «Descargar plantilla» del CSV de la dieta: un enlace sencillo */
+.plantilla {
+  align-self: flex-start;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}

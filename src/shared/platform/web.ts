@@ -103,6 +103,15 @@ export const webPlatform: Platform = {
     }
   },
 
+  async copy(text) {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch {
+      return false
+    }
+  },
+
   async shareFile(title, file) {
     try {
       if (navigator.canShare?.({ files: [file] })) {
@@ -133,11 +142,11 @@ export const webPlatform: Platform = {
     })
   },
 
-  async startCamera(video) {
+  async startCamera(video, facing = 'environment') {
     if (!navigator.mediaDevices?.getUserMedia) return null
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
+        video: { facingMode: facing },
         audio: false,
       })
       video.srcObject = stream

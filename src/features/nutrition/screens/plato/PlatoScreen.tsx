@@ -3,25 +3,43 @@ import { useEffect, useState } from 'preact/hooks'
 import { daysBetween, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
-import { ChevronRightIcon, MinusIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
+import {
+  BookmarkIcon,
+  CameraIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MinusIcon,
+  PlusIcon,
+  ClockIcon,
+  ShareIcon,
+} from '../../../../shared/ui/icons.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
-import { comidaPorHora, diaVisto, dieta, estado, hoy } from '../../state/comida.ts'
+import { useVolver } from '../../../../shared/ui/useVolver.ts'
+import { comidaPorHora, diaVisto, dieta, estado, hoy, type ComidaId } from '../../state/comida.ts'
 import {
+  encuadresPlatos,
   enCrudo,
   estadoRecetas,
   fotos,
-  MACROS,
   menu,
   platoPorId,
   recetario,
+  recetasGuardadas,
   siguiente,
   totalDePlato,
 } from '../../state/recetas.ts'
 import { ponerPlato } from '../../use-cases/menu.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
-import { apuntarPlato, borrarPlato, cargarRecetas, desapuntar } from '../../use-cases/recipes.ts'
+import {
+  alternarRecetaGuardada,
+  apuntarPlato,
+  borrarPlato,
+  cargarRecetas,
+  compartirReceta,
+  desapuntar,
+} from '../../use-cases/recipes.ts'
+import a from '../comida/Anadir.module.css'
 import { comidaDe, esComida } from '../comun/platos.ts'
 import { useAviso } from '../comun/useAviso.ts'
 import { Cifras } from '../comun/Cifras.tsx'
@@ -29,9 +47,11 @@ import h from '../comun/Hojas.module.css'
 import r from '../receta/Receta.module.css'
 import { ADietaHoja } from './ADietaHoja.tsx'
 import { AjustarHoja } from './AjustarHoja.tsx'
-import { AlMenuHoja } from './AlMenuHoja.tsx'
+import { ApuntarHoja } from './ApuntarHoja.tsx'
+import { BarraPlato } from './BarraPlato.tsx'
 import { CambiarHoja } from './CambiarHoja.tsx'
 import { EditarPlatoHoja } from './EditarPlatoHoja.tsx'
+import { FotoPlatoHoja } from './FotoPlatoHoja.tsx'
 import styles from './Plato.module.css'
 
 /**
@@ -47,16 +67,27 @@ export function PlatoScreen(props: { id: string }) {
   const [veces, setVeces] = useState(1)
   const [gramos, setGramos] = useState<(number | null)[] | null>(null)
   const [cual, setCual] = useState<number | null>(null)
+  // Ingredientes · Pasos (rediseño 30; sin «Cómo se prepara»: lo decide «Cómo cocinas», usuario 2026-11-21)
+  // `?ver=pasos`: abre en sus pasos (desde «Cocinar ahora»)
+  const [ver, setVer] = useState<'ingredientes' | 'pasos'>(query.ver === 'pasos' ? 'pasos' : 'ingredientes')
+  const pasos = ver === 'pasos'
   const ajustarHoja = useSheet('ajustar')
   const cambiar = useSheet('cambiar')
   const editar = useSheet('editar')
-  const alMenu = useSheet('al-menu')
+  const apuntarHoja = useSheet('apuntar')
   const aDieta = useSheet('a-dieta')
+  const fotoHoja = useSheet('foto')
   const { aviso, avisar } = useAviso()
+  const volver =
+    query.desde === 'menu'
+      ? `${paths.nutrition}?vista=menus&menu=${query.menu ?? 'A'}`
+      : query.fecha
+        ? `${paths.nutrition}?vista=plan&paso=come`
+        : `${paths.nutrition}?vista=recetas`
+  const atras = useVolver(volver)
   if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
   const fecha = query.fecha ?? diaVisto.value
   const p = platoPorId(props.id, fecha)
-  const volver = query.desde === 'menu' ? `${paths.nutrition}?vista=menu` : `${paths.nutrition}?vista=recetas`
   if (!p) {
     return (
       <div class={r.page}>
@@ -77,39 +108,85 @@ export function PlatoScreen(props: { id: string }) {
   const yaEnMenu = enMenu?.platos[comida] === p.id
   const total = totalDePlato(p, gramos ?? undefined, veces)
   const categoria = recetario.value?.categorias.find((c) => c.id === p.categoria)?.nombre
-  const detalle = [
-    categoria ?? (p.origen === 'tuyo' ? 'Tuyo' : 'De ejemplo'),
+  // Tiempo, dificultad y categoría, en pastillas (usuario, 2026-11-17)
+  const datos = [
     p.dificultad,
-    p.minutos ? `${p.minutos} min` : '',
+    categoria ?? (p.origen === 'tuyo' ? 'Receta tuya' : 'De ejemplo'),
     p.raciones > 1 ? `${p.raciones} raciones en total` : '',
-  ]
-    .filter(Boolean)
-    .join(' · ')
+  ].filter(Boolean)
 
-  const apuntar = async () => {
-    const ids = await apuntarPlato(p, comida, gramos, veces, fecha)
-    avisar(`Apuntado en ${comidaDe(comida).nombre.toLowerCase()} ${cuando}`, {
+  const apuntar = async (en: ComidaId = comida) => {
+    const ids = await apuntarPlato(p, en, gramos, veces, fecha)
+    avisar(`Apuntado en ${comidaDe(en).nombre.toLowerCase()} ${cuando}`, {
       label: 'Deshacer',
       onClick: () => void desapuntar(ids, fecha),
     })
   }
 
-  const apuntarHoy = (
-    <Button variant={enMenu ? 'secondary' : undefined} onClick={() => void apuntar()}>
-      Apuntar en {comidaDe(comida).nombre.toLowerCase()} {cuando}
-    </Button>
-  )
+  const guardada = recetasGuardadas.value.includes(p.id)
+  const foto = fotos.value[p.id]
 
   return (
     <div class={r.screen}>
-      <HeroHeader
-        title={p.nombre}
-        description={detalle}
-        photo={fotos.value[p.id]}
-        tone={5}
-        backHref={volver}
-      />
-      <div class={r.page}>
+      {/* La foto arriba con volver, compartir y guardar (rediseño 30; usuario, 2026-11-17) */}
+      <div
+        class={styles.hero}
+        style={
+          foto
+            ? {
+                backgroundImage: `url(${foto})`,
+                backgroundPosition: `${encuadresPlatos.value[p.id]?.x ?? 50}% ${encuadresPlatos.value[p.id]?.y ?? 50}%`,
+              }
+            : undefined
+        }
+      >
+        <button type="button" class={styles.heroBoton} aria-label="Volver" onClick={atras}>
+          <ChevronLeftIcon />
+        </button>
+        <span class={styles.heroDerecha}>
+          {/* Tu foto: cambiarla y centrarla (usuario, 2026-11-17) */}
+          <button type="button" class={styles.heroBoton} aria-label="Cambiar la foto" onClick={fotoHoja.show}>
+            <CameraIcon />
+          </button>
+          <button
+            type="button"
+            class={styles.heroBoton}
+            aria-label="Compartir la receta"
+            onClick={async () => {
+              const r0 = await compartirReceta(p)
+              if (r0 === 'copied') avisar('Receta copiada: pégala donde quieras')
+            }}
+          >
+            <ShareIcon />
+          </button>
+          <button
+            type="button"
+            class={styles.heroBoton}
+            aria-pressed={guardada}
+            aria-label={guardada ? 'Quitar de guardadas' : 'Guardar la receta'}
+            onClick={async () => {
+              const si = await alternarRecetaGuardada(p.id)
+              avisar(si ? 'Receta guardada' : 'Quitada de guardadas')
+            }}
+          >
+            <BookmarkIcon filled={guardada} />
+          </button>
+        </span>
+      </div>
+      <div class={`${r.page} ${styles.panel}`}>
+        <header class={styles.titulo}>
+          <h1>{p.nombre}</h1>
+          <ul class={styles.datos}>
+            {p.minutos ? (
+              <li>
+                <ClockIcon /> {p.minutos} min
+              </li>
+            ) : null}
+            {datos.map((d) => (
+              <li key={d}>{d}</li>
+            ))}
+          </ul>
+        </header>
         <Cifras total={total} />
         <p class={h.foot}>
           {p.origen === 'recetario'
@@ -120,143 +197,155 @@ export function PlatoScreen(props: { id: string }) {
             : '.'}
           {gramos ? ' Con los gramos ajustados.' : ''}
         </p>
-        {p.ajustable && !enMenu && (
-          <div class={styles.buttons}>
-            <Button variant="secondary" onClick={ajustarHoja.show}>
-              {gramos ? 'Ajustar otra vez' : 'Ajustar a lo que falta'}
-            </Button>
-          </div>
-        )}
-        <section aria-labelledby="ingredientes">
-          <div class={r.head}>
-            <h2 id="ingredientes" class={r.title}>
+        <div class={styles.controles}>
+          <div class={a.segmento} role="group" aria-label="Qué ver">
+            <button
+              type="button"
+              class={ver === 'ingredientes' ? a.on : ''}
+              aria-pressed={ver === 'ingredientes'}
+              onClick={() => setVer('ingredientes')}
+            >
               Ingredientes
-            </h2>
-            <span class={r.stepper}>
-              <button
-                type="button"
-                aria-label="Menos raciones"
-                disabled={veces <= 1}
-                onClick={() => setVeces((n) => Math.max(1, n - 1))}
-              >
-                <MinusIcon />
-              </button>
-              <span>
-                {veces} {veces === 1 ? 'ración' : 'raciones'}
-              </span>
-              <button
-                type="button"
-                aria-label="Más raciones"
-                onClick={() => setVeces((n) => Math.min(12, n + 1))}
-              >
-                <PlusIcon />
-              </button>
-            </span>
+            </button>
+            <button
+              type="button"
+              class={pasos ? a.on : ''}
+              aria-pressed={pasos}
+              disabled={!p.pasos.length}
+              onClick={() => setVer('pasos')}
+            >
+              Pasos
+            </button>
           </div>
-          <ul class={r.list}>
-            {p.ingredientes.map((i, k) => {
-              const g0 = i.gramos === null ? null : (i.gramos * veces) / p.raciones
-              const g = gramos?.[k] != null ? (gramos[k]! * veces) / p.raciones : g0
-              const macro = MACROS.find((m) => m.id === i.macro)
-              return (
-                <li key={`${i.texto}-${k}`}>
-                  <button
-                    type="button"
-                    class={r.row}
-                    disabled={!i.cuenta || !i.alimentoId}
-                    onClick={() => {
-                      setCual(k)
-                      cambiar.show()
-                    }}
-                  >
-                    <span
-                      class={`${styles.tag} ${macro ? '' : styles.sinTag}`}
-                      aria-label={macro ? macro.nombre : undefined}
-                      aria-hidden={macro ? undefined : 'true'}
+          <span class={styles.raciones}>
+            <button
+              type="button"
+              aria-label="Menos raciones"
+              disabled={veces <= 1}
+              onClick={() => setVeces((n) => Math.max(1, n - 1))}
+            >
+              <MinusIcon />
+            </button>
+            <span>
+              {veces} {veces === 1 ? 'ración' : 'raciones'}
+            </span>
+            <button
+              type="button"
+              aria-label="Más raciones"
+              onClick={() => setVeces((n) => Math.min(12, n + 1))}
+            >
+              <PlusIcon />
+            </button>
+          </span>
+        </div>
+        {!pasos ? (
+          <section aria-label="Ingredientes">
+            {/* Arriba, antes de la lista (usuario, 2026-11-21) */}
+            <p class={`${h.foot} ${styles.notaArriba}`}>
+              Toca un ingrediente para cambiarlo por otra marca u otro alimento.
+            </p>
+            <ul class={styles.ingredientes}>
+              {p.ingredientes.map((i, k) => {
+                const g0 = i.gramos === null ? null : (i.gramos * veces) / p.raciones
+                const g = gramos?.[k] != null ? (gramos[k]! * veces) / p.raciones : g0
+                // «Eliminar de la receta» (0 g): ya no sale en la lista
+                if (i.cuenta && g === 0) return null
+                return (
+                  <li key={`${i.texto}-${k}`}>
+                    <button
+                      type="button"
+                      class={r.row}
+                      disabled={!i.cuenta || !i.alimentoId}
+                      onClick={() => {
+                        setCual(k)
+                        cambiar.show()
+                      }}
                     >
-                      {macro?.corto ?? ''}
-                    </span>
-                    <span class={r.rowText}>
-                      <span class={r.name}>{i.alimentoId ? i.nombre : i.texto}</span>
-                      {i.antes && <span class={h.foot}>En lugar de {i.antes.toLowerCase()}</span>}
-                      {i.cuenta && enCrudo(i.alimentoId, g) && (
-                        <span class={h.foot}>{enCrudo(i.alimentoId, g)}</span>
-                      )}
-                    </span>
-                    {g !== null && i.cuenta && (
-                      <b class={r.grams}>
-                        {g0 !== null && Math.round(g0) !== Math.round(g) && (
-                          <span class={styles.old}>{formatInt(g0)}</span>
+                      <span class={r.rowText}>
+                        <span class={r.name}>{i.alimentoId ? i.nombre : i.texto}</span>
+                        {i.antes && <span class={h.foot}>En lugar de {i.antes.toLowerCase()}</span>}
+                        {i.cuenta && enCrudo(i.alimentoId, g) && (
+                          <span class={h.foot}>{enCrudo(i.alimentoId, g)}</span>
                         )}
-                        {i.sugerido ? '≈ ' : ''}
-                        {formatInt(g)} g{i.sugerido && <span class={styles.sugerido}>sugerido</span>}
-                      </b>
-                    )}
-                    {i.cuenta && i.alimentoId && <ChevronRightIcon />}
-                  </button>
+                        {i.cuenta && p.gramosDescanso?.[k] != null && p.gramosDescanso[k] !== i.gramos && (
+                          <span class={h.foot}>
+                            Días de descanso: {formatInt((p.gramosDescanso[k]! * veces) / p.raciones)} g
+                          </span>
+                        )}
+                      </span>
+                      {g !== null && i.cuenta && (
+                        <span class={styles.gramos}>
+                          {g0 !== null && Math.round(g0) !== Math.round(g) && (
+                            <span class={styles.old}>{formatInt(g0)}</span>
+                          )}
+                          {i.sugerido ? '≈ ' : ''}
+                          {formatInt(g)} g{i.sugerido && <span class={styles.sugerido}>sugerido</span>}
+                        </span>
+                      )}
+                      {i.cuenta && i.alimentoId && <ChevronRightIcon />}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        ) : (
+          <section aria-label="Pasos">
+            <ol class={styles.pasos}>
+              {/* Como los ingredientes: una fila por paso con su número (usuario, 2026-11-21) */}
+              {p.pasos.map((x, k) => (
+                <li key={x}>
+                  <span class={styles.numeroPaso} aria-hidden="true">
+                    {k + 1}
+                  </span>
+                  <span>{x}</span>
                 </li>
-              )
-            })}
-          </ul>
-          <p class={h.foot}>Toca un ingrediente para cambiarlo por otra marca u otro alimento.</p>
-        </section>
-        {p.pasos.length > 0 && (
-          <section aria-labelledby="preparacion">
-            <h2 id="preparacion" class={r.title}>
-              Preparación
-            </h2>
-            <ol class={r.steps}>
-              {p.pasos.map((x) => (
-                <li key={x}>{x}</li>
               ))}
             </ol>
           </section>
         )}
-        <div class={styles.more}>
-          {enMenu ? (
-            apuntarHoy
-          ) : (
-            <Button variant="secondary" onClick={alMenu.show}>
-              Al menú
-            </Button>
+        <div class={styles.mas}>
+          {/* Tu versión de una receta, tocando sus ingredientes; ajustar, en «Apuntar» (usuario, 2026-11-21) */}
+          {p.origen === 'tuyo' && (
+            <button type="button" class={a.pastilla} onClick={editar.show}>
+              Editar
+            </button>
           )}
-          <Button variant="secondary" onClick={editar.show}>
-            {p.origen === 'tuyo' ? 'Editar' : 'Hacer tu versión'}
-          </Button>
           {dieta.value && (
-            <Button variant="secondary" onClick={aDieta.show}>
+            <button type="button" class={a.pastilla} onClick={aDieta.show}>
               A tu dieta
-            </Button>
+            </button>
           )}
           {p.origen === 'tuyo' && (
-            <Button
-              variant="secondary"
+            <button
+              type="button"
+              class={a.pastilla}
               onClick={async () => {
                 await borrarPlato(p.id)
                 route(volver)
               }}
             >
               Borrar
-            </Button>
+            </button>
           )}
         </div>
       </div>
-      <div class={r.bottom}>
-        {!enMenu ? (
-          apuntarHoy
-        ) : yaEnMenu ? (
-          <Button href={volver}>Volver al menú</Button>
-        ) : (
-          <Button
-            onClick={async () => {
-              await ponerPlato(enMenu.id, comida, p.id)
-              route(volver)
-            }}
-          >
-            Poner en {enMenu.nombre} · {comidaDe(comida).nombre.toLowerCase()}
-          </Button>
-        )}
-      </div>
+      <BarraPlato
+        enMenu={enMenu && `Poner en ${enMenu.nombre} · ${comidaDe(comida).nombre.toLowerCase()}`}
+        yaEnMenu={yaEnMenu}
+        volver={volver}
+        cuando={cuando}
+        onApuntar={apuntarHoja.show}
+        onPoner={() => void (enMenu && ponerPlato(enMenu.id, comida, p.id).then(() => route(volver)))}
+        onApuntarHoy={() => void apuntar()}
+        onCocinar={
+          p.pasos.length
+            ? // La olla lleva al modo cocina de esta receta (usuario, 2026-11-22), con tu ración de esa comida
+              () =>
+                route(paths.cookDish(p.id, typeof query.menu === 'string' ? query.menu : '', comida, veces))
+            : null
+        }
+      />
       {ajustarHoja.open && (
         <AjustarHoja
           plato={p}
@@ -274,8 +363,27 @@ export function PlatoScreen(props: { id: string }) {
       {cambiar.open && cual !== null && (
         <CambiarHoja plato={p} indice={cual} fecha={fecha} onClose={cambiar.close} avisar={avisar} />
       )}
-      {alMenu.open && <AlMenuHoja plato={p} onClose={alMenu.close} avisar={avisar} />}
+      {apuntarHoja.open && (
+        <ApuntarHoja
+          plato={p}
+          comida={comida}
+          kcal={total.kcal}
+          cuando={cuando}
+          apuntarHoy={apuntar}
+          onAjustar={
+            p.ajustable
+              ? () => {
+                  apuntarHoja.close()
+                  ajustarHoja.show()
+                }
+              : null
+          }
+          onClose={apuntarHoja.close}
+          avisar={avisar}
+        />
+      )}
       {aDieta.open && <ADietaHoja plato={p} onClose={aDieta.close} avisar={avisar} />}
+      {fotoHoja.open && <FotoPlatoHoja plato={p} onClose={fotoHoja.close} avisar={avisar} />}
       {editar.open && <EditarPlatoHoja plato={p} onClose={editar.close} avisar={avisar} />}
       <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
     </div>

@@ -5,6 +5,10 @@
   border-radius: var(--radius-card);
 }
 
+.plano {
+  border-radius: 0;
+}
+
 .fila {
   position: relative;
   transition: transform var(--duration-sheet) var(--ease);

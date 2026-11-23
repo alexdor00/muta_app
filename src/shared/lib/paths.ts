@@ -4,6 +4,8 @@ export const paths = {
   welcome: '/bienvenida',
   /** A02–A04: pasos de la bienvenida (1, 2, 3). */
   onboarding: (step: number) => `/bienvenida/${step}`,
+  /** Los pasos de comida de la bienvenida (1: tus datos, 2: tu objetivo), en Nutrición; se pueden saltar. */
+  welcomeFood: (paso: number) => `/bienvenida/comida/${paso}`,
   today: '/hoy',
   training: '/entreno',
   routine: '/entreno/rutina',
@@ -26,12 +28,25 @@ export const paths = {
   nutrition: '/comida',
   /** Tu objetivo de comida: cómo sale, la revisión semanal del entrenador y el historial. */
   nutritionTarget: '/comida/objetivo',
+  /** Cómo cocinas: cuándo cocinas y compras, lo que dejas hecho y para cuántos (pantalla completa). */
+  cooking: '/comida/como-cocinas',
   /** Una receta de tu dieta (`tipo`: la versión de entreno o la de descanso). */
   recipe: (id: string, tipo?: 'entreno' | 'descanso') => `/comida/receta/${id}${tipo ? `?tipo=${tipo}` : ''}`,
   /** La lista de la compra de tu dieta. */
   shopping: '/comida/compra',
   /** Cocina: el arroz, repartir una olla y calcular un plato. */
   kitchen: '/comida/cocina',
+  /**
+   * El modo cocina de una tanda de tu semana resuelta (su día) o de lo que cocinas aparte ese día a una hora (`aparte`):
+   * pesar, cada receta y repartir en tápers.
+   */
+  batch: (fecha: string, aparte?: string, plato?: string) =>
+    `/comida/tanda/${fecha}${aparte ? `?aparte=${aparte}` : plato ? `?plato=${plato}` : ''}`,
+  /** Una comida al momento (o solo su proteína, si la base está en tu táper): pesar, sus pasos y apuntarla. */
+  cookNow: (fecha: string, comida: string) => `/comida/al-momento/${fecha}/${comida}`,
+  /** El modo cocina de cualquier plato (con los gramos de ese menú y comida; sin menú, tu ración de esa comida). */
+  cookDish: (plato: string, menu: string, comida: string, raciones = 1) =>
+    `/comida/cocinar/${plato}?menu=${menu}&comida=${comida}${raciones > 1 ? `&raciones=${raciones}` : ''}`,
   /** La consulta semanal con tu dieta. */
   checkIn: '/comida/consulta',
   /** Los platos de una categoría del recetario. */
@@ -42,12 +57,39 @@ export const paths = {
   /** Tu nutricionista: lo que propone para tu menú. */
   nutritionist: '/comida/nutricionista',
   progress: '/progreso',
+  /** La ficha de un músculo (a pantalla completa, como la del ejercicio). */
+  muscle: (id: string) => `/entreno/musculo/${id}`,
+  /** Un día de entreno en Progreso (AAAA-MM-DD): cada ejercicio, serie a serie, frente a la vez anterior. */
+  progressDay: (fecha: string) => `/progreso/dia/${fecha}`,
   profile: '/perfil',
 } as const
 
 // Patrones para el router (mismas rutas, con parámetros).
+/** Lo que añade Hoy a sus enlaces: la pantalla a la que llegas enseña «‹ Hoy» (si entras por otro sitio, no sale). */
+export const DESDE_HOY = 'de=hoy'
+
+/** El enlace con la marca de que vienes de Hoy. */
+export function desdeHoy(href: string): string {
+  return `${href}${href.includes('?') ? '&' : '?'}${DESDE_HOY}`
+}
+
+/** ¿Vienes de Hoy? (lo que dice la dirección: `query.de`). */
+export const vieneDeHoy = (query: Record<string, string | undefined>) => query.de === 'hoy'
+
+/** El enlace con la marca de que vienes de Entreno: la pantalla enseña «‹ Entrenamiento» (la tarjeta de tu semana). */
+export const desdeEntreno = (href: string) => `${href}${href.includes('?') ? '&' : '?'}de=entreno`
+
+/** A dónde vuelve la flecha de una pestaña a la que llegaste desde otra (Hoy o Entreno); null si entraste por su pestaña. */
+export function volverA(query: Record<string, string | undefined>): { href: string; label: string } | null {
+  if (query.de === 'hoy') return { href: paths.today, label: 'Hoy' }
+  if (query.de === 'entreno') return { href: paths.training, label: 'Entrenamiento' }
+  return null
+}
+
 export const patterns = {
+  progressDay: '/progreso/dia/:fecha',
   onboarding: '/bienvenida/:step',
+  welcomeFood: '/bienvenida/comida/:paso',
   routineCategory: '/entreno/rutinas/:category',
   routineSection: '/entreno/rutinas/:category/:section',
   routineDetail: '/entreno/programa/:id',
@@ -56,9 +98,13 @@ export const patterns = {
   session: '/entreno/sesion/:sessionId',
   summary: '/entreno/sesion/:sessionId/resumen',
   exercise: '/entreno/ejercicio/:exerciseId',
+  muscle: '/entreno/musculo/:muscleId',
   recipe: '/comida/receta/:id',
   dishes: '/comida/recetas/:categoria',
   dish: '/comida/plato/:id',
+  batch: '/comida/tanda/:fecha',
+  cookNow: '/comida/al-momento/:fecha/:comida',
+  cookDish: '/comida/cocinar/:plato',
 } as const
 
 export type Tab = 'today' | 'training' | 'nutrition' | 'progress'
@@ -79,12 +125,12 @@ export function tabOf(path: string): Tab | null {
 /**
  * Pantalla completa, sin barra de pestañas: la bienvenida, ver una sesión (lleva «Empezar» fijo abajo), la ficha de un
  * ejercicio y las pantallas de Comida que salen de la pestaña (Tu objetivo, una receta, la compra, la cocina y la consulta:
- * llevan su propia flecha atrás) y entrenar
+ * llevan su propia flecha atrás), un día de Progreso y entrenar
  * (sesión en curso y resumen), para no salir por error. La sesión antes de empezar (inicio) sí lleva pestañas.
  */
 export function isFullScreen(path: string): boolean {
   if (path === paths.welcome || path.startsWith(`${paths.welcome}/`)) return true
   if (path.startsWith(`${paths.routine}/`) || path.startsWith('/entreno/ejercicio/')) return true
-  if (path.startsWith(`${paths.nutrition}/`)) return true
+  if (path.startsWith(`${paths.nutrition}/`) || path.startsWith(`${paths.progress}/`)) return true
   return /^\/entreno\/sesion\/[^/]+(\/resumen)?\/?$/.test(path)
 }

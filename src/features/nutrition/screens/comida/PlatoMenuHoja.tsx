@@ -1,5 +1,5 @@
 import { useState } from 'preact/hooks'
-import { formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import { formatInt } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
@@ -9,6 +9,7 @@ import { PlatoFila } from '../../components/Platos.tsx'
 import { hoy, type ComidaId } from '../../state/comida.ts'
 import {
   diasDelMenu,
+  platosDelMenu,
   enCrudo,
   fotos,
   gramosDeHueco,
@@ -18,7 +19,7 @@ import {
   totalCon,
   type Cocinado,
 } from '../../state/recetas.ts'
-import { ajustarComida, cocinadoNuevo, ponerPlato } from '../../use-cases/menu.ts'
+import { ajustarComida, ponerPlato } from '../../use-cases/menu.ts'
 import { CambiarHoja } from '../plato/CambiarHoja.tsx'
 import { comidaDe, macrosCortos } from '../comun/platos.ts'
 import type { Aviso } from '../comun/useAviso.ts'
@@ -39,10 +40,10 @@ type Props = {
  * Un plato de un menú: sus cantidades (las que te sugiere para tu objetivo o las de la receta), cambiar un ingrediente por
  * otro parecido, cuándo lo cocinas, cambiar el plato o quitarlo.
  */
-export function PlatoMenuHoja({ menuId, comida, onClose, onCambiar, onCocinar, avisar }: Props) {
+export function PlatoMenuHoja({ menuId, comida, onClose, onCambiar, avisar }: Props) {
   const [cual, setCual] = useState<number | null>(null)
   const m = menu.value.menus.find((x) => x.id === menuId)
-  const id = m?.platos[comida]
+  const id = m && platosDelMenu(m)[comida]
   if (!m || !id) return null
   const fecha = diasDelMenu(menu.value, menuId, hoy.value)[0] ?? hoy.value
   const p = platoPorId(id, fecha)
@@ -67,7 +68,6 @@ export function PlatoMenuHoja({ menuId, comida, onClose, onCambiar, onCocinar, a
   const ajustada = !m.fijos?.includes(comida)
   const gramos = p ? gramosDeHueco(hueco, p) : []
   const total = p ? totalCon(p, gramos) : null
-  const cocinado = hueco.cocinado ? menu.value.cocinados.find((c) => c.id === hueco.cocinado) : null
   return (
     <Sheet title={`${m.nombre} · ${comidaDe(comida).nombre}`} onClose={onClose} large>
       <div class={h.stack}>
@@ -120,16 +120,7 @@ export function PlatoMenuHoja({ menuId, comida, onClose, onCambiar, onCocinar, a
         )}
         <p class={h.foot}>Toca un ingrediente para cambiarlo por otra marca u otro parecido.</p>
         <div class={h.actions}>
-          {p && (
-            <Button
-              variant="secondary"
-              onClick={() => onCocinar(cocinado ?? cocinadoNuevo(fecha, comida, id))}
-            >
-              {cocinado
-                ? `Lo cocinas el ${formatDayDate(cocinado.fecha)}, ${cocinado.hora}`
-                : 'Cuándo cocinarlo'}
-            </Button>
-          )}
+          {/* Cómo y cuándo se cocina, solo en Mi plan · 3 Cocina (usuario, 2026-11-19) */}
           <Button variant="secondary" onClick={onCambiar}>
             Cambiar de plato
           </Button>

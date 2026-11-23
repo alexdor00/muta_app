@@ -1,160 +1,283 @@
 import { useState } from 'preact/hooks'
-import { paths } from '../../../../shared/lib/paths.ts'
-import { addDays, formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
+import { addDays, formatInt } from '../../../../shared/lib/format.ts'
+import { nuevoId } from '../../../../shared/lib/id.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
+import { CheckIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
-import { COMIDAS, hoy, tipoDe } from '../../state/comida.ts'
+import { tandaDeHueco, tandas } from '../../state/autopilot.ts'
+import { PlatoFoto } from '../../components/Platos.tsx'
+import { COMIDAS, hoy } from '../../state/comida.ts'
 import {
   clave,
-  enCrudoDe,
-  gramosDeHueco,
-  menu,
+  DIA_LARGO,
   DIAS_NEVERA,
+  diaSemana,
+  enCrudoDe,
+  fotos,
+  gramosDeHueco,
+  huecosDelDia,
+  LETRA_DIA,
+  menu,
   paraCocinar,
-  paraCongelar,
+  pasanDeLaNevera,
   platoPorId,
   type Cocinado,
+  type Hueco,
 } from '../../state/recetas.ts'
-import { comidasDelPlato, guardarCocinado, quitarCocinado } from '../../use-cases/menu.ts'
+import { guardarSesion, marcarCocinados, volverA } from '../../use-cases/menu.ts'
 import type { Aviso } from '../comun/useAviso.ts'
 import h from '../comun/Hojas.module.css'
+import c from './CocinarAparte.module.css'
 
 type Props = {
+  /** El cocinado con el que se abre: su día y su hora traen los demás platos de esa misma vez. */
   cocinado: Cocinado
   onClose: () => void
   avisar: (texto: string, accion?: Aviso['accion']) => void
 }
 
 /**
- * Cuándo cocinas un plato: el día, la hora y para qué comidas de tu menú (las del mismo plato). Te da los gramos de todo
- * de una vez; cada comida se sirve con los suyos.
+ * Cocinar aparte (fuera de tus tandas): el día, la hora y qué comidas de tu semana cocinas de una vez, de cualquier plato
+ * (desayuno, comida, merienda o cena). Lo que ya cocinas otra vez sale tachado. Debajo, el total de cada plato; cada comida se
+ * sirve luego con sus gramos de su día.
  */
 export function CocinarHoja({ cocinado, onClose, avisar }: Props) {
-  const p = platoPorId(cocinado.plato)
+  // Los platos que ya cocinas a esa misma hora ese día van juntos
+  const sesion = menu.value.cocinados.filter(
+    (x) => x.id === cocinado.id || (x.fecha === cocinado.fecha && x.hora === cocinado.hora),
+  )
+  const ids = sesion.map((x) => x.id)
+  // Ya guardado (no uno nuevo) y si ya lo cocinaste
+  const guardada = sesion.some((x) => menu.value.cocinados.includes(x))
+  const hecho = guardada && sesion.every((x) => x.hecho)
   const [fecha, setFecha] = useState(cocinado.fecha)
   const [hora, setHora] = useState(cocinado.hora)
-  const [para, setPara] = useState<string[]>(cocinado.para)
-  if (!p) return null
-  const posibles = comidasDelPlato(p.id, hoy.value).filter((x) => x.fecha >= fecha)
-  const dias = Array.from({ length: 7 }, (_, i) => addDays(hoy.value, i)).filter(
-    (d) => !para.length || para.every((k) => k.split('|')[0] >= d),
-  )
-  const borrador: Cocinado = { ...cocinado, fecha, hora, para }
-  const gramos = paraCocinar(menu.value, borrador, p, gramosDeHueco)
-  const existe = menu.value.cocinados.some((c) => c.id === cocinado.id)
+  const [para, setPara] = useState<string[]>(() => [
+    ...new Set([...cocinado.para, ...sesion.flatMap((x) => x.para)]),
+  ])
+  const dias = Array.from({ length: 7 }, (_, i) => addDays(hoy.value, i))
+  const huecos = dias.filter((d) => d >= fecha).flatMap((d) => huecosDelDia(menu.value, d))
+  const elegidos = huecos.filter((x) => para.includes(clave(x.fecha, x.comida)))
+  // Cada plato con sus comidas: lo que se guarda (un cocinado por plato, a la misma hora)
+  const porPlato = [...new Set(elegidos.map((x) => x.plato))].map((plato) => ({
+    plato,
+    para: elegidos.filter((x) => x.plato === plato).map((x) => clave(x.fecha, x.comida)),
+  }))
+  const nuevos: Cocinado[] = porPlato.map((x) => ({
+    id: sesion.find((y) => y.plato === x.plato)?.id ?? nuevoId(),
+    hecho: sesion.find((y) => y.plato === x.plato)?.hecho,
+    plato: x.plato,
+    fecha,
+    hora,
+    para: x.para,
+  }))
+  const fuera = pasanDeLaNevera(fecha, para)
+  const nombreComida = (x: Hueco) => COMIDAS.find((k) => k.id === x.comida)?.nombre ?? ''
+  const elDia = (d: string) => (d === hoy.value ? 'hoy' : `el ${DIA_LARGO[diaSemana(d)]}`)
+
+  async function guardar() {
+    const antes = menu.value
+    await guardarSesion(ids, nuevos)
+    onClose()
+    avisar(`Cocinas ${elDia(fecha)} a las ${hora}`, {
+      label: 'Deshacer',
+      onClick: () => void volverA(antes),
+    })
+  }
+  async function quitar() {
+    const antes = menu.value
+    await guardarSesion(ids, [])
+    onClose()
+    avisar('Cada comida se cocina su día', { label: 'Deshacer', onClick: () => void volverA(antes) })
+  }
+
   return (
     <Sheet
-      title={`Cocinar · ${p.nombre}`}
+      title={`Cocinas ${elDia(fecha)}`}
       onClose={onClose}
       large
       footer={
         <div class={h.actions}>
-          <Button
-            disabled={!para.length}
-            onClick={async () => {
-              await guardarCocinado(borrador)
-              onClose()
-              avisar(`Cocinas el ${formatDayDate(fecha)} a las ${hora}`)
-            }}
-          >
-            Guardar
+          <Button disabled={!para.length} onClick={() => void guardar()}>
+            {para.length
+              ? `Guardar · ${para.length} ${para.length === 1 ? 'comida' : 'comidas'}`
+              : 'Marca lo que dejas hecho'}
           </Button>
-          {existe && (
-            <button
-              type="button"
-              class={h.textButton}
+          {guardada && cocinado.fecha <= hoy.value && (
+            <Button
+              variant="secondary"
               onClick={async () => {
-                await quitarCocinado(cocinado.id)
+                await marcarCocinados(ids, !hecho)
                 onClose()
-                avisar('Cada comida se cocina su día', {
-                  label: 'Deshacer',
-                  onClick: () => void guardarCocinado(cocinado),
-                })
+                avisar(hecho ? 'Sin cocinar' : 'Cocinado: tachado también en Hoy')
               }}
             >
-              Quitar: cocinarlo cada día
+              {hecho ? 'Marcar sin cocinar' : 'Ya lo he cocinado'}
+            </Button>
+          )}
+          {guardada && (
+            <button type="button" class={`${h.textButton} ${h.danger}`} onClick={() => void quitar()}>
+              Quitar este día de cocina
             </button>
           )}
         </div>
       }
     >
       <div class={h.stack}>
-        <ChoiceChips<string>
-          name="cocinar-dia"
-          legend="Día"
-          showLegend
-          options={dias.map((d) => ({ value: d, label: d === hoy.value ? 'Hoy' : formatDayDate(d) }))}
-          value={fecha}
-          onChange={setFecha}
-        />
-        <label class={h.field}>
-          <span class={h.foot}>Hora</span>
-          <input type="time" value={hora} onInput={(e) => setHora(e.currentTarget.value || hora)} />
-        </label>
-        <fieldset class={h.grupo}>
-          <legend class={h.eyebrow}>Para</legend>
-          {posibles.length ? (
-            posibles.map((x) => {
-              const k = clave(x.fecha, x.comida)
+        {/* Cuándo: el día en una fila de círculos (con su número) y la hora junto al título (usuario, 2026-11-16) */}
+        <section class={c.tarjeta} aria-labelledby="cocinar-cuando">
+          <div class={c.cabeza}>
+            <h3 id="cocinar-cuando" class={c.titulo}>
+              ¿Qué día?
+            </h3>
+            <label class={c.aLas}>
+              a las
+              <input
+                class={c.hora}
+                type="time"
+                aria-label="Hora de cocinar"
+                value={hora}
+                onInput={(e) => setHora(e.currentTarget.value || hora)}
+              />
+            </label>
+          </div>
+          <div class={c.dias}>
+            {dias.map((d) => (
+              <button
+                key={d}
+                type="button"
+                class={c.dia}
+                aria-pressed={d === fecha}
+                aria-label={`${LETRA_DIA[diaSemana(d)]} · ${d === hoy.value ? 'hoy' : DIA_LARGO[diaSemana(d)]} ${Number(d.slice(8))}`}
+                onClick={() => {
+                  setFecha(d)
+                  // Lo de antes de ese día ya no se puede cocinar ese día
+                  setPara(para.filter((k) => k.split('|')[0] >= d))
+                }}
+              >
+                <small>{LETRA_DIA[diaSemana(d)]}</small>
+                {Number(d.slice(8))}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <p class={c.nota}>
+          Marca lo que dejas hecho. Lo que no marques lo cocinas el mismo día que te lo comes.
+        </p>
+
+        {/* Las comidas de esos días, en una lista con su foto: un toque marca o desmarca */}
+        <section class={c.tarjeta} aria-label="Lo que dejas hecho">
+          {dias
+            .filter((d) => d >= fecha)
+            .map((d) => {
+              const delDia = huecos.filter((x) => x.fecha === d)
+              if (!delDia.length) return null
               return (
-                <label key={k} class={h.casilla}>
-                  <input
-                    type="checkbox"
-                    checked={para.includes(k)}
-                    onChange={() => setPara(para.includes(k) ? para.filter((y) => y !== k) : [...para, k])}
-                  />
-                  <span class={h.rowMain}>
-                    <span class={h.rowTitle}>
-                      {COMIDAS.find((c) => c.id === x.comida)?.nombre} · {formatDayDate(x.fecha)}
-                    </span>
-                    <span class={h.rowDetail}>
-                      {tipoDe(x.fecha) === 'entreno' ? 'Día de entreno' : 'Día de descanso'}
-                    </span>
-                  </span>
-                </label>
-              )
-            })
-          ) : (
-            <p class={h.sub}>Pon este plato en más comidas de tu menú para cocinarlo de una vez.</p>
-          )}
-        </fieldset>
-        {paraCongelar(fecha, para).length > 0 && (
-          <p class={h.warn} role="status">
-            Lo cocinado aguanta unos {DIAS_NEVERA}–4 días en la nevera: congela las raciones de{' '}
-            {paraCongelar(fecha, para)
-              .map((k) => formatDayDate(k.split('|')[0]))
-              .filter((d, i, todos) => todos.indexOf(d) === i)
-              .join(', ')}{' '}
-            y sácalas la noche antes.
-          </p>
-        )}
-        <section class={h.card} aria-label="Cocinas en total">
-          <p class={h.eyebrow}>
-            Cocinas en total · {para.length} {para.length === 1 ? 'ración' : 'raciones'}
-          </p>
-          {gramos
-            .filter((i) => i.gramos !== null)
-            .map((i) => {
-              // Lo que se cuece (el arroz), en crudo, que es como se pesa; debajo, lo que pesará cocido
-              const crudo = enCrudoDe(i.alimentoId, i.gramos!)
-              return (
-                <p key={i.texto} class={h.line}>
-                  <span class={h.rowMain}>
-                    <span>{crudo?.nombre ?? i.nombre}</span>
-                    {crudo && <span class={h.foot}>≈ {formatInt(i.gramos!)} g cocido</span>}
-                  </span>
-                  <b>{formatInt(crudo?.gramos ?? i.gramos!)} g</b>
-                </p>
+                <div key={d}>
+                  <p class={c.diaNombre}>
+                    {d === hoy.value ? 'Hoy' : `${DIA_LARGO[diaSemana(d)]} ${Number(d.slice(8))}`}
+                  </p>
+                  <ul class={c.lista}>
+                    {delDia.map((x) => {
+                      const k = clave(x.fecha, x.comida)
+                      const on = para.includes(k)
+                      // Ya lo cocinas otra vez: no se puede marcar aquí
+                      const otra = x.cocinado && !ids.includes(x.cocinado)
+                      const otraVez = otra ? menu.value.cocinados.find((y) => y.id === x.cocinado) : null
+                      const tanda = otra ? null : tandaDeHueco(tandas.value, x)
+                      const p = platoPorId(x.plato, x.fecha)
+                      return (
+                        <li key={k}>
+                          <button
+                            type="button"
+                            class={c.fila}
+                            aria-pressed={on}
+                            disabled={!!otra}
+                            onClick={() => setPara(on ? para.filter((y) => y !== k) : [...para, k])}
+                          >
+                            <PlatoFoto foto={fotos.value[x.plato] ?? null} />
+                            <span class={c.texto}>
+                              <span class={c.comida}>{nombreComida(x)}</span>
+                              <span class={c.plato}>{p?.nombre ?? 'Plato'}</span>
+                              {otraVez ? (
+                                <span class={c.ya}>Ya lo cocinas {elDia(otraVez.fecha)}</span>
+                              ) : (
+                                tanda &&
+                                !on && (
+                                  <span class={c.ya}>Ya va en tu día de cocina {elDia(tanda.fecha)}</span>
+                                )
+                              )}
+                            </span>
+                            <span class={c.marca} aria-hidden="true">
+                              {on && <CheckIcon />}
+                            </span>
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
               )
             })}
-          <p class={h.foot}>
-            Luego cada comida lleva los gramos de su día.{' '}
-            <a href={`${paths.kitchen}?desde=menu&plato=${p.id}&raciones=${para.length}`}>
-              Pesar lo cocinado ›
-            </a>
-          </p>
+          {!huecos.length && <p class={c.nota}>Pon platos en tus menús para cocinarlos de una vez.</p>}
         </section>
+
+        {fuera.length > 0 && (
+          <p class={h.warn} role="status">
+            Lo cocinado aguanta {DIAS_NEVERA} días en la nevera: lo del{' '}
+            {[...new Set(fuera.map((k) => DIA_LARGO[diaSemana(k.split('|')[0])]))].join(', ')}, mejor hazlo
+            ese día.
+          </p>
+        )}
+
+        {nuevos.length > 0 && (
+          <section class={c.tarjeta} aria-label="Cocinas en total">
+            <div class={c.cabeza}>
+              <h3 class={c.titulo}>
+                Cocinas {para.length} {para.length === 1 ? 'ración' : 'raciones'}
+              </h3>
+            </div>
+            <p class={c.nota}>
+              {nuevos
+                .map((x) => {
+                  const p = platoPorId(x.plato)
+                  return p ? `${p.nombre} ×${x.para.length}` : null
+                })
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+            <details class={c.cantidades}>
+              <summary>Ver cuánto de cada cosa</summary>
+              {nuevos.map((x) => {
+                const p = platoPorId(x.plato)
+                if (!p) return null
+                return (
+                  <div key={x.plato} class={c.total}>
+                    <p class={c.totalNombre}>
+                      {p.nombre} ×{x.para.length}
+                    </p>
+                    {paraCocinar(menu.value, x, p, gramosDeHueco)
+                      .filter((i) => i.gramos)
+                      .map((i) => {
+                        const crudo = enCrudoDe(i.alimentoId, i.gramos!)
+                        return (
+                          <p key={i.texto} class={h.line}>
+                            <span class={h.rowMain}>
+                              <span>{crudo?.nombre ?? i.nombre}</span>
+                              {crudo && <span class={h.foot}>≈ {formatInt(i.gramos!)} g cocido</span>}
+                            </span>
+                            <b>{formatInt(crudo?.gramos ?? i.gramos!)} g</b>
+                          </p>
+                        )
+                      })}
+                  </div>
+                )
+              })}
+              <p class={h.foot}>Luego cada comida lleva los gramos de su día.</p>
+            </details>
+          </section>
+        )}
       </div>
     </Sheet>
   )

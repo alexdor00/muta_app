@@ -1,0 +1,1036 @@
+/* Progreso: tarjetas grises como las de «Tu objetivo» (título pequeño en mayúsculas, una cifra, una nota corta y los
+   datos en cajitas blancas), una debajo de otra. */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--gutter) var(--gap-block);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--control-sm);
+}
+
+.eti {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nota {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.sub {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.sub b {
+  color: var(--label);
+}
+
+/* Una cifra grande con su unidad y su detalle */
+.cifra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.numero {
+  font: var(--text-session-value);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cajitas blancas, de dos en dos */
+.cajas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Cada cajita, centrada: la cifra arriba y qué es debajo */
+.cajas li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+  min-width: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.cajas b {
+  font: var(--text-headline);
+  color: var(--label);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Botón de texto en la cabecera de una tarjeta («Medirme») */
+.accion {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.accion svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Filas de una lista dentro de la tarjeta (tus básicos, tus marcas) */
+.lista {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  list-style: none;
+}
+
+.lista li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  padding: var(--space-2) var(--space-3);
+  color: var(--label);
+  text-decoration: none;
+}
+
+.filaTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.filaTitulo {
+  overflow: hidden;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filaDetalle {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.fila svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.subtitulo {
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+/* La hoja «Tus medidas»: una fila gris por perímetro con su campo en cm */
+.hoja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.campo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--control-lg);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: var(--text-body);
+}
+
+.campo span:first-child {
+  flex: 1;
+}
+
+.campo input {
+  width: calc(var(--control-lg) * 1.5);
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-headline);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  caret-color: var(--label);
+}
+
+/* En la hoja, la nota y los títulos empiezan donde el texto de las filas (no en el borde de la tarjeta) */
+.hoja > .nota,
+.hoja > .subtitulo {
+  padding: 0 var(--space-4);
+  text-align: left;
+}
+
+/* La unidad de una fila («cm»), con el mismo ancho en todas: los números quedan en columna */
+.unidad {
+  flex: none;
+  width: var(--space-6);
+}
+
+/* Al escribir, sin recuadro: se ve el cursor */
+.campo input:focus-visible {
+  outline: none;
+}
+
+/* El valor a la derecha de una fila, con su detalle debajo */
+.valor {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.valor small {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* Lo que toca: una fila gris con su píldora («Toca ahora» en negro) */
+.toca {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--label);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+}
+
+/* Barra de un rango: la zona del rango en gris, tu punto encima y, si hay, la marca del objetivo */
+.rail {
+  position: relative;
+  height: var(--rail);
+  margin: var(--space-2) 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+}
+
+.zona {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--label-2);
+}
+
+.puntoRail {
+  position: absolute;
+  top: 50%;
+  width: var(--rail-dot);
+  height: var(--rail-dot);
+  border: var(--border) solid var(--bg);
+  border-radius: var(--radius-pill);
+  background: var(--range-dot);
+  transform: translate(-50%, -50%);
+}
+
+/* Fotos: dos o tres en fila, del mismo alto */
+.fotos {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--space-2);
+}
+
+.foto {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: var(--progress-photo);
+  padding: 0 0 var(--space-2);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-3);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  cursor: pointer;
+}
+
+.foto img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto span {
+  position: relative;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font-weight: var(--weight-semibold);
+}
+
+.fotoGrande {
+  width: 100%;
+  border-radius: var(--radius-control);
+}
+
+/* El campo de una foto en la hoja «Tus fotos de hoy» */
+.subir {
+  position: relative;
+}
+
+.subir input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Las semanas del mesociclo (Constancia): un punto por sesión */
+.semanas {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-1);
+  overflow-x: auto;
+  list-style: none;
+}
+
+.semana {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: calc(var(--tap-min) + var(--space-3));
+  min-height: var(--tap-min);
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+.semana[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 var(--border) var(--label);
+}
+
+.puntos {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.puntito {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+}
+
+.puntitoOn {
+  background: var(--label);
+}
+
+/* Lo que dice el balance o una comparación: frases en cajitas blancas */
+.frases {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.frases li {
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-subhead);
+}
+
+/* Comparar: dos barras por medida (el primero en negro, el segundo en gris) */
+.barraCmp {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  font: var(--text-footnote);
+  font-variant-numeric: tabular-nums;
+}
+
+.pista {
+  height: var(--rail);
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+}
+
+.pista i {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--label);
+}
+
+.pista.otra i {
+  background: var(--label-2);
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.leyenda b {
+  color: var(--label);
+}
+
+/* Los selectores de «Comparar» */
+.select {
+  width: 100%;
+  min-height: var(--control);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  font: var(--text-body);
+}
+
+.justificado {
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Tres cajitas en fila (composición, un entreno, las cifras de un mesociclo) */
+.cajas3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Lo que se hace con una etapa, al final */
+.acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.acciones > button:first-child {
+  align-self: stretch;
+}
+
+/* El récord del mes: en negro, con su trofeo (es historia; el naranja, solo el día que lo consigues: usuario, 2026-11-20) */
+.record {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.record svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Tus fotos: una sola foto partida por una línea que se desliza (izquierda, antes; derecha, este mes) */
+.comparar {
+  position: relative;
+  height: calc(var(--progress-photo) * 1.8);
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background: var(--photo-placeholder);
+}
+
+.comparar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.compararAntes {
+  clip-path: inset(0 calc(100% - var(--corte)) 0 0);
+}
+
+.compararLinea {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--corte);
+  width: var(--border);
+  background: var(--on-photo);
+  pointer-events: none;
+}
+
+.compararLinea::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--on-photo);
+  box-shadow: var(--float-shadow);
+  content: '';
+  transform: translate(-50%, -50%);
+}
+
+.compararEti {
+  position: absolute;
+  top: var(--space-3);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--on-photo);
+  color: var(--on-photo-label);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  pointer-events: none;
+}
+
+.compararEtiAntes {
+  left: var(--space-3);
+}
+
+.compararEtiAhora {
+  right: var(--space-3);
+}
+
+.compararRango {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.compararRango:focus-visible {
+  opacity: 0.01;
+}
+
+.comparar:has(.compararRango:focus-visible) {
+  outline: var(--focus-ring) solid var(--accent);
+  outline-offset: var(--focus-ring);
+}
+
+.fotoSola {
+  display: block;
+  height: calc(var(--progress-photo) * 1.8);
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--photo-placeholder);
+  cursor: pointer;
+}
+
+.fotoSola img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* La tira de meses: elige con cuál comparar */
+.tira {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 calc(var(--space-4) * -1);
+  padding: 0 var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tiraMes {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-caption);
+  cursor: pointer;
+}
+
+.tiraMes img {
+  width: var(--meal-thumb);
+  height: var(--meal-thumb);
+  border: var(--border) solid transparent;
+  border-radius: var(--radius-control);
+  object-fit: cover;
+}
+
+.tiraMes[aria-pressed='true'] {
+  color: var(--label);
+  font-weight: var(--weight-semibold);
+}
+
+.tiraMes[aria-pressed='true'] img {
+  border-color: var(--accent);
+}
+
+.notaCentro {
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: center;
+}
+
+.flecha {
+  font-weight: var(--weight-bold);
+}
+
+.tablaSeries {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--text-footnote);
+  font-variant-numeric: tabular-nums;
+}
+
+.tablaSeries th {
+  padding: 0 0 var(--space-1);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.tablaSeries td {
+  padding: var(--space-2) var(--space-2) var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+  vertical-align: top;
+}
+
+.tablaSeries td:first-child {
+  white-space: nowrap;
+}
+
+.tablaSeries td:last-child {
+  font-weight: var(--weight-semibold);
+}
+
+.tablaSeries a {
+  color: var(--label-2);
+}
+
+/* ── Como el resto de MUTA (propuesta «cohesión», 2026-11-11) ── */
+
+/* El título de una sección, como «Comidas»: grande, fuera de la tarjeta, con su dato a la derecha */
+.seccionCab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.seccionCab h2 {
+  margin: 0;
+  font: var(--text-title-2);
+}
+
+.seccionCab span {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+/* Una lista plana sobre blanco con raya fina (como los ejercicios de Ver sesión) */
+.plana {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plana > li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.filaPlana {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.filaPlana > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.filaPlana[aria-expanded] > svg {
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.filaPlana[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
+
+/* Dentro de un grupo abierto: sus ejercicios, un poco metidos */
+.dentroGrupo {
+  margin: 0 0 var(--space-2) var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+.dentroGrupo > li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+/* El cambio como en Ver sesión: en verde (flecha y número) si sube; la flecha gris si baja */
+.cambio {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: calc(var(--space-1) / 2);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.cambio svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.sube {
+  color: var(--improve);
+}
+
+.baja svg {
+  color: var(--label-2);
+}
+
+/* El mes: tarjeta como la del día de Nutrición; la etapa en una píldora blanca y tres cifras en letra condensada */
+.etapaChip {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  gap: var(--space-1);
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  cursor: pointer;
+}
+
+.etapaChip b {
+  color: var(--label);
+  font-weight: var(--weight-semibold);
+}
+
+.etapaChip svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.cifrasMes b {
+  font: var(--text-dato-fila);
+}
+
+/* Una cifra protagonista con su cambio (como la de Ver sesión) */
+.cifraCab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.cifraCab b {
+  font: var(--text-session-value);
+  font-variant-numeric: tabular-nums;
+}
+
+.cifraCab span {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+/* Una sección sin tarjeta: su título y lo suyo debajo */
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.conIcono {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.conIcono svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.seccionTabla {
+  padding: 0 0 var(--space-2);
+  font: var(--text-headline);
+  text-align: left;
+}
+
+/* Solo para el lector de pantalla */
+.oculto {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Días: una tarjeta como «Tu semana» de Entreno, con un círculo por día */
+.semanaCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.semanaCab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.semanaEti {
+  margin: 0;
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.semanaCuenta {
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.semanaCuenta strong {
+  font: var(--text-title-2);
+  font-style: italic;
+  font-weight: var(--weight-semibold);
+  color: var(--label);
+}
+
+.mesDias {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  row-gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  justify-items: center;
+}
+
+.mesLetra {
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+.circuloDia {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  padding: 0;
+  border: var(--border) solid var(--separator);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.circuloDia.hecho {
+  border-color: var(--label);
+  background: var(--label);
+  color: var(--on-accent);
+  font-style: italic;
+  font-weight: var(--weight-bold);
+}
+
+.circuloDia.esHoy {
+  border-color: var(--label);
+  color: var(--label);
+  font-weight: var(--weight-bold);
+}
+
+.circuloDia.futuro {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+
+/* «Hacer las fotos»: una fila como las de las medidas (mismo ancho, radio y fondo), con la cámara en un círculo negro */
+.hacerFotos {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--control-lg);
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.hacerFotos > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-3);
+}
+
+.hacerFotosIcono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-lg);
+  height: var(--control-lg);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.hacerFotosIcono svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.hacerFotosTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.hacerFotosTexto b {
+  font: var(--text-headline);
+}
+
+.hacerFotosTexto span {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* Un día de recarga de hidratos: una «R» pequeña arriba a la derecha del círculo */
+.conRecarga {
+  position: relative;
+}
+
+.marcaRecarga {
+  position: absolute;
+  top: calc(var(--space-1) * -1);
+  right: calc(50% - var(--control-sm) / 2 - var(--space-2));
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--space-4);
+  height: var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  pointer-events: none;
+}

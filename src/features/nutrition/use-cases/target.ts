@@ -1,7 +1,7 @@
 // Tu objetivo: se calcula con tus datos y después solo cambia por ti (fase, a mano, tus datos) o al aceptar una
 // sugerencia del entrenador. Cada cambio queda en el historial y el último aceptado se puede deshacer.
 import { getDb } from '../../../shared/data/db.ts'
-import { addDays, formatInt } from '../../../shared/lib/format.ts'
+import { addDays, daysBetween, formatInt } from '../../../shared/lib/format.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import { phaseOf, type Goal, type Phase } from '../../profile/index.ts'
 import {
@@ -20,8 +20,14 @@ import {
   SEMANA_FINAL,
   semanaDeLaFase,
   type Situacion,
+  aprenderGasto,
+  gastoEnReposo,
+  type Deporte,
+  type Trabajo,
 } from '../domain/targets.ts'
-import { ajustes, cambios, hoy, type Ajustes, type Cambio } from '../state/comida.ts'
+import { finDeRecarga } from '../domain/refeed.ts'
+import { ajustes, cambios, hoy, tipoDe, type Ajustes, type Cambio } from '../state/comida.ts'
+import { gastoReal, rendimientoComida } from '../state/entrenador.ts'
 import { apuntarPeso, guardarAjustes, guardarCambio, ID_AJUSTES, marcarCambio } from './nutritionStore.ts'
 
 const FASE_DEL_PERFIL: Record<Phase, Fase> = {
@@ -59,9 +65,14 @@ async function cambiarObjetivo(a: Ajustes, tipo: Cambio['tipo'], texto: string, 
  * Guarda tus datos y recalcula tu objetivo. La primera vez lo crea con la fase que eliges (si no, la de tu bienvenida);
  * tu peso queda también como pesaje de hoy.
  */
-export async function guardarDatos(cuerpo: Cuerpo, pasos: number, fase?: Fase): Promise<void> {
+export async function guardarDatos(
+  cuerpo: Cuerpo,
+  pasos: number,
+  fase?: Fase,
+  ritmo?: number,
+): Promise<void> {
   const previo = ajustes.value
-  const deLaBienvenida = previo ?? { ...(await deTuPerfil()), ritmo: RITMO_DE_SERIE }
+  const deLaBienvenida = previo ?? { ...(await deTuPerfil()), ritmo: ritmo ?? RITMO_DE_SERIE }
   const perfil = { ...deLaBienvenida, fase: (!previo && fase) || deLaBienvenida.fase }
   const calculo = calcularObjetivo({
     cuerpo,
@@ -69,9 +80,16 @@ export async function guardarDatos(cuerpo: Cuerpo, pasos: number, fase?: Fase): 
     diasEntreno: perfil.diasEntreno,
     fase: perfil.fase,
     ritmo: perfil.ritmo,
+    trabajo: previo?.trabajo,
+    deporte: previo?.deporte,
+    gastoAprendido: previo?.gastoAprendido,
   })
   const a: Ajustes = {
     id: ID_AJUSTES,
+    trabajo: previo?.trabajo,
+    deporte: previo?.deporte ?? null,
+    gastoAprendido: previo?.gastoAprendido ?? null,
+    gastoFecha: previo?.gastoFecha ?? null,
     target: 'nutricion',
     cuerpo,
     pasos,
@@ -100,13 +118,37 @@ export async function guardarDatos(cuerpo: Cuerpo, pasos: number, fase?: Fase): 
 }
 
 /**
+ * Lo que saldría con tus datos, sin guardar nada (la bienvenida lo enseña antes de que lo aceptes): kcal, macros con el
+ * reparto de serie y el cálculo paso a paso.
+ */
+export function previaDelObjetivo(
+  cuerpo: Cuerpo,
+  pasos: number,
+  perfil: { fase: Fase; diasEntreno: number },
+  ritmo: number,
+) {
+  const calculo = calcularObjetivo({
+    cuerpo,
+    pasos,
+    diasEntreno: perfil.diasEntreno,
+    fase: perfil.fase,
+    ritmo,
+  })
+  const macros = macrosObjetivo(calculo.kcal, cuerpo.pesoKg, {
+    proteinaGKg: PROTEINA_G_KG[0],
+    grasaGKg: GRASA_G_KG[0],
+  })
+  return { calculo, macros }
+}
+
+/**
  * Cambia de fase (y de ritmo en definición) y recalcula. Con velocidad por fases, las kcal salen de la velocidad de la
  * etapa en la que estás; en mantenimiento, `situacion` (parón o salida de una definición) empieza sus mesetas de cero.
  */
 export async function cambiarFase(
   fase: Fase,
   ritmoPedido: number,
-  opciones: { porFases?: boolean; situacion?: Situacion | null } = {},
+  opciones: { porFases?: boolean; situacion?: Situacion | null; ritmoVolumen?: number } = {},
 ): Promise<void> {
   const previo = ajustes.value
   if (!previo) return
@@ -119,7 +161,8 @@ export async function cambiarFase(
   const porFases = fase === 'definicion' && (opciones.porFases ?? previo.porFases ?? false)
   const ritmoTramo = porFases ? ritmoDeLaSemana(ritmo, semanaDeLaFase(faseDesde, hoy.value)) : null
   const situacion = fase === 'mantenimiento' ? (opciones.situacion ?? previo.situacion ?? null) : null
-  const calculo = calcularObjetivo({ ...previo, fase, ritmo: ritmoTramo ?? ritmo })
+  const ritmoVolumen = opciones.ritmoVolumen ?? previo.ritmoVolumen
+  const calculo = calcularObjetivo({ ...previo, fase, ritmo: ritmoTramo ?? ritmo, ritmoVolumen })
   const a: Ajustes = {
     ...previo,
     fase,
@@ -128,6 +171,7 @@ export async function cambiarFase(
     porFases,
     ritmoTramo,
     situacion,
+    ritmoVolumen,
     mesetas: situacion !== (previo.situacion ?? null) ? 0 : (previo.mesetas ?? 0),
     kcal: calculo.kcal,
     kcalAnterior: null,
@@ -135,6 +179,35 @@ export async function cambiarFase(
     aMano: false,
   }
   await cambiarObjetivo(a, 'fase', `Nueva fase: ${nombreFase(fase).toLowerCase()}`, previo)
+}
+
+/**
+ * Tu actividad (trabajo y otros deportes; usuario, 2026-11-19): recalcula tu objetivo con ella. Si ya se aprendió tu gasto
+ * de tus datos, manda lo aprendido y la actividad solo queda guardada.
+ */
+export async function cambiarActividad(trabajo: Trabajo, deporte: Deporte | null): Promise<void> {
+  const previo = ajustes.value
+  if (!previo) return
+  const calculo = calcularObjetivo({ ...previo, trabajo, deporte, ritmo: previo.ritmoTramo ?? previo.ritmo })
+  if (previo.aMano || calculo.kcal === previo.kcal)
+    return void (await guardarAjustes({ ...previo, trabajo, deporte }))
+  const a: Ajustes = { ...previo, trabajo, deporte, kcal: calculo.kcal, kcalAnterior: null, desde: hoy.value }
+  await cambiarObjetivo(a, 'datos', 'Cambiaste tu actividad', previo)
+}
+
+/**
+ * Aprende lo que gastas de tus datos (02-reglas, «Revisión semanal automática»): con 8 pesajes y 8 días de comida en 14,
+ * una vez por semana, nuevo gasto = 0,6 × el anterior + 0,4 × lo observado. No cambia lo que comes: tu objetivo sigue
+ * igual hasta que cambias de fase o aceptas una revisión; desde entonces, sale de lo aprendido.
+ */
+export async function aprenderDeTusDatos(): Promise<void> {
+  const a = ajustes.value
+  const observado = gastoReal.value
+  if (!a || !observado) return
+  if (a.gastoFecha && daysBetween(a.gastoFecha, hoy.value) < 7) return
+  const anterior = a.gastoAprendido ?? calcularObjetivo({ ...a, gastoAprendido: null }).gasto
+  const nuevo = aprenderGasto(anterior, observado, gastoEnReposo(a.cuerpo))
+  await guardarAjustes({ ...a, gastoAprendido: nuevo, gastoFecha: hoy.value })
 }
 
 /** Cambia cómo repartes tus kcal: proteína y grasa por kilo o en gramos; los hidratos son lo que queda. */
@@ -150,15 +223,43 @@ export async function cambiarOnOff(diferencia: number | null): Promise<void> {
 }
 
 /** Empieza la recarga de hidratos propuesta: desde hoy hasta completar una vuelta de tu rutina. */
-export async function empezarRecarga(hasta: string): Promise<void> {
+export async function empezarRecarga(hasta: string, sesiones?: number): Promise<Ajustes | null> {
   const previo = ajustes.value
-  if (previo) await guardarAjustes({ ...previo, recarga: { desde: hoy.value, hasta } })
+  if (previo) await guardarAjustes({ ...previo, recarga: { desde: hoy.value, hasta, sesiones } })
+  return previo
+}
+
+/**
+ * Empezar una recarga porque tú lo decides (usuario, 2026-11-22: un botón en Tu objetivo): desde hoy, una vuelta de tu
+ * rutina (las sesiones que da Entreno o, sin ellas, tus entrenos de la semana). Devuelve lo de antes (para «Deshacer»).
+ */
+export function empezarRecargaYa(): Promise<Ajustes | null> {
+  const sesiones = rendimientoComida.value?.sesionesDelCiclo ?? ajustes.value?.diasEntreno ?? 4
+  return empezarRecarga(
+    finDeRecarga(hoy.value, sesiones, (f) => tipoDe(f) === 'entreno'),
+    sesiones,
+  )
+}
+
+/** Terminar la recarga (usuario, 2026-11-22): desde hoy, tu definición. Devuelve lo de antes (para «Deshacer»). */
+export async function terminarRecarga(): Promise<Ajustes | null> {
+  const previo = ajustes.value
+  const r = previo?.recarga
+  if (previo && r)
+    await guardarAjustes({ ...previo, recarga: { desde: r.desde, hasta: addDays(hoy.value, -1) } })
+  return previo
+}
+
+/** «Deshacer» de empezar, terminar o «Ahora no» a la recarga: vuelve lo de antes. */
+export async function volverARecarga(previo: Ajustes | null): Promise<void> {
+  if (previo) await guardarAjustes(previo)
 }
 
 /** «Ahora no» a la recarga: no se vuelve a proponer en 7 días. */
-export async function descartarRecarga(): Promise<void> {
+export async function descartarRecarga(): Promise<Ajustes | null> {
   const previo = ajustes.value
   if (previo) await guardarAjustes({ ...previo, recargaDescartada: hoy.value })
+  return previo
 }
 
 /** Fija las kcal a mano (entre 1.000 y 6.000). Devuelve false si no son válidas. */
@@ -189,13 +290,24 @@ export async function aplicarSugerencia(id: string): Promise<void> {
   const previo = ajustes.value
   const c = cambios.value.find((x) => x.id === id)
   if (!previo || !c || c.status !== 'pendiente') return
+  const extra = c.revision?.extra
   const antes = {
     kcal: previo.kcal,
     kcalAnterior: previo.kcalAnterior,
     desde: previo.desde,
     aMano: previo.aMano,
+    // Si cambia de fase (salir de la definición o una pausa), lo de antes para «Deshacer»
+    ...(extra?.fase
+      ? {
+          fase: previo.fase,
+          faseDesde: previo.faseDesde,
+          situacion: previo.situacion ?? null,
+          mesetas: previo.mesetas ?? 0,
+          kcalAlEmpezar: previo.kcalAlEmpezar ?? null,
+          ultimaDefinicion: previo.ultimaDefinicion ?? null,
+        }
+      : {}),
   }
-  const extra = c.revision?.extra
   await guardarAjustes({
     ...previo,
     kcal: c.a,
@@ -204,7 +316,15 @@ export async function aplicarSugerencia(id: string): Promise<void> {
     // Una etapa nueva de la definición o una meseta más
     ...(extra?.ritmoTramo ? { ritmoTramo: extra.ritmoTramo } : {}),
     ...(extra?.meseta ? { mesetas: (previo.mesetas ?? 0) + 1 } : {}),
+    // Salir de la definición o una pausa (usuario, 2026-11-22): la fase nueva desde mañana
+    ...(extra?.fase
+      ? { fase: extra.fase, faseDesde: addDays(hoy.value, 1), situacion: extra.situacion ?? null, mesetas: 0 }
+      : {}),
   })
+  // Una pausa porque la definición se atragantaba: queda dicho para la siguiente
+  const u = ajustes.value?.ultimaDefinicion
+  if (extra?.fase && !extra.situacion && u && ajustes.value)
+    await guardarAjustes({ ...ajustes.value, ultimaDefinicion: { ...u, atragantada: true } })
   const nuevo = { ...c, status: 'aplicado' as const, antes, updatedAt: new Date().toISOString() }
   cambios.value = cambios.value.map((x) => (x.id === id ? nuevo : x))
   await (await getDb()).put('coach', nuevo)

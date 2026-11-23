@@ -6,6 +6,9 @@ export const DISCOS = [25, 20, 15, 10, 5, 2.5, 1.25] as const
 /** Todos los discos son múltiplos de este paso (kg): se cuenta en pasos para no arrastrar decimales. */
 const PASO = 0.25
 
+/** El peso total más alto que se calcula (kg): con más, el cálculo no acabaría y nadie lo carga en una barra. */
+export const MAX_TOTAL_DISCOS = 1000
+
 /**
  * Discos que van a cada lado de la barra para llegar al peso total, de mayor a menor, con los que hay (sin los de
  * `faltan`): los menos posibles y, si empatan, los más grandes. Lo que no se puede poner sale en `sobra` (por lado).
@@ -15,7 +18,7 @@ export function discosPorLado(
   barra: number,
   faltan: readonly number[] = [],
 ): { discos: number[]; sobra: number } {
-  const lado = Math.max(0, (total - barra) / 2)
+  const lado = Math.max(0, (Math.min(total, MAX_TOTAL_DISCOS) - barra) / 2)
   const hay = DISCOS.filter((d) => !faltan.includes(d)).map((d) => Math.round(d / PASO))
   const pasos = Math.floor(lado / PASO + 1e-9)
   // cuantos[u]: los menos discos que suman u pasos (Infinity si no se puede)

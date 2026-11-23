@@ -8,7 +8,13 @@ import { avisar, pantallaEncendida } from '../../use-cases/workoutFeedback.ts'
  */
 export function useReloj() {
   const [ahora, setAhora] = useState(() => Date.now())
-  const [descanso, setDescanso] = useState<{ fin: number; avisado: boolean } | null>(null)
+  const [descanso, setDescanso] = useState<{
+    fin: number
+    dura: number
+    avisado: boolean
+    /** Parado: los segundos que quedaban al pararlo (usuario, 2026-11-14: todos los cronómetros se paran). */
+    parado?: number | null
+  } | null>(null)
 
   useEffect(() => {
     pantallaEncendida(true)
@@ -21,7 +27,7 @@ export function useReloj() {
 
   useEffect(() => {
     setDescanso((d) => {
-      if (!d) return d
+      if (!d || d.parado != null) return d
       const quedan = (d.fin - ahora) / 1000
       if (quedan < -90) return null
       if (quedan > 0 || d.avisado) return d
@@ -30,8 +36,29 @@ export function useReloj() {
     })
   }, [ahora])
 
-  const quedanDescanso = descanso ? (descanso.fin - ahora) / 1000 : 0
+  const quedanDescanso = descanso ? (descanso.parado ?? (descanso.fin - ahora) / 1000) : 0
+  /** Para el descanso o lo sigue desde donde se quedó. */
+  const pausarDescanso = () =>
+    setDescanso((d) =>
+      !d
+        ? d
+        : d.parado != null
+          ? { ...d, fin: Date.now() + d.parado * 1000, parado: null }
+          : { ...d, parado: (d.fin - Date.now()) / 1000 },
+    )
   const tiempoDescanso =
     quedanDescanso > 0 ? formatClock(Math.ceil(quedanDescanso)) : `+${formatClock(-quedanDescanso)}`
-  return { ahora, descanso, setDescanso, quedanDescanso, tiempoDescanso }
+  // Lo que queda del descanso, de 1 a 0 (el anillo de la tarjeta del descanso)
+  const parteDescanso = descanso?.dura ? Math.min(1, Math.max(0, quedanDescanso / descanso.dura)) : 0
+  const descansoParado = descanso?.parado != null
+  return {
+    ahora,
+    descanso,
+    setDescanso,
+    quedanDescanso,
+    tiempoDescanso,
+    parteDescanso,
+    pausarDescanso,
+    descansoParado,
+  }
 }

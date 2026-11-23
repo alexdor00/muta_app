@@ -1,7 +1,7 @@
 # MUTA
 
 App de entrenamiento instalable (PWA) en español. Se construye pantalla a pantalla siguiendo el documento
-de rediseño; hoy están hechas las áreas **Entreno** y **Nutrición** (antes Comida) y la **bienvenida**.
+de rediseño; hoy están hechas las áreas **Hoy**, **Entreno**, **Nutrición** (antes Comida) y **Progreso**, y la **bienvenida**.
 Repositorio público: `alexdor00/muta_app`. Cómo trabajar con ella: ver «Reglas globales».
 
 ## Stack
@@ -24,13 +24,18 @@ size-limit · Lighthouse CI · Node 24.
 
 Los e2e se construyen sin las rutinas privadas (`VITE_NO_LOCAL_PROGRAMS=1`), igual que la CI.
 
+**Cuándo probar** (usuario, 2026-11-12): mientras se itera, tras cada cambio solo lo rápido (`npx tsc -b`, el linter de lo
+tocado y, si cambia lo que se ve, una captura o el e2e de esa pantalla). `npm run check` y todos los e2e, al cerrar una
+tanda y siempre antes del commit. No ejecutar `npm run build` mientras corren los e2e: pisa la app que sirve su servidor.
+
 ## Mapa de módulos (cada uno con su CLAUDE.md si lleva uno)
 
 - `src/app/` — arranque, rutas, pestañas, pantalla de error, actualizaciones → [CLAUDE.md](src/app/CLAUDE.md)
 - `src/features/training/` — **Entreno**: catálogo, detalle de rutina, elecciones → [CLAUDE.md](src/features/training/CLAUDE.md)
 - `src/features/profile/` — bienvenida y perfil → [CLAUDE.md](src/features/profile/CLAUDE.md)
 - `src/features/nutrition/` — **Comida**: apuntar, tu objetivo, tu menú, las recetas que se ajustan a lo que falta, tu dieta (compra, cocina, consulta) y el escáner; quien aconseja propone, no aplica → [CLAUDE.md](src/features/nutrition/CLAUDE.md)
-- `src/features/today|progress/` — Hoy (de momento, tu peso y lo de hoy, de Comida) y Progreso (pendiente)
+- `src/features/progress/` — **Progreso** mes a mes en una pantalla: el mes con su etapa y Días · Cuerpo · Fuerza; da a Hoy lo que toca → [CLAUDE.md](src/features/progress/CLAUDE.md)
+- `src/features/today/` — **Hoy**: solo lo que te queda por hacer hoy, con lo que da cada área → [CLAUDE.md](src/features/today/CLAUDE.md)
 - `src/shared/` — lo común: `ui`, `data`, `content`, `platform`, `lib` → [CLAUDE.md](src/shared/CLAUDE.md)
 - `tests/e2e/` — recorridos, accesibilidad y capturas → [CLAUDE.md](tests/e2e/CLAUDE.md)
 - `scripts/` — generadores de contenido y documentos (no forman parte de la app)
@@ -65,6 +70,10 @@ Leer este archivo, `TAREAS.md` y el `CLAUDE.md` del módulo; resumir en cinco l�
 7. Los datos de terceros (`private/`) no se suben ni se copian a `src/` (excepción: el recetario, decisión 2026-11-06); sin nombres de personas en la app.
 8. Un cambio = una rama (`refactor/…`, `pantalla/…`), un commit con sentido y todo en verde antes de unirlo.
 9. Pantalla nueva: sin diseño aprobado no se programa. Ver el checklist del documento de rediseño.
+10. **Todo es sugerencia, nunca automático** (dieta y entrenamiento): kcal, macros, fase, series, cargas, RIR, ejercicios,
+    descansos… La app propone con su motivo y cambia solo lo que tú aplicas («Aplicar / Ahora no», con «Deshacer»).
+11. **Lo que sale en varios sitios es igual en todos**: un componente en `shared/ui`, usado tal cual; ver «Sistema de diseño» en
+    [docs/rediseno.md](docs/rediseno.md).
 
 ## Mantenimiento de la documentación
 

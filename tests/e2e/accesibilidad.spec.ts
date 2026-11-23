@@ -39,10 +39,10 @@ test('tu plan, con un músculo tocado y con la hoja Tu rutina abierta', async ({
   await sinFallos(page)
 })
 
-test('la ficha del ejercicio, desde la sesión, con sus dos gráficas', async ({ page }) => {
+test('la ficha del ejercicio, desde la sesión, con su gráfica', async ({ page }) => {
   await page.goto('/entreno/ejercicio/peso_muerto_rumano?sesion=b1&ej=0')
   await expect(page.getByRole('button', { name: 'Empezar ejercicio' })).toBeVisible()
-  await expect(page.getByRole('region', { name: 'Tonelaje del ejercicio' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Progreso del ejercicio' })).toBeVisible()
   await sinFallos(page)
 })
 
@@ -62,7 +62,7 @@ test('la ficha del músculo, en Resumen (con el rango a mano abierto) y en Conse
     .getByRole('region', { name: 'Músculos que trabaja' })
     .getByRole('button', { name: 'Femoral' })
     .click()
-  const hoja = page.getByRole('dialog', { name: 'Femoral' })
+  const hoja = page.getByRole('main')
   await hoja.getByText('Ajustar a mano').click()
   await sinFallos(page)
   await hoja.getByText('Consejos', { exact: true }).click()
@@ -155,6 +155,7 @@ test('elegir rutina y detalle de una rutina de MUTA', async ({ page }) => {
   await page.getByRole('link', { name: 'Comenzar' }).click()
   await page.getByRole('link', { name: 'Siguiente' }).click()
   await page.getByRole('button', { name: 'Siguiente' }).click()
+  await page.getByRole('link', { name: 'Ahora no, solo entreno' }).click()
   await expect(page).toHaveURL('/entreno/rutinas')
   await sinFallos(page)
   await page.goto('/entreno/programa/muta-cuerpo-completo-4d')
@@ -187,12 +188,12 @@ test('Editar rutina, sus consejos del entrenador y Editar ejercicio (con las rep
   await sinFallos(page)
   await page
     .getByRole('list', { name: 'Tu semana' })
-    .getByRole('button', { name: /^\d+ Isquios, glúteo y pecho/ })
+    .getByRole('button', { name: /^Isquios, glúteo y pecho/ })
     .click()
   await sinFallos(page)
   await page.getByRole('button', { name: /^Peso muerto rumano/ }).click()
   const ej = page.getByRole('dialog', { name: 'Peso muerto rumano' })
-  await ej.locator('summary', { hasText: 'Repeticiones' }).click()
+  await ej.getByRole('button', { name: 'Más opciones' }).click()
   await sinFallos(page)
 })
 
@@ -205,7 +206,7 @@ test('foto de la sesión (desde Editar rutina) y el «···» de un ejercicio c
     .click()
   await page
     .getByRole('list', { name: 'Tu semana' })
-    .getByRole('button', { name: /^\d+ Isquios, glúteo y pecho/ })
+    .getByRole('button', { name: /^Isquios, glúteo y pecho/ })
     .click()
   await page.getByRole('button', { name: /foto (a|de) Isquios, glúteo y pecho/ }).click()
   await expect(page.getByRole('dialog', { name: 'Foto de la sesión' })).toBeVisible()
@@ -218,12 +219,11 @@ test('foto de la sesión (desde Editar rutina) y el «···» de un ejercicio c
   await sinFallos(page)
 })
 
-test('Perfil · Tu material y el «···» de la ficha', async ({ page }) => {
+test('Perfil · Tu material y la ficha', async ({ page }) => {
   await page.goto('/perfil')
   await page.getByRole('switch', { name: 'Máquinas' }).click()
   await sinFallos(page)
   await page.goto('/entreno/ejercicio/peso_muerto_rumano')
-  await page.getByRole('button', { name: 'Más opciones' }).click()
-  await expect(page.getByRole('dialog', { name: 'Peso muerto rumano' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Peso muerto rumano' })).toBeVisible()
   await sinFallos(page)
 })

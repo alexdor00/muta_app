@@ -1,4 +1,4 @@
-// Tu dieta: menús que se repiten en un ciclo de 7 días, recetas con su versión de entreno y de descanso, y lo que la
+// Tu dieta: menús que se repiten en un ciclo (de los días que diga la dieta: 7, 6, 4…), recetas con su versión de entreno y de descanso, y lo que la
 // consulta semanal cambia (kcal por tipo de día, pasos y fase). Reglas del prototipo anterior (js/comida/dieta.js):
 // qué día del menú es hoy, qué receta absorbe los cambios de kcal y cómo se redondean sus gramos.
 import { addDays, daysBetween } from '../../../shared/lib/format.ts'
@@ -24,6 +24,8 @@ export type Ingrediente = {
   ajusta: boolean
   /** Cómo va si no lleva gramos: «al gusto», «1 cucharadita». */
   nota: string
+  /** Se hace el mismo día aunque el plato se cocine antes (el pescado, la verdura fresca). */
+  alMomento?: boolean
 }
 
 export type Receta = {
@@ -36,6 +38,10 @@ export type Receta = {
   /** El menú al que pertenece; null si va todos los días. */
   menu: string | null
   soloEntreno: boolean
+  /** Solo los días de descanso (lo contrario del preentreno). */
+  soloDescanso?: boolean
+  /** Cómo lo dice la dieta: con antelación (el día de cocinar) o al momento. */
+  preparar?: 'antes' | 'momento'
   ingredientes: Ingrediente[]
   pasos: string[]
   notas: string[]
@@ -57,8 +63,10 @@ export type Dieta = {
   nombre: string
   descripcion: string
   menus: Menu[]
-  /** El menú de cada día del ciclo (7, el primero es el día 1). */
+  /** El menú de cada día del ciclo (los días que dure, de 1 en adelante; el primero es el día 1). */
   ciclo: string[]
+  /** Los días del ciclo en que se cocina (como «Cuándo cocinar» de la dieta); sin decir, los elige tu semana. */
+  cocinar?: number[]
   recetas: Receta[]
   fases: FaseDieta[]
   /** Kilos por semana que la consulta considera bajar deprisa o despacio. */
@@ -92,6 +100,9 @@ export type DietaActiva = {
   originales: Record<string, Receta>
 }
 
+/** Lo más largo que puede durar el ciclo de una dieta (dos meses). */
+export const MAX_CICLO = 60
+
 /** Pasos al día de la regla (docs/conocimiento/02-reglas.md · sección 8). */
 export const PASOS = 10_000
 /** Umbrales de la regla: más de 0,9 kg por semana es deprisa; menos de 0,3, despacio. */
@@ -99,9 +110,10 @@ export const UMBRALES = { rapido: 0.9, lento: 0.3 }
 /** Factor del arroz cocido del prototipo (100 g en crudo ≈ 300 g cocido) hasta que lo midas. */
 export const FACTOR_ARROZ = 3
 
-/** Día del ciclo de 7 (1 = el día de inicio). */
-export function diaDelCiclo(inicio: string, fecha: string): number {
-  return (((daysBetween(inicio, fecha) % 7) + 7) % 7) + 1
+/** Día del ciclo de `n` días (1 = el día de inicio; de serie, 7). */
+export function diaDelCiclo(inicio: string, fecha: string, n = 7): number {
+  const largo = Math.max(1, n)
+  return (((daysBetween(inicio, fecha) % largo) + largo) % largo) + 1
 }
 
 /** Semana de la dieta (1 = la primera). */
@@ -115,7 +127,7 @@ export function inicioSi(hoy: string, n: number): string {
 }
 
 export function menuDe(dieta: Dieta, inicio: string, fecha: string): Menu {
-  const id = dieta.ciclo[diaDelCiclo(inicio, fecha) - 1]
+  const id = dieta.ciclo[diaDelCiclo(inicio, fecha, dieta.ciclo.length) - 1]
   return dieta.menus.find((m) => m.id === id) ?? dieta.menus[0]
 }
 
@@ -135,12 +147,17 @@ export function kcalExtra(dieta: Dieta, ajuste: AjusteDieta, tipo: TipoDia): num
   return (faseDe(dieta, ajuste)?.kcal ?? 0) + ajuste.kcal[tipo]
 }
 
-const ORDEN: ComidaId[] = ['desayuno', 'comida', 'merienda', 'cena']
+export const ORDEN: ComidaId[] = ['desayuno', 'comida', 'merienda', 'cena']
 
 /** Las recetas de un día: las del menú y las de todos los días (el preentreno, solo si entrenas), por comidas. */
 export function recetasDe(dieta: Dieta, menuId: string, tipo: TipoDia): Receta[] {
   return dieta.recetas
-    .filter((r) => (r.menu === menuId || r.menu === null) && (!r.soloEntreno || tipo === 'entreno'))
+    .filter(
+      (r) =>
+        (r.menu === menuId || r.menu === null) &&
+        (!r.soloEntreno || tipo === 'entreno') &&
+        (!r.soloDescanso || tipo === 'descanso'),
+    )
     .map((r, i) => [ORDEN.indexOf(r.comida) * 100 + i, r] as const)
     .sort((a, b) => a[0] - b[0])
     .map(([, r]) => r)
@@ -216,7 +233,7 @@ export function diaDeDieta(activa: DietaActiva, fecha: string, tipo: TipoDia): D
     fecha,
     tipo,
     menu,
-    diaCiclo: diaDelCiclo(activa.inicio, fecha),
+    diaCiclo: diaDelCiclo(activa.inicio, fecha, dieta.ciclo.length),
     semana: semanaDeDieta(activa.inicio, fecha),
     recetas,
     total: sumar(recetas.map((r) => r.total)),
@@ -226,13 +243,15 @@ export function diaDeDieta(activa: DietaActiva, fecha: string, tipo: TipoDia): D
 
 /** Media de un tipo de día en todo el ciclo (lo que se enseña antes de empezar y en la tarjeta de la dieta). */
 export function mediaDelTipo(activa: DietaActiva, desde: string, tipo: TipoDia): Macros {
-  const dias = Array.from({ length: 7 }, (_, i) => diaDeDieta(activa, addDays(desde, i), tipo).total)
+  // Todo el ciclo, dure lo que dure
+  const n = Math.max(1, activa.dieta.ciclo.length)
+  const dias = Array.from({ length: n }, (_, i) => diaDeDieta(activa, addDays(desde, i), tipo).total)
   const s = sumar(dias)
   return {
-    kcal: Math.round(s.kcal / 7),
-    protein: r1(s.protein / 7),
-    carbs: r1(s.carbs / 7),
-    fat: r1(s.fat / 7),
+    kcal: Math.round(s.kcal / n),
+    protein: r1(s.protein / n),
+    carbs: r1(s.carbs / n),
+    fat: r1(s.fat / n),
   }
 }
 
@@ -268,124 +287,4 @@ export function siguienteMenu(dieta: Dieta): Menu {
   const usados = new Set(dieta.menus.map((m) => m.id))
   const letra = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').find((l) => !usados.has(l)) ?? String(usados.size + 1)
   return { id: letra, nombre: `Menú ${letra}` }
-}
-
-const esNumero = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x) && x >= 0
-const esTexto = (x: unknown): x is string => typeof x === 'string'
-const COMIDAS_ID: readonly string[] = ORDEN
-
-function leerMacros(x: unknown): Macros | null {
-  if (!x || typeof x !== 'object') return null
-  const m = x as Record<string, unknown>
-  return esNumero(m.kcal) && esNumero(m.protein) && esNumero(m.carbs) && esNumero(m.fat)
-    ? { kcal: m.kcal, protein: m.protein, carbs: m.carbs, fat: m.fat }
-    : null
-}
-
-function leerIngrediente(x: unknown): Ingrediente | null {
-  if (!x || typeof x !== 'object') return null
-  const i = x as Record<string, unknown>
-  const por100 = leerMacros(i.por100)
-  const g = i.gramos as Record<string, unknown> | null | undefined
-  const gramos =
-    g && esNumero(g.entreno) && esNumero(g.descanso) ? { entreno: g.entreno, descanso: g.descanso } : null
-  if (!esTexto(i.nombre) || !i.nombre.trim() || !por100 || (g && !gramos)) return null
-  return {
-    nombre: i.nombre.trim(),
-    alimentoId: esTexto(i.alimentoId) ? i.alimentoId : null,
-    categoria: esTexto(i.categoria) ? i.categoria : '',
-    por100,
-    gramos,
-    ajusta: i.ajusta === true,
-    nota: esTexto(i.nota) ? i.nota : '',
-  }
-}
-
-const textos = (x: unknown) => (Array.isArray(x) ? x.filter(esTexto) : [])
-
-/**
- * Lee un archivo de dieta de MUTA (lo que guarda «Guardar como archivo»). Devuelve la dieta o, si no vale, por qué.
- * Comprueba todo lo que la app usa: nada a medias.
- */
-export function leerDieta(x: unknown): { ok: true; dieta: Dieta } | { ok: false; motivo: string } {
-  if (!x || typeof x !== 'object') return { ok: false, motivo: 'No es un archivo de dieta de MUTA' }
-  const d = x as Record<string, unknown>
-  if (d.formato !== FORMATO) return { ok: false, motivo: 'No es un archivo de dieta de MUTA' }
-  if (d.version !== 1) return { ok: false, motivo: 'Es de una versión de MUTA más nueva' }
-  const menus = Array.isArray(d.menus)
-    ? d.menus.flatMap((m: unknown) => {
-        const mm = m as Record<string, unknown> | null
-        return mm && esTexto(mm.id) && esTexto(mm.nombre) ? [{ id: mm.id, nombre: mm.nombre }] : []
-      })
-    : []
-  if (!menus.length) return { ok: false, motivo: 'La dieta no trae menús' }
-  const ids = new Set(menus.map((m) => m.id))
-  const ciclo = Array.isArray(d.ciclo) ? d.ciclo.filter(esTexto) : []
-  if (ciclo.length !== 7 || ciclo.some((c) => !ids.has(c)))
-    return { ok: false, motivo: 'El ciclo debe decir el menú de cada uno de los 7 días' }
-  const recetas: Receta[] = []
-  for (const r of Array.isArray(d.recetas) ? d.recetas : []) {
-    const rr = r as Record<string, unknown> | null
-    const ingredientes = Array.isArray(rr?.ingredientes) ? rr.ingredientes.map(leerIngrediente) : []
-    if (
-      !rr ||
-      !esTexto(rr.id) ||
-      !esTexto(rr.nombre) ||
-      !esTexto(rr.comida) ||
-      !COMIDAS_ID.includes(rr.comida) ||
-      (rr.menu !== null && !(esTexto(rr.menu) && ids.has(rr.menu))) ||
-      ingredientes.some((i) => !i)
-    )
-      return {
-        ok: false,
-        motivo: `Una receta no se puede leer${rr && esTexto(rr.nombre) ? `: ${rr.nombre}` : ''}`,
-      }
-    recetas.push({
-      id: rr.id,
-      nombre: rr.nombre,
-      comida: rr.comida as ComidaId,
-      rotulo: esTexto(rr.rotulo) ? rr.rotulo : rr.nombre,
-      menu: rr.menu as string | null,
-      soloEntreno: rr.soloEntreno === true,
-      ingredientes: ingredientes as Ingrediente[],
-      pasos: textos(rr.pasos),
-      notas: textos(rr.notas),
-      propia: rr.propia === true,
-    })
-  }
-  const fases = Array.isArray(d.fases)
-    ? d.fases.flatMap((f: unknown) => {
-        const ff = f as Record<string, unknown> | null
-        return ff &&
-          esTexto(ff.id) &&
-          esTexto(ff.nombre) &&
-          esNumero(ff.desdeSemana) &&
-          typeof ff.kcal === 'number'
-          ? [{ id: ff.id, nombre: ff.nombre, desdeSemana: ff.desdeSemana, kcal: ff.kcal }]
-          : []
-      })
-    : []
-  const u = d.umbrales as Record<string, unknown> | undefined
-  return {
-    ok: true,
-    dieta: {
-      formato: FORMATO,
-      version: 1,
-      id: esTexto(d.id) && d.id ? d.id : 'dieta',
-      nombre: esTexto(d.nombre) && d.nombre.trim() ? d.nombre.trim() : 'Mi dieta',
-      descripcion: esTexto(d.descripcion) ? d.descripcion : '',
-      menus,
-      ciclo,
-      recetas,
-      fases,
-      umbrales:
-        u && esNumero(u.rapido) && esNumero(u.lento) ? { rapido: u.rapido, lento: u.lento } : UMBRALES,
-      ejemplo: d.ejemplo === true,
-    },
-  }
-}
-
-/** La dieta como archivo (lo que lee `leerDieta`): las recetas tal cual, con lo que hayas editado. */
-export function aArchivo(dieta: Dieta): string {
-  return JSON.stringify(dieta, null, 2)
 }

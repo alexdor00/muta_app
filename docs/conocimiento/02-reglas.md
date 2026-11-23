@@ -95,7 +95,7 @@ Compara 1.ª y 2.ª serie con mismo peso y RIR parecido:
 - RIR real 2,5+ por encima del objetivo: «Te dejaste ~N reps de más. Acércate al RIR objetivo».
 
 ### Calentamiento (`calentamiento.js`)
-Solo la primera vez que un grupo grande trabaja en la sesión (principal o secundario de un ejercicio anterior). No cuenta como volumen ni récords; se guarda aparte.
+Cuándo (usuario, 2026-11-14, cambia la regla del prototipo): todo **básico** (compuesto) lleva su rampa, aunque su músculo ya haya trabajado; un **aislamiento**, solo si es el primero de su músculo como principal. Haber trabajado como secundario no cuenta (dorsal y luego espalda alta: la espalda alta calienta). No cuenta como volumen ni récords; se guarda aparte.
 
 | Ejercicio | Rampa |
 |---|---|
@@ -276,6 +276,11 @@ Basal (Mifflin-St Jeor) = 10 × kg + 6,25 × cm − 5 × edad + 5 (hombre) | −
 - Comida fuera del 85–115 % del objetivo → no toca («primero, comer lo que marca el plan»).
 - 10 días entre cambios. Margen: ±0,2 %/sem en definición, ±0,15 resto.
 - Nunca bajo el suelo. En definición, antes de comer menos: 10.000 pasos. Subidas en hidratos (+37 g). Pasos y cardio no suben calorías.
+
+> **Decisión 2026-11-22 (usuario, «como un entrenador real»):** la revisión sin dieta usa también las reglas 4, 5, 6, 7
+> y 8 de la consulta y las señales de § 5 (cintura, cómo estás, fuerza, proteína, déficit, ritmo > 1,2 %), los fines de
+> semana, la salida al llegar a tu grasa objetivo y la pausa si la definición se atraganta. Detalle en
+> [decisiones](../decisiones.md) (2026-11-22).
 
 ### Consulta semanal con dieta cargada
 1. Cambio de fase al llegar a la siguiente del plan.

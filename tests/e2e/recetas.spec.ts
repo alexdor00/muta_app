@@ -1,115 +1,55 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, type Page } from '@playwright/test'
+import { expect } from '@playwright/test'
+import { prepararObjetivo } from './nutricion.ts'
 import { sinAnimaciones, testGuardando as test } from './plan.ts'
 
 // Recetas y tus menús (sin el recetario privado: salen los platos de la dieta de ejemplo, «De ejemplo»). Un plato
 // ajustado a lo que te falta y apuntado, tus menús (cuántos, qué día, un plato y cuándo cocinarlo), el tick en Hoy, lo de
 // hoy en la pestaña Hoy, la compra de tus menús, cuadrar el día y axe en sus pantallas. Datos escritos a mano: perfil y un objetivo de 2.375 kcal, sin nada apuntado hoy.
 
-async function prepararObjetivo(page: Page) {
-  await page.goto('/dev/ui')
-  await page.evaluate(async () => {
-    for (let i = 0; i < 100; i++) {
-      const dbs = await indexedDB.databases()
-      if (dbs.some((d) => d.name === 'muta' && (d.version ?? 0) > 1)) break
-      await new Promise((ok) => setTimeout(ok, 50))
-    }
-    const db = await new Promise<IDBDatabase>((ok, ko) => {
-      const r = indexedDB.open('muta')
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => ko(r.error)
-    })
-    const ahora = new Date().toISOString()
-    const tx = db.transaction(['profile', 'userContent'], 'readwrite')
-    tx.objectStore('profile').put({
-      id: 'me',
-      daysPerWeek: 4,
-      level: 'intermediate',
-      goal: 'lose_fat',
-      createdAt: ahora,
-      updatedAt: ahora,
-      deletedAt: null,
-    })
-    tx.objectStore('userContent').put({
-      id: 'nutricion',
-      target: 'nutricion',
-      cuerpo: { sexo: 'hombre', edad: 30, alturaCm: 180, pesoKg: 81 },
-      pasos: 10300,
-      diasEntreno: 4,
-      fase: 'definicion',
-      ritmo: 0.75,
-      proteinaGKg: 1.8,
-      grasaGKg: 0.8,
-      kcal: 2375,
-      kcalAnterior: null,
-      desde: '2026-01-01',
-      aMano: false,
-      creado: '2026-01-01',
-    })
-    await new Promise((ok, ko) => {
-      tx.oncomplete = ok
-      tx.onerror = () => ko(tx.error)
-    })
-    db.close()
-  })
-}
-
-test('un plato: ajustarlo a lo que te falta y apuntarlo (se deshace)', async ({ page }) => {
+test('un plato: apuntarlo hoy desde su hoja (se deshace)', async ({ page }) => {
   await prepararObjetivo(page)
   await page.goto('/comida?vista=recetas')
-  await expect(page.getByRole('heading', { name: 'De ejemplo' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Categorías' })).toBeVisible()
+  await page.getByLabel('Buscar una receta o un ingrediente').fill('pollo con arroz')
   await page
     .getByRole('link', { name: /Pollo con arroz y verduras/ })
     .first()
     .click()
   await expect(page.getByRole('heading', { name: 'Pollo con arroz y verduras', level: 1 })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Ingredientes' })).toBeVisible()
-  await page.getByRole('button', { name: 'Ajustar a lo que falta' }).click()
-  const hoja = page.getByRole('dialog', { name: /^Ajustar (al|a la) / })
-  await expect(hoja.getByRole('region', { name: /Así queda/ })).toBeVisible()
-  await hoja.getByRole('button', { name: 'Aplicar y apuntar' }).click()
-  await expect(page.getByRole('status')).toContainText('Ajustado y apuntado')
+  await expect(page.getByRole('button', { name: 'Ingredientes' })).toHaveAttribute('aria-pressed', 'true')
+  // Un solo «Apuntar» abre su hoja: hoy o en un menú, y en qué comida (usuario, 2026-11-21)
+  await page.getByRole('button', { name: 'Apuntar', exact: true }).click()
+  const hoja = page.getByRole('dialog', { name: /^Apuntar pollo con arroz/ })
+  await hoja.getByRole('button', { name: /^Añadir (al|a la) / }).click()
+  await expect(page.getByRole('status')).toContainText('Apuntado en')
   await page.getByRole('button', { name: 'Deshacer' }).click()
 })
 
-test('tus menús: un plato en la cena, cuándo cocinarlo, el tick en Hoy y lo de hoy', async ({ page }) => {
+test('tus menús: un plato en la cena, el tick en Hoy y la compra', async ({ page }) => {
   await prepararObjetivo(page)
-  await page.goto('/comida?vista=menu')
-  await expect(page.getByRole('heading', { name: 'Tu semana' })).toBeVisible()
-  // Sin platos, el menú sale abierto
-  await expect(page.getByRole('button', { name: /^Menú A/ })).toHaveAttribute('aria-expanded', 'true')
-  await page.getByRole('button', { name: /Cena.*Añadir plato/ }).click()
+  await page.goto('/comida?vista=menus&menu=A')
+  await expect(page.getByRole('radio', { name: 'Menú A' })).toBeChecked()
+  await page.getByRole('button', { name: /^Cena .*Añadir/ }).click()
+  await page
+    .getByRole('dialog', { name: 'Cena' })
+    .getByRole('button', { name: /^Añadir un plato/ })
+    .click()
   const elegir = page.getByRole('dialog', { name: 'Menú A · Cena' })
   await elegir.getByRole('button', { name: 'Poner Salmón con patata asada' }).click()
   await expect(page.getByRole('status')).toContainText('Salmón con patata asada: en Menú A')
-  await page.getByRole('button', { name: /Cena.*Salmón con patata asada/ }).click()
-  await page
-    .getByRole('dialog', { name: 'Menú A · Cena' })
-    .getByRole('button', { name: 'Cuándo cocinarlo' })
-    .click()
-  const cocinar = page.getByRole('dialog', { name: 'Cocinar · Salmón con patata asada' })
-  await cocinar.getByLabel('Hora').fill('20:30')
-  await expect(cocinar.getByRole('region', { name: 'Cocinas en total' })).toContainText('Salmón')
-  await cocinar.getByRole('button', { name: 'Guardar' }).click()
-  await expect(page.getByRole('status')).toContainText('20:30')
   // En Hoy, la cena ya trae su plato: el tick lo apunta
   await page.goto('/comida')
   await expect(page.getByRole('heading', { name: 'Menú A' })).toBeVisible()
-  await page.getByRole('button', { name: 'Cena: apuntar Salmón con patata asada' }).click()
+  await page.getByRole('button', { name: 'Apuntar Salmón con patata asada' }).click()
   await expect(page.getByRole('status')).toContainText('apuntado')
-  await expect(page.getByRole('button', { name: 'Cena: hecho, quitar' })).toHaveAttribute(
+  await expect(page.getByRole('button', { name: 'Salmón con patata asada: hecho, quitar' })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
-  // Lo de hoy, en la pestaña Hoy
-  await page.goto('/hoy')
-  await expect(page.getByRole('region', { name: 'Lo de hoy' })).toContainText(
-    '20:30 · Cocina Salmón con patata asada',
-  )
   // La compra sale de tus menús, por días o por los menús que elijas
   await page.goto('/comida/compra')
-  const pescado = page.getByRole('button', { name: /^Pescado y marisco/ })
-  if ((await pescado.getAttribute('aria-expanded')) === 'false') await pescado.click()
+  await expect(page.getByRole('heading', { name: /^Pescado y marisco/ })).toBeVisible()
   await expect(page.getByText(/Salmón/).first()).toBeVisible()
   await page.getByText('Unos menús', { exact: true }).click()
   // Cada menú entra una vez de serie (con ×0 la lista salía vacía)
@@ -119,21 +59,24 @@ test('tus menús: un plato en la cena, cuándo cocinarlo, el tick en Hoy y lo de
   await expect(page.getByText(/Salmón/).first()).toBeVisible()
 })
 
-test('tus menús: cuántos y qué día va cada uno', async ({ page }) => {
+test('tu dieta: cuántos menús y qué menú va cada día de tu ciclo', async ({ page }) => {
   await prepararObjetivo(page)
-  await page.goto('/comida?vista=menu')
-  await page.getByRole('region', { name: 'Tu semana' }).getByRole('button', { name: 'Cambiar' }).click()
-  const hoja = page.getByRole('dialog', { name: 'Tus menús' })
-  await hoja.getByRole('button', { name: 'Un menú más' }).click()
-  await hoja.getByRole('button', { name: 'Un menú más' }).click()
-  await expect(hoja.getByRole('button', { name: 'Lun: menú A, cambiar' })).toBeVisible()
-  await expect(hoja.getByRole('button', { name: 'Mar: menú B, cambiar' })).toBeVisible()
-  await hoja.getByRole('button', { name: 'Mar: menú B, cambiar' }).click()
-  await expect(hoja.getByRole('button', { name: 'Mar: menú C, cambiar' })).toBeVisible()
-  await hoja.getByRole('button', { name: 'Listo' }).click()
-  await expect(page.getByRole('region', { name: 'Menú C' })).toBeVisible()
-  await page.getByRole('button', { name: 'Añadir menú' }).click()
-  await expect(page.getByRole('region', { name: 'Menú D' })).toBeVisible()
+  await page.goto('/comida?vista=menus&menu=A')
+  // Dos menús más: el nuevo queda elegido
+  await page.getByText('+', { exact: true }).click()
+  await page.getByText('+', { exact: true }).click()
+  await expect(page.getByRole('radio', { name: 'Menú C' })).toBeChecked()
+  // En Tu dieta, se toca un día del ciclo y se le pone un menú; el ciclo puede durar un día más
+  // En Tu dieta, los días de la semana se reparten entre tus menús; tocar uno le pone el menú elegido
+  await page.goto('/comida?vista=menus')
+  const semana = page.getByRole('group', { name: 'Días de esta semana' })
+  await expect(semana.getByRole('button', { name: /, Menú C$/ }).first()).toBeVisible()
+  await page
+    .getByRole('group', { name: 'Tus menús' })
+    .getByRole('radio', { name: 'C' })
+    .check({ force: true })
+  await semana.getByRole('button', { name: /^lunes \d+, Menú A$/ }).click()
+  await expect(semana.getByRole('button', { name: /^lunes \d+, Menú C$/ })).toBeVisible()
 })
 
 test('cuadrar el día con recetas: un plato por comida que queda', async ({ page }) => {
@@ -147,36 +90,34 @@ test('cuadrar el día con recetas: un plato por comida que queda', async ({ page
   await expect(page.getByRole('status')).toContainText('Apuntadas las 4')
 })
 
-test('tu versión de un plato: cambiar gramos, quitar un ingrediente y guardarla como tuya', async ({
-  page,
-}) => {
+test('tu versión de un plato: quitar un ingrediente cambia la receta (se deshace)', async ({ page }) => {
   await prepararObjetivo(page)
   await page.goto('/comida/plato/ej-pollo_arroz')
-  await page.getByRole('button', { name: 'Hacer tu versión' }).click()
-  const hoja = page.getByRole('dialog', { name: 'Tu versión' })
-  await hoja.getByLabel('Nombre').fill('Mi pollo con arroz')
-  await hoja
-    .getByRole('button', { name: /^Quitar/ })
-    .first()
+  await page.getByRole('button', { name: /Arroz/ }).first().click()
+  await page
+    .getByRole('dialog', { name: /^Arroz/ })
+    .getByRole('button', { name: 'Eliminar de la receta' })
     .click()
-  await hoja.getByRole('button', { name: 'Guardar' }).click()
-  await expect(page.getByRole('heading', { name: 'Mi pollo con arroz', level: 1 })).toBeVisible()
-  await page.goto('/comida?vista=recetas')
-  await expect(page.getByRole('heading', { name: 'Tuyos' })).toBeVisible()
+  await expect(page.getByRole('status')).toContainText('Sin arroz')
+  await expect(page.getByRole('button', { name: /^Arroz/ })).toHaveCount(0)
+  await page.getByRole('status').getByRole('button', { name: 'Deshacer' }).click()
+  await expect(page.getByRole('button', { name: /Arroz/ }).first()).toBeVisible()
 })
 
 test('tu dieta pasa a tus menús (y se deshace)', async ({ page }) => {
   await prepararObjetivo(page)
   await page.goto('/comida?vista=dieta')
-  await page.getByRole('button', { name: 'Probar la dieta de ejemplo' }).click()
+  await page.getByRole('button', { name: /^Probar una de ejemplo/ }).click()
   await page
     .getByRole('dialog', { name: 'Empezar la dieta' })
     .getByRole('button', { name: 'Empezar hoy' })
     .click()
-  await page.goto('/comida?vista=menu')
-  await page.getByRole('button', { name: 'Pasar sus menús a tus menús' }).click()
+  // Sin menús, Plan está vacío: «Usar mi dieta» pasa los de tu dieta
+  await page.goto('/comida?vista=plan')
+  await page.getByRole('button', { name: /^Usar mi dieta/ }).click()
   await expect(page.getByRole('status')).toContainText('Tus menús son ahora los de tu dieta')
-  await expect(page.getByRole('region', { name: 'Menú C' })).toBeVisible()
+  await page.goto('/comida?vista=menus&menu=A')
+  await expect(page.getByRole('radio', { name: 'C', exact: true })).toBeVisible()
 })
 
 test('accesibilidad: Recetas, un plato, el menú y tu nutricionista', async ({ page }) => {
@@ -189,27 +130,26 @@ test('accesibilidad: Recetas, un plato, el menú y tu nutricionista', async ({ p
     expect(r.violations, `${donde}: ${r.violations.map((v) => v.id).join(', ')}`).toEqual([])
   }
   await page.goto('/comida?vista=recetas')
-  await expect(page.getByRole('heading', { name: 'De ejemplo' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Categorías' })).toBeVisible()
   await revisar('Recetas')
   await page.goto('/comida/plato/ej-pollo_arroz')
-  await expect(page.getByRole('heading', { name: 'Ingredientes' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Ingredientes' })).toHaveAttribute('aria-pressed', 'true')
   await revisar('Plato')
-  await page.getByRole('button', { name: 'Ajustar a lo que falta' }).click()
-  await expect(page.getByRole('dialog', { name: /^Ajustar (al|a la) / })).toBeVisible()
-  await revisar('Ajustar')
+  await page.getByRole('button', { name: 'Apuntar', exact: true }).click()
+  await expect(page.getByRole('dialog', { name: /^Apuntar / })).toBeVisible()
+  await revisar('Apuntar')
   await page.goto('/comida/plato/ej-pollo_arroz')
   await page.getByRole('button', { name: /Arroz/ }).first().click()
   await expect(page.getByRole('dialog', { name: /^Arroz/ })).toBeVisible()
   await revisar('Cambiar un ingrediente')
-  await page.goto('/comida?vista=menu')
-  await expect(page.getByRole('heading', { name: 'Tu semana' })).toBeVisible()
-  await expect(page.getByRole('button', { name: /^Menú A/ })).toHaveAttribute('aria-expanded', 'true')
+  await page.goto('/comida?vista=menus&menu=A')
+  await expect(page.getByRole('radio', { name: 'Menú A' })).toBeChecked()
   await revisar('Menú')
   await page.goto('/comida/recetas/ejemplo')
   await expect(page.getByRole('heading', { name: 'De ejemplo', level: 1 })).toBeVisible()
   await revisar('Categoría')
   await page.goto('/hoy')
-  await expect(page.getByRole('region', { name: /Tu peso/ })).toBeVisible()
+  await expect(page.getByRole('img', { name: /de \d+ hechas/ })).toBeVisible()
   await revisar('Hoy')
   await page.goto('/comida/nutricionista')
   await expect(page.getByRole('heading', { name: 'Tu nutricionista', level: 1 })).toBeVisible()

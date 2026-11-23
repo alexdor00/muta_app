@@ -1,55 +1,19 @@
 import { Button } from '../../../shared/ui/Button.tsx'
-import { CheckIcon, ChevronDownIcon, ChevronRightIcon } from '../../../shared/ui/icons.tsx'
+import { CheckIcon, ChevronDownIcon, BookIcon, ChevronRightIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
+import { TIP_TARJETA, TipList, type ConsejoVisto } from '../../../shared/ui/Consejos.tsx'
 import styles from './SessionTips.module.css'
 
 // «Consejos de hoy» (C10 del prototipo anterior) y dónde se ven: la tarjeta de Ver sesión y el aviso de la sesión.
-
-export type ConsejoVisto = {
-  text: string
-  why: string
-  /** Se arregla con un toque, solo hoy («Invertir hoy»); `hecho` cuando ya se aplicó. */
-  accion?: { label: string; hecho: boolean; onClick: () => void; textoHecho?: string } | null
-}
-
-/** Los consejos numerados 01, 02… (desde `desde` + 1) con su porqué; con botón si se arreglan con un toque. */
-export function TipList({ consejos, desde = 0 }: { consejos: ConsejoVisto[]; desde?: number }) {
-  return (
-    <ol class={styles.tips}>
-      {consejos.map((c, i) => (
-        <li key={c.text} class={styles.tip}>
-          <span class={styles.number} aria-hidden="true">
-            {String(desde + i + 1).padStart(2, '0')}
-          </span>
-          <div class={styles.tipText}>
-            <p class={styles.text}>{c.text}</p>
-            <p class={styles.why}>{c.why}</p>
-            {c.accion &&
-              (c.accion.hecho ? (
-                <p class={styles.done}>
-                  <CheckIcon />
-                  {c.accion.textoHecho ?? 'Hecho, solo hoy'}
-                </p>
-              ) : (
-                <button type="button" class={styles.fix} onClick={c.accion.onClick}>
-                  {c.accion.label}
-                </button>
-              ))}
-          </div>
-        </li>
-      ))}
-    </ol>
-  )
-}
 
 /** Ver sesión: «Consejos para esta sesión · 3», plegados para que no ocupen (si no hay ninguno, no sale). */
 export function SessionTipsCard({ consejos }: { consejos: ConsejoVisto[] }) {
   if (!consejos.length) return null
   return (
-    <details class={styles.card}>
-      <summary class={styles.summary}>
+    <details class={TIP_TARJETA.card}>
+      <summary class={TIP_TARJETA.summary}>
         <span>
-          Consejos para esta sesión <span class={styles.count}>· {consejos.length}</span>
+          Consejos para esta sesión <span class={TIP_TARJETA.count}>· {consejos.length}</span>
         </span>
         <ChevronDownIcon />
       </summary>
@@ -62,7 +26,10 @@ export function SessionTipsCard({ consejos }: { consejos: ConsejoVisto[] }) {
 export function TipsBanner({ cuantos, onAbrir }: { cuantos: number; onAbrir: () => void }) {
   return (
     <button type="button" class={styles.banner} onClick={onAbrir}>
-      <span>
+      <span class={styles.bannerIcon} aria-hidden="true">
+        <BookIcon />
+      </span>
+      <span class={styles.bannerText}>
         {cuantos} {cuantos === 1 ? 'consejo' : 'consejos'} para esta sesión
       </span>
       <ChevronRightIcon />
@@ -78,9 +45,7 @@ export function TodayTipsSheet(props: {
   consejos: ConsejoVisto[]
   antes: { text: string; why: string; hecho: boolean }[]
   onMarcar: (k: number) => void
-  /** Ocultar uno de antes de empezar (para siempre; se puede volver a enseñar). */
-  onOcultar: (k: number) => void
-  /** Cuántos ocultaste y volver a enseñarlos. */
+  /** Cuántos ocultaste antes (ya no se ocultan: usuario, 2026-11-12) y volver a enseñarlos. */
   ocultos: number
   onMostrarOcultos: () => void
   alEmpezar: boolean
@@ -127,7 +92,7 @@ export function TodayTipsSheet(props: {
           <h3 id="antes-primera" class={styles.label}>
             Antes de la primera serie
           </h3>
-          <span class={styles.count}>
+          <span class={TIP_TARJETA.count}>
             {hechos} de {props.antes.length}
           </span>
         </div>
@@ -147,14 +112,6 @@ export function TodayTipsSheet(props: {
                   <b>{a.text}</b>
                   <small>{a.why}</small>
                 </span>
-              </button>
-              <button
-                type="button"
-                class={styles.hide}
-                aria-label={`Ocultar: ${a.text}`}
-                onClick={() => props.onOcultar(k)}
-              >
-                Ocultar
               </button>
             </li>
           ))}

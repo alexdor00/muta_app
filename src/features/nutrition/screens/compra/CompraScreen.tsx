@@ -3,15 +3,15 @@ import { addDays, formatDayDate } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceCircles, ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
-import { CheckIcon, ChevronDownIcon, MinusIcon, PlusIcon, TrashIcon } from '../../../../shared/ui/icons.tsx'
+import { CheckIcon, MinusIcon, PlusIcon, TrashIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { dieta, estado, hoy } from '../../state/comida.ts'
-import { emojiDe, SECCIONES } from '../../state/dieta.ts'
+import { SECCIONES } from '../../state/dieta.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
 import { cargarRecetas } from '../../use-cases/recipes.ts'
-import { enCrudo, estadoRecetas, menu } from '../../state/recetas.ts'
+import { enCrudo, estadoRecetas, menu, tienePlatos } from '../../state/recetas.ts'
 import {
   anadirPropio,
   cantidad,
@@ -21,6 +21,7 @@ import {
   desdeElDia,
   desmarcarTodo,
   marcar,
+  modoActual,
   modoDeCompra,
   vecesDeMenu,
   vecesEnLaCompra,
@@ -30,6 +31,10 @@ import {
   racionesDeMas,
 } from '../../use-cases/shopping.ts'
 import { Barra } from '../comun/Barra.tsx'
+import { CompraSemana } from './CompraSemana.tsx'
+import seg from '../comida/Anadir.module.css'
+import cs from './Compra.module.css'
+import { piloto } from '../../state/autopilot.ts'
 import p from '../comun/Pagina.module.css'
 import h from '../comun/Hojas.module.css'
 import { useAviso } from '../comun/useAviso.ts'
@@ -45,11 +50,10 @@ export function CompraScreen() {
   const anadir = useSheet('anadir')
   const alguien = useSheet('alguien')
   const { aviso, avisar } = useAviso()
-  // Las que abres o cierras tú (al empezar, abierta la primera con algo por comprar y las que llevan algo tuyo)
-  const [tocadas, setTocadas] = useState<string[]>([])
   if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
-  const volver = `${paths.nutrition}?vista=menu`
-  if (!dieta.value && !menu.value.menus.some((x) => Object.keys(x.platos).length)) {
+  // Sin pantalla detrás (enlace directo), a tu día; si no, «‹» vuelve a la de antes
+  const volver = paths.nutrition
+  if (!dieta.value && !menu.value.menus.some(tienePlatos)) {
     return (
       <div class={p.page}>
         <Barra titulo="La compra" volver={volver} />
@@ -58,13 +62,36 @@ export function CompraScreen() {
     )
   }
   const c = compraActual()
+  const modo = modoActual(c)
+  const segmento = (
+    <ChoiceSegmented<'semana' | 'dias' | 'menus'>
+      name="modo-compra"
+      legend="La lista sale de"
+      options={[
+        ...(piloto.value?.compra ? [{ value: 'semana' as const, label: 'Tu semana' }] : []),
+        { value: 'dias', label: 'Unos días' },
+        { value: 'menus', label: 'Unos menús' },
+      ]}
+      value={modo}
+      onChange={(m) => void modoDeCompra(m)}
+    />
+  )
+  if (modo === 'semana' || piloto.value?.compra)
+    return (
+      <div class={p.page}>
+        <Barra titulo="La compra" volver={volver} />
+        <CompraSemana onAnadir={anadir.show} avisar={avisar} />
+        {anadir.open && <AnadirCompraHoja onClose={anadir.close} />}
+        <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
+      </div>
+    )
   const { productos, entreno, descanso } = productosDe(c)
   const tienes = new Set(c.tienes)
   const total = productos.length + c.propios.length
   const hechos =
     productos.filter((x) => tienes.has(x.clave)).length + c.propios.filter((x) => tienes.has(x.id)).length
   const manana = addDays(hoy.value, 1)
-  const porMenus = c.modo === 'menus'
+  const porMenus = modo === 'menus'
 
   return (
     <div class={p.page}>
@@ -88,16 +115,7 @@ export function CompraScreen() {
             <i style={{ width: `${Math.round((hechos / total) * 100)}%` }} />
           </div>
         )}
-        <ChoiceSegmented<'dias' | 'menus'>
-          name="modo-compra"
-          legend="La lista sale de"
-          options={[
-            { value: 'dias', label: 'Unos días' },
-            { value: 'menus', label: 'Unos menús' },
-          ]}
-          value={porMenus ? 'menus' : 'dias'}
-          onChange={(m) => void modoDeCompra(m)}
-        />
+        {segmento}
         {porMenus ? (
           <ul class={p.list}>
             {menu.value.menus.map((m) => (
@@ -160,92 +178,67 @@ export function CompraScreen() {
         </button>
       </section>
 
-      {SECCIONES.map((s) => {
-        const de = productos.filter((x) => x.seccion === s.id)
-        const suyos = c.propios.filter((x) => x.seccion === s.id)
+      {/* Cada sección en una tarjeta, abierta, con su círculo para marcar (rediseño 23; usuario, 2026-11-17) */}
+      {SECCIONES.map((sec) => {
+        const de = productos.filter((x) => x.seccion === sec.id)
+        const suyos = c.propios.filter((x) => x.seccion === sec.id)
         if (!de.length && !suyos.length) return null
-        const faltan =
-          de.filter((x) => !tienes.has(x.clave)).length + suyos.filter((x) => !tienes.has(x.id)).length
-        const primera =
-          SECCIONES.find((x) => productos.some((y) => y.seccion === x.id && !tienes.has(y.clave)))?.id ===
-          s.id
-        const abierta = (primera || suyos.length > 0) !== tocadas.includes(s.id)
         return (
-          <section key={s.id} class={p.seccion} aria-labelledby={`sec-${s.id}`}>
-            <h2 class={p.seccionTitulo}>
-              <button
-                type="button"
-                id={`sec-${s.id}`}
-                class={p.seccionAbrir}
-                aria-expanded={abierta}
-                onClick={() =>
-                  setTocadas(tocadas.includes(s.id) ? tocadas.filter((x) => x !== s.id) : [...tocadas, s.id])
-                }
-              >
-                <span>{s.nombre}</span>
-                <span class={p.foot}>{faltan ? faltan : 'todo hecho'}</span>
-                {faltan ? <ChevronDownIcon /> : <CheckIcon />}
-              </button>
+          <section key={sec.id} class={cs.seccion} aria-labelledby={`sec-${sec.id}`}>
+            <h2 id={`sec-${sec.id}`} class={seg.rotulo}>
+              {sec.nombre}
             </h2>
-            {abierta && (
-              <ul class={p.list}>
-                {de.map((x) => (
-                  <li key={x.clave}>
-                    <button
-                      type="button"
-                      class={`${p.check} ${tienes.has(x.clave) ? p.checked : ''}`}
-                      aria-pressed={tienes.has(x.clave)}
-                      onClick={() => void marcar(x.clave)}
-                    >
-                      <span class={p.box} aria-hidden="true">
-                        {tienes.has(x.clave) && <CheckIcon />}
-                      </span>
-                      <span class={p.emoji} aria-hidden="true">
-                        {emojiDe(x.nombre, x.seccion)}
-                      </span>
-                      <span class={p.rowText}>
-                        <span class={p.rowTitle}>{x.nombre}</span>
-                        {(x.menus.length > 0 || enCrudo(x.clave, x.gramos)) && (
-                          <span class={p.foot}>
-                            {[x.menus.join(' · '), enCrudo(x.clave, x.gramos)].filter(Boolean).join(' · ')}
-                          </span>
-                        )}
-                      </span>
-                      <b class={p.qty}>{x.gramos ? cantidad(x.gramos) : 'al gusto'}</b>
-                    </button>
-                  </li>
-                ))}
-                {suyos.map((x) => (
-                  <li key={x.id} class={p.withAction}>
-                    <button
-                      type="button"
-                      class={`${p.check} ${tienes.has(x.id) ? p.checked : ''}`}
-                      aria-pressed={tienes.has(x.id)}
-                      onClick={() => void marcar(x.id)}
-                    >
-                      <span class={p.box} aria-hidden="true">
-                        {tienes.has(x.id) && <CheckIcon />}
-                      </span>
-                      <span class={p.emoji} aria-hidden="true">
-                        {emojiDe(x.nombre, x.seccion)}
-                      </span>
-                      <span class={p.rowText}>
-                        <span class={p.rowTitle}>{x.nombre}</span>
-                        <span class={p.foot}>Añadido por ti</span>
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      class={h.round}
-                      aria-label={`Quitar ${x.nombre}`}
-                      onClick={() => void quitarPropio(x.id)}
-                    >
-                      <TrashIcon />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <ul class={seg.tarjeta}>
+              {de.map((x) => (
+                <li key={x.clave}>
+                  <button
+                    type="button"
+                    class={`${cs.item} ${tienes.has(x.clave) ? cs.marcado : ''}`}
+                    aria-pressed={tienes.has(x.clave)}
+                    onClick={() => void marcar(x.clave)}
+                  >
+                    <span class={cs.circulo} aria-hidden="true">
+                      {tienes.has(x.clave) && <CheckIcon />}
+                    </span>
+                    <span class={cs.itemTexto}>
+                      <span class={cs.itemNombre}>{x.nombre}</span>
+                      {(x.menus.length > 0 || enCrudo(x.clave, x.gramos)) && (
+                        <span class={cs.detalle}>
+                          {[x.menus.join(' · '), enCrudo(x.clave, x.gramos)].filter(Boolean).join(' · ')}
+                        </span>
+                      )}
+                    </span>
+                    <span class={cs.cantidad}>{x.gramos ? cantidad(x.gramos) : 'al gusto'}</span>
+                  </button>
+                </li>
+              ))}
+              {suyos.map((x) => (
+                <li key={x.id} class={p.withAction}>
+                  <button
+                    type="button"
+                    class={`${cs.item} ${tienes.has(x.id) ? cs.marcado : ''}`}
+                    aria-pressed={tienes.has(x.id)}
+                    onClick={() => void marcar(x.id)}
+                  >
+                    <span class={cs.circulo} aria-hidden="true">
+                      {tienes.has(x.id) && <CheckIcon />}
+                    </span>
+                    <span class={cs.itemTexto}>
+                      <span class={cs.itemNombre}>{x.nombre}</span>
+                      <span class={cs.detalle}>Añadido por ti</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    class={h.round}
+                    aria-label={`Quitar ${x.nombre}`}
+                    onClick={() => void quitarPropio(x.id)}
+                  >
+                    <TrashIcon />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </section>
         )
       })}
@@ -261,6 +254,7 @@ export function CompraScreen() {
       <Button
         onClick={async () => {
           const r = await compartirCompra()
+          if (r === 'saved') avisar('Excel guardado en Descargas: compártelo desde ahí')
           if (r === 'copied') avisar('Lista copiada: pégala en Notas o WhatsApp')
         }}
       >

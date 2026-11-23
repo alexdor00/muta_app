@@ -4,12 +4,45 @@
   padding: var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .head {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+}
+
+/* Tres datos en fila (series · repeticiones · descanso): la cifra grande y su nombre debajo, separados por una raya fina */
+.datos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.datos li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: calc(var(--space-1) / 2);
+}
+
+.datos li + li {
+  border-left: var(--hairline) solid var(--separator);
+}
+
+.datos b {
+  font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
+}
+
+.datos span {
+  font: var(--text-footnote);
+  color: var(--label-2);
 }
 
 .name {
@@ -120,17 +153,24 @@
 }
 
 .tag {
-  padding: 0 var(--space-2);
+  padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
-  background: var(--label);
-  color: var(--bg);
-  font: var(--text-caption);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
   line-height: var(--control-sm);
 }
 
+/* Sube: verde suave */
+.sube {
+  background: color-mix(in srgb, var(--good) 22%, var(--surface));
+}
+
+/* El muñeco, más grande que la lista de músculos (usuario, 2026-11-14) */
 .muscles {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: var(--space-4);
   align-items: center;
 }
@@ -143,61 +183,17 @@
   border-right: var(--hairline) solid var(--separator);
 }
 
+/* Los músculos, siempre alineados a la izquierda, arriba */
 .lists {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  align-self: start;
   gap: var(--space-2);
 }
 
 .lists .chips + .title {
   margin-top: var(--space-2);
-}
-
-.rest {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.restTitle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font: var(--text-headline);
-}
-
-.restTitle svg {
-  width: var(--icon);
-  height: var(--icon);
-}
-
-.restControls {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: var(--space-2);
-}
-
-.restButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: var(--control);
-  border: var(--hairline) solid var(--separator);
-  border-radius: var(--radius-pill);
-  background: var(--bg);
-  color: var(--label);
-  font: var(--text-headline);
-  cursor: pointer;
-}
-
-.restValue {
-  font: var(--text-set-value);
-}
-
-.restButton svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
 }
 
 /* De dónde sale la pauta de la cabecera */
@@ -230,4 +226,36 @@
 .myNote {
   text-align: justify;
   hyphens: auto;
+}
+
+/* Tu récord, debajo de la gráfica: en negro (usuario, 2026-11-20) */
+.record {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-3);
+  border-top: var(--hairline) solid var(--separator);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-align: left;
+}
+
+.record svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.record span {
+  flex: 1;
+}
+
+.record b {
+  font: var(--text-cifra-fila);
+}
+
+.record small {
+  color: var(--label-2);
+  font: var(--text-footnote);
 }

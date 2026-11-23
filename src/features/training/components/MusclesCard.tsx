@@ -79,7 +79,7 @@ export function MusclesCard({
             Músculos
           </h2>
           <p class={styles.summary}>
-            {musculos} músculos · {series} series {cuando}
+            {musculos} músculos · {series} series
           </p>
         </div>
         <div class={styles.toggle}>

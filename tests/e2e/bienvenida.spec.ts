@@ -25,7 +25,7 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
 
   // A03: «Ganar músculo» viene marcado; se elige «Perder grasa»
   await expect(page).toHaveURL('/bienvenida/1')
-  await expect(page.getByText('1/2')).toBeVisible()
+  await expect(page.getByRole('progressbar', { name: 'Paso 1 de 4' })).toBeVisible()
   await expect(page.getByRole('radio', { name: /Ganar músculo/ })).toBeChecked()
   await capture(page, 'A03-define-tu-objetivo')
   await page.getByText('Perder grasa').click()
@@ -34,7 +34,7 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
 
   // A04: Principiante y 3 días vienen marcados; se elige Intermedio y 4 días
   await expect(page).toHaveURL('/bienvenida/2')
-  await expect(page.getByText('2/2')).toBeVisible()
+  await expect(page.getByRole('progressbar', { name: 'Paso 2 de 4' })).toBeVisible()
   // Nivel y días miden lo mismo de alto
   const pill = await page.getByText('Principiante').boundingBox()
   const day = await page.getByText('3', { exact: true }).boundingBox()
@@ -45,6 +45,25 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   await page.getByText('Intermedio').click()
   await page.getByText('4', { exact: true }).click()
   await page.getByRole('button', { name: 'Siguiente' }).click()
+
+  // Paso 3 (Nutrición): tus datos; los entrenos ya vienen de la bienvenida
+  await expect(page).toHaveURL('/bienvenida/comida/1')
+  await expect(page.getByText('4 entrenos por semana')).toBeVisible()
+  await page.getByText('Mujer', { exact: true }).click()
+  await page.getByLabel('Edad').fill('31')
+  await page.getByLabel('Altura').fill('165')
+  await page.getByLabel('Peso').fill('62,5')
+  await page.getByLabel('Pasos al día').fill('9.000')
+  await capture(page, 'bienvenida-tus-datos')
+  await page.getByRole('button', { name: 'Siguiente' }).click()
+
+  // Paso 4: tu objetivo, con el ritmo (es definición); se guarda al elegir rutina
+  await expect(page).toHaveURL('/bienvenida/comida/2')
+  await expect(page.getByRole('heading', { name: 'Tu objetivo, listo' })).toBeVisible()
+  await expect(page.getByText('kcal al día')).toBeVisible()
+  await expect(page.getByRole('radio', { name: '−0,75 %' })).toBeChecked()
+  await capture(page, 'bienvenida-tu-objetivo')
+  await page.getByRole('button', { name: 'Elegir mi rutina' }).click()
 
   // Elige tu rutina (en la CI solo están las 2 rutinas de MUTA)
   await expect(page).toHaveURL('/entreno/rutinas')
@@ -108,6 +127,23 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
       }),
   )
   expect(profile).toMatchObject({ goal: 'lose_fat', level: 'intermediate', daysPerWeek: 4 })
+  // Y tu objetivo de comida, con tus datos
+  const objetivo = await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        const open = indexedDB.open('muta')
+        open.onsuccess = () => {
+          const get = open.result.transaction('userContent').objectStore('userContent').get('nutricion')
+          get.onsuccess = () => resolve(get.result)
+        }
+      }),
+  )
+  expect(objetivo).toMatchObject({
+    fase: 'definicion',
+    ritmo: 0.75,
+    pasos: 9000,
+    cuerpo: { sexo: 'mujer', pesoKg: 62.5 },
+  })
   const plan = await page.evaluate(
     () =>
       new Promise((resolve) => {
@@ -127,4 +163,18 @@ test('la bienvenida completa guarda el perfil y lleva a Tu plan', async ({ page 
   // Con perfil, la app ya no abre en la bienvenida
   await page.goto('/')
   await expect(page).toHaveURL('/hoy')
+})
+
+test('la parte de comida se puede saltar: «Ahora no, solo entreno» lleva a elegir rutina sin objetivo', async ({
+  page,
+}) => {
+  await page.goto('/bienvenida/1')
+  await page.getByRole('link', { name: 'Siguiente' }).click()
+  await page.getByRole('button', { name: 'Siguiente' }).click()
+  await expect(page).toHaveURL('/bienvenida/comida/1')
+  await page.getByRole('link', { name: 'Ahora no, solo entreno' }).click()
+  await expect(page).toHaveURL('/entreno/rutinas')
+  // Sin objetivo, Nutrición lo pide como siempre
+  await page.goto('/comida')
+  await expect(page.getByRole('heading', { name: 'Calcula tu objetivo' })).toBeVisible()
 })

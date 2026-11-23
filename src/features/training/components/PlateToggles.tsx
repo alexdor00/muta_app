@@ -15,6 +15,7 @@ export function PlateToggles(props: {
           key={d.kg}
           type="button"
           class={`${styles.plate} ${d.hay ? styles.on : ''}`}
+          data-kg={String(d.kg)}
           aria-pressed={d.hay}
           aria-label={`Discos de ${d.label} kg`}
           onClick={() => props.onCambio(d.kg, !d.hay)}

@@ -1,25 +1,5 @@
 /* Comida: cabecera con «Objetivo», el control Hoy · Semana · Dieta y el estado sin objetivo (tarjeta gris). */
 
-/* «Tu plan», como «Editar» en Entreno */
-.plan {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  height: var(--avatar);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-pill);
-  background: var(--surface-2);
-  color: var(--label);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
-  text-decoration: none;
-}
-
-.plan svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-}
-
 /* «‹ Tu plan», «‹ Recetas», «‹ Tu dieta» */
 .barra {
   padding: calc(var(--safe-top) + var(--space-2)) var(--gutter) var(--space-3);
@@ -34,16 +14,24 @@
   border-radius: var(--radius-card);
   background: var(--surface);
   color: var(--label);
+  box-shadow: var(--card-shadow);
 }
 
 .emptyTitle {
-  font: var(--text-title-2);
+  font: var(--text-titulo-tarjeta);
 }
 
 .emptyText {
   font: var(--text-subhead);
   text-align: justify;
   hyphens: auto;
+}
+
+.emptyLink {
+  color: var(--label);
+  font: var(--text-subhead);
+  text-align: center;
+  text-decoration: underline;
 }
 
 .emptyButton {
@@ -53,5 +41,17 @@
   background: var(--accent);
   color: var(--on-accent);
   font: var(--text-headline);
+  cursor: pointer;
+}
+
+/* El «+» de Tus menús, en la barra de arriba */
+.mas {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label);
   cursor: pointer;
 }

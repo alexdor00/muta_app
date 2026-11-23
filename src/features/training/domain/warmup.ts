@@ -1,6 +1,7 @@
-// Series de calentamiento (aproximación), como en el prototipo anterior (calentamiento.js): la primera vez que un músculo
-// trabaja en la sesión, antes de sus series efectivas, una rampa con los kilos calculados desde el peso de trabajo.
-// Lo que ya trabajó (como principal o secundario) en un ejercicio anterior no repite. No cuenta como volumen ni récord.
+// Series de calentamiento (aproximación), con la rampa del prototipo anterior (calentamiento.js) y las reglas del usuario
+// (2026-11-14): cada básico (compuesto) lleva siempre su rampa, aunque su músculo ya trabajara; un aislamiento, solo si es
+// el primero de su músculo como principal. Haber trabajado como secundario no cuenta (dorsal y luego espalda alta: la
+// espalda alta calienta). No cuenta como volumen ni récord.
 import type { MuscleId } from './muscles.ts'
 
 /** Músculos que piden más aproximación (calentamiento.js · WARM_BIG). */
@@ -18,7 +19,7 @@ const GRANDES: ReadonlySet<MuscleId> = new Set([
 export type EjercicioACalentar = {
   /** Músculo principal; null si no se sabe (se calienta como si fuera el primero). */
   musculo: MuscleId | null
-  /** Los que trabajan bastante sin ser el principal: cuentan como ya calentados. */
+  /** Los que trabajan bastante sin ser el principal (ya no cuentan como calentados: regla del 2026-11-14). */
   secundarios: readonly MuscleId[]
   /** Básico (varias articulaciones) o aislamiento. */
   compuesto: boolean
@@ -57,8 +58,9 @@ export function rampa(e: EjercicioACalentar): [number, number][] | null {
 }
 
 /**
- * El calentamiento de cada ejercicio de la sesión, en orden: solo el primero que trabaja cada músculo. Los kilos se
- * redondean hacia abajo al salto del ejercicio; se quitan los que salen 0, repetidos o iguales al peso de trabajo.
+ * El calentamiento de cada ejercicio de la sesión, en orden: todo básico; un aislamiento, solo si es el primero de su
+ * músculo como principal. Los kilos se redondean hacia abajo al salto del ejercicio; se quitan los que salen 0, repetidos o
+ * iguales al peso de trabajo.
  */
 export function planCalentamiento(
   ejercicios: readonly EjercicioACalentar[],
@@ -67,8 +69,7 @@ export function planCalentamiento(
   return ejercicios.map((e) => {
     const primero = e.musculo === null || !calentados.has(e.musculo)
     if (e.musculo) calentados.add(e.musculo)
-    for (const m of e.secundarios) calentados.add(m)
-    const pasos = primero ? rampa(e) : null
+    const pasos = primero || e.compuesto ? rampa(e) : null
     if (!pasos || e.kilos === null) return null
     const series: SerieCalentamiento[] = []
     for (const [parte, reps] of pasos) {

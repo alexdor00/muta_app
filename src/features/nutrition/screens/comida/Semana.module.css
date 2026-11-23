@@ -1,0 +1,311 @@
+/* Tu semana (usuario, 2026-11-15): lo que toca en una barra blanca, un menú cada vez con sus comidas en lista y sus
+   días, y abajo tres enlaces. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--gutter) var(--space-6);
+}
+
+/* «Organizar»: una píldora gris pequeña, como «Cambiar» en las tarjetas */
+.organizar {
+  flex: none;
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+/* Menú A · B · C · + en el control segmentado de la app, y su «···» */
+.pestanas {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0 var(--space-1) var(--space-2);
+}
+
+.letras {
+  flex: 1;
+  min-width: 0;
+}
+
+.opciones {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label);
+  cursor: pointer;
+}
+
+.opciones svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+/* El menú: sus cuatro platos en foto grande, sus kcal y sus días */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-4);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+/* Sus comidas: filas con la foto redonda, la comida en gris, el plato y sus kcal (o cuándo lo cocinas) */
+/* Las comidas del menú en una tarjeta (Plan, 2026-11-18): cada fila trae su raya */
+.lista {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-2) var(--space-2);
+  border: 0;
+  background: var(--surface);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.filaTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.filaComida {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.filaPlato {
+  overflow: hidden;
+  font: var(--text-headline);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filaVacia {
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+/* Las kcal de cada plato: la cifra inclinada, pequeña, y «kcal» en gris debajo (usuario, 2026-11-15) */
+.filaKcal {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  font: var(--text-headline);
+  font-style: oblique 6deg;
+  font-weight: var(--weight-semibold);
+}
+
+.filaKcal small {
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+.cuando {
+  flex: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+.hueco {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--meal-thumb);
+  height: var(--meal-thumb);
+  border: var(--border) dashed var(--separator);
+  border-radius: 50%;
+  color: var(--label);
+}
+
+.hueco svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.propuesta {
+  padding: 0 var(--space-2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-decoration: none;
+}
+
+.propuesta b {
+  color: var(--label);
+  font-weight: var(--weight-semibold);
+}
+
+.pie {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--space-1) var(--space-2) 0;
+}
+
+.vaDias {
+  display: flex;
+  flex-direction: column;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.vaDias small {
+  font: var(--text-subhead); /* las macros del menú, más grandes (usuario, 2026-11-19) */
+}
+
+.vaDias b {
+  color: var(--label);
+  font: var(--text-headline);
+}
+
+.nota {
+  margin: 0;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.kcal {
+  font: var(--text-cifra-fila);
+}
+
+.kcal small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.dias {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 var(--space-1);
+}
+
+.dia {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.dia[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.dia:disabled {
+  cursor: default;
+}
+
+/* Abajo: pesar, el recetario y los avisos, en una línea */
+.herramientas {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.herramientas a,
+.herramientas button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.herramientas svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.deDieta {
+  align-self: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Lo que va además del plato (una fruta, un yogur): una línea bajo su comida, alineada con el texto */
+.extra {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: 0 var(--space-2) var(--space-2) calc(var(--meal-thumb) + var(--space-3) + var(--space-2));
+  background: var(--surface);
+}
+
+.extraNombre {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--text-subhead);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.extraKcal {
+  flex: none;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+/* Dentro de Tu dieta: sus márgenes son los de la pantalla (usuario, 2026-11-19: los mismos en todo) */
+.dentro {
+  padding: 0;
+}
+
+/* Desde «Tu nutricionista»: lo que propone y dónde cambiarlo */
+.marcaAviso {
+  margin: 0;
+  padding-left: var(--space-3);
+  border-left: var(--border) solid var(--accent);
+  color: var(--label);
+  font: var(--text-subhead);
+}

@@ -8,7 +8,7 @@ import {
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { CheckIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
-import { TrendChart } from '../../components/TrendChart.tsx'
+import { TrendChart } from '../../../../shared/ui/TrendChart.tsx'
 import { ajustes, calculo, hoy, pendiente, serie, tituloCambio } from '../../state/comida.ts'
 import { aplicarSugerencia, deshacerCambio, descartarSugerencia, macrosCon } from '../../use-cases/target.ts'
 import type { Aviso } from '../comun/useAviso.ts'
@@ -54,10 +54,15 @@ export function SugerenciaHoja({ onClose, avisar }: Props) {
             onClick={async () => {
               await aplicarSugerencia(s.id)
               onClose()
-              avisar(`Objetivo: ${formatInt(r.a)} kcal desde mañana`, {
-                label: 'Deshacer',
-                onClick: () => void deshacerCambio(s.id),
-              })
+              avisar(
+                r.extra?.fase
+                  ? 'Desde mañana, mantenimiento'
+                  : `Objetivo: ${formatInt(r.a)} kcal desde mañana`,
+                {
+                  label: 'Deshacer',
+                  onClick: () => void deshacerCambio(s.id),
+                },
+              )
             }}
           >
             Aplicar desde mañana
@@ -88,14 +93,22 @@ export function SugerenciaHoja({ onClose, avisar }: Props) {
           <span class={styles.to}>{formatInt(r.a)}</span>
           <span class={h.sub}>kcal</span>
         </p>
-        {antes && despues && (
+        {/* Salir de la definición o una pausa (usuario, 2026-11-22): qué pasa con tu fase */}
+        {r.extra?.fase && (
+          <p class={h.figures}>
+            {r.extra.situacion === 'salida'
+              ? 'Salida de la definición: mantenimiento desde mañana y, con el peso estable, +200 kcal en hidratos.'
+              : 'Pausa en mantenimiento unas semanas. Después, vuelta a la definición.'}
+          </p>
+        )}
+        {antes && despues && diferencia !== 0 && (
           <p class={h.figures}>
             {diferencia > 0 ? '+' : '−'}
-            {formatInt(Math.abs(diferencia))} kcal, todo en los hidratos:{' '}
+            {formatInt(Math.abs(diferencia))} kcal en hidratos:{' '}
             <b>
               {formatInt(antes.carbs)} → {formatInt(despues.carbs)} g
             </b>
-            . La proteína y la grasa no cambian.
+            . Proteína y grasa, igual.
           </p>
         )}
         {/* Se puede enfocar: la hoja se desplaza y sin esto no tendría nada que alcanzar con el teclado */}
@@ -121,7 +134,7 @@ export function SugerenciaHoja({ onClose, avisar }: Props) {
           <p class={h.foot}>En gris, lo previsto para tu fase; la línea, la tendencia de tu peso.</p>
         </section>
         <div>
-          <p class={h.eyebrow}>Antes de proponerlo he comprobado</p>
+          <p class={h.eyebrow}>Comprobado</p>
           <ul class={styles.checks}>
             {r.comprobaciones.map((c) => (
               <li key={c.texto}>

@@ -1,0 +1,156 @@
+/* Una comida en su tarjeta (usuario, 2026-11-19): su nombre y sus kcal arriba; una fila por cosa debajo */
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grupo {
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.boton {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Arriba: el nombre (se toca) y el «+» redondo, como en tu día */
+.arriba {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cabeza {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-2);
+  padding: var(--space-3) 0 var(--space-2);
+}
+
+.cabeza b {
+  font: var(--text-headline);
+}
+
+.total {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.meta {
+  width: 100%;
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+.cosa {
+  width: 100%;
+  background: var(--surface);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+  border: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.grupo > :last-child .cosa {
+  padding-bottom: var(--space-3);
+}
+
+.texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nombre {
+  overflow: hidden;
+  font: var(--text-subhead);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.texto small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.origen {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.origen svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.anadir {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0 var(--space-3);
+  border-top: var(--hairline) solid var(--separator);
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.anadir svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Desde «Tu nutricionista»: la comida que hay que cambiar, con un filo negro a la izquierda (como en Editar rutina) */
+.marcada {
+  box-shadow:
+    inset var(--border) 0 0 var(--accent),
+    var(--card-shadow);
+}
+
+.add {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.add svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}

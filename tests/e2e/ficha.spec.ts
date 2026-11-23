@@ -2,7 +2,7 @@ import { expect, test } from './plan.ts'
 
 // Ficha del ejercicio (diseño aprobado del 2026-11-02): datos de prueba de state/muestra/ y la biblioteca real.
 
-test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos y descanso', async ({
+test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos y descanso en la cabecera', async ({
   page,
 }) => {
   await page.goto('/entreno/ejercicio/peso_muerto_rumano')
@@ -13,7 +13,6 @@ test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos
   const pauta = page.getByRole('list', { name: 'Pauta' })
   await expect(pauta.getByLabel('3 series')).toBeVisible()
   await expect(pauta.getByLabel('6 a 10 repeticiones, de tu plan')).toBeVisible()
-  await expect(page.getByText('Repeticiones de tu plan')).toBeVisible()
   await expect(pauta.getByLabel('Descanso 3:00')).toBeVisible()
 
   await expect(page.getByRole('region', { name: 'La clave' })).toContainText('RIR 2–3')
@@ -28,20 +27,17 @@ test('un ejercicio del plan: pauta, la clave, peso sugerido, progreso, músculos
   await expect(progreso).toContainText('84 kg')
   await expect(progreso).toContainText('desde la primera vez')
   await expect(progreso).toContainText('1RM estimado')
-  // Debajo, la del tonelaje total
-  const tonelaje = page.getByRole('region', { name: 'Tonelaje del ejercicio' })
-  await expect(tonelaje).toContainText('Tonelaje total')
-  await expect(tonelaje).toContainText(' t')
-  await expect(tonelaje.getByRole('img', { name: /de 3 entrenos/ })).toBeVisible()
+  // La misma gráfica cambia al tonelaje con su botón
+  await progreso.getByText('Tonelaje', { exact: true }).click()
+  await expect(progreso).toContainText('Tonelaje total')
+  await expect(progreso).toContainText(' t')
+  await expect(progreso.getByRole('img', { name: /de 3 entrenos/ })).toBeVisible()
 
   await expect(page.getByRole('region', { name: 'Músculos que trabaja' })).toContainText('Femoral')
 
-  const descanso = page.getByRole('region', { name: 'Descanso' })
-  await descanso.getByRole('button', { name: '15 segundos más' }).click()
-  await expect(descanso.getByRole('button', { name: /^Descanso 3:15/ })).toBeVisible()
-  await descanso.getByRole('button', { name: /^Descanso 3:15/ }).click()
-  await page.getByRole('dialog', { name: 'Descanso' }).getByRole('button', { name: '2:00' }).click()
-  await expect(pauta.getByLabel('Descanso 2:00')).toBeVisible()
+  // El descanso solo se ve en la cabecera: se cambia en Editar rutina o en la sesión
+  await expect(pauta.getByLabel(/^Descanso \d/)).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Descanso' })).toHaveCount(0)
   // Solo se puede empezar si vienes de la sesión
   await expect(page.getByRole('button', { name: 'Empezar ejercicio' })).toHaveCount(0)
 })
@@ -54,7 +50,6 @@ test('un ejercicio que no está en tu plan: primera vez, sin descanso ni histori
   await expect(page.getByText('Aún no has hecho este ejercicio.')).toBeVisible()
   await expect(page.getByRole('region', { name: 'Descanso' })).toHaveCount(0)
   // Tu rutina (MUTA cuerpo completo) no lo lleva: las típicas, y lo dice
-  await expect(page.getByText('Repeticiones típicas de este ejercicio: tu rutina no lo lleva')).toBeVisible()
 })
 
 test('desde la biblioteca se abre la ficha y la flecha vuelve', async ({ page }) => {
@@ -64,18 +59,6 @@ test('desde la biblioteca se abre la ficha y la flecha vuelve', async ({ page })
   await expect(page.getByRole('heading', { name: 'Prensa', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Volver' }).click()
   await expect(page.getByRole('dialog', { name: 'Biblioteca de ejercicios' })).toBeVisible()
-})
-
-test('desde la sesión, «Empezar ejercicio» vuelve con ese ejercicio abierto', async ({ page }) => {
-  await page.goto('/entreno/sesion/b1')
-  await page.getByRole('button', { name: /Press inclinado con mancuernas/ }).click()
-  await page.getByRole('button', { name: 'Opciones de Press inclinado con mancuernas' }).click()
-  await page.getByRole('link', { name: 'Ficha', exact: true }).click()
-  await expect(page).toHaveURL(/\/entreno\/ejercicio\/press_inclinado_con_mancuernas\?sesion=b1&ej=1/)
-  // Cerrar el ejercicio en la sesión no importa: se pide el de la ficha
-  await page.getByRole('button', { name: 'Empezar ejercicio' }).click()
-  await expect(page).toHaveURL(/\/entreno\/sesion\/b1$/)
-  await expect(page.getByRole('button', { name: 'Opciones de Press inclinado con mancuernas' })).toBeVisible()
 })
 
 test('un ejercicio que no existe lo dice', async ({ page }) => {

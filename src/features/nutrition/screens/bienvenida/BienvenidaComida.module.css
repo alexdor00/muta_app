@@ -1,0 +1,182 @@
+/* Los pasos de comida de la bienvenida (usuario, 2026-11-17): filas blancas con el dato a la derecha, la cifra en grande
+   y el reparto en tres tarjetas, como el rediseño de Nutrición. */
+.tarjeta {
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--control);
+  font: var(--text-body);
+}
+
+.fila + .fila {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.valor {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.valor input {
+  width: 5.5em;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-headline);
+  text-align: right;
+  outline: none;
+}
+
+/* El foco, en toda la fila (el campo no lleva marco) */
+.fila:focus-within {
+  box-shadow: inset 0 calc(var(--border) * -1) 0 var(--label);
+}
+
+.unidad {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) 0;
+  font: var(--text-headline);
+}
+
+.texto small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rotulo {
+  padding: 0 var(--space-1);
+  color: var(--label-2);
+  font: var(--text-caption);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.error {
+  color: var(--critical);
+  font: var(--text-footnote);
+}
+
+.saltar {
+  display: grid;
+  place-items: center;
+  min-height: var(--tap-min);
+  color: var(--label);
+  font: var(--text-headline);
+  text-decoration: none;
+}
+
+/* Tu objetivo: la cifra centrada y en grande */
+.cifra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.kcal {
+  font: var(--text-cifra-grande);
+}
+
+.macros {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.macro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.macro b {
+  font: var(--text-cifra-fila);
+}
+
+.macro span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.nota {
+  padding: 0 var(--space-1);
+  text-align: left;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.plegable {
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.plegable summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--row);
+  list-style: none;
+  cursor: pointer;
+}
+
+.plegable summary::-webkit-details-marker {
+  display: none;
+}
+
+.plegable summary svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+}
+
+.plegable[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.calculo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+}
+
+.calculo p {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.calculo b {
+  flex: none;
+  color: var(--label);
+}

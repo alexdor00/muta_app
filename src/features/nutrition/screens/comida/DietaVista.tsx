@@ -1,15 +1,23 @@
 import { useLocation } from 'preact-iso'
 import { formatDayDate, formatInt } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { Button } from '../../../../shared/ui/Button.tsx'
-import { ChevronRightIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
+import {
+  BookIcon,
+  ChatIcon,
+  ChevronRightIcon,
+  PencilIcon,
+  PlusIcon,
+  SparkIcon,
+} from '../../../../shared/ui/icons.tsx'
+import { CartIcon } from '../../../../shared/ui/iconosHoy.tsx'
+import sv from './SemanaVista.module.css'
 import { CoachCard } from '../../components/CoachCard.tsx'
 import { DietWeek } from '../../components/DietWeek.tsx'
-import { TargetHero } from '../../components/TargetHero.tsx'
 import { dieta } from '../../state/comida.ts'
 import {
   ahoraDieta,
   cifrasDieta,
+  PLANTILLA_DIETA,
   proximaConsulta,
   recetaDelDia,
   semanaDieta,
@@ -57,35 +65,67 @@ function FilaReceta({ r }: { r: Receta }) {
 export function DietaVista(p: Props) {
   const { route } = useLocation()
   const a = dieta.value
+  // Sin dieta (rediseño 45; usuario, 2026-11-17): es opcional; tres formas de tenerla
   if (!a) {
     return (
-      <div class={styles.stack}>
-        <section class={styles.card} aria-labelledby="sin-dieta">
-          <h2 id="sin-dieta" class={styles.cardTitle}>
-            Sigue una dieta
-          </h2>
-          <p class={styles.sub}>
-            Como tu rutina en Entreno: menús que se repiten, recetas con su versión de entreno y de descanso,
-            y la app sabe qué toca comer cada día. Lo apuntas de un toque y te hace la lista de la compra.
-          </p>
-          <div class={styles.actions}>
-            <Button onClick={p.onArchivo}>Cargar un archivo de dieta</Button>
-            <Button variant="secondary" onClick={p.onPropia}>
-              Crear la mía con mis recetas
-            </Button>
-            <Button variant="secondary" onClick={p.onEjemplo}>
-              Probar la dieta de ejemplo
-            </Button>
-          </div>
-          <p class={styles.foot}>
-            El archivo puede ser el de MUTA o un CSV con una fila por ingrediente: menú, comida, receta,
-            ingrediente y gramos (o gramos de entreno y de descanso).
-          </p>
-          <p class={styles.foot}>
-            La de ejemplo es la del prototipo anterior, para ver cómo funciona: no es una dieta pautada para
-            ti.
-          </p>
+      <div class={sv.vista}>
+        <section class={sv.vaciaTexto}>
+          <h2>¿Sigues una dieta pautada?</h2>
+          <p>Es opcional. Si la traes, MUTA la convierte en tu menú, tu compra y tu día.</p>
         </section>
+        <ul class={sv.tarjeta}>
+          <li>
+            <button type="button" class={sv.opcion} onClick={p.onArchivo}>
+              <span class={sv.icono}>
+                <BookIcon />
+              </span>
+              <span class={sv.texto}>
+                <b>Importar un archivo</b>
+                <span class={sv.detalle}>El de MUTA o un CSV de tu nutricionista</span>
+              </span>
+              <ChevronRightIcon />
+            </button>
+          </li>
+          <li>
+            <button type="button" class={sv.opcion} onClick={p.onPropia}>
+              <span class={sv.icono}>
+                <PencilIcon />
+              </span>
+              <span class={sv.texto}>
+                <b>Crear una con recetas</b>
+                <span class={sv.detalle}>Eliges los platos de cada día</span>
+              </span>
+              <ChevronRightIcon />
+            </button>
+          </li>
+          <li>
+            <button type="button" class={sv.opcion} onClick={p.onEjemplo}>
+              <span class={sv.icono}>
+                <SparkIcon />
+              </span>
+              <span class={sv.texto}>
+                <b>Probar una de ejemplo</b>
+                <span class={sv.detalle}>Para ver cómo funciona; se quita cuando quieras</span>
+              </span>
+              <ChevronRightIcon />
+            </button>
+          </li>
+        </ul>
+        <p class={sv.detalle}>
+          Sin dieta todo funciona igual: MUTA calcula tu objetivo y te propone los menús.
+        </p>
+        <p class={sv.detalle}>
+          El CSV lleva una fila por ingrediente: menú y sus días, cuándo se cocina, comida, receta,
+          ingrediente y gramos (de entreno y de descanso si cambian). Lo que va todos los días, con el menú
+          «Todos». La de ejemplo no está pautada para ti.
+        </p>
+        <a
+          class={sv.plantilla}
+          href={`data:text/csv;charset=utf-8,${encodeURIComponent(PLANTILLA_DIETA)}`}
+          download="dieta-plantilla.csv"
+        >
+          Descargar plantilla
+        </a>
       </div>
     )
   }
@@ -96,26 +136,70 @@ export function DietaVista(p: Props) {
   const menus: (Menu | null)[] = [...a.dieta.menus, null]
   return (
     <div class={styles.stack}>
+      {/* Rediseño 46 (usuario, 2026-11-17): el nombre, la semana con sus kcal y lo que hay que hacer con ella */}
       {cifras && ahora && (
-        <div class={styles.pad}>
-          <TargetHero
-            etiqueta={[a.dieta.nombre, `semana ${ahora.semana}`, ahora.fase?.nombre]
-              .filter(Boolean)
-              .join(' · ')}
-            kcal={cifras.entreno.kcal}
-            cuando="los días de entreno"
-            macros={{
-              proteina: cifras.entreno.protein,
-              hidratos: cifras.entreno.carbs,
-              grasa: cifras.entreno.fat,
-            }}
-            detalle={`${formatInt(cifras.descanso.kcal)} kcal los días de descanso · ${formatInt(ahora.ajuste.pasos)} pasos al día`}
-          >
-            <button type="button" onClick={p.onMas}>
-              ··· Tu dieta
+        <section class={sv.vista} aria-label="Tu dieta">
+          <div class={styles.cabezaDieta}>
+            <span>
+              <h2>{a.dieta.nombre}</h2>
+              <p>
+                {[
+                  `Semana ${ahora.semana}`,
+                  ahora.fase?.nombre,
+                  `${formatInt(cifras.entreno.kcal)} kcal si entrenas`,
+                  `${formatInt(cifras.descanso.kcal)} si descansas`,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
+            </span>
+            <button type="button" class={styles.editar} aria-label="Tu dieta: opciones" onClick={p.onMas}>
+              <PencilIcon />
             </button>
-          </TargetHero>
-        </div>
+          </div>
+          <ul class={sv.tarjeta}>
+            <li>
+              <a class={sv.opcion} href={paths.checkIn}>
+                <span class={sv.icono}>
+                  <ChatIcon />
+                </span>
+                <span class={sv.texto}>
+                  <b>Revisión semanal</b>
+                  <span class={sv.detalle}>
+                    {proximaConsulta.value
+                      ? `Toca el ${formatDayDate(proximaConsulta.value).toLowerCase()}: cuéntale cómo ha ido`
+                      : 'Cuéntale cómo ha ido la semana'}
+                  </span>
+                </span>
+                <ChevronRightIcon />
+              </a>
+            </li>
+            <li>
+              <a class={sv.opcion} href={`${paths.nutrition}?vista=plan&paso=come`}>
+                <span class={sv.icono}>
+                  <SparkIcon />
+                </span>
+                <span class={sv.texto}>
+                  <b>Propuestas</b>
+                  <span class={sv.detalle}>Cambios que te sugiere tu nutricionista</span>
+                </span>
+                <ChevronRightIcon />
+              </a>
+            </li>
+            <li>
+              <a class={sv.opcion} href={paths.shopping}>
+                <span class={sv.icono}>
+                  <CartIcon />
+                </span>
+                <span class={sv.texto}>
+                  <b>Compra de la dieta</b>
+                  <span class={sv.detalle}>Lo que necesitas, en tu lista</span>
+                </span>
+                <ChevronRightIcon />
+              </a>
+            </li>
+          </ul>
+        </section>
       )}
       {a.dieta.ejemplo && (
         <p class={`${styles.foot} ${styles.pad}`}>

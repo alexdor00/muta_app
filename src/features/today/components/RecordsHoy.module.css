@@ -1,0 +1,47 @@
+/* Hoy · tus récords del día: una tarjeta blanca con el trofeo en naranja (un logro) */
+.tarjeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 var(--gutter);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  text-decoration: none;
+}
+
+.trofeo {
+  display: grid;
+  flex: none;
+  color: var(--streak);
+}
+
+.trofeo svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.texto b {
+  font: var(--text-headline);
+}
+
+.texto small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.tarjeta > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-3);
+}

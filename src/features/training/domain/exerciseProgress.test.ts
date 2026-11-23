@@ -19,14 +19,28 @@ describe('progresoDe', () => {
       },
     ]
     // 60 × (1 + 12/30) = 84; 62,5 × (1 + 8/30) = 79,2
-    expect(progresoDe(veces, 2)).toEqual([{ fecha: '2026-10-23', maximo: 84, volumen: 975, puesto: null }])
+    expect(progresoDe(veces, 2)).toEqual([
+      { fecha: '2026-10-23', maximo: 84, volumen: 975, puesto: null, mejor: { kg: 60, reps: 10 } },
+    ])
   })
   it('con peso corporal el máximo son reps + RIR y no suma volumen; las veces sin series no cuentan', () => {
     const veces = [
       { fecha: '2026-10-20', series: [{ kg: null, reps: 12 }] },
       { fecha: '2026-10-22', series: [{ kg: null, reps: 0 }] },
     ]
-    expect(progresoDe(veces, 1)).toEqual([{ fecha: '2026-10-20', maximo: 13, volumen: 0, puesto: null }])
+    expect(progresoDe(veces, 1)).toEqual([
+      { fecha: '2026-10-20', maximo: 13, volumen: 0, puesto: null, mejor: { kg: null, reps: 12 } },
+    ])
+  })
+  it('dos veces el mismo día cuentan como una: la mejor serie y todo el tonelaje', () => {
+    const veces = [
+      { fecha: '2026-11-12', series: [{ kg: 60, reps: 8 }] },
+      { fecha: '2026-11-12', series: [{ kg: 60, reps: 10 }] },
+    ]
+    const [p, ...resto] = progresoDe(veces, 0)
+    expect(resto).toEqual([])
+    expect(p.mejor).toEqual({ kg: 60, reps: 10 })
+    expect(p.volumen).toBe(1080)
   })
 })
 
@@ -44,6 +58,7 @@ describe('avisoDeOrden', () => {
     maximo: 80,
     volumen: 900,
     puesto,
+    mejor: { kg: 60, reps: 10 },
   })
   it('avisa si la última vez y la anterior fueron en distinto puesto', () => {
     expect(avisoDeOrden([p(1), p(3), p(1)])).toEqual({ antes: 3, ahora: 1 })

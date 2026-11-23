@@ -1,0 +1,94 @@
+/* «Saca esto» plegado por pasillos: una fila por pasillo, que se abre */
+.tarjeta {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.tarjeta > li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.pasillo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+}
+
+.pasillo > button:first-child {
+  padding: 0;
+  cursor: pointer;
+}
+
+.abrir {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.nombre {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  font: var(--text-body);
+}
+
+.nombre small {
+  overflow: hidden;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hecho .nombre {
+  color: var(--label-3);
+  text-decoration: line-through;
+}
+
+.cuenta {
+  flex: none;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.abrir svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-3);
+}
+
+/* Lo de dentro, un poco metido */
+.dentro {
+  margin: 0;
+  padding: 0 0 var(--space-2) var(--space-8);
+  list-style: none;
+}
+
+.dentro li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.alGusto {
+  padding: var(--space-2) 0;
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.vacio {
+  background: none;
+}

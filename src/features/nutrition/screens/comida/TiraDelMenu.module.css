@@ -1,0 +1,114 @@
+/* «Tu semana» en Tu dieta (usuario, 2026-11-19): la tira con «Repetir» y la hoja para elegir cómo se repiten */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cabeza h3 {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.repetir {
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.nota {
+  margin: 0;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-align: left;
+}
+
+.nota b {
+  color: var(--label);
+}
+
+.enlace {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.sub {
+  margin: 0 0 var(--space-3);
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.opcionesRepetir {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.opcion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.opcion[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 var(--border) var(--label);
+}
+
+.opcion svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.opcionTexto {
+  display: flex;
+  flex-direction: column;
+}
+
+.opcionTexto b {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.opcionTexto small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.ejemplo {
+  display: flex;
+  flex: none;
+  gap: var(--space-1);
+}

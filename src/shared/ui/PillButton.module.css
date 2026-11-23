@@ -9,7 +9,7 @@
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
   font: var(--text-subhead);
   font-weight: var(--weight-semibold);
   cursor: pointer;

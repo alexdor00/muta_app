@@ -1,0 +1,716 @@
+/* Compra y cocina (la hoja): cuatro tarjetas blancas cortas, con su título y, a la derecha, su hora; los días en círculos
+   como en Tu semana; en táper, un interruptor por comida (usuario, 2026-11-15). */
+.intro {
+  margin: 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--control-sm);
+}
+
+.titulo {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+/* «a las» y la hora en una píldora gris pequeña */
+.aLas {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.hora {
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.dias {
+  display: flex;
+  justify-content: space-between;
+}
+
+.dia {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.dia[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.nota {
+  margin: 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--row);
+  font: var(--text-body);
+}
+
+.subTexto {
+  display: flex;
+  flex-direction: column;
+}
+
+.detalle {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* Así queda: una agenda; el día a la izquierda (como la línea de tiempo del diseño) y lo que haces */
+.lineas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linea {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.fecha {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  width: var(--badge);
+  padding: var(--space-1) 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.fecha small {
+  color: var(--label-2);
+  font: var(--text-caption);
+  text-transform: uppercase;
+}
+
+.fecha b {
+  font: var(--text-cifra-fila);
+}
+
+.lineaTexto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-top: var(--space-1);
+}
+
+.lineaTitulo {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+.icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--badge);
+  height: var(--badge);
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.icono svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.opcionTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  font: var(--text-headline);
+}
+
+.opcionTexto small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+/* Así queda: un día de cocina se toca para cambiarlo */
+.lineaBoton {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.lineaBoton .lineaTexto {
+  flex: 1;
+}
+
+.cambiar {
+  flex: none;
+  align-self: center;
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+/* Un día de cocina */
+.volver {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.volver svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.grupo {
+  margin: 0;
+  padding: var(--space-2) 0 var(--space-1);
+  color: var(--label-2);
+  font: var(--text-caption);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comidaFila + .comidaFila {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.comidaFila {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-2);
+}
+
+.marcar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-2) 0 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* El círculo para marcar: vacío o negro con su ✓ */
+.marca {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  border: var(--border) solid var(--separator);
+  border-radius: 50%;
+  color: var(--on-accent);
+}
+
+.marcar[aria-pressed='true'] .marca {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.marca svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* La etiqueta del plato: qué se hace el mismo día; se toca para cambiarlo */
+.etiqueta {
+  align-self: flex-start;
+  margin-left: calc(var(--meal-thumb) + var(--space-3));
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.cifra {
+  font: var(--text-cifra-fila);
+}
+
+/* En cada día de cocina, lo que se hace el día que comes, a la vista (usuario, 2026-11-16) */
+.fresco {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+/* ¿Cocinas para varios días?: dos respuestas grandes, la elegida con su ✓ */
+.respuestas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.respuestas li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.respuesta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.respuesta[aria-pressed='true'] .marca {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+/* Cada plato de un día de cocina: su nombre y, debajo, lo de ese día y lo de al comer */
+.partes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.partes li {
+  display: flex;
+  flex-direction: column;
+}
+
+.parteNombre {
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+/* Las filas que se tocan (un día de cocina, la compra): con su «›» */
+.lineaBoton {
+  text-decoration: none;
+}
+
+.lineaBoton > svg {
+  flex: none;
+  align-self: center;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-3);
+}
+
+/* «Nada pasa más de 3 días en la nevera»: nota gris con su icono (rediseño 21) */
+.aviso {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+}
+
+.aviso svg {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+}
+
+/* Organizar la semana: filas con su desplegable, separadas por una raya fina (usuario, 2026-11-17: sencillo) */
+.filas {
+  gap: 0;
+  padding-block: var(--space-2);
+}
+
+.filas > .fila + .fila,
+.filas > .dias + .fila,
+.filas > .fila + .dias {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.filas > .dias {
+  padding-block: var(--space-3);
+}
+
+.filas > .titulo {
+  padding-block: var(--space-2);
+}
+
+/* Un desplegable pequeño y gris, como la hora */
+.desplegable {
+  flex: none;
+  max-width: 70%;
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+/* Tus próximos días: dos semanas de casillas; la de cocinar, en negro (una acción que eliges, no un logro) */
+.calendario {
+  gap: var(--space-3);
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.celda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--space-1) / 2);
+  min-height: var(--tap-min);
+  padding: var(--space-2) 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.celda small {
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+.celda b {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.letra {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+.iconos {
+  display: flex;
+  gap: calc(var(--space-1) / 2);
+  min-height: var(--icon-sm);
+}
+
+.iconos svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.celdaCocina {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.celdaCocina small {
+  color: var(--on-accent);
+  opacity: 0.8;
+}
+
+/* Cómo cocinas en una pantalla (usuario, 2026-11-19): tarjetas juntas, sin desplegables */
+.pantalla {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cabeza h3 {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.veces {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.veces > span:first-child {
+  display: flex;
+  flex-direction: column;
+  font: var(--text-subhead);
+}
+
+.veces small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.paso {
+  display: flex;
+  flex: none;
+  gap: var(--space-2);
+}
+
+.paso button {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.paso button:disabled {
+  opacity: 0.4;
+}
+
+.paso svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.pastillas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pastillas button {
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
+  cursor: pointer;
+}
+
+.pastillas button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: var(--weight-semibold);
+}
+
+/* Cada bloque de Cómo cocinas, separado por una raya fina dentro de la misma tarjeta */
+.bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bloque + .bloque,
+.bloque + .veces {
+  padding-top: var(--space-3);
+  border-top: var(--hairline) solid var(--separator);
+}
+
+/* Todo en una pantalla: menos aire, títulos y horas más pequeños */
+.compacta {
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+
+.compacta .cabeza {
+  min-height: 0;
+}
+
+.compacta .cabeza h3 {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.compacta .hora {
+  height: var(--icon);
+  padding: 0 var(--space-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+.compacta .bloque + .bloque,
+.compacta .bloque + .veces {
+  padding-top: var(--space-2);
+}
+
+.compacta .pastillas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.compacta .pastillas button {
+  padding: var(--space-2) var(--space-1);
+}
+
+/* «Dejas hecho»: una pastilla por comida y, debajo, lo fresco a lo ancho */
+.compacta .pastillas.cuatro {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.compacta .pastillas .ancha {
+  grid-column: 1 / -1;
+}
+
+/* Cómo cocinas en cuatro preguntas (usuario, 2026-11-19, Desktop/MUTA-Como-cocinas.png) */
+.pregunta {
+  margin: var(--space-2) var(--space-1) calc(-1 * var(--space-2));
+  color: var(--label-2);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.quien {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.quien button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.quien button svg {
+  width: var(--icon);
+  height: var(--icon);
+  margin-bottom: var(--space-1);
+}
+
+.quien b {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.quien small {
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+.quien button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.quien button[aria-pressed='true'] small {
+  color: var(--on-accent);
+  opacity: 0.7;
+}
+
+.filaQ {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font: var(--text-body);
+}
+
+.paso b {
+  display: grid;
+  place-items: center;
+  min-width: var(--space-5);
+  font: var(--text-headline);
+}
+
+.comidaHecha {
+  display: grid;
+  grid-template-columns: 5.5em 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-subhead);
+}
+
+.comidaHecha + .comidaHecha {
+  padding-top: var(--space-2);
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.estrecho {
+  flex: 0 1 60%;
+}
+
+/* Sin dieta quedan tres: la última, a lo ancho */
+.quien button:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}

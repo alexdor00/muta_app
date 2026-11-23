@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
 import { ChoiceList } from '../../../shared/ui/Choice.tsx'
-import { CameraIcon } from '../../../shared/ui/icons.tsx'
+import { FotoEditable } from '../../../shared/ui/FotoEditable.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import { Desplegable } from './Desplegable.tsx'
 import styles from './SessionPhotoSheet.module.css'
@@ -14,18 +14,20 @@ export function SessionPhotoSheet(props: {
   sigla: string
   onSigla: (sigla: string) => void
   foto: string | null
+  /** La foto de serie que lleva (si no pusiste la tuya). */
+  deSerie: string
+  /** Las siete fotos de la app para elegir: su nombre, dónde está y si es la que lleva. */
+  fotosDeSerie: { foto: string; url: string; elegida: boolean }[]
+  onDeSerie: (foto: string) => void
+  /** Dónde está centrada (en %) y al soltar después de arrastrarla. */
+  encuadre: { x: number; y: number }
+  onCentrar: (x: number, y: number) => void
   onFoto: (archivo: File) => void
   onQuitar: () => void
   onClose: () => void
 }) {
   const [abierto, setAbierto] = useState(false)
   const nombre = props.sesiones.find((s) => s.value === props.sigla)?.label ?? props.sigla
-  const elegir = (e: Event) => {
-    const input = e.currentTarget as HTMLInputElement
-    const archivo = input.files?.[0]
-    if (archivo) props.onFoto(archivo)
-    input.value = ''
-  }
   return (
     <Sheet title="Foto de la sesión" onClose={props.onClose} large>
       <Desplegable titulo="Sesión" valor={nombre} abierto={abierto} onAbrir={setAbierto}>
@@ -40,35 +42,38 @@ export function SessionPhotoSheet(props: {
           }}
         />
       </Desplegable>
-      <div class={`${styles.preview} ${props.foto ? styles.withPhoto : ''}`}>
-        {props.foto ? (
-          <img src={props.foto} alt={`Tu foto de ${nombre}`} />
-        ) : (
-          <span class={styles.empty}>
-            <CameraIcon />
-            Sin foto: la tarjeta va con su color
-          </span>
-        )}
+      <FotoEditable
+        foto={props.foto ?? props.deSerie}
+        alt={props.foto ? `Tu foto de ${nombre}` : `Foto de ${nombre}`}
+        encuadre={props.encuadre}
+        onCentrar={props.onCentrar}
+        onFoto={props.onFoto}
+        onQuitar={props.foto ? props.onQuitar : undefined}
+        entre={
+          <>
+            {/* Una de las siete de la app (usuario, 2026-11-14) */}
+            <p class={styles.deSerieTitulo}>Fotos de la app</p>
+            <div class={styles.deSerie} role="group" aria-label="Fotos de la app">
+              {props.fotosDeSerie.map((f) => (
+                <button
+                  key={f.foto}
+                  type="button"
+                  class={`${styles.miniatura} ${f.elegida && !props.foto ? styles.miniaturaElegida : ''}`}
+                  aria-pressed={f.elegida && !props.foto}
+                  aria-label={`Poner la foto ${f.foto} de la app`}
+                  onClick={() => props.onDeSerie(f.foto)}
+                >
+                  <img src={f.url} alt="" />
+                </button>
+              ))}
+            </div>
+          </>
+        }
+      >
         <span class={styles.name}>
           <b>{props.sigla}</b> {nombre}
         </span>
-      </div>
-      <label class={styles.primary}>
-        Elegir de la galería
-        <input type="file" accept="image/*" onChange={elegir} />
-      </label>
-      <label class={styles.secondary}>
-        Hacer una foto
-        <input type="file" accept="image/*" capture="environment" onChange={elegir} />
-      </label>
-      {props.foto && (
-        <button type="button" class={styles.remove} onClick={props.onQuitar}>
-          Quitar la foto
-        </button>
-      )}
-      <p class={styles.note}>
-        Se guarda solo en tu móvil. La tarjeta de Tu plan la lleva de fondo, oscurecida para que se lea.
-      </p>
+      </FotoEditable>
     </Sheet>
   )
 }

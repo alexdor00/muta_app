@@ -65,7 +65,7 @@
 
 .chip.on {
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .list {

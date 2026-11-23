@@ -8,6 +8,7 @@
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .semanaCard {
@@ -242,6 +243,7 @@
   border-radius: var(--radius-card);
   background: var(--surface);
   list-style: none;
+  box-shadow: var(--card-shadow);
 }
 
 .herramientas > li + li {
@@ -299,7 +301,7 @@
   font: var(--text-headline);
 }
 
-/* Lo que propone tu nutricionista, dentro de su menú: una línea con un punto naranja */
+/* Lo que propone tu nutricionista, dentro de su menú: una línea */
 .avisoMenu {
   display: flex;
   align-items: center;
@@ -310,14 +312,6 @@
   background: var(--bg);
   color: var(--label);
   text-decoration: none;
-}
-
-.punto {
-  flex: none;
-  width: var(--space-2);
-  height: var(--space-2);
-  border-radius: var(--radius-pill);
-  background: var(--streak);
 }
 
 .avisoTexto {

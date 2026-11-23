@@ -12,7 +12,13 @@ type Props = {
   /** «Serie 1 · peso en kg». */
   detalle: string
   /** Con el descanso en marcha, va arriba del teclado en lugar del título (C05). */
-  descanso: { tiempo: string; quedan: number; onSaltar: () => void } | null
+  descanso: {
+    tiempo: string
+    quedan: number
+    parado: boolean
+    onPausar: () => void
+    onSaltar: () => void
+  } | null
   /** «+ / −» suman o restan esto («2,5»). */
   paso: string
   /** En la casilla del RIR, la tecla de la coma es «Fallo». */
@@ -113,10 +119,19 @@ export function WorkoutKeypad({
           role="timer"
           aria-label="Descanso"
         >
-          <div class={styles.restText}>
+          {/* Tocar el tiempo lo para o lo sigue */}
+          <button
+            type="button"
+            class={`${styles.restText} ${styles.restPausar} ${descanso.parado ? styles.restParado : ''}`}
+            aria-label={descanso.parado ? 'Seguir el descanso' : 'Parar el descanso'}
+            aria-pressed={descanso.parado}
+            onClick={descanso.onPausar}
+          >
             <b>{descanso.tiempo}</b>
-            <small>{descanso.quedan <= 0 ? '¡A por ella!' : 'Descanso entre series'}</small>
-          </div>
+            <small>
+              {descanso.parado ? 'En pausa' : descanso.quedan <= 0 ? '¡A por ella!' : 'Descanso entre series'}
+            </small>
+          </button>
           <button type="button" class={styles.restSkip} onClick={descanso.onSaltar}>
             Omitir
           </button>

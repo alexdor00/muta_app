@@ -1,16 +1,17 @@
 import { useState } from 'preact/hooks'
-import { formatChange, formatDayDate, formatDecimal, formatTons } from '../../../../shared/lib/format.ts'
-import { paths } from '../../../../shared/lib/paths.ts'
+import { formatChange, formatDecimal } from '../../../../shared/lib/format.ts'
+import { useLocation } from 'preact-iso'
+import { desdeHoy, paths, vieneDeHoy } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { PlayIcon } from '../../../../shared/ui/icons.tsx'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { ExerciseList } from '../../components/ExerciseList.tsx'
-import { SessionHero } from '../../components/SessionHero.tsx'
-import { METRICAS_SESION, SessionProgress, type Metrica } from '../../components/SessionProgress.tsx'
+import { encuadreDe, fotoDeTarjeta } from '../../state/fotos.ts'
+import { SessionHero } from '../../../../shared/ui/SessionHero.tsx'
+import { SessionChart } from '../../../../shared/ui/SessionChart.tsx'
 import { SessionTipsCard } from '../../components/SessionTips.tsx'
 import {
   cambioDe,
-  textoReps,
   detalleSesion,
   entrenos,
   notaSugerido,
@@ -37,9 +38,10 @@ function vistaCambio(c: number | null): { texto: string; sentido: 1 | 0 | -1 } |
  * sesión (si hay), sus ejercicios con la última vez y «Empezar» fijo abajo.
  */
 export function VerSesionScreen(props: { sessionId: string }) {
-  const [metrica, setMetrica] = useState<Metrica>('ton')
   const [abierto, setAbierto] = useState<number | null>(null)
   const plan = usePlan()
+  // Si llegas desde Hoy, la flecha atrás vuelve a Hoy (y al salir de la sesión, también)
+  const deHoy = vieneDeHoy(useLocation().query)
   if (plan.status === 'loading') return null
   if (plan.status === 'none') return <SinPlan />
   const sesion = sesionDe(props.sessionId)
@@ -50,21 +52,12 @@ export function VerSesionScreen(props: { sessionId: string }) {
       </Pending>
     )
   }
-  const puntos = progresoDeSesion(entrenos.value, sesion.sigla).map((e) => ({
-    fecha: e.fecha,
-    valor: metrica === 'ton' ? e.toneladas : metrica === 'reps' ? e.reps : e.minutos,
-  }))
-  const ultimo = puntos.at(-1)
-  const anterior = puntos.at(-2)
-  const texto = (v: number) =>
-    metrica === 'ton' ? formatTons(v) : `${v} ${metrica === 'reps' ? 'reps' : 'min'}`
-  // El cambio frente a la vez anterior, redondeado: si redondea a 0 %, «Igual que la anterior»
-  const pct = ultimo && anterior?.valor ? Math.round((ultimo.valor / anterior.valor - 1) * 100) : null
   const ejercicios = sesion.ejercicios.map((e) => {
     const lib = porNombre(e.nombre)
     return {
       nombre: e.nombre,
-      detalle: `${e.series} series · ${textoReps(e)} reps · ${effortLabel(e.rir)}`,
+      // Con cada serie distinta, solo el rango de todas: más claro (usuario, 2026-11-15)
+      detalle: `${e.series} series · ${e.reps} reps · ${effortLabel(e.rir)}`,
       sugerido:
         [e.enLugarDe ? 'En lugar de ' + e.enLugarDe + ' (cambiado en tu plan)' : null, notaSugerido(e)]
           .filter(Boolean)
@@ -82,25 +75,15 @@ export function VerSesionScreen(props: { sessionId: string }) {
         nombre={sesion.nombre}
         detalle={detalleSesion(sesion)}
         tono={tonoDe(sesion.sigla)}
-        backHref={paths.training}
+        foto={fotoDeTarjeta(sesion.sigla)}
+        encuadre={encuadreDe(sesion.sigla)}
+        backHref={deHoy ? paths.today : paths.training}
+        backLabel={deHoy ? 'Volver a Hoy' : undefined}
       />
       <div class={styles.panel}>
-        <SessionProgress
-          metricas={METRICAS_SESION}
+        <SessionChart
+          veces={progresoDeSesion(entrenos.value, sesion.sigla)}
           etiqueta="Progreso de la sesión"
-          vacio="Aún no has hecho esta sesión."
-          valor={ultimo ? texto(ultimo.valor) : null}
-          cambio={
-            pct === null
-              ? null
-              : pct === 0
-                ? 'Igual que la anterior'
-                : `${formatChange(pct / 100)} que la anterior`
-          }
-          fecha={ultimo ? formatDayDate(ultimo.fecha) : null}
-          puntos={puntos}
-          metrica={metrica}
-          onMetrica={setMetrica}
         />
         <SessionTipsCard
           consejos={consejosDeSesion(sesion.ejercicios).map((t) => ({ text: t.text, why: t.why }))}
@@ -117,7 +100,13 @@ export function VerSesionScreen(props: { sessionId: string }) {
         />
       </div>
       <div class={styles.footer}>
-        <Button href={paths.session(sesion.sigla.toLowerCase())}>
+        <Button
+          href={
+            deHoy
+              ? desdeHoy(paths.session(sesion.sigla.toLowerCase()))
+              : paths.session(sesion.sigla.toLowerCase())
+          }
+        >
           <span class={styles.startLabel}>
             <PlayIcon />
             Empezar {sesion.sigla}

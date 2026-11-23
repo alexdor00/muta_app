@@ -1,0 +1,23 @@
+/* «Lo que llevas»: la foto del plato, de dónde es y lo que aporta (usuario, 2026-11-21) */
+.cabeza {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.texto h3 {
+  margin: 0;
+}
+
+.macros {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}

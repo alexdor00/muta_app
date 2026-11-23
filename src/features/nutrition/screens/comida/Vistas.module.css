@@ -15,6 +15,7 @@
   padding: var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .cardHead {
@@ -70,6 +71,7 @@
   background: var(--surface);
   color: var(--label);
   text-decoration: none;
+  box-shadow: var(--card-shadow);
 }
 
 .tileTitle {
@@ -145,12 +147,41 @@
   cursor: pointer;
 }
 
-/* «Ver todas las recetas ›», al final de tu día */
-.verTodas {
+/* Tu dieta (rediseño 46): su nombre con la semana y el lápiz */
+.cabezaDieta {
   display: flex;
-  align-items: center;
-  min-height: var(--tap-min);
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.cabezaDieta > span {
+  flex: 1;
+}
+
+.cabezaDieta h2 {
+  margin: 0;
+  font: var(--text-title-1);
+}
+
+.cabezaDieta p {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.editar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
   color: var(--label);
-  font: var(--text-headline);
-  text-decoration: none;
+  cursor: pointer;
+}
+
+.editar svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
 }

@@ -1,6 +1,6 @@
 # Arquitectura y flujo de datos
 
-La app se organiza por **áreas** (Entreno, Comida, Perfil, y las pendientes Hoy y Progreso) y, dentro de cada
+La app se organiza por **áreas** (Entreno, Comida, Perfil, Progreso y la pendiente Hoy) y, dentro de cada
 una, por **capas**. Lo común vive en `shared/`. Las fronteras no dependen de la disciplina: el linter rechaza un
 import prohibido (`eslint.config.js`, tabla «Quién puede usar a quién» del documento de rediseño).
 
@@ -89,6 +89,36 @@ La compra (del menú y de la dieta) · Cocina · Consulta (solo pintan)
 Comida lee de Perfil solo su objetivo y sus días de entreno (`phaseOf` de su `index.ts`) para el primer cálculo, y de Entreno
 (su `index.ts`) los días de entreno y la fuerza en los básicos para la consulta. El escáner consulta Open Food Facts (el único
 acceso a internet de Comida) y guarda lo encontrado en `userContent/alimentos-propios` con su código.
+
+## Flujo de datos: Progreso
+
+```
+Comida · index.ts · comidaParaProgreso()  ── pesajes y tendencia, ritmo frente al previsto, lo que comiste cada día con tu
+                                             objetivo, la cintura de la consulta, la consulta de tu dieta y tu sexo y altura
+Entreno · index.ts · entrenoParaProgreso() ── tus etapas (mesociclos, en curso y anteriores) con su fuerza, tu fuerza semana
+                                             a semana y desde que empezaste (domain/strengthHistory.ts), tus entrenos y el
+                                             récord del básico de cada grupo
+          mesocicloParaProgreso() · compararMesociclos() ── una etapa por dentro y dos comparadas (domain/mesocycles.ts)
+          renombrar · empezar otra · volver a usar · elegir básico ── los guarda Entreno (mesocycles, plans, userContent)
+IndexedDB `bodyLog` (tipo «perimetros»)    ── tus siete medidas
+IndexedDB `photos`                         ── tus fotos de progreso (reducidas, solo en el móvil)
+IndexedDB `userContent/composicion`        ── tu calibración y tu objetivo de grasa
+        │
+        ▼  progress/use-cases/progress.ts · cargarProgreso()  (cada vez que se abre la pestaña)
+   state/progreso.ts (y lo calculado: composición, evolución, una etapa con domain/stage.ts, un mes frente al anterior)
+   → screens/progreso (el mes con su etapa y Días · Cuerpo · Fuerza; la etapa, en su hoja) y screens/hoy (¿Cómo estás
+     hoy? y las medidas del mes, para Hoy por index.ts): solo pintan
+```
+
+**Hoy** (2026-11-13) no calcula nada: cada área le da sus cosas de hoy como `TareaDeHoy` (`shared/lib/tareaDeHoy.ts`) con
+un hook de su `paraHoy.ts` (la API para Hoy, aparte del `index.ts` para que las demás áreas no la carguen: `useHoyDeEntreno`, `useHoyDeComida`, `useHoyDeProgreso`, que traen también sus hojas); Hoy las
+junta y ordena (`today/domain/dia.ts`), pinta el anillo y las listas y solo guarda lo que marcas a mano (la compra,
+cocinar: `userContent/hoy-marcadas`). Pasos (`bodyLog` tipo `steps`) los guarda Nutrición; ¿Cómo estás hoy? (tipo
+`sensaciones`), Progreso.
+
+Progreso no calcula nada de Comida ni de Entreno: cada área lo calcula desde sus datos y lo da por su `index.ts`. Para el
+peso de cada mesociclo, Progreso le pasa a Entreno una función con tus pesajes (`PesoEnTramo`). El mesociclo en curso lo
+crea y lo cierra Entreno al leerlo (si cambiaste de rutina, se cierra el día antes del nuevo).
 
 ## Datos y contenido
 

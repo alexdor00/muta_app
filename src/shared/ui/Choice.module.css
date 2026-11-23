@@ -91,7 +91,7 @@
 .circle.selected,
 .chip.selected {
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 /* Control segmentado */
@@ -111,12 +111,26 @@
   border-radius: var(--radius-pill);
   font: var(--text-footnote);
   color: var(--label);
+  white-space: nowrap; /* «Menú A» en una línea */
+}
+
+/* Pestañas: más grandes, para tocarlas bien */
+.grande .segment {
+  height: calc(var(--tap-min) - var(--space-1));
+  font: var(--text-body);
 }
 
 .segment.selected {
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
   font-weight: var(--weight-semibold);
+}
+
+/* Un segmento con su icono o su número delante (los pasos de Mi plan) */
+.conIcono {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
 }
 
 /* Tarjetas */
@@ -134,7 +148,7 @@
   padding: var(--space-3) var(--space-4);
   border: var(--border) solid var(--separator);
   border-radius: var(--radius-control);
-  background: var(--bg);
+  background: var(--surface);
 }
 
 .card.selected {
@@ -159,7 +173,7 @@
 
 .selected .badge {
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .text {
@@ -175,8 +189,7 @@
 .detail {
   display: block;
   margin-top: var(--space-1);
-  font: var(--text-caption);
-  font-weight: var(--weight-regular);
+  font: var(--text-footnote); /* la nota de la escala (usuario, 2026-11-20) */
   color: var(--label-2);
 }
 
@@ -203,7 +216,7 @@
   flex-direction: column;
   overflow: hidden;
   border-radius: var(--radius-control);
-  background: var(--bg);
+  background: var(--surface);
 }
 
 .list .item + .item {

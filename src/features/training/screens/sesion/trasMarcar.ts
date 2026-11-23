@@ -6,6 +6,7 @@ import {
   nombreHoy,
   sesionEnCurso,
   terminado,
+  textoSerie,
   type Apunte,
 } from '../../state/sesionEnCurso.ts'
 import { siguienteSinTerminar } from '../../state/ordenHoy.ts'
@@ -19,7 +20,7 @@ type Pantalla = {
   ahora: number
   /** ¿Está abierto el teclado? */
   activa: boolean
-  setDescanso: (d: { fin: number; avisado: boolean } | null) => void
+  setDescanso: (d: { fin: number; dura: number; avisado: boolean } | null) => void
   entrar: (a: { ej: number; serie: number; campo: Campo } | null) => void
   decir: (texto: string) => void
   abrir: (ej: number) => void
@@ -34,18 +35,28 @@ type Pantalla = {
 export function trasMarcar(apunte: Hecha, ej: number, j: number, p: Pantalla): void {
   guardarSesion(apunte.sesion)
   const c = apunte.comparacion
-  avisar(c === 1 ? 'record' : c === 0 ? 'betterThanLast' : 'setLogged')
-  p.setDescanso(apunte.descanso === null ? null : { fin: p.ahora + apunte.descanso * 1000, avisado: false })
+  const e = ejerciciosDe(apunte.sesion)[ej]
+  const x = apunte.sesion.ejercicios[ej]
+  const record = apunte.record ? `Récord en ${nombreHoy(e, x).toLowerCase()}: ${textoSerie(e, x, j)}` : null
+  avisar(record || c === 1 ? 'record' : c === 0 ? 'betterThanLast' : 'setLogged')
+  p.setDescanso(
+    apunte.descanso === null
+      ? null
+      : { fin: p.ahora + apunte.descanso * 1000, dura: apunte.descanso, avisado: false },
+  )
   const ss = siguienteEnSuperserie(apunte.sesion, ej)
   if (ss) {
-    if (ss.corto) p.setDescanso({ fin: p.ahora + DESCANSO_SUPERSERIE * 1000, avisado: false })
+    if (ss.corto)
+      p.setDescanso({ fin: p.ahora + DESCANSO_SUPERSERIE * 1000, dura: DESCANSO_SUPERSERIE, avisado: false })
     p.entrar(null)
     const otro = ejerciciosDe(apunte.sesion)[ss.siguiente]
-    p.decir(`Superserie: ahora ${nombreHoy(otro, apunte.sesion.ejercicios[ss.siguiente])}`)
+    // Un récord se dice antes que nada (usuario, 2026-11-20)
+    p.decir(record ?? `Superserie: ahora ${nombreHoy(otro, apunte.sesion.ejercicios[ss.siguiente])}`)
     setTimeout(() => p.abrir(ss.siguiente), 300)
     return
   }
-  if (apunte.bajada)
+  if (record) p.decir(record)
+  else if (apunte.bajada)
     p.decir(`Bajaste de ${apunte.bajada.de} a ${apunte.bajada.a} reps. Descansa 1 minuto más.`)
   // Con el teclado abierto sigue en los kilos de la serie siguiente
   if (p.activa) {

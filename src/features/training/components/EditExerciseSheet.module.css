@@ -1,51 +1,57 @@
-/* Editar ejercicio (A12–A13): tres contadores, «Al terminar la serie» plegado y dos enlaces. */
-
-.back {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-height: var(--tap-min);
-  margin-bottom: var(--space-3);
-  padding: 0 var(--space-4) 0 var(--space-2);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--label);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-}
-
-.back svg {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-}
+/* Editar ejercicio (A12–A14): la pauta en una tarjeta blanca (todo con − / +), «Más opciones» plegado y dos botones. */
 
 .card {
   display: grid;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
   font: var(--text-body);
 }
 
+/* Cada fila: su nombre a la izquierda y el contador a la derecha; entre filas, una raya fina */
 .line {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: var(--space-3);
   min-height: var(--row);
-  border-bottom: var(--hairline) solid var(--separator);
 }
 
+.card > * + * {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.etiqueta {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-1) / 2);
+}
+
+.nota {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.valor {
+  font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* − valor +: una pastilla gris */
 .counter {
   display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: var(--space-1);
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  background: var(--bg);
 }
 
 .counter b {
-  min-width: 5ch;
+  min-width: 4ch;
   font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
   text-align: center;
 }
 
@@ -62,14 +68,40 @@
 }
 
 .counter button:disabled {
-  color: var(--label-2);
+  color: var(--label-3);
   cursor: default;
 }
 
 .counter svg,
-.links svg {
+.botones svg {
   width: var(--icon-sm);
   height: var(--icon-sm);
+}
+
+/* «Más opciones ⌄»: un título gris que pliega y despliega la segunda tarjeta */
+.mas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--tap-min);
+  margin-top: var(--space-4);
+  padding: 0 var(--space-4);
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-subhead);
+  cursor: pointer;
+}
+
+.mas svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.mas[aria-expanded='true'] svg {
+  transform: rotate(180deg);
 }
 
 .hint {
@@ -77,33 +109,33 @@
   margin-bottom: var(--space-2);
   font: var(--text-footnote);
   color: var(--label-2);
+  text-align: justify;
+  hyphens: auto;
 }
 
-.links {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--space-4);
+/* «Cambiar por otro» y «Quitar»: dos botones grises, el de quitar con la letra roja */
+.botones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
 }
 
-.links button {
+.botones button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
-  min-height: var(--tap-min);
+  min-height: var(--control-lg);
   border: 0;
-  background: none;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
   color: var(--label);
   font: var(--text-body);
   font-weight: var(--weight-semibold);
   cursor: pointer;
 }
 
-.links .danger {
+.botones .danger {
   color: var(--critical-label);
-}
-
-/* Los textos de información y consejos, justificados (rectos por los dos lados) y con palabras partidas si hace falta */
-.hint {
-  text-align: justify;
-  hyphens: auto;
 }

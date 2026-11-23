@@ -2,7 +2,14 @@ import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import { estadoRecetas } from '../../state/recetas.ts'
 import { cargarRecetas } from '../../use-cases/recipes.ts'
-import { ComoPesar, PesaCrudo } from './PesaCrudo.tsx'
+import { PesaCrudo } from './PesaCrudo.tsx'
+import {
+  CentroCocina,
+  ComoPesarBien,
+  CrudoACocinado,
+  HERRAMIENTAS,
+  type Herramienta,
+} from './Herramientas.tsx'
 import { formatDecimal, formatInt, parseDecimal } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
@@ -21,7 +28,12 @@ import { useAviso } from '../comun/useAviso.ts'
 
 const num = (s: string) => parseDecimal(s) ?? 0
 
-/** Cocina: pesa en crudo y come cocinado (un plato de tus menús), cuánto arroz cocer y cuánto pesa cocido, repartir una olla en raciones y calcular un plato tuyo por 100 g. */
+/**
+ * Cocinar (rediseño 32 a 40; usuario, 2026-11-17): sin `?h=`, lo de hoy y las herramientas; con `?h=`, una de ellas
+ * (de crudo a cocinado —con tu olla de arroz si sigues una dieta—, repartir una olla, calcular un plato tuyo y cómo pesar).
+ * Con `?plato=`, pesa en crudo un plato de tus menús.
+ */
+/** Antes: pesa en crudo y come cocinado (un plato de tus menús), cuánto arroz cocer y cuánto pesa cocido, repartir una olla en raciones y calcular un plato tuyo por 100 g. */
 export function CocinaScreen() {
   useEffect(() => {
     void cargarComida().then(cargarRecetas)
@@ -29,15 +41,34 @@ export function CocinaScreen() {
   const { query } = useLocation()
   const { aviso, avisar } = useAviso()
   if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
-  const volver = query.desde === 'menu' ? `${paths.nutrition}?vista=menu` : `${paths.nutrition}?vista=dieta`
+  const tool = query.h && query.h in HERRAMIENTAS ? (query.h as Herramienta) : null
+  const volver =
+    tool || query.plato
+      ? paths.kitchen
+      : query.desde === 'dia'
+        ? paths.nutrition
+        : query.desde === 'dieta'
+          ? `${paths.nutrition}?vista=dieta`
+          : `${paths.nutrition}?vista=plan`
   return (
     <div class={p.page}>
-      <Barra titulo="Cocina" volver={volver} />
-      <PesaCrudo inicial={{ plato: query.plato, raciones: Number(query.raciones) || undefined }} />
-      {dieta.value && <Arroz />}
-      <Olla />
-      <Plato avisar={avisar} />
-      <ComoPesar />
+      <Barra titulo={tool ? HERRAMIENTAS[tool] : query.plato ? 'Pesa en crudo' : 'Cocinar'} volver={volver} />
+      {query.plato ? (
+        <PesaCrudo inicial={{ plato: query.plato, raciones: Number(query.raciones) || undefined }} />
+      ) : tool === 'crudo' ? (
+        <>
+          <CrudoACocinado />
+          {dieta.value && <Arroz />}
+        </>
+      ) : tool === 'repartir' ? (
+        <Olla />
+      ) : tool === 'plato' ? (
+        <Plato avisar={avisar} />
+      ) : tool === 'pesar' ? (
+        <ComoPesarBien />
+      ) : (
+        <CentroCocina />
+      )}
       <Toast message={aviso?.texto ?? null} action={aviso?.accion ?? null} />
     </div>
   )

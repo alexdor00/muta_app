@@ -1,0 +1,181 @@
+/* Una etapa: barra con atrás, su nombre, tu cuerpo, tu entreno y tu comida, y su botón; sus vistas (entrenos, músculos y rutina). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: calc(var(--safe-top) + var(--space-2)) var(--gutter) calc(var(--gap-block) + var(--safe-bottom));
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: var(--tap-min) 1fr var(--tap-min);
+  align-items: center;
+  margin: 0 calc(var(--space-3) * -1);
+}
+
+.barTitle {
+  font: var(--text-headline);
+  text-align: center;
+}
+
+.cabeza {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.titulo {
+  margin: 0;
+  font: var(--text-title-1);
+}
+
+.cifras li {
+  background: var(--surface);
+}
+
+.texto {
+  flex: 1;
+  width: 100%;
+  text-align: left;
+}
+
+.oculto {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Rutina: cada sesión en su tarjeta gris, plegada; a la izquierda, su foto o su color con la sigla */
+.sesiones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sesion {
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.sesion summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  list-style: none;
+  cursor: pointer;
+}
+
+.sesion summary::-webkit-details-marker {
+  display: none;
+}
+
+.sesion summary > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.sesion[open] summary > svg {
+  transform: rotate(180deg);
+}
+
+.sesion > ul {
+  margin: 0 var(--space-4) var(--space-4);
+}
+
+.miniatura {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--meal-thumb);
+  height: var(--meal-thumb);
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  font: var(--text-session-label);
+}
+
+.miniatura img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Los colores de las tarjetas de sesión de Tu plan, en el mismo orden */
+.tono1 {
+  background: var(--session-1);
+  color: var(--on-session-dark);
+}
+
+.tono2 {
+  background: var(--session-2);
+  color: var(--on-session-light);
+}
+
+.tono3 {
+  background: var(--session-3);
+  color: var(--on-session-dark);
+}
+
+.tono4 {
+  background: var(--session-4);
+  color: var(--on-session-light);
+}
+
+/* Tu cuerpo: al empezar y ahora, en una tabla blanca sobre la tarjeta gris */
+.tabla {
+  width: 100%;
+  overflow: hidden;
+  border-collapse: collapse;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-subhead);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--space-3) var(--space-2);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tabla th:first-child {
+  padding-left: var(--space-3);
+}
+
+.tabla td:last-child {
+  padding-right: var(--space-3);
+  color: var(--label-2);
+  text-align: right;
+}
+
+.tabla thead th {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.tabla tbody tr {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.tabla tbody th {
+  font-weight: var(--weight-regular);
+}
+
+.fuerte {
+  font-weight: var(--weight-semibold);
+}

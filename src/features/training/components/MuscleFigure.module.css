@@ -17,6 +17,16 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* El contorno otra vez, encima y sin relleno: los músculos pintados no se salen de la silueta */
+.contorno {
+  pointer-events: none;
+  fill: none;
+  stroke: color-mix(in srgb, var(--label) 55%, var(--bg));
+  stroke-width: calc(var(--hairline) * 1.5);
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
 .muscle,
 .some,
 .on,
@@ -43,6 +53,15 @@
 .on {
   fill: var(--label);
   stroke: var(--label);
+}
+
+/* En pequeño (la ficha, sin toques): cada músculo trabajado con su borde claro, para que no se junten en un borrón */
+.fija .on {
+  stroke: color-mix(in srgb, var(--label) 30%, var(--bg));
+}
+
+.fija .some {
+  stroke: color-mix(in srgb, var(--label) 15%, var(--bg));
 }
 
 /* Tocar un músculo: se marca con un borde grueso (y el negro se aclara para que se vea) */

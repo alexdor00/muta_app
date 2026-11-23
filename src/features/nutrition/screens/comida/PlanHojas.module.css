@@ -1,0 +1,231 @@
+/* Las hojas del Plan: una tarjeta de filas (lo que es a la izquierda, su control a la derecha). */
+.filas {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  padding: var(--space-2) 0;
+}
+
+.fila + .fila {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.que {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  font: var(--text-headline);
+}
+
+.que small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.letras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.letras button {
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  cursor: pointer;
+}
+
+.nota {
+  margin: 0;
+  padding: 0 var(--space-1);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.valor {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.valor svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+select.valor {
+  appearance: none;
+  cursor: pointer;
+}
+
+.paso {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.paso button {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.paso button svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.paso b {
+  min-width: var(--space-10);
+  font: var(--text-headline);
+  text-align: center;
+}
+
+.quitar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.quitar svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Lo que lleva una comida: una fila que se toca, el «+» y la × de quitar */
+.item {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-3);
+}
+
+.masItem {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--meal-thumb);
+  height: var(--meal-thumb);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.masItem svg,
+.quitarItem svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.quitarItem {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  cursor: pointer;
+}
+
+input.valor {
+  max-width: 50%;
+  text-align: right;
+}
+
+.ok {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.ok svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Una fila que se desliza a la izquierda para quitarla (el plato y lo de más de una comida) */
+.filaDeslizable {
+  margin: 0 calc(var(--space-4) * -1); /* a lo ancho de la tarjeta, para deslizar */
+  list-style: none;
+}
+
+.filaDeslizable + .filaDeslizable,
+.fila + .filaDeslizable,
+.filaDeslizable + .fila {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.itemFila {
+  min-height: var(--row);
+  padding: var(--space-2) var(--space-4);
+}
+
+/* El nombre de la comida, del largo de lo que pone (usuario, 2026-11-19: «no tan largo») */
+.nombreComida {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 60%;
+}
+
+/* Desde «Tu nutricionista»: lo que propone, con su raya negra, y las opciones para elegir */
+.consejo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding-left: var(--space-3);
+  border-left: var(--border) solid var(--accent);
+}
+
+.consejo > p {
+  margin: 0;
+  font: var(--text-subhead);
+}

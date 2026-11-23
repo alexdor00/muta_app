@@ -1,0 +1,91 @@
+/* Un día de entreno, como Ver sesión: cabecera de color, la hoja blanca encima y cada ejercicio con su tabla. */
+
+.pagina {
+  padding-bottom: calc(var(--gap-block) + var(--safe-bottom));
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: calc(var(--radius-card) * -1);
+  padding: var(--space-5) var(--gutter) 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  background: var(--bg);
+}
+
+.ejercicio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) 0 var(--space-2);
+}
+
+.cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.titulo {
+  margin: 0;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.titulo a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  color: inherit;
+  text-decoration: none;
+}
+
+.titulo svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--text-subhead);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla th {
+  padding: 0 0 var(--space-1);
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: left;
+}
+
+.tabla td {
+  padding: var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.numero {
+  width: var(--space-6);
+  color: var(--label-2);
+}
+
+.hoy {
+  font-weight: var(--weight-semibold);
+}
+
+.antes {
+  color: var(--label-2);
+}
+
+/* Cómo estabas ese día (lo que apuntaste en Hoy), en una línea gris arriba */
+.como {
+  margin: 0 0 var(--space-4);
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: center;
+}

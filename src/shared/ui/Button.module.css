@@ -5,7 +5,7 @@
   justify-content: center;
   width: 100%;
   min-height: var(--control-lg);
-  padding: 0 var(--space-10);
+  padding: 0 var(--button-pad, var(--space-10)); /* más justo cuando van dos en fila */
   border: 0;
   border-radius: var(--radius-pill);
   font: var(--text-headline);
@@ -23,7 +23,7 @@
 
 .primary {
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .onPhoto {
@@ -32,7 +32,8 @@
 }
 
 .secondary {
-  background: var(--surface);
+  /* Gris: se ve igual sobre el fondo y dentro de una tarjeta blanca */
+  background: var(--surface-2);
   color: var(--label);
 }
 

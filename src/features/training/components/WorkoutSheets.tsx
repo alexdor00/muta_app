@@ -5,7 +5,6 @@ import {
   ArrowUpIcon,
   BookIcon,
   ChevronRightIcon,
-  InfoIcon,
   PauseIcon,
   PlayIcon,
   RepeatIcon,
@@ -81,7 +80,6 @@ export function ExerciseOptionsSheet(props: {
   onClose: () => void
 }) {
   const tiles: { label: string; icono: ComponentChildren; href?: string; onClick?: (() => void) | null }[] = [
-    { label: 'Ficha', icono: <InfoIcon />, href: props.fichaHref },
     {
       label: 'Hacer ahora',
       icono: <ArrowUpIcon />,
@@ -89,7 +87,6 @@ export function ExerciseOptionsSheet(props: {
     },
     { label: 'Cambiar', icono: <SwapIcon />, onClick: props.onCambiar },
     { label: 'Discos', icono: <PlatesIcon />, onClick: props.onDiscos },
-    { label: 'Cronómetro', icono: <StopwatchIcon />, onClick: props.onCronometro },
   ]
   return (
     <Sheet title={props.nombre} onClose={props.onClose} large>
@@ -266,11 +263,15 @@ export function RestChoiceSheet(props: {
   )
 }
 
-/** Confirmar algo que borra (C20 cambiar de sesión, C21 descartar): Cancelar y la acción en rojo. */
+/**
+ * Confirmar algo que borra (C20 cambiar de sesión, C21 descartar): Cancelar y la acción en rojo. Con `normal`, la acción en
+ * el botón negro de siempre (volver a la rutina original: se puede rehacer).
+ */
 export function DangerSheet(props: {
   titulo: string
   texto: string
   accion: string
+  normal?: boolean
   onSi: () => void
   onClose: () => void
 }) {
@@ -281,9 +282,13 @@ export function DangerSheet(props: {
         <Button variant="secondary" onClick={props.onClose}>
           Cancelar
         </Button>
-        <button type="button" class={styles.dangerButton} onClick={props.onSi}>
-          {props.accion}
-        </button>
+        {props.normal ? (
+          <Button onClick={props.onSi}>{props.accion}</Button>
+        ) : (
+          <button type="button" class={styles.dangerButton} onClick={props.onSi}>
+            {props.accion}
+          </button>
+        )}
       </div>
     </Sheet>
   )

@@ -5,6 +5,7 @@ import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import {
   ajustes,
+  alimentoPorId,
   dias,
   diaVisto,
   dieta,
@@ -16,6 +17,7 @@ import {
 } from '../../state/comida.ts'
 import { menuDelDia, type Dieta } from '../../state/dieta.ts'
 import { deshacer } from '../../use-cases/consult.ts'
+import { aprenderDeTusDatos } from '../../use-cases/target.ts'
 import {
   anadirMenu,
   apuntarReceta,
@@ -25,56 +27,52 @@ import {
   elegirArchivo,
   quitarReceta,
 } from '../../use-cases/diet.ts'
-import { cargarComida } from '../../use-cases/nutritionStore.ts'
-import { menusDeTuDieta, ponerPlato, quitarDelMenu, quitarDeEseDia, volverA } from '../../use-cases/menu.ts'
-import { apuntarPlato, cargarRecetas, desapuntar, platoApuntado } from '../../use-cases/recipes.ts'
-import { gramosDeHueco, huecoDe, menu, platoPorId, type Cocinado } from '../../state/recetas.ts'
+import { cargarComida, tiposLeidos } from '../../use-cases/nutritionStore.ts'
+import { alDia } from '../../use-cases/autopilot.ts'
+import { platoEseDia, ponerPlato, quitarDeEseDia, tickDelMenu } from '../../use-cases/menu.ts'
+import { cargarRecetas } from '../../use-cases/recipes.ts'
+import { type Cocinado } from '../../state/recetas.ts'
 import { comidaDe, esComida } from '../comun/platos.ts'
 import { AvisosHoja } from './AvisosHoja.tsx'
+import { DiaCocinaHoja } from './DiaCocina.tsx'
 import { CocinarHoja } from './CocinarHoja.tsx'
 import { CrearPlatoHoja } from './CrearPlatoHoja.tsx'
 import { CuadrarDiaHoja } from './CuadrarDiaHoja.tsx'
 import { ElegirPlatoHoja } from './ElegirPlatoHoja.tsx'
-import { CuantosMenusHoja } from './CuantosMenusHoja.tsx'
 import { OpcionesMenuHoja } from './OpcionesMenuHoja.tsx'
 import { PlatoMenuHoja } from './PlatoMenuHoja.tsx'
-import { MenuVista } from './MenuVista.tsx'
 import { RecetasVista } from './RecetasVista.tsx'
 import { useAviso } from '../comun/useAviso.ts'
 import { AnadirHoja } from './AnadirHoja.tsx'
-import styles from './ComidaScreen.module.css'
 import { ComidaDelDiaHoja } from './ComidaDelDiaHoja.tsx'
 import { CrearAlimentoHoja } from './CrearAlimentoHoja.tsx'
 import { Cabecera, type VistaNutricion } from './Cabecera.tsx'
 import { DatosHoja } from './DatosHoja.tsx'
-import { PlanVista } from './PlanVista.tsx'
 import { DiaDietaHoja } from './DiaDietaHoja.tsx'
 import { DietaVista } from './DietaVista.tsx'
 import { EmpezarDietaHoja } from './EmpezarDietaHoja.tsx'
 import { EscanerHoja } from './EscanerHoja.tsx'
 import { HoyVista } from './HoyVista.tsx'
+import { SemanaYMenus } from './SemanaYMenus.tsx'
+import { SinObjetivo } from './SinObjetivo.tsx'
+import { CambiarPlatoHoja } from './CambiarPlatoHoja.tsx'
 import { MasDietaHoja } from './MasDietaHoja.tsx'
 import { NuevaRecetaHoja } from './NuevaRecetaHoja.tsx'
 import { RacionHoja } from './RacionHoja.tsx'
 import { RapidoHoja } from './RapidoHoja.tsx'
 import { SugerenciaHoja } from '../objetivo/SugerenciaHoja.tsx'
 
-/** Las vistas (`?vista=`): tu día, Tu plan, el recetario y tu dieta. «menu», la de antes, es Tu plan. */
-const VISTAS: VistaNutricion[] = ['hoy', 'plan', 'recetas', 'dieta']
+/** Las vistas (`?vista=`): tu día, Tu semana (`plan`; «menu», la de antes), el recetario y tu dieta. */
+const VISTAS: VistaNutricion[] = ['hoy', 'plan', 'menus', 'recetas', 'dieta']
 
-/**
- * Nutrición (pestaña): abre en tu día. «Tu plan» reúne tu objetivo, tus menús y tu dieta; las recetas, desde tu día
- * («Para la cena» y «Ver todas»). Añadir, la ración, el menú, cocinar, los avisos y el entrenador van en hojas. La
- * semana (medias, tendencia del peso) será de Progreso.
- */
+/** Nutrición (pestaña): abre en tu día; arriba, «Plan» (y desde tu día, tu objetivo). Lo demás va en hojas. */
 export function ComidaScreen() {
   useEffect(() => {
-    void cargarComida().then(cargarRecetas)
+    void cargarComida().then(aprenderDeTusDatos).then(cargarRecetas).then(tiposLeidos).then(alDia)
   }, [])
   const { query, route } = useLocation()
   const vista: VistaNutricion =
-    query.vista === 'menu' ? 'plan' : (VISTAS.find((v) => v === query.vista) ?? 'hoy')
-  // Cada vista (tu día, Tu plan, Recetas, Tu dieta) empieza arriba, no a la altura de la anterior
+    query.vista === 'menu' ? 'menus' : (VISTAS.find((v) => v === query.vista) ?? 'hoy')
   useEffect(() => window.scrollTo(0, 0), [vista])
   const [comida, setComida] = useState<ComidaId>('desayuno')
   const [alimento, setAlimento] = useState<Alimento | null>(null)
@@ -82,6 +80,7 @@ export function ComidaScreen() {
   const [nueva, setNueva] = useState<Dieta | null>(null)
   const [fecha, setFecha] = useState('')
   const [menuReceta, setMenuReceta] = useState<string | null>(null)
+  const [alPlan, setAlPlan] = useState(false)
   const anadir = useSheet('anadir')
   const racion = useSheet('racion')
   const rapido = useSheet('rapido')
@@ -96,12 +95,15 @@ export function ComidaScreen() {
   const receta = useSheet('receta-nueva')
   const elegir = useSheet('plato')
   const platoMenu = useSheet('plato-menu')
-  const cuantos = useSheet('menus')
   const opciones = useSheet('menu')
   const cocinar = useSheet('cocinar')
   const avisos = useSheet('avisos')
+  const diaCocina = useSheet('dia-cocina')
+  const [fechaCocina, setFechaCocina] = useState('')
   const crearPlato = useSheet('crear-plato')
   const cuadrar = useSheet('cuadrar')
+  const cambiarPlato = useSheet('cambiar-plato')
+  const [aCambiar, setACambiar] = useState<{ fecha: string; comida: ComidaId } | null>(null)
   const [enMenu, setEnMenu] = useState<{ menu: string; comida: ComidaId } | null>(null)
   const [cocinado, setCocinado] = useState<Cocinado | null>(null)
   const { aviso, avisar } = useAviso()
@@ -138,74 +140,77 @@ export function ComidaScreen() {
     await apuntarReceta(r)
     avisar(`${r.nombre}: apuntada`, { label: 'Deshacer', onClick: () => void quitarReceta(id) })
   }
-  const desdeArchivo = async () => {
+  // Desde Plan, la dieta pasa a ser tu plan; desde Tu objetivo, como siempre
+  const desdeArchivo = async (plan = false) => {
+    setAlPlan(plan)
     const r = await elegirArchivo()
     if (!r) return
     if (!r.ok) return avisar(r.motivo)
     proponer(r.dieta)
   }
-  const deEjemplo = async () => proponer(await dietaEjemplo())
-  const propia = () => proponer(dietaPropia('Mi dieta'))
+  const deEjemplo = async () => {
+    setAlPlan(false)
+    proponer(await dietaEjemplo())
+  }
+  const propia = () => {
+    setAlPlan(false)
+    proponer(dietaPropia('Mi dieta'))
+  }
   const hayObjetivo = ajustes.value || dieta.value
-  // Quitar deslizando (una comida de un día o un plato del menú), con «Deshacer»
   const quitarYAvisar = async (texto: string, hacer: () => Promise<() => Promise<unknown>>) => {
     const reponer = await hacer()
     avisar(texto, { label: 'Deshacer', onClick: () => void reponer() })
   }
   // El tick de una comida con plato de tu menú: lo apunta (con sus gramos de ese día) o lo quita
-  const tick = async (c: ComidaId) => {
+  const tick = async (c: ComidaId, solo?: 'plato' | number) => {
     const f = diaVisto.value
-    const h = huecoDe(menu.value, f, c)
-    const p = h ? platoPorId(h.plato, f) : null
-    if (!h || !p) return
-    if (platoApuntado(p.id, c, f)) {
-      const ids = (dias.value[f] ?? []).filter((a) => a.receta === p.id && a.comida === c).map((a) => a.id)
-      await desapuntar(ids, f)
-      return
-    }
-    const ids = await apuntarPlato(p, c, gramosDeHueco(h, p), 1, f)
-    avisar(`${p.nombre}: apuntado`, { label: 'Deshacer', onClick: () => void desapuntar(ids, f) })
-  }
-  const abrirCocinado = (id: string) => {
-    const c = menu.value.cocinados.find((x) => x.id === id)
-    if (!c) return
-    setCocinado(c)
-    cocinar.show()
+    const r = await tickDelMenu(f, c, solo)
+    if (r) avisar(`${r.nombre}: apuntado`, { label: 'Deshacer', onClick: () => void tickDelMenu(f, c, solo) })
   }
 
   return (
     <>
-      <Cabecera vista={vista} conPlan={Boolean(hayObjetivo)} />
-      {vista === 'plan' ? (
-        <PlanVista>
-          <MenuVista
-            onPlato={(m, c) => {
-              setEnMenu({ menu: m, comida: c })
-              platoMenu.show()
-            }}
-            onQuitarPlato={(m, c) => void quitarYAvisar('Quitado del menú', () => quitarDelMenu(m, c))}
-            onAnadir={(m, c) => {
+      <Cabecera vista={vista} />
+      {vista === 'plan' || vista === 'menus' ? (
+        <SemanaYMenus
+          vista={vista}
+          menuId={query.menu}
+          avisar={avisar}
+          abrir={{
+            cambiar: (f, c) => {
+              setACambiar({ fecha: f, comida: c })
+              cambiarPlato.show()
+            },
+            elegir: (m, c) => {
               setEnMenu({ menu: m, comida: c })
               elegir.show()
-            }}
-            onOpciones={(m) => {
+            },
+            plato: (m, c) => {
+              setEnMenu({ menu: m, comida: c })
+              platoMenu.show()
+            },
+            opciones: (m) => {
               setEnMenu({ menu: m, comida: 'desayuno' })
               opciones.show()
-            }}
-            onCuantos={cuantos.show}
-            onAvisos={avisos.show}
-            onDeDieta={async () => {
-              const antes = await menusDeTuDieta()
-              if (antes)
-                avisar('Tus menús son ahora los de tu dieta', {
-                  label: 'Deshacer',
-                  onClick: () => void volverA(antes),
-                })
-            }}
-          />
-        </PlanVista>
+            },
+            organizar: () => route(paths.cooking),
+            diaCocina: (f) => {
+              setFechaCocina(f)
+              diaCocina.show()
+            },
+            avisos: avisos.show,
+            cargar: () => void desdeArchivo(true),
+            calcular: datos.show,
+            sugerencia: sugerencia.show,
+          }}
+        />
       ) : vista === 'recetas' ? (
-        <RecetasVista />
+        <RecetasVista
+          onCrear={() => {
+            setEnMenu(null)
+            crearPlato.show()
+          }}
+        />
       ) : vista === 'dieta' ? (
         <DietaVista
           onArchivo={() => void desdeArchivo()}
@@ -230,33 +235,33 @@ export function ComidaScreen() {
           }}
         />
       ) : !hayObjetivo ? (
-        <section class={styles.empty}>
-          <h2 class={styles.emptyTitle}>Calcula tu objetivo</h2>
-          <p class={styles.emptyText}>
-            Con tu sexo, edad, altura, peso y pasos al día calculo lo que gastas y cuánto comer para tu fase.
-            Lo ves paso a paso y lo puedes cambiar. O sigue una dieta desde «Tu plan».
-          </p>
-          <button type="button" class={styles.emptyButton} onClick={datos.show}>
-            Calcular mi objetivo
-          </button>
-        </section>
+        <SinObjetivo onCalcular={datos.show} />
       ) : (
         <HoyVista
           onAnadir={abrirAnadir}
+          avisar={avisar}
           onAbrirComida={(id) => {
             setComida(id)
             delDia.show()
+          }}
+          onAbrirApunte={(c, id) => {
+            const ap = (dias.value[diaVisto.value] ?? []).find((x) => x.id === id)
+            if (!ap) return
+            setComida(c)
+            const al = ap.alimentoId ? alimentoPorId(ap.alimentoId) : null
+            if (al) return abrirRacion(al, ap, false)
+            void (setEditando(ap), rapido.show())
           }}
           onSugerencia={pendiente.value ? sugerencia.show : null}
           onAbrirReceta={(id) => route(paths.recipe(id, menuDelDia.value?.tipo))}
           onApuntarReceta={(id) => void apuntarDelMenu(id)}
           onConsulta={() => route(paths.checkIn)}
           onCuadrar={cuadrar.show}
-          onCocinado={abrirCocinado}
-          onTick={(c) => void tick(c)}
+          onTick={(c, solo) => void tick(c, solo)}
           onQuitar={(c) =>
-            void quitarYAvisar(`${comidaDe(c).nombre}: quitada de este día`, () =>
-              quitarDeEseDia(c, diaVisto.value),
+            void quitarYAvisar(
+              `Fuera de este día: ${platoEseDia(diaVisto.value, c) ?? comidaDe(c).nombre}`,
+              () => quitarDeEseDia(c, diaVisto.value),
             )
           }
         />
@@ -273,6 +278,7 @@ export function ComidaScreen() {
           }}
           onCrear={crear.showInstead}
           onEscanear={escaner.showInstead}
+          onMenuHecho={(c) => void tick(c)}
           avisar={avisar}
         />
       )}
@@ -280,8 +286,10 @@ export function ComidaScreen() {
         <RacionHoja
           alimento={alimento}
           comida={editando?.comida ?? comida}
+          onComida={editando ? undefined : setComida}
           editando={editando}
           onClose={racion.close}
+          onAtras={editando ? delDia.showInstead : anadir.showInstead}
           avisar={avisar}
         />
       )}
@@ -292,7 +300,7 @@ export function ComidaScreen() {
       {escaner.open && (
         <EscanerHoja
           comida={comida}
-          onClose={escaner.close}
+          onClose={anadir.showInstead}
           onElegir={(a) => abrirRacion(a, null, true)}
           avisar={avisar}
         />
@@ -312,7 +320,9 @@ export function ComidaScreen() {
       )}
       {datos.open && <DatosHoja onClose={datos.close} />}
       {sugerencia.open && <SugerenciaHoja onClose={sugerencia.close} avisar={avisar} />}
-      {empezar.open && nueva && <EmpezarDietaHoja dieta={nueva} onClose={empezar.close} avisar={avisar} />}
+      {empezar.open && nueva && (
+        <EmpezarDietaHoja dieta={nueva} onClose={empezar.close} avisar={avisar} alPlan={alPlan} />
+      )}
       {diaDieta.open && fecha && <DiaDietaHoja fecha={fecha} onClose={diaDieta.close} />}
       {mas.open && (
         <MasDietaHoja
@@ -350,9 +360,25 @@ export function ComidaScreen() {
         <CocinarHoja cocinado={cocinado} onClose={cocinar.close} avisar={avisar} />
       )}
       {avisos.open && <AvisosHoja onClose={avisos.close} avisar={avisar} />}
+      {cambiarPlato.open && aCambiar && (
+        <CambiarPlatoHoja
+          fecha={aCambiar.fecha}
+          comida={aCambiar.comida}
+          onClose={cambiarPlato.close}
+          onBuscar={(m, c) => {
+            setEnMenu({ menu: m, comida: c })
+            elegir.show()
+          }}
+          avisar={avisar}
+        />
+      )}
+      {diaCocina.open && fechaCocina && (
+        <DiaCocinaHoja fecha={fechaCocina} onClose={diaCocina.close} avisar={avisar} />
+      )}
       {crearPlato.open && (
         <CrearPlatoHoja
           onClose={crearPlato.close}
+          avisar={avisar}
           onCreado={async (id) => {
             crearPlato.close()
             if (enMenu) await ponerPlato(enMenu.menu, enMenu.comida, id)
@@ -364,7 +390,6 @@ export function ComidaScreen() {
         />
       )}
       {cuadrar.open && <CuadrarDiaHoja onClose={cuadrar.close} avisar={avisar} />}
-      {cuantos.open && <CuantosMenusHoja onClose={cuantos.close} />}
       {opciones.open && enMenu && (
         <OpcionesMenuHoja menuId={enMenu.menu} onClose={opciones.close} avisar={avisar} />
       )}

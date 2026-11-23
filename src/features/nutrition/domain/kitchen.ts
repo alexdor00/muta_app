@@ -26,6 +26,15 @@ export function racionDeOlla(vacia: number, llena: number, raciones: number): nu
   return llena > vacia && raciones > 0 ? Math.round((llena - vacia) / raciones) : null
 }
 
+/**
+ * Lo cocinado de una olla (en gramos, sin la olla) repartido según lo que te toca en cada comida (sus kcal de ese día;
+ * usuario, 2026-11-17): a más kcal, más gramos. Sin kcal, a partes iguales.
+ */
+export function repartirOlla(neto: number, kcals: readonly number[]): number[] {
+  const suma = kcals.reduce((s, k) => s + Math.max(0, k), 0)
+  return kcals.map((k) => Math.round(suma > 0 ? (neto * Math.max(0, k)) / suma : neto / kcals.length))
+}
+
 /** Un plato tuyo: los ingredientes en crudo y lo que pesa ya cocinado → sus valores por 100 g cocinado. */
 export function platoPor100(
   ingredientes: readonly { por100: Macros; gramos: number }[],
@@ -78,10 +87,15 @@ export function parejasEnCrudo(
   for (const a of base)
     if (SE_CUECEN.includes(a.category) && /crud[oa]|sec[oa]/i.test(a.name) && !crudos.has(sinCoccion(a.name)))
       crudos.set(sinCoccion(a.name), a)
+  // Sin su pareja exacta (arroz basmati cocido, sin basmati crudo en la base), la de su familia: el primer crudo que empieza
+  // igual («arroz» → arroz blanco crudo). Por kcal da casi lo mismo (sugerido)
+  const familia = (nombre: string) => sinCoccion(nombre).split(' ')[0]
+  const porFamilia = new Map<string, Alimento>()
+  for (const [nombre, a] of crudos) if (!porFamilia.has(familia(nombre))) porFamilia.set(familia(nombre), a)
   const parejas = new Map<string, { cocido: Alimento; crudo: Alimento }>()
   for (const c of base) {
     if (!SE_CUECEN.includes(c.category) || !/cocid[oa]/i.test(c.name)) continue
-    const crudo = crudos.get(sinCoccion(c.name))
+    const crudo = crudos.get(sinCoccion(c.name)) ?? porFamilia.get(familia(c.name))
     // Al cocerse con agua pesa más: si no, no es la pareja que se busca
     if (crudo && crudo.id !== c.id && crudo.kcal > c.kcal) parejas.set(c.id, { cocido: c, crudo })
   }

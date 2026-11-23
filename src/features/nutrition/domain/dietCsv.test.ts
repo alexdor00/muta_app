@@ -55,3 +55,45 @@ A;Cena;X;Quinoa rara;50`
     expect(dietaDesdeCsv('Menú;Receta\nA;X', 'x', 'x', buscar).errores[0]).toContain('comida')
   })
 })
+
+describe('cualquier dieta en CSV (usuario, 2026-11-17)', () => {
+  // Como el «Plan de dieta · Fase 1»: menús de 2 días (el 7 repite A), cocinar el día 1, 3, 5 y 7, el batido todos los
+  // días, el preentreno solo los de entreno, el arroz que cambia según el día, cantidades «al gusto» y valores totales
+  const PLAN = `Menú;Días;Cocinar;Comida;Nombre;Receta;Ingrediente;Gramos entreno;Gramos descanso;Cantidad;kcal total;Proteína total;Hidratos total;Grasa total;Solo;Paso
+A;1-2 7;1 7;Comida;Comida 1;Egg salad wrap;Tortillas de trigo;120;120;2 tortillas;360;10;60;8,6;;
+A;;;Comida;Comida 1;Egg salad wrap;Perejil, orégano, sal;;;al gusto;;;;;;
+;;;;;Egg salad wrap;;;;;;;;;;Cuece los huevos 10-11 minutos.
+A;;;Cena;Comida 2;Burrito bowl;Arroz (en crudo);130;80;;464,1;9;102,7;0,8;;
+B;3-4;3;Comida;Comida 1;Butter chicken;Pechuga de pollo (en crudo);180;180;;198;41,4;0;2,7;;
+C;5-6;5;Comida;Comida 1;Shakshuka;Pan de barra;145;80;;377;13;72,5;2,2;;
+Todos;;;Merienda;Batido;Batido;Plátano;120;120;1 plátano;105;1;27;0,4;;
+Todos;;;Merienda;Preentreno;Preentreno;Miel;20;20;;65;0;17;0;Entreno;`
+  const r = dietaDesdeCsv(PLAN, 'Fase 1', 'fase-1', () => null)
+  const d = r.dieta!
+
+  it('el ciclo de 7 días con A A B B C C A y los días de cocinar', () => {
+    expect(r.errores).toEqual([])
+    expect(d.ciclo).toEqual(['a', 'a', 'b', 'b', 'c', 'c', 'a'])
+    expect(d.cocinar).toEqual([1, 3, 5, 7])
+  })
+  it('lo de todos los días, solo entreno, su nombre en el menú, pasos y «al gusto»', () => {
+    const batido = d.recetas.find((x) => x.nombre === 'Batido')!
+    expect(batido).toMatchObject({ menu: null, rotulo: 'Batido', soloEntreno: false })
+    expect(d.recetas.find((x) => x.nombre === 'Preentreno')!.soloEntreno).toBe(true)
+    const wrap = d.recetas.find((x) => x.nombre === 'Egg salad wrap')!
+    expect(wrap.rotulo).toBe('Comida 1')
+    expect(wrap.pasos).toEqual(['Cuece los huevos 10-11 minutos.'])
+    expect(wrap.ingredientes[1]).toMatchObject({ gramos: null, nota: 'al gusto' })
+    expect(wrap.ingredientes[0].nota).toBe('2 tortillas')
+  })
+  it('los valores totales pasan a 100 g y el arroz, que cambia según el día, es lo que ajusta', () => {
+    const bowl = d.recetas.find((x) => x.nombre === 'Burrito bowl')!
+    expect(bowl.ingredientes[0].gramos).toEqual({ entreno: 130, descanso: 80 })
+    expect(Math.round(bowl.ingredientes[0].por100.kcal)).toBe(357)
+    expect(bowl.ingredientes[0].ajusta).toBe(true)
+  })
+  it('un ciclo de 6 días si la dieta no dice el séptimo', () => {
+    const seis = PLAN.replace('A;1-2 7;1 7;', 'A;1-2;1;')
+    expect(dietaDesdeCsv(seis, 'x', 'x', () => null).dieta!.ciclo).toEqual(['a', 'a', 'b', 'b', 'c', 'c'])
+  })
+})

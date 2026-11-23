@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { DISCOS, discosPorLado, faseCadencia } from './workoutTools.ts'
 
 describe('discosPorLado', () => {
+  it('no pasa de 1000 kg aunque se escriba más (y responde al momento)', () => {
+    expect(discosPorLado(999999, 20)).toEqual(discosPorLado(1000, 20))
+  })
+
   it('reparte el peso que falta entre los dos lados, de mayor a menor', () => {
     expect(discosPorLado(62.5, 20)).toEqual({ discos: [20, 1.25], sobra: 0 })
     expect(discosPorLado(100, 20)).toEqual({ discos: [25, 15], sobra: 0 })

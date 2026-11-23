@@ -73,7 +73,7 @@ export function MuscleFigure({ side, selected = null, onSelect, series, names, l
     : `Músculos, ${side === 'front' ? 'de frente' : 'de espalda'}: ninguno trabajado`
   if (!onSelect) {
     return (
-      <svg class={styles.figure} viewBox={viewBox} role="img" aria-label={fixed ?? label}>
+      <svg class={`${styles.figure} ${styles.fija}`} viewBox={viewBox} role="img" aria-label={fixed ?? label}>
         <path class={styles.outline} d={outline} />
         {parts.map((part) => (
           <g key={part.muscle}>
@@ -82,6 +82,7 @@ export function MuscleFigure({ side, selected = null, onSelect, series, names, l
             ))}
           </g>
         ))}
+        <path class={styles.contorno} d={outline} />
       </svg>
     )
   }
@@ -126,6 +127,7 @@ export function MuscleFigure({ side, selected = null, onSelect, series, names, l
           </g>
         )
       })}
+      <path class={styles.contorno} d={outline} />
     </svg>
   )
 }

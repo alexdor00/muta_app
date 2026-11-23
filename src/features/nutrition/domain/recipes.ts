@@ -2,7 +2,6 @@
 // (si no hay recetario) y los tuyos. Un plato no es una receta de tu dieta (diet.ts): no tiene versión de entreno y de
 // descanso; sus gramos los ajusta fit.ts a lo que te falta.
 import { plainText } from '../../../shared/lib/format.ts'
-import type { Receta } from './diet.ts'
 import type { Alimento, ComidaId, Macros } from './food.ts'
 
 export type MacroId = 'protein' | 'carbs' | 'fat'
@@ -47,9 +46,13 @@ export type Plato = {
   total: Macros
   ingredientes: IngredientePlato[]
   pasos: string[]
+  /** Los minutos de cada paso, si los dijiste (una receta tuya; usuario, 2026-11-21). */
+  minutosPasos?: (number | null)[]
   /** Tiene algo que mover (y es de una ración). */
   ajustable: boolean
   origen: 'recetario' | 'ejemplo' | 'tuyo'
+  /** Los gramos de cada ingrediente los días de descanso, si son otros (un plato de tu dieta: menos arroz). */
+  gramosDescanso?: (number | null)[]
 }
 
 export type CategoriaPlato = { id: string; nombre: string }
@@ -155,46 +158,38 @@ export function ingredienteDe(a: Alimento, gramos: number, texto = ''): Ingredie
   }
 }
 
-/** Un plato tuyo: su total es la suma de sus ingredientes. */
+/** Lo que dices de una receta tuya al crearla (usuario, 2026-11-21): su categoría, tiempo, dificultad, raciones y minutos de cada paso. */
+export type DatosDeReceta = {
+  categoria?: string
+  dificultad?: string
+  minutos?: number | null
+  raciones?: number
+  minutosPasos?: (number | null)[]
+}
+
+/** Un plato tuyo: su total es la suma de sus ingredientes (el de todas sus raciones). */
 export function platoTuyo(
   id: string,
   nombre: string,
   ingredientes: IngredientePlato[],
   pasos: string[] = [],
+  datos: DatosDeReceta = {},
 ): Plato {
   return {
     id,
     numero: null,
     nombre,
-    categoria: 'tuyos',
-    dificultad: '',
-    minutos: null,
-    raciones: 1,
+    categoria: datos.categoria ?? 'tuyos',
+    dificultad: datos.dificultad ?? '',
+    minutos: datos.minutos ?? null,
+    raciones: Math.max(1, datos.raciones ?? 1),
+    ...(datos.minutosPasos?.some((m) => m !== null) ? { minutosPasos: datos.minutosPasos } : {}),
     total: sumaDe(ingredientes),
     ingredientes,
     pasos,
-    ajustable: ingredientes.some((i) => i.macro),
+    // Se ajusta si es de una ración y tiene algo que mover
+    ajustable: Math.max(1, datos.raciones ?? 1) === 1 && ingredientes.some((i) => i.macro),
     origen: 'tuyo',
-  }
-}
-
-/** Una receta de la dieta de ejemplo como plato (con los gramos del día de entreno). */
-export function platoDeReceta(r: Receta): Plato {
-  const ingredientes = r.ingredientes.map((i): IngredientePlato => ({
-    texto: i.gramos ? `${i.gramos.entreno} g de ${i.nombre.toLowerCase()}` : `${i.nombre} ${i.nota}`.trim(),
-    nombre: i.nombre,
-    categoria: i.categoria,
-    por100: i.por100,
-    alimentoId: i.alimentoId,
-    cuenta: i.gramos !== null,
-    gramos: i.gramos?.entreno ?? null,
-    sugerido: false,
-    macro: i.gramos ? macroDe(i.por100, i.gramos.entreno, i.categoria) : null,
-  }))
-  return {
-    ...platoTuyo(`ej-${r.id}`, r.nombre, ingredientes, r.pasos),
-    categoria: 'ejemplo',
-    origen: 'ejemplo',
   }
 }
 
@@ -298,7 +293,8 @@ export function platoCon(
       gramos: g,
       sugerido: c.gramos === null && i.sugerido,
       macro: macroDe(v, g, a.category),
-      antes: i.nombre,
+      // Solo si cambió el alimento: con los mismos y otros gramos no es «en lugar de» (usuario, 2026-11-21)
+      antes: a.id !== i.alimentoId ? i.nombre : undefined,
     }
   })
   return cambia ? { ...p, total, ingredientes } : p
@@ -348,4 +344,53 @@ export function platoEditado(
     origen: 'tuyo',
     categoria: p.origen === 'tuyo' ? p.categoria : 'tuyos',
   }
+}
+
+/** Filtrar y ordenar recetas (rediseño, pantalla 29; usuario, 2026-11-17). */
+export type FiltroRecetas = {
+  /** De serie, de la A a la Z (usuario, 2026-11-21: «todo en orden alfabético»). */
+  orden: 'az' | 'falta' | 'proteina' | 'kcal' | 'rapidas'
+  /** Como mucho estos minutos; null, sin prisa. */
+  tiempo: 15 | 30 | null
+  dificultad: 'Fácil' | 'Intermedia' | 'Avanzada' | null
+  guardadas: boolean
+}
+
+export const FILTRO_RECETAS: FiltroRecetas = {
+  orden: 'az',
+  tiempo: null,
+  dificultad: null,
+  guardadas: false,
+}
+
+/**
+ * Las recetas con un filtro: el tiempo y la dificultad que dice cada una, solo las guardadas,
+ * y ordenadas (de la A a la Z, lo que te falta hoy —`error`, cuánto se aleja de lo que te falta—, más proteína, menos kcal o más rápidas).
+ */
+export function filtrarPlatos(
+  platos: readonly Plato[],
+  f: FiltroRecetas,
+  c: { error: ((p: Plato) => number) | null; guardadas: readonly string[] },
+): Plato[] {
+  const lista = platos.filter(
+    (p) =>
+      (f.tiempo === null || (p.minutos !== null && p.minutos <= f.tiempo)) &&
+      (f.dificultad === null || p.dificultad === f.dificultad) &&
+      (!f.guardadas || c.guardadas.includes(p.id)),
+  )
+  // De la A a la Z, sin tildes ni mayúsculas
+  if (f.orden === 'az')
+    return [...lista].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }))
+  const clave: (p: Plato) => number =
+    f.orden === 'falta' && c.error
+      ? c.error
+      : f.orden === 'kcal'
+        ? (p) => p.total.kcal
+        : f.orden === 'rapidas'
+          ? (p) => p.minutos ?? Infinity
+          : (p) => -p.total.protein
+  return lista
+    .map((p) => ({ p, k: clave(p) }))
+    .sort((a, b) => a.k - b.k)
+    .map((x) => x.p)
 }

@@ -4,14 +4,11 @@ import { WORKOUT_STATUS } from '../../../shared/data/schema.ts'
 import { localDate } from '../../../shared/lib/format.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import { CATALOG, sourceOf, type Level } from '../domain/catalog.ts'
-import type { MuscleId } from '../domain/muscles.ts'
 import { applyChoices } from '../domain/planProgram.ts'
-import type { PriorityChoice } from '../domain/priorities.ts'
 import type { ProgramData } from '../domain/program.ts'
 import { selectVariant } from '../domain/programInfo.ts'
-import type { WeakChoice } from '../domain/weakPoints.ts'
 import type { Entreno } from '../domain/workoutHistory.ts'
-import { aplicarEdicion, type EdicionSesion, type Ediciones } from '../domain/routineEdit.ts'
+import { aplicarEdicion } from '../domain/routineEdit.ts'
 import {
   avanzar,
   dondeVas,
@@ -22,38 +19,20 @@ import {
 } from '../domain/workoutPlan.ts'
 import { PREFIJO_MIA, type RutinaMia } from '../domain/csvRoutine.ts'
 import { descansosDeRutina } from '../domain/restDays.ts'
-import { elecciones, type EleccionMusculo } from '../state/musculos.ts'
+import { ordenarSemana, sesionVacia } from '../domain/weekOrder.ts'
+import { elecciones } from '../state/musculos.ts'
 import { entrenos, tuPlan } from '../state/plan.ts'
 import { descansosElegidos, sesionEnCurso, type SesionEnCurso } from '../state/sesionEnCurso.ts'
 import { porNombre } from './exerciseLibrary.ts'
+import { cargarEditado, editado, guardarEnPlan, type PlanGuardado } from './planEditado.ts'
 import { cargarNotas } from './exerciseNotes.ts'
 import { entrenoDe } from './workoutRecord.ts'
 import { cargarMaterial } from './myEquipment.ts'
 import { cargarMisConsejos } from './myTips.ts'
-import { cargarFotos } from './sessionPhotos.ts'
+import { cargarFotos, repartirFotosDeSerie } from './sessionPhotos.ts'
 import { cargarFase } from './fase.ts'
 import { LEVELS } from './loadRoutines.ts'
 import { BUILT_IN } from './routineDetail.ts'
-
-/** El plan guardado (`plans/current`): la rutina con tus elecciones y lo que cambias desde la sesión y las fichas. */
-type PlanGuardado = {
-  id: 'current'
-  programId: string
-  weakPoints?: WeakChoice | null
-  priorities?: PriorityChoice | null
-  /** Descanso elegido por ejercicio (segundos), para todas las sesiones. */
-  descansos?: Record<string, number>
-  /** Mantener · Desarrollar · Prioridad o a mano, por músculo. */
-  musculos?: Partial<Record<MuscleId, EleccionMusculo>>
-  /** Ejercicios que cambiaste en tu plan: nombre en la rutina → el que lo sustituye. */
-  cambios?: Record<string, string>
-  /** Lo que cambias en cada sesión desde Editar rutina (orden, quitar, añadir y pauta), por sigla. */
-  ediciones?: Ediciones
-  /** El nombre que le pusiste a cada sesión en Editar rutina, por sigla. */
-  nombres?: Record<string, string>
-  /** Descansos obligatorios cambiados en Editar rutina: tras qué sesiones van (sin esto, los de la rutina). */
-  descansosTras?: number[]
-}
 
 type RotacionGuardada = Rotacion & { id: 'current'; programId: string }
 
@@ -65,14 +44,6 @@ type FilaEntreno =
 
 /** El programa con tus elecciones (para avanzar la rotación al terminar). */
 let programa: ProgramData | null = null
-/** Lo que cambiaste en tu plan (se aplica al montar las sesiones). */
-let cambios: Record<string, string> = {}
-/** Lo que editaste en cada sesión (se aplica al montar la semana). */
-let ediciones: Ediciones = {}
-/** Los nombres que pusiste a tus sesiones. */
-let nombresPropios: Record<string, string> = {}
-/** Los descansos obligatorios que cambiaste (null: los de la rutina). */
-let descansosTras: number[] | null = null
 let carga: Promise<void> | null = null
 /** El último entreno guardado y la rotación de antes, para «Me faltó un ejercicio». */
 let ultimoGuardado: { id: string; rotacion: Rotacion } | null = null
@@ -123,12 +94,10 @@ async function leer(): Promise<void> {
     entrenos.value = filas.flatMap((f) => (f.status === WORKOUT_STATUS.finished ? [aEntreno(f)] : []))
     descansosElegidos.value = plan.descansos ?? {}
     elecciones.value = plan.musculos ?? {}
-    cambios = plan.cambios ?? {}
-    ediciones = plan.ediciones ?? {}
-    nombresPropios = plan.nombres ?? {}
-    descansosTras = plan.descansosTras ?? null
+    cargarEditado(plan)
     ponerPlan(plan.programId, titulo, nivel, rotacion)
     void cargarFotos(plan.programId)
+    void repartirFotosDeSerie(plan.programId)
     const enCurso = filas.find((f) => f.id === EN_CURSO)
     if (enCurso && 'sesion' in enCurso && !sesionEnCurso.value) sesionEnCurso.value = enCurso.sesion
     vigilar()
@@ -154,9 +123,13 @@ function aEntreno(f: Entreno): Entreno {
 
 function ponerPlan(programId: string, rutina: string, nivel: Level, rotacion: Rotacion) {
   if (!programa) return
-  const semana = sesionesDeSemana(programa, rotacion, porNombre, cambios)
-    .map((s) => aplicarEdicion(s, ediciones[s.sigla], porNombre))
-    .map((s) => (nombresPropios[s.sigla] ? { ...s, nombre: nombresPropios[s.sigla] } : s))
+  // Las de la rutina y las tuyas, con tus ediciones y tus nombres, en tu orden
+  const semana = ordenarSemana(
+    [...sesionesDeSemana(programa, rotacion, porNombre, editado.cambios), ...editado.propias.map(sesionVacia)]
+      .map((s) => aplicarEdicion(s, editado.ediciones[s.sigla], porNombre))
+      .map((s) => (editado.nombres[s.sigla] ? { ...s, nombre: editado.nombres[s.sigla] } : s)),
+    editado.ordenSemana,
+  )
   const dias = programa.blocks[rotacion.bloque]?.weeks[rotacion.semana]?.days ?? []
   const musculos = semana.map((s) => s.ejercicios.flatMap((e) => (e.musculo ? [e.musculo] : [])))
   tuPlan.value = {
@@ -167,7 +140,8 @@ function ponerPlan(programId: string, rutina: string, nivel: Level, rotacion: Ro
     rotacion,
     donde: dondeVas(programa, rotacion),
     semana,
-    descansos: descansosTras ?? descansosDeRutina(dias, musculos, programa.restRules, rotacion.bloque),
+    descansos:
+      editado.descansosTras ?? descansosDeRutina(dias, musculos, programa.restRules, rotacion.bloque),
   }
 }
 
@@ -202,29 +176,6 @@ async function guardarEnCurso(en: SesionEnCurso | null): Promise<void> {
   await db.put('workouts', fila)
 }
 
-// Las escrituras del plan van en cola y cada una guarda lo último de todo (descansos, músculos, cambios y ediciones):
-// dos cambios casi a la vez no se pisan.
-let cola: Promise<void> = Promise.resolve()
-
-function guardarEnPlan(): Promise<void> {
-  const escribir = async () => {
-    const db = await getDb()
-    const plan = (await db.get('plans', 'current')) as PlanGuardado | undefined
-    if (!plan) return
-    await db.put('plans', {
-      ...plan,
-      descansos: descansosElegidos.value,
-      musculos: elecciones.value,
-      cambios,
-      ediciones,
-      nombres: nombresPropios,
-      descansosTras: descansosTras ?? undefined,
-    })
-  }
-  cola = cola.then(escribir, escribir)
-  return cola
-}
-
 /**
  * Termina la sesión: guarda lo hecho, pasa a la siguiente de la rotación (tras la que has hecho) y deja la sesión
  * terminada en memoria para el resumen.
@@ -235,15 +186,14 @@ export async function terminarEntreno(en: SesionEnCurso, ahora: number): Promise
   if (plan.status !== 'ready' || !programa) return
   const entreno = entrenoDe(en, plan.programId, ahora)
   const hecha = plan.semana.findIndex((s) => s.sigla === en.sigla)
-  const rotacion = hecha >= 0 ? avanzar(programa, plan.rotacion, hecha) : plan.rotacion
+  const rotacion = hecha >= 0 ? avanzar(programa, plan.rotacion, hecha, plan.semana.length) : plan.rotacion
   try {
     const db = await getDb()
     if (entreno.ejercicios.length) {
       const fila: FilaEntreno = { ...entreno, date: entreno.fecha, status: WORKOUT_STATUS.finished }
       await db.put('workouts', fila)
     }
-    const guardada: RotacionGuardada = { id: 'current', programId: plan.programId, ...rotacion }
-    await db.put('rotation', guardada)
+    await guardarRotacion(plan.programId, rotacion)
     if (entreno.ejercicios.length) entrenos.value = [...entrenos.value, entreno]
     ultimoGuardado = { id: entreno.id, rotacion: plan.rotacion }
     ponerPlan(plan.programId, plan.rutina, plan.nivel, rotacion)
@@ -262,8 +212,7 @@ export async function reabrirEntreno(en: SesionEnCurso): Promise<void> {
   try {
     const db = await getDb()
     await db.delete('workouts', deshacer.id)
-    const guardada: RotacionGuardada = { id: 'current', programId: plan.programId, ...deshacer.rotacion }
-    await db.put('rotation', guardada)
+    await guardarRotacion(plan.programId, deshacer.rotacion)
     entrenos.value = entrenos.value.filter((x) => x.id !== deshacer.id)
     ponerPlan(plan.programId, plan.rutina, plan.nivel, deshacer.rotacion)
   } catch (error) {
@@ -271,101 +220,16 @@ export async function reabrirEntreno(en: SesionEnCurso): Promise<void> {
   }
 }
 
-/**
- * Cambia un ejercicio en tu plan para las próximas veces (`nuevo`), o lo deja como en la rutina (null). `deLaRutina` es
- * el nombre que trae la rutina. La pauta (series, repeticiones, esfuerzo y descanso) sigue siendo la de la rutina.
- */
-export async function cambiarEnPlan(deLaRutina: string, nuevo: string | null): Promise<void> {
+/** Guarda dónde vas en la rotación. */
+export async function guardarRotacion(programId: string, rotacion: Rotacion): Promise<void> {
+  const db = await getDb()
+  const guardada: RotacionGuardada = { id: 'current', programId, ...rotacion }
+  await db.put('rotation', guardada)
+}
+
+/** Vuelve a montar tu semana con lo editado (y otra rotación, si se da), tras cambiar algo en Editar rutina. */
+export function remontarPlan(rotacion?: Rotacion): void {
   const plan = tuPlan.value
   if (plan.status !== 'ready') return
-  const resto = Object.fromEntries(Object.entries(cambios).filter(([k]) => k !== deLaRutina))
-  cambios = nuevo && nuevo !== deLaRutina ? { ...resto, [deLaRutina]: nuevo } : resto
-  ponerPlan(plan.programId, plan.rutina, plan.nivel, plan.rotacion)
-  try {
-    await guardarEnPlan()
-  } catch (error) {
-    logError(error, 'cambiar un ejercicio en el plan')
-  }
-}
-
-/**
- * Lo que se cambia desde la sesión: hoy ya está cambiado; con `enPlan`, también en tu plan (o se vuelve al de la rutina si
- * eliges ese). Devuelve el aviso que se enseña.
- */
-export function cambiarDesdeSesion(
-  e: { nombre: string; enLugarDe?: string },
-  nuevo: string,
-  enPlan: boolean,
-): string {
-  if (!enPlan) return `Cambiado por ${nuevo}, solo para hoy`
-  const deLaRutina = e.enLugarDe ?? e.nombre
-  void cambiarEnPlan(deLaRutina, nuevo === deLaRutina ? null : nuevo)
-  return nuevo === deLaRutina ? `Vuelves a ${nuevo} en tu plan` : `Cambiado por ${nuevo} en tu plan`
-}
-
-/** Cambia una sesión de tu plan desde Editar rutina (para todas las semanas) y la guarda. */
-export async function editarSesion(
-  sigla: string,
-  cambio: (ed: EdicionSesion) => EdicionSesion,
-): Promise<void> {
-  const plan = tuPlan.value
-  if (plan.status !== 'ready') return
-  ediciones = { ...ediciones, [sigla]: cambio(ediciones[sigla] ?? {}) }
-  ponerPlan(plan.programId, plan.rutina, plan.nivel, plan.rotacion)
-  try {
-    await guardarEnPlan()
-  } catch (error) {
-    logError(error, 'editar la rutina')
-  }
-}
-
-/** Cambia los descansos obligatorios (tras qué sesiones van) o vuelve a los de la rutina (null), y lo guarda. */
-export async function cambiarDescansos(tras: number[] | null): Promise<void> {
-  const plan = tuPlan.value
-  if (plan.status !== 'ready') return
-  descansosTras = tras
-  ponerPlan(plan.programId, plan.rutina, plan.nivel, plan.rotacion)
-  try {
-    await guardarEnPlan()
-  } catch (error) {
-    logError(error, 'cambiar los descansos')
-  }
-}
-
-/** Cambia el nombre de una sesión de tu plan (sale en todas partes) y lo guarda. */
-export async function renombrarSesion(sigla: string, nombre: string): Promise<void> {
-  const plan = tuPlan.value
-  if (plan.status !== 'ready' || !nombre.trim()) return
-  nombresPropios = { ...nombresPropios, [sigla]: nombre.trim() }
-  ponerPlan(plan.programId, plan.rutina, plan.nivel, plan.rotacion)
-  try {
-    await guardarEnPlan()
-  } catch (error) {
-    logError(error, 'cambiar el nombre de la sesión')
-  }
-}
-
-/**
- * Vuelve a la rutina original: una sesión (quita lo que editaste en ella y su nombre) o todas (`null`: también los ejercicios
- * cambiados por otros, los descansos y lo elegido en la ficha de cada músculo).
- */
-export async function volverARutina(sigla: string | null): Promise<void> {
-  const plan = tuPlan.value
-  if (plan.status !== 'ready') return
-  if (sigla) {
-    ediciones = Object.fromEntries(Object.entries(ediciones).filter(([k]) => k !== sigla))
-    nombresPropios = Object.fromEntries(Object.entries(nombresPropios).filter(([k]) => k !== sigla))
-  } else {
-    nombresPropios = {}
-    ediciones = {}
-    cambios = {}
-    descansosTras = null
-    elecciones.value = {}
-  }
-  ponerPlan(plan.programId, plan.rutina, plan.nivel, plan.rotacion)
-  try {
-    await guardarEnPlan()
-  } catch (error) {
-    logError(error, 'volver a la rutina')
-  }
+  ponerPlan(plan.programId, plan.rutina, plan.nivel, rotacion ?? plan.rotacion)
 }

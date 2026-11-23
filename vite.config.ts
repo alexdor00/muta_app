@@ -47,5 +47,7 @@ export default defineConfig({
     include: ['src/**/*.test.ts'], // los recorridos de tests/e2e los pasa Playwright
     // Sin las rutinas ni la biblioteca locales (private/): las pruebas dan lo mismo aquí que en la CI
     env: { VITE_NO_LOCAL_PROGRAMS: '1' },
+    // Con el modo de serie (forks) Vitest 5 no arranca en este equipo («reading 'config'» en cada prueba); así sí (2026-11-22)
+    pool: 'vmThreads',
   },
 })

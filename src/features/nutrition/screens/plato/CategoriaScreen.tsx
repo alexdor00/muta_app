@@ -1,106 +1,123 @@
 import { useEffect, useState } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
-import { ChoiceChips } from '../../../../shared/ui/Choice.tsx'
-import { HeroHeader } from '../../../../shared/ui/HeroHeader.tsx'
-import { PlatoFila } from '../../components/Platos.tsx'
+import { ChevronDownIcon, SearchIcon } from '../../../../shared/ui/icons.tsx'
 import { estado } from '../../state/comida.ts'
-import { ajustar, categorias, estadoRecetas, fotos, siguiente, totalDePlato } from '../../state/recetas.ts'
+import { filtrosPuestos, recetasCon } from '../../state/filtroRecetas.ts'
+import {
+  buscarPlatos,
+  categorias,
+  platos,
+  recetasGuardadas,
+  estadoRecetas,
+  FILTRO_RECETAS,
+  siguiente,
+  type FiltroRecetas,
+} from '../../state/recetas.ts'
 import { cargarComida } from '../../use-cases/nutritionStore.ts'
 import { cargarRecetas } from '../../use-cases/recipes.ts'
 import { Barra } from '../comun/Barra.tsx'
-import { comidaDe, macrosCortos } from '../comun/platos.ts'
 import p from '../comun/Pagina.module.css'
-import h from '../comun/Hojas.module.css'
-import r from '../receta/Receta.module.css'
-import styles from './Plato.module.css'
-
-type Filtro = 'todas' | 'cuadran' | 'proteina' | 'rapidas'
+import a from '../comida/Anadir.module.css'
+import { FiltrosHoja } from './FiltrosHoja.tsx'
+import { RecetaFila } from './RecetaFila.tsx'
+import s from './Recetas.module.css'
 
 /**
- * Los platos de una categoría, con la foto de uno de ellos arriba y filtros: los que cuadran con lo que te falta, más
- * proteína y poco tiempo.
+ * Los platos de una categoría (rediseño, pantallas 28 y 29; usuario, 2026-11-17): «‹ Carne» con su lupa, el orden (abre
+ * filtrar y ordenar) y los filtros rápidos en pastillas, y la lista con su marcador.
  */
 export function CategoriaScreen(props: { categoria: string }) {
   useEffect(() => {
     void cargarComida().then(cargarRecetas)
   }, [])
-  const [filtro, setFiltro] = useState<Filtro>('todas')
+  const [filtro, setFiltro] = useState<FiltroRecetas>(FILTRO_RECETAS)
+  const [filtrar, setFiltrar] = useState(false)
+  const [buscando, setBuscando] = useState(false)
+  const [texto, setTexto] = useState('')
   if (estado.value === 'cargando' || estadoRecetas.value !== 'listo') return null
-  const c = categorias.value.find((x) => x.id === props.categoria)
+  // Tus guardadas, como una categoría más (usuario, 2026-11-21: «‹» vuelve a Recetas)
+  const guardadas = props.categoria === 'guardadas'
+  const c = guardadas
+    ? {
+        id: 'guardadas',
+        nombre: 'Guardadas',
+        platos: platos.value.filter((x) => recetasGuardadas.value.includes(x.id)),
+      }
+    : categorias.value.find((x) => x.id === props.categoria)
   const volver = `${paths.nutrition}?vista=recetas`
   if (!c) {
     return (
       <div class={p.page}>
         <Barra titulo="Recetas" volver={volver} />
-        <p class={h.sub}>Esta categoría no tiene recetas.</p>
+        <p class={s.vacio}>Esta categoría no tiene recetas.</p>
       </div>
     )
   }
-  const s = siguiente.value
-  const conTotal = c.platos.map((x) => ({ plato: x, total: totalDePlato(x) }))
-  const lista =
-    filtro === 'cuadran' && s
-      ? conTotal.filter(({ plato }) => {
-          const a = ajustar(plato, s.objetivo)
-          return !a.corto.length && !a.sobra.length
-        })
-      : filtro === 'proteina'
-        ? [...conTotal].sort(
-            (x, y) => y.total.protein / (y.total.kcal || 1) - x.total.protein / (x.total.kcal || 1),
-          )
-        : filtro === 'rapidas'
-          ? conTotal.filter(({ plato }) => plato.minutos !== null && plato.minutos <= 20)
-          : conTotal
-  const opciones: { value: Filtro; label: string }[] = [
-    { value: 'todas', label: 'Todas' },
-    ...(s ? [{ value: 'cuadran' as const, label: `Para ${comidaDe(s.comida).el}` }] : []),
-    { value: 'proteina', label: 'Más proteína' },
-    { value: 'rapidas', label: 'Rápidas' },
-  ]
-  const portada = c.platos.map((x) => fotos.value[x.id]).find(Boolean)
+  const base = texto.trim() ? buscarPlatos(c.platos, texto) : c.platos
+  const lista = recetasCon(base, filtro)
+  const s0 = siguiente.value
+  const puestos = filtrosPuestos(filtro)
   return (
-    <div class={r.screen}>
-      <HeroHeader
-        title={c.nombre}
-        description={`${c.platos.length} recetas`}
-        photo={portada ?? undefined}
-        tone={5}
-        backHref={volver}
+    <div class={p.page}>
+      <Barra
+        titulo={c.nombre}
+        volver={volver}
+        accion={
+          <button
+            type="button"
+            class={s.marcador}
+            aria-label="Buscar en esta categoría"
+            aria-pressed={buscando}
+            onClick={() => setBuscando(!buscando)}
+          >
+            <SearchIcon />
+          </button>
+        }
       />
-      <div class={r.page}>
-        <div class={styles.filtros}>
-          <ChoiceChips<Filtro>
-            name="filtro-platos"
-            legend="Filtrar"
-            options={opciones}
-            value={filtro}
-            onChange={setFiltro}
+      {buscando && (
+        <label class={a.buscador}>
+          <SearchIcon />
+          <input
+            type="search"
+            value={texto}
+            placeholder={`Busca en ${c.nombre.toLowerCase()}`}
+            aria-label={`Buscar en ${c.nombre}`}
+            onInput={(e) => setTexto(e.currentTarget.value)}
           />
+        </label>
+      )}
+      {/* Un solo botón (usuario, 2026-11-21): la hoja tiene orden, tiempo y dificultad; con pocas recetas, ni eso */}
+      {c.platos.length >= 8 && (
+        <div class={s.filtros}>
+          <button
+            type="button"
+            class={`${a.pastilla} ${puestos ? a.on : ''}`}
+            onClick={() => setFiltrar(true)}
+          >
+            Ordenar y filtrar{puestos ? ` · ${puestos}` : ''} <ChevronDownIcon />
+          </button>
         </div>
-        <p class={h.foot}>
-          {lista.length} {lista.length === 1 ? 'receta' : 'recetas'}
-          {filtro === 'rapidas' ? ' de 20 minutos o menos' : ''}
-          {filtro === 'cuadran' && s ? ` que caben en lo que te queda` : ''}
+      )}
+      {lista.length ? (
+        <ul class={s.lista}>
+          {lista.map((x) => (
+            <RecetaFila
+              key={x.id}
+              plato={x}
+              comida={filtro.orden === 'falta' && s0 ? s0.comida : undefined}
+            />
+          ))}
+        </ul>
+      ) : (
+        <p class={s.vacio}>
+          {guardadas && !c.platos.length
+            ? 'Aún no has guardado ninguna: toca la estrella de una receta.'
+            : 'Ninguna con este filtro.'}
         </p>
-        {lista.length ? (
-          <ul class={h.list}>
-            {lista.map(({ plato, total }) => (
-              <PlatoFila
-                key={plato.id}
-                nombre={plato.nombre}
-                foto={fotos.value[plato.id] ?? null}
-                lineas={[
-                  macrosCortos(total),
-                  [plato.minutos ? `${plato.minutos} min` : '', plato.dificultad].filter(Boolean).join(' · '),
-                ].filter(Boolean)}
-                href={paths.dish(plato.id, s && filtro === 'cuadran' ? { comida: s.comida } : undefined)}
-              />
-            ))}
-          </ul>
-        ) : (
-          <p class={h.sub}>Ninguna con este filtro.</p>
-        )}
-      </div>
+      )}
+      {filtrar && (
+        <FiltrosHoja platos={base} filtro={filtro} onAplicar={setFiltro} onClose={() => setFiltrar(false)} />
+      )}
     </div>
   )
 }

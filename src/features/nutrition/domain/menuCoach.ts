@@ -5,14 +5,8 @@
 import { formatInt } from '../../../shared/lib/format.ts'
 import { mejoresPara } from './fit.ts'
 import { COMIDAS, type ComidaId, type Macros } from './food.ts'
-import {
-  huecosDelDia,
-  menuDelDia,
-  totalDelDia,
-  type CambioMenu,
-  type Hueco,
-  type MenuSemanal,
-} from './menu.ts'
+import { huecosDelDia, menuDelDia, type CambioMenu, type Hueco, type MenuSemanal } from './menu.ts'
+import { totalDelDia } from './menuExtras.ts'
 import type { Plato } from './recipes.ts'
 
 export const UMBRAL_PROTEINA = 15
@@ -37,6 +31,8 @@ export type Contexto = {
   objetivoDeComida: (fecha: string, comida: ComidaId) => Macros | null
   /** Lo que lleva una comida de un día (con sus gramos ajustados). */
   totalDe: (h: Hueco) => Macros | null
+  /** Cuántas veces usas un plato (en tus menús): a igualdad, primero los que más usas (usuario, 2026-11-19). */
+  usos?: (plato: string) => number
 }
 
 /** Las propuestas para tus menús, cada uno mirado en su primer día de `fechas`. */
@@ -67,7 +63,14 @@ export function propuestasDelMenu(m: MenuSemanal, fechas: readonly string[], c: 
         for (const e of mejoresPara(c.platos, h.comida, quiero, 8, [h.plato])) {
           const gana = e.ajuste.total.protein - actual.protein
           if (Math.abs(e.ajuste.total.kcal - actual.kcal) > Math.max(120, actual.kcal * 0.2)) continue
-          if (!mejor || gana > mejor.gana) mejor = { h, plato: e.plato, gana }
+          const usa = (id: string) => c.usos?.(id) ?? 0
+          // Lo que usas más gana si llega casi igual (3 g)
+          if (
+            !mejor ||
+            gana > mejor.gana + 3 ||
+            (gana >= mejor.gana - 3 && usa(e.plato.id) > usa(mejor.plato.id))
+          )
+            mejor = { h, plato: e.plato, gana }
         }
       }
       if (mejor && mejor.gana >= 5) {
@@ -87,7 +90,7 @@ export function propuestasDelMenu(m: MenuSemanal, fechas: readonly string[], c: 
     const vacia = COMIDAS.find((x) => !menu.platos[x.id])
     if (faltaKcal >= UMBRAL_KCAL && vacia) {
       const parte = c.objetivoDeComida(fecha, vacia.id)
-      const [e] = parte ? mejoresPara(c.platos, vacia.id, parte, 1) : []
+      const e = parte ? masUsado(mejoresPara(c.platos, vacia.id, parte, 8), c.usos) : undefined
       if (e)
         fuera.push({
           id: `kcal-${sello}`,
@@ -101,4 +104,38 @@ export function propuestasDelMenu(m: MenuSemanal, fechas: readonly string[], c: 
     }
   }
   return fuera.filter((p) => !m.descartadas.includes(p.id))
+}
+
+/**
+ * De los que encajan, el que más usas entre los que encajan casi tan bien como el mejor (hasta un 30 % más de error):
+ * así te propone lo tuyo, con sus gramos para lo que falta.
+ */
+function masUsado<T extends { plato: Plato; error: number }>(
+  xs: readonly T[],
+  usos?: (id: string) => number,
+): T | undefined {
+  const [primero] = xs
+  if (!primero || !usos) return primero
+  const cerca = xs.filter((x) => x.error <= primero.error * 1.3 + 0.01)
+  return cerca.reduce((a, b) => (usos(b.plato.id) > usos(a.plato.id) ? b : a), primero)
+}
+
+/**
+ * Las opciones para una comida (usuario, 2026-11-19: «que busque primero en favoritos o guardados»): de las que encajan
+ * bien (hasta el doble de error que la mejor), primero tus guardadas, luego las que más usas y luego las que
+ * mejor encajan. Cada una ya viene con sus gramos para lo que falta.
+ */
+export function opcionesPara<T extends { plato: Plato; error: number }>(
+  xs: readonly T[],
+  guardadas: ReadonlySet<string>,
+  usos: (id: string) => number,
+  n = 4,
+): T[] {
+  const [primero] = xs
+  if (!primero) return []
+  const g = (x: T) => (guardadas.has(x.plato.id) ? 1 : 0)
+  return xs
+    .filter((x) => x.error <= primero.error * 2 + 0.01)
+    .sort((a, b) => g(b) - g(a) || usos(b.plato.id) - usos(a.plato.id) || a.error - b.error)
+    .slice(0, n)
 }

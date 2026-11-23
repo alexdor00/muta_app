@@ -58,7 +58,7 @@
 .selected {
   border-color: var(--label);
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .disabled {
@@ -97,7 +97,7 @@
 .selected .mark {
   border-color: var(--accent);
   background: var(--accent);
-  color: var(--bg);
+  color: var(--on-accent);
 }
 
 .mark svg {

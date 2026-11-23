@@ -3,13 +3,11 @@ import { describe, expect, it } from 'vitest'
 import foods from '../../../shared/content/foods.json'
 import type { Alimento } from '../domain/food.ts'
 import {
-  aArchivo,
   ajusteDe,
   diaDeDieta,
   diaDelCiclo,
   dietaNueva,
   inicioSi,
-  leerDieta,
   mediaDelTipo,
   menuDe,
   recetaDelDia,
@@ -18,6 +16,7 @@ import {
   siguienteMenu,
   type DietaActiva,
 } from '../domain/diet.ts'
+import { aArchivo, leerDieta } from '../domain/dietArchivo.ts'
 import { dietaDeEjemplo } from '../domain/dietSample.ts'
 
 const base = foods as Alimento[]
@@ -127,7 +126,7 @@ describe('el archivo de la dieta', () => {
       ok: false,
       motivo: 'No es un archivo de dieta de MUTA',
     })
-    expect(leerDieta({ ...ejemplo, ciclo: ['A'] })).toMatchObject({ ok: false })
+    expect(leerDieta({ ...ejemplo, ciclo: ['no-existe'] })).toMatchObject({ ok: false })
     expect(leerDieta({ ...ejemplo, recetas: [{ ...ejemplo.recetas[0], comida: 'almuerzo' }] })).toMatchObject(
       {
         ok: false,

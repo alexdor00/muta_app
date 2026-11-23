@@ -1,0 +1,210 @@
+/* «Ver tu cambio»: a pantalla completa, en negro, la foto de cada mes con su mes, tu peso y tu cintura. */
+
+.velo {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: var(--photo-placeholder);
+}
+
+/* Del ancho de un móvil, centrado (en el ordenador no ocupa toda la ventana) */
+.fondo {
+  display: flex;
+  max-width: var(--app-max-width);
+  height: 100%;
+  margin: 0 auto;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: calc(var(--safe-top) + var(--space-3)) var(--gutter) calc(var(--safe-bottom) + var(--space-4));
+  background: var(--photo-placeholder);
+  color: var(--on-photo);
+}
+
+.rayas {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.rayas i {
+  flex: 1;
+  height: var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--rest-step);
+  background-image: linear-gradient(var(--on-photo), var(--on-photo));
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+}
+
+.rayas i.llena {
+  background-size: 100% 100%;
+}
+
+.rayas i.pasando {
+  animation: llenar 1800ms linear forwards;
+}
+
+@keyframes llenar {
+  to {
+    background-size: 100% 100%;
+  }
+}
+
+.arriba {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.poses {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.pose {
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--on-session-light-soft);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.pose[aria-pressed='true'] {
+  background: var(--on-photo);
+  color: var(--on-photo-label);
+}
+
+.foto {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  border-radius: var(--radius-card);
+  object-fit: cover;
+  animation: aparecer var(--duration-screen) var(--ease);
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+
+.pie {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.mes {
+  font: var(--text-title-2);
+}
+
+.mes span {
+  color: var(--on-session-light-soft);
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.datos li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--rest-step);
+  color: var(--on-session-light-soft);
+  font: var(--text-caption);
+}
+
+.datos b {
+  color: var(--on-photo);
+  font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
+}
+
+/* La línea de tus meses: un punto por mes (el de ahora, grande) */
+.meses {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.meses::before {
+  position: absolute;
+  top: calc(var(--space-2) + var(--hairline));
+  right: var(--space-4);
+  left: var(--space-4);
+  height: var(--border);
+  background: var(--rest-step);
+  content: '';
+}
+
+.paso {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--on-session-light-soft);
+  font: var(--text-caption);
+  cursor: pointer;
+}
+
+.paso::before {
+  width: var(--space-3);
+  height: var(--space-3);
+  margin: var(--space-1) 0;
+  border-radius: var(--radius-pill);
+  background: var(--label-2);
+  content: '';
+}
+
+.pasado::before {
+  background: var(--on-photo);
+}
+
+.paso[aria-current='true'] {
+  color: var(--on-photo);
+  font-weight: var(--weight-semibold);
+}
+
+.paso[aria-current='true']::before {
+  width: var(--space-5);
+  height: var(--space-5);
+  margin: 0;
+  background: var(--on-photo);
+}
+
+.vacio {
+  flex: 1;
+  font: var(--text-subhead);
+}
+
+.botones {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foto,
+  .rayas i.pasando {
+    animation: none;
+  }
+}

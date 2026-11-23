@@ -1,56 +1,41 @@
 import type { JSX } from 'preact'
-import {
-  BoltIcon,
-  ChevronDownIcon,
-  ClockIcon,
-  DumbbellIcon,
-  InfoIcon,
-  PencilIcon,
-  RepeatIcon,
-  StopwatchIcon,
-} from '../../../shared/ui/icons.tsx'
+import { BoltIcon, InfoIcon, PencilIcon } from '../../../shared/ui/icons.tsx'
+import { TrophyIcon } from '../../../shared/ui/iconosHoy.tsx'
 import { MuscleFigure } from './MuscleFigure.tsx'
 import styles from './ExerciseFicha.module.css'
 
 // Las tarjetas de la ficha de un ejercicio (diseño aprobado del 2026-11-02, sin foto). Reciben los textos ya hechos.
 
-const ICONO: Record<'series' | 'reps' | 'descanso', () => JSX.Element> = {
-  series: DumbbellIcon,
-  reps: RepeatIcon,
-  descanso: StopwatchIcon,
-}
+/** Cada dato de la pauta: series, repeticiones o descanso. */
+type DatoPauta = 'series' | 'reps' | 'descanso'
 
-/** Nombre, músculos principales y la pauta («3 series», «6–10 reps», «2:45»). */
+/** Lo que va debajo de cada cifra de la pauta. */
+const QUE: Record<DatoPauta, string> = { series: 'series', reps: 'repeticiones', descanso: 'descanso' }
+
+/** Nombre, músculos principales y la pauta en tres datos (cifra y qué es), sin tarjeta ni nota. */
 export function FichaCabecera(props: {
   nombre: string
   musculos: string[]
-  pauta: { icono: keyof typeof ICONO; texto: string; etiqueta: string }[]
+  pauta: { icono: DatoPauta; texto: string; etiqueta: string }[]
   /** De dónde sale la pauta («Repeticiones de tu rutina»), en gris debajo. */
   nota?: string
 }) {
   return (
-    <section class={`${styles.card} ${styles.head}`}>
+    // Sin tarjeta: el nombre y, debajo, en una línea de texto, sus músculos y la pauta (usuario, 2026-11-14)
+    <header class={styles.head}>
       <h2 class={styles.name}>{props.nombre}</h2>
-      <ul class={styles.chips} aria-label="Músculos principales">
-        {props.musculos.map((m) => (
-          <li key={m} class={styles.chip}>
-            {m}
-          </li>
-        ))}
-      </ul>
-      <ul class={styles.pills} aria-label="Pauta">
-        {props.pauta.map(({ icono, texto, etiqueta }) => {
-          const Icono = ICONO[icono]
-          return (
-            <li key={icono} class={styles.pill} aria-label={etiqueta}>
-              <Icono />
-              <span aria-hidden="true">{texto}</span>
+      {/* La pauta en tres datos: la cifra grande y, debajo, qué es */}
+      {props.pauta.length > 0 && (
+        <ul class={styles.datos} aria-label="Pauta">
+          {props.pauta.map(({ icono, texto, etiqueta }) => (
+            <li key={icono} aria-label={etiqueta}>
+              <b aria-hidden="true">{texto.replace(/s*(series|serie|reps)$/, '')}</b>
+              <span aria-hidden="true">{QUE[icono]}</span>
             </li>
-          )
-        })}
-      </ul>
-      {props.nota && <p class={styles.headNote}>{props.nota}</p>}
-    </section>
+          ))}
+        </ul>
+      )}
+    </header>
   )
 }
 
@@ -108,8 +93,11 @@ export function FichaSugerencia(props: { etiqueta: string; valor: string; porque
   return (
     <Fila icono={<BoltIcon />} titulo="Peso sugerido">
       <p class={styles.suggestion}>
-        <span class={styles.tag}>{props.etiqueta}</span>
-        <strong>{props.valor}</strong>
+        {/* Cuando sube, en verde; si no, en gris */}
+        <span class={`${styles.tag} ${props.etiqueta.startsWith('↑') ? styles.sube : ''}`}>
+          {props.etiqueta}
+        </span>
+        <span>{props.valor}</span>
       </p>
       <p class={styles.text}>{props.porque}</p>
     </Fila>
@@ -172,41 +160,14 @@ export function FichaMusculos(props: {
   )
 }
 
-/** El descanso de este ejercicio en tu plan: el selector abre la lista, y −15 / +15 lo ajustan. */
-export function FichaDescanso(props: {
-  texto: string
-  onElegir: () => void
-  onMenos: () => void
-  onMas: () => void
-}) {
+/** Tu récord, debajo de la gráfica del 1RM: en negro (es historia; el naranja, solo el día que lo consigues). */
+export function FichaRecord(props: { valor: string; fecha: string }) {
   return (
-    <section class={`${styles.card} ${styles.rest}`} aria-label="Descanso">
-      <h3 class={styles.restTitle}>
-        <ClockIcon />
-        Descanso
-      </h3>
-      <div class={styles.restControls}>
-        <button
-          type="button"
-          class={`${styles.restButton} ${styles.restValue}`}
-          aria-label={`Descanso ${props.texto}, elegir otro`}
-          onClick={props.onElegir}
-        >
-          {props.texto}
-          <ChevronDownIcon />
-        </button>
-        <button
-          type="button"
-          class={styles.restButton}
-          aria-label="15 segundos menos"
-          onClick={props.onMenos}
-        >
-          −15
-        </button>
-        <button type="button" class={styles.restButton} aria-label="15 segundos más" onClick={props.onMas}>
-          +15
-        </button>
-      </div>
-    </section>
+    <p class={styles.record}>
+      <TrophyIcon />
+      <span>Tu récord</span>
+      <b>{props.valor}</b>
+      <small>· {props.fecha}</small>
+    </p>
   )
 }

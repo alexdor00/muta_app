@@ -30,16 +30,18 @@ export function PlatesSheet(props: {
 }) {
   return (
     <Sheet title="Discos por lado" onClose={props.onClose} large>
-      <label class={styles.label} for="peso-total">
-        Peso total
+      {/* Una fila, no un campo enorme: «Peso total ··· 111 kg» */}
+      <label class={styles.pesoFila}>
+        <span>Peso total</span>
+        <input
+          id="peso-total"
+          inputMode="decimal"
+          maxLength={6}
+          value={props.total}
+          onInput={(e) => props.onTotal(e.currentTarget.value)}
+        />
+        <span class={styles.unidadKg}>kg</span>
       </label>
-      <input
-        id="peso-total"
-        class={styles.total}
-        inputMode="decimal"
-        value={props.total}
-        onInput={(e) => props.onTotal(e.currentTarget.value)}
-      />
       <p class={styles.label}>Barra</p>
       <div class={styles.bars}>
         <ChoiceSegmented
@@ -57,7 +59,6 @@ export function PlatesSheet(props: {
             {String(d).replace('.', ',')}
           </span>
         ))}
-        <span class={styles.collar} />
         <span class={styles.end} />
       </div>
       <p class={styles.perSide}>

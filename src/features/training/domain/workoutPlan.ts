@@ -95,6 +95,8 @@ export type EjercicioPlan = {
   rir: number
   /** Kilos y repeticiones de cada serie la última vez (vacío la primera vez). */
   ultima: SerieHecha[]
+  /** Tu mejor 1RM estimado de siempre en este ejercicio, para saber si hoy es récord (0 o sin él: la primera vez). */
+  mejorDeSiempre?: number
   /** Descanso entre series, en segundos. */
   descanso: number
   /** Músculo principal (null si no se sabe), los que también trabajan y si es básico. */
@@ -282,10 +284,15 @@ const sesionesEn = (program: ProgramData, bloque: number, semana: number) =>
 /**
  * Tras terminar la sesión `hecha` de la semana: toca la siguiente; si era la última, la semana siguiente (o la
  * primera de la fase siguiente); tras la última de todo, se vuelve a empezar (decisión 2026-11-03: la semana pasa al
- * completarla, no por calendario).
+ * completarla, no por calendario). `n`: cuántas sesiones tiene tu semana (con las que añadiste; de serie, las de la rutina).
  */
-export function avanzar(program: ProgramData, rot: Rotacion, hecha: number): Rotacion {
-  if (hecha + 1 < sesionesEn(program, rot.bloque, rot.semana)) return { ...rot, siguiente: hecha + 1 }
+export function avanzar(
+  program: ProgramData,
+  rot: Rotacion,
+  hecha: number,
+  n = sesionesEn(program, rot.bloque, rot.semana),
+): Rotacion {
+  if (hecha + 1 < n) return { ...rot, siguiente: hecha + 1 }
   if (rot.semana + 1 < (program.blocks[rot.bloque]?.weeks.length ?? 0))
     return { bloque: rot.bloque, semana: rot.semana + 1, siguiente: 0 }
   if (rot.bloque + 1 < program.blocks.length) return { bloque: rot.bloque + 1, semana: 0, siguiente: 0 }

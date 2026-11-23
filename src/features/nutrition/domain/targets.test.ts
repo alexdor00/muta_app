@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  aprenderGasto,
   avisosReparto,
+  kcalDeDeporte,
   ritmoDeLaSemana,
   semanaDeLaFase,
   kcalDelDia,
@@ -53,7 +55,9 @@ describe('calcularObjetivo', () => {
     expect(c).toEqual({
       basal: 1780,
       factor: 1.64,
+      deporte: 0,
       gasto: 2919,
+      aprendido: false,
       cambio: -660,
       suelo: 1958,
       kcal: 2259,
@@ -151,5 +155,44 @@ describe('velocidad por fases y semanas de la fase', () => {
   it('la semana de la fase empieza en 1', () => {
     expect(semanaDeLaFase('2026-11-02', '2026-11-08')).toBe(1)
     expect(semanaDeLaFase('2026-11-02', '2026-11-09')).toBe(2)
+  })
+})
+
+describe('tu actividad y lo que se aprende de tus datos (usuario, 2026-11-19)', () => {
+  const cuerpo = { sexo: 'hombre' as const, edad: 29, alturaCm: 178, pesoKg: 80 }
+  const base = { cuerpo, pasos: 10_000, diasEntreno: 4, fase: 'mantenimiento' as const, ritmo: 0.75 }
+
+  it('el trabajo suma al factor encima de pasos y entrenos', () => {
+    expect(factorActividad(10_000, 4, 'fisico')).toBeCloseTo(factorActividad(10_000, 4) + 0.15, 2)
+    expect(factorActividad(10_000, 4, 'sentado')).toBe(factorActividad(10_000, 4))
+  })
+
+  it('otros deportes: MET × kg × horas ÷ 7, sumado al gasto', () => {
+    expect(kcalDeDeporte(80, { horas: 3, intensidad: 'media' })).toBe(Math.round((6 * 80 * 3) / 7))
+    expect(kcalDeDeporte(80, null)).toBe(0)
+    const sin = calcularObjetivo(base)
+    const con = calcularObjetivo({ ...base, deporte: { horas: 3, intensidad: 'media' } })
+    expect(con.gasto - sin.gasto).toBe(con.deporte)
+  })
+
+  it('con lo aprendido de tus datos, manda sobre la fórmula', () => {
+    const c = calcularObjetivo({ ...base, gastoAprendido: 2600 })
+    expect(c.gasto).toBe(2600)
+    expect(c.aprendido).toBe(true)
+  })
+
+  it('aprender: 0,6 de lo anterior y 0,4 de lo observado, entre basal × 1,1 y × 2,6', () => {
+    expect(aprenderGasto(3000, 2600, 1800)).toBe(2840)
+    expect(aprenderGasto(3000, 100, 1800)).toBe(1980)
+    expect(aprenderGasto(9000, 9000, 1800)).toBe(4680)
+  })
+})
+
+describe('velocidad del volumen', () => {
+  it('de serie, 0,375 % del peso al mes; la lenta y la rápida, más o menos', () => {
+    expect(superavitDiario(80)).toBe(superavitDiario(80, 0.375))
+    expect(superavitDiario(80, 0.25)).toBeLessThan(superavitDiario(80))
+    expect(superavitDiario(80, 0.5)).toBeGreaterThan(superavitDiario(80))
+    expect(superavitDiario(40, 0.25)).toBe(75)
   })
 })

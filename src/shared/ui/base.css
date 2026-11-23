@@ -50,6 +50,12 @@ p {
   margin: 0;
 }
 
+/* Una palabra en negrita dentro de un texto: el mismo peso que el resto de la app (usuario, 2026-11-20) */
+b,
+strong {
+  font-weight: var(--weight-semibold);
+}
+
 /* Los párrafos, justificados (como en un documento) y partiendo palabras con guion para que no queden huecos grandes
    en una pantalla estrecha. Lo que va centrado o en una fila lo dice su propia clase. */
 p {

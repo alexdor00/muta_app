@@ -1,3 +1,4 @@
+import { desdeEntreno, paths } from '../../../shared/lib/paths.ts'
 import { CheckIcon, MoonIcon } from '../../../shared/ui/icons.tsx'
 import styles from './WeekCard.module.css'
 
@@ -14,7 +15,7 @@ type Props = { dias: readonly WeekDay[]; total: number }
 
 /**
  * «Tu semana»: entrenos hechos, barra de progreso y un círculo por día: ✓ lo hecho, la luna los descansos (también los que
- * tocan) y la sigla de lo que toca (sin leyenda: se entiende sola).
+ * tocan) y la sigla de lo que toca (sin leyenda: se entiende sola). Toda la tarjeta lleva al calendario de Progreso.
  */
 export function WeekCard({ dias, total }: Props) {
   const hechos = dias.filter((d) => d.estado === 'hecho').length
@@ -28,6 +29,8 @@ export function WeekCard({ dias, total }: Props) {
           <strong>{hechos}</strong> de {total} entrenos
         </p>
       </div>
+      {/* Toda la tarjeta se toca: lleva al calendario de tus entrenos en Progreso */}
+      <a class={styles.link} href={desdeEntreno(paths.progress)} aria-label="Ver tu calendario" />
       <progress class={styles.bar} value={hechos} max={total} aria-label="Entrenos de la semana" />
       <ol class={styles.days}>
         {dias.map((d) => (

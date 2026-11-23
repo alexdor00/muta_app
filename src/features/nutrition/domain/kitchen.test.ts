@@ -2,7 +2,16 @@
 import { describe, expect, it } from 'vitest'
 import { recetaDelDia, type Receta } from './diet.ts'
 import type { Alimento } from './food.ts'
-import { arrozDe, factorDe, gramosEnCrudo, parejaEnCrudo, platoPor100, racionDeOlla } from './kitchen.ts'
+import {
+  arrozDe,
+  factorDe,
+  gramosEnCrudo,
+  parejaEnCrudo,
+  platoPor100,
+  racionDeOlla,
+  parejasEnCrudo,
+  repartirOlla,
+} from './kitchen.ts'
 
 const receta = (nombre: string, ingredientes: [string, number][]): Receta => ({
   id: nombre,
@@ -90,5 +99,23 @@ describe('cocido y su equivalencia en crudo', () => {
     expect(parejaEnCrudo(pollo, [pollo, al('q', 'Pechuga de pollo (cruda)', 'Carnes', 110)])).toBeNull()
     expect(parejaEnCrudo(crudo, base)).toBeNull()
     expect(parejaEnCrudo(al('x', 'Arroz basmati cocido', 'Cereales', 130), base)).toBeNull()
+  })
+})
+
+describe('lo cocido en crudo, sin su pareja exacta', () => {
+  it('el arroz basmati cocido sale en crudo con el arroz blanco crudo (su familia)', () => {
+    const a = (id: string, name: string, kcal: number) =>
+      ({ id, name, category: 'Cereales', kcal, protein: 0, carbs: 0, fat: 0 }) as Parameters<
+        typeof parejasEnCrudo
+      >[0][number]
+    const base = [a('crudo', 'Arroz blanco (crudo)', 355), a('basmati', 'Arroz basmati cocido', 135)]
+    expect(parejasEnCrudo(base).get('basmati')?.crudo.id).toBe('crudo')
+  })
+})
+
+describe('repartir la olla según lo que te toca', () => {
+  it('a más kcal, más gramos; sin kcal, a partes iguales', () => {
+    expect(repartirOlla(900, [600, 300])).toEqual([600, 300])
+    expect(repartirOlla(600, [0, 0, 0])).toEqual([200, 200, 200])
   })
 })

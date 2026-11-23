@@ -1,4 +1,4 @@
-/* Descanso entre series: barra negra baja y alargada, fija abajo (C03); al acabar cambia el rótulo (C04). */
+/* Descanso entre series (C03): tarjeta negra que flota abajo, con el anillo que se vacía; al acabar cambia el rótulo (C04). */
 
 .bar {
   position: fixed;
@@ -7,32 +7,59 @@
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-4);
-  width: calc(100% - var(--gutter) * 2);
-  max-width: calc(var(--app-max-width) - var(--gutter) * 2);
-  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5);
-  border-radius: var(--radius-pill);
+  /* Algo más estrecha que el resto de la pantalla (usuario, 2026-11-14) */
+  width: calc(100% - var(--gutter) * 3);
+  max-width: calc(var(--app-max-width) - var(--gutter) * 3);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-card);
   background: var(--rest-bg);
+  box-shadow: var(--float-shadow);
   color: var(--rest-fg);
   transform: translateX(-50%);
 }
 
+.ring {
+  flex: none;
+  width: var(--control);
+  height: var(--control);
+  transform: rotate(-90deg);
+}
+
+.track,
+.arc {
+  fill: none;
+  stroke-width: 5;
+}
+
+.track {
+  stroke: var(--rest-step);
+}
+
+.arc {
+  stroke: var(--rest-fg);
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--duration-tap) linear;
+}
+
+/* «DESCANSO» y, debajo con algo de aire, el tiempo */
 .text {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .label {
+  color: var(--on-session-light-soft);
   font: var(--text-caption);
   font-weight: var(--weight-bold);
-  color: var(--streak);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .time {
-  font: var(--text-set-value);
+  font: var(--text-cifra-barra);
   font-variant-numeric: tabular-nums;
 }
 
@@ -43,8 +70,8 @@
   padding: 0 var(--space-4);
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--rest-fg);
-  color: var(--rest-bg);
+  background: var(--rest-step);
+  color: var(--rest-fg);
   font: var(--text-subhead);
   font-weight: var(--weight-semibold);
   cursor: pointer;
@@ -54,4 +81,31 @@
   position: absolute;
   inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;
   content: '';
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc {
+    transition: none;
+  }
+}
+
+/* El anillo y el tiempo: un botón que para el descanso o lo sigue */
+.pausar {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Parado: el tiempo y el anillo, apagados */
+.parado .time,
+.parado .arc {
+  opacity: 0.55;
 }

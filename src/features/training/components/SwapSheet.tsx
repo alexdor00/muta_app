@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
 import { ChoiceSegmented } from '../../../shared/ui/Choice.tsx'
-import { ChevronRightIcon, SearchIcon } from '../../../shared/ui/icons.tsx'
+import { ChevronRightIcon, InfoIcon, SearchIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import styles from './WorkoutSheets.module.css'
 
@@ -61,6 +61,7 @@ export function SwapSheet(props: {
     <Sheet title="Cambiar ejercicio" onClose={props.onClose} large>
       {!props.soloPlan && (
         <ChoiceSegmented
+          grande
           name="alcance-cambio"
           legend="Dónde se cambia"
           options={ALCANCES}
@@ -68,17 +69,13 @@ export function SwapSheet(props: {
           onChange={setAlcance}
         />
       )}
-      <p class={styles.lead}>
-        {alcance === 'hoy'
-          ? 'Solo cambia en esta sesión; tu plan sigue igual.'
-          : 'Cambia en tu plan las próximas veces, con las mismas series, repeticiones y descanso.'}
-      </p>
-      <p class={styles.lead}>
-        ¿Molestias o te has estancado? Antes de cambiarlo, revisa la técnica en vídeo: cambiar de ejercicio no
-        arregla un estancamiento.
+      {/* El aviso, corto y en su tarjeta */}
+      <p class={styles.swapAviso}>
+        <InfoIcon />
+        <span>¿Molestias o estancado? Revisa la técnica antes de cambiarlo.</span>
       </p>
       {props.enLugarDe && (
-        <ul class={styles.options}>
+        <ul class={`${styles.options} ${styles.swapCard}`}>
           <FilaCambio
             titulo={`Volver a ${props.enLugarDe}`}
             detalle="El de tu rutina"
@@ -88,8 +85,8 @@ export function SwapSheet(props: {
       )}
       {equivalentes.length > 0 && (
         <>
-          <h3 class={styles.label}>Hacen lo mismo</h3>
-          <ul class={styles.options}>
+          <h3 class={styles.swapTitulo}>Hacen lo mismo</h3>
+          <ul class={`${styles.options} ${styles.swapCard}`}>
             {equivalentes.map((e) => (
               <FilaCambio
                 key={e.nombre}
@@ -103,8 +100,8 @@ export function SwapSheet(props: {
       )}
       {sustitutos.length > 0 && (
         <>
-          <h3 class={styles.label}>Los que da tu programa</h3>
-          <ul class={styles.options}>
+          <h3 class={styles.swapTitulo}>Los que da tu programa</h3>
+          <ul class={`${styles.options} ${styles.swapCard}`}>
             {sustitutos.map((s) => (
               <FilaCambio key={s} titulo={s} onClick={() => props.onElegir(s, alcance)} />
             ))}
@@ -113,8 +110,8 @@ export function SwapSheet(props: {
       )}
       {lejos.length > 0 && (
         <>
-          <h3 class={styles.label}>No está en tu material</h3>
-          <ul class={`${styles.options} ${styles.dim}`}>
+          <h3 class={styles.swapTitulo}>No está en tu material</h3>
+          <ul class={`${styles.options} ${styles.swapCard} ${styles.dim}`}>
             {lejos.map((e) => (
               <FilaCambio
                 key={e.nombre}

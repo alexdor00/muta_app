@@ -1,19 +1,40 @@
 import { useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { ChoiceCircles } from '../../../../shared/ui/Choice.tsx'
+import { CheckIcon } from '../../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
-import type { Dieta } from '../../state/dieta.ts'
+import { resumenDeDieta, type Dieta } from '../../state/dieta.ts'
 import { empezar, vistaPrevia } from '../../use-cases/diet.ts'
+import { cocinarComoLaDieta } from '../../use-cases/autopilot.ts'
+import { menusDeTuDieta, volverA } from '../../use-cases/menu.ts'
 import type { Aviso } from '../comun/useAviso.ts'
 import h from '../comun/Hojas.module.css'
+import p from './PlanHojas.module.css'
 
-type Props = { dieta: Dieta; onClose: () => void; avisar: (texto: string, accion?: Aviso['accion']) => void }
+type Props = {
+  dieta: Dieta
+  onClose: () => void
+  avisar: (texto: string, accion?: Aviso['accion']) => void
+  /** Cargada desde Plan: tu plan pasa a ser esta dieta (sus menús, su ciclo y sus días de cocinar). */
+  alPlan?: boolean
+}
 
 /** Antes de empezar una dieta: sus cifras, lo que cambia en tu objetivo y qué día del menú es hoy. Nada cambia hasta «Empezar hoy». */
-export function EmpezarDietaHoja({ dieta, onClose, avisar }: Props) {
+export function EmpezarDietaHoja({ dieta, onClose, avisar, alPlan }: Props) {
   const [dia, setDia] = useState(1)
   const v = vistaPrevia(dieta)
+  const r = resumenDeDieta(dieta)
+  const y = (xs: readonly (string | number)[]) =>
+    xs.length > 1 ? `${xs.slice(0, -1).join(', ')} y ${xs.at(-1)}` : String(xs[0] ?? '')
+  // Lo que MUTA ha entendido de tu archivo (Plan, usuario 2026-11-18)
+  const leido = [
+    `${r.menus} ${r.menus === 1 ? 'menú' : 'menús'} y ${r.recetas} ${r.recetas === 1 ? 'receta' : 'recetas'}`,
+    `Se repite cada ${r.ciclo.length} días: ${r.ciclo.join(' ')}`,
+    r.cocinar.length ? `Cocinas los días ${y(r.cocinar)}` : null,
+    r.todosLosDias.length ? `Todos los días: ${y(r.todosLosDias).toLowerCase()}` : null,
+    r.soloEntreno.length ? `Solo entreno: ${y(r.soloEntreno).toLowerCase()}` : null,
+    r.soloDescanso.length ? `Solo descanso: ${y(r.soloDescanso).toLowerCase()}` : null,
+  ].filter((x): x is string => !!x)
   return (
     <Sheet
       title="Empezar la dieta"
@@ -24,8 +45,14 @@ export function EmpezarDietaHoja({ dieta, onClose, avisar }: Props) {
           <Button
             onClick={async () => {
               await empezar(dieta, dia)
+              // Tu plan pasa a ser tu dieta tal cual: sus menús, su ciclo y sus días de cocinar
+              const antes = alPlan ? await menusDeTuDieta() : null
+              if (alPlan) await cocinarComoLaDieta()
               onClose()
-              avisar(`Empiezas «${dieta.nombre}»: hoy es el día ${dia} del menú`)
+              avisar(
+                `Empiezas «${dieta.nombre}»: hoy es el día ${dia}`,
+                antes ? { label: 'Deshacer', onClick: () => void volverA(antes) } : undefined,
+              )
             }}
           >
             Empezar hoy
@@ -73,14 +100,61 @@ export function EmpezarDietaHoja({ dieta, onClose, avisar }: Props) {
             Es la dieta de ejemplo del prototipo: sirve para probar, no está pautada para ti.
           </p>
         )}
-        <ChoiceCircles
-          name="dia-del-menu"
-          legend="¿Qué día del menú es hoy?"
-          showLegend
-          options={[1, 2, 3, 4, 5, 6, 7].map((n) => ({ value: n, label: String(n) }))}
-          value={dia}
-          onChange={setDia}
-        />
+        <ul class={p.filas} aria-label="Lo que he leído">
+          {leido.map((t) => (
+            <li key={t} class={p.fila}>
+              <span class={p.ok} aria-hidden="true">
+                <CheckIcon />
+              </span>
+              <span class={p.que}>{t}</span>
+            </li>
+          ))}
+        </ul>
+        {(r.estimados.length > 0 || r.alGusto.length > 0) && (
+          <ul class={p.filas} aria-label="Para revisar">
+            {r.estimados.length > 0 && (
+              <li class={p.fila}>
+                <span class={p.que}>
+                  Revisa {r.estimados.length} {r.estimados.length === 1 ? 'cantidad' : 'cantidades'}
+                  <small>
+                    {y(r.estimados.slice(0, 3)).toLowerCase()}
+                    {r.estimados.length > 3 ? '…' : ''} venían en unidades: van con gramos aproximados.
+                  </small>
+                </span>
+              </li>
+            )}
+            {r.alGusto.length > 0 && (
+              <li class={p.fila}>
+                <span class={p.que}>
+                  Al gusto
+                  <small>
+                    {y(r.alGusto.slice(0, 3)).toLowerCase()}
+                    {r.alGusto.length > 3 ? '…' : ''}: no suman kcal.
+                  </small>
+                </span>
+              </li>
+            )}
+          </ul>
+        )}
+        <ul class={p.filas}>
+          <li class={p.fila}>
+            <label class={p.que} for="dia-del-ciclo">
+              Hoy es el día
+            </label>
+            <select
+              id="dia-del-ciclo"
+              class={p.valor}
+              value={dia}
+              onChange={(e) => setDia(Number(e.currentTarget.value))}
+            >
+              {r.ciclo.map((_, i) => (
+                <option key={i} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
+            </select>
+          </li>
+        </ul>
       </div>
     </Sheet>
   )

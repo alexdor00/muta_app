@@ -6,24 +6,25 @@ import {
   formatDayDate,
   formatDecimal,
   formatRange,
+  localDate,
 } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
-import { ChevronLeftIcon, DotsIcon, PlayIcon } from '../../../../shared/ui/icons.tsx'
+import { ChevronLeftIcon, PlayIcon } from '../../../../shared/ui/icons.tsx'
 import { Pending } from '../../../../shared/ui/Pending.tsx'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import {
   FichaCabecera,
   FichaClave,
   FichaNotas,
-  FichaDescanso,
   FichaMusculos,
+  FichaRecord,
   FichaSugerencia,
 } from '../../components/ExerciseFicha.tsx'
-import { SessionProgress } from '../../components/SessionProgress.tsx'
-import { RestChoiceSheet, NoteSheet } from '../../components/WorkoutSheets.tsx'
+import { SessionProgress } from '../../../../shared/ui/SessionProgress.tsx'
+import { NoteSheet } from '../../components/WorkoutSheets.tsx'
 import { fichaDe } from '../../state/ficha.ts'
-import { descansoDe, elegirDescanso, pedirEjercicio } from '../../state/sesionEnCurso.ts'
+import { descansoDe, pedirEjercicio } from '../../state/sesionEnCurso.ts'
 import {
   avisoDeOrden,
   cambioDesdePrimera,
@@ -35,9 +36,8 @@ import {
 import { ejercicioDeBiblioteca } from '../../use-cases/exerciseLibrary.ts'
 import { guardarNota, notaDe } from '../../use-cases/exerciseNotes.ts'
 import { pautaEnTuRutina } from '../../use-cases/training.ts'
-import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { usePlan } from '../comun/usePlan.ts'
-import { MasFichaHoja, type AvisoFicha } from './MasFichaHoja.tsx'
+import type { AvisoFicha } from './MasFichaHoja.tsx'
 import styles from './FichaEjercicioScreen.module.css'
 
 const NOMBRES = Object.fromEntries(MUSCLE_IDS.map((id) => [id, MUSCLES[id].label]))
@@ -51,16 +51,15 @@ const FUENTE = {
 
 /**
  * Ficha del ejercicio (diseño aprobado del 2026-11-02, sin foto): nombre y pauta, la clave, el peso que toca hoy con su
- * porqué (doble progresión), cómo ha ido a lo largo del tiempo, qué músculos trabaja y su descanso. Desde la sesión,
+ * porqué (doble progresión), cómo ha ido a lo largo del tiempo, qué músculos trabaja y tus notas; el descanso se ve en la
+ * cabecera y se cambia en Editar rutina o en la sesión (usuario, 2026-11-13). Desde la sesión,
  * «Empezar ejercicio» vuelve a ella con este ejercicio abierto. Con tu plan y tus entrenos.
  */
 export function FichaEjercicioScreen(props: { exerciseId: string }) {
   const { query, route } = useLocation()
   usePlan()
-  const [eligiendo, setEligiendo] = useState(false)
-  const [musculo, setMusculo] = useState<MuscleId | null>(null)
+  const [metrica, setMetrica] = useState<'maximo' | 'volumen'>('maximo')
   const [escribiendo, setEscribiendo] = useState(false)
-  const [mas, setMas] = useState(false)
   const [aviso, setAviso] = useState<AvisoFicha | null>(null)
   useEffect(() => {
     if (!aviso) return
@@ -85,7 +84,6 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
   const principales = musculos(1, Infinity)
   const secundarios = musculos(0.5, 1)
   const descanso = f.plan ? descansoDe(f.plan.e) : ex.restSec
-  const cambiar = (s: number) => f.plan && elegirDescanso(f.plan.e.nombre, Math.min(600, Math.max(15, s)))
 
   const orden = avisoDeOrden(f.progreso)
   const puestoHoy = f.progreso.at(-1)?.puesto
@@ -95,6 +93,11 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
     const puntos = f.progreso.map((p) => ({
       fecha: p.fecha,
       valor: m === 'volumen' ? p.volumen / 1000 : p.maximo,
+      // Al pasar el dedo por el 1RM: la serie que lo dio ese día
+      nota:
+        m === 'maximo'
+          ? `Mejor serie: ${p.mejor.kg != null ? `${formatDecimal(p.mejor.kg)} kg × ` : ''}${p.mejor.reps}${p.mejor.kg == null ? ' reps' : ''}`
+          : undefined,
     }))
     const ultimo = puntos.at(-1)
     const cambio = cambioDesdePrimera(puntos.map((p) => p.valor))
@@ -104,12 +107,32 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
         : `${formatDecimal(Math.round(v))} ${f.pesoCorporal ? 'reps' : 'kg'}`
     return {
       valor: ultimo ? texto(ultimo.valor) : null,
-      cambio:
-        cambio === null ? null : `${formatChange(cambio)} desde la primera vez (${puntos.length} veces)`,
+      cambio: cambio === null ? null : `${formatChange(cambio)} desde la primera vez`,
       fecha: ultimo ? formatDayDate(ultimo.fecha) : null,
       puntos,
+      texto,
     }
   }
+
+  // Tu récord (usuario, 2026-11-20): el día de tu mejor 1RM, cuando ya hay con qué compararlo
+  const record = f.progreso.length > 1 ? f.progreso.reduce((m, p) => (p.maximo > m.maximo ? p : m)) : null
+  const pieRecord =
+    record && metrica === 'maximo' ? (
+      <FichaRecord
+        valor={grafica('maximo').texto(record.maximo)}
+        fecha={record.fecha === localDate(new Date()) ? 'hoy' : formatDayDate(record.fecha).toLowerCase()}
+      />
+    ) : null
+
+  const METRICAS = [
+    // En el botón, el nombre corto; arriba de la gráfica, el largo
+    {
+      value: 'maximo' as const,
+      label: f.pesoCorporal ? 'Mejor serie' : '1RM',
+      titulo: f.pesoCorporal ? 'Mejor serie' : '1RM estimado',
+    },
+    { value: 'volumen' as const, label: 'Tonelaje', titulo: 'Tonelaje total' },
+  ]
 
   const sesion = typeof query.sesion === 'string' ? query.sesion : null
   const indice = Number(query.ej)
@@ -125,9 +148,8 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
           <ChevronLeftIcon />
         </button>
         <h1 class={styles.barTitle}>Ficha del ejercicio</h1>
-        <button type="button" class={styles.more} aria-label="Más opciones" onClick={() => setMas(true)}>
-          <DotsIcon />
-        </button>
+        {/* Sin «···» (usuario, 2026-11-14): el hueco deja el título centrado */}
+        <span class={styles.more} aria-hidden="true" />
       </header>
       <div class={styles.cards}>
         <FichaCabecera
@@ -156,59 +178,41 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
           ]}
           nota={`Repeticiones ${FUENTE[f.fuente]}`}
         />
-        {ex.key && (
-          <FichaClave texto={plainEffort(ex.key)} fuente={ex.deRutina ? ex.source : null} web={ex.keyWeb} />
-        )}
-        <FichaNotas texto={notaDe(ex.name)} onEscribir={() => setEscribiendo(true)} />
-        <FichaSugerencia
-          etiqueta={f.sugerencia.etiqueta}
-          valor={f.sugerencia.valor}
-          porque={f.sugerencia.porque}
-        />
+        {/* Lo que progresa, arriba y en una sola gráfica: 1RM estimado (o mejor serie) y, con peso, el tonelaje con un botón */}
         <SessionProgress
-          titulo={f.pesoCorporal ? 'Mejor serie' : '1RM estimado'}
-          metricas={[{ value: 'maximo', label: f.pesoCorporal ? 'Mejor serie' : '1RM estimado' }]}
+          titulo={METRICAS.find((x) => x.value === metrica)?.titulo ?? ''}
+          metricas={f.pesoCorporal || !f.progreso.length ? METRICAS.slice(0, 1) : METRICAS}
           etiqueta="Progreso del ejercicio"
           vacio="Aún no has hecho este ejercicio."
-          {...grafica('maximo')}
-          metrica="maximo"
-          onMetrica={() => {}}
+          {...grafica(metrica)}
+          metrica={metrica}
+          onMetrica={setMetrica}
           otroPuesto={f.progreso.map((p) => p.puesto !== puestoHoy)}
+          pie={pieRecord}
           aviso={
             orden &&
             `⚠ La última vez lo hiciste en el puesto ${orden.ahora} de la sesión y la anterior en el ${orden.antes}: con otra fatiga encima, la comparación no es exacta.`
           }
         />
-        {/* El tonelaje, con peso y cuando ya lo has hecho (si no, basta con el aviso de la de arriba) */}
-        {!f.pesoCorporal && f.progreso.length > 0 && (
-          <SessionProgress
-            titulo="Tonelaje total"
-            metricas={[{ value: 'volumen', label: 'Tonelaje total' }]}
-            etiqueta="Tonelaje del ejercicio"
-            vacio="Aún no has hecho este ejercicio."
-            {...grafica('volumen')}
-            metrica="volumen"
-            onMetrica={() => {}}
-          />
-        )}
+        <FichaSugerencia
+          etiqueta={f.sugerencia.etiqueta}
+          valor={f.sugerencia.valor}
+          porque={f.sugerencia.porque}
+        />
         <FichaMusculos
           principales={principales.map((id) => ({ id, label: MUSCLES[id].label }))}
           secundarios={secundarios.map((id) => ({ id, label: MUSCLES[id].label }))}
-          onMusculo={(id) => setMusculo(id as MuscleId)}
+          onMusculo={(id) => route(paths.muscle(id))}
           series={Object.fromEntries([
             ...principales.map((id) => [id, 3]),
             ...secundarios.map((id) => [id, 1]),
           ])}
           names={NOMBRES}
         />
-        {f.plan && (
-          <FichaDescanso
-            texto={formatClock(descanso)}
-            onElegir={() => setEligiendo(true)}
-            onMenos={() => cambiar(descanso - 15)}
-            onMas={() => cambiar(descanso + 15)}
-          />
+        {ex.key && (
+          <FichaClave texto={plainEffort(ex.key)} fuente={ex.deRutina ? ex.source : null} web={ex.keyWeb} />
         )}
+        <FichaNotas texto={notaDe(ex.name)} onEscribir={() => setEscribiendo(true)} />
       </div>
       {sesion && (
         <div class={styles.footer}>
@@ -220,7 +224,6 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
           </Button>
         </div>
       )}
-      {mas && <MasFichaHoja ejercicio={ex} onAviso={setAviso} onClose={() => setMas(false)} />}
       <Toast
         message={aviso?.texto ?? null}
         action={
@@ -235,7 +238,6 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
             : null
         }
       />
-      {musculo && <MusculoHoja musculo={musculo} onClose={() => setMusculo(null)} />}
       {escribiendo && (
         <NoteSheet
           nombre={ex.name}
@@ -245,18 +247,6 @@ export function FichaEjercicioScreen(props: { exerciseId: string }) {
             setEscribiendo(false)
           }}
           onClose={() => setEscribiendo(false)}
-        />
-      )}
-      {eligiendo && f.plan && (
-        <RestChoiceSheet
-          nombre={ex.name}
-          segundos={descanso}
-          formato={formatClock}
-          onElegir={(s) => {
-            cambiar(s)
-            setEligiendo(false)
-          }}
-          onClose={() => setEligiendo(false)}
         />
       )}
     </div>

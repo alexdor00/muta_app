@@ -1,13 +1,31 @@
-/* Lista de ejercicios de Ver sesión: filas con nombre, series y flecha; desplegada, «Última vez» en píldoras. */
+/* Lista de ejercicios de Ver sesión: en una tarjeta blanca, cada fila con su número, nombre, series, el cambio y la
+   flecha; desplegada, «Última vez» en píldoras. Como los ejercicios de la sesión en curso. */
 
 .title {
-  font: var(--text-headline);
+  font: var(--text-titulo-seccion);
 }
 
 .list {
-  margin: var(--space-2) 0 0;
-  padding: 0;
+  margin: var(--space-3) 0 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
   list-style: none;
+}
+
+/* El número del ejercicio, en un círculo gris suave */
+.numero {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
 }
 
 .item + .item {
@@ -19,7 +37,7 @@
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  min-height: var(--tap-min);
+  min-height: var(--row);
   padding: var(--space-3) 0;
   border: 0;
   background: none;
@@ -35,10 +53,9 @@
   gap: calc(var(--space-1) / 2);
 }
 
-/* El ejercicio: 15 seminegrita, del tamaño de los títulos de las fichas; debajo, su pauta en 13 */
+/* El ejercicio, título de fila; debajo, su pauta en gris */
 .name {
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
+  font: var(--text-headline);
 }
 
 .detail {
@@ -68,7 +85,7 @@
 }
 
 .last {
-  padding-bottom: var(--space-4);
+  padding: 0 0 var(--space-4) calc(var(--control-sm) + var(--space-3));
 }
 
 .lastTitle {
@@ -88,7 +105,7 @@
 .sets li {
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  background: var(--bg);
   font: var(--text-subhead);
 }
 
@@ -123,7 +140,7 @@
   color: var(--label-2);
 }
 
-/* El cambio frente a la vez anterior: el número en negro; la flecha, naranja si sube y gris si baja */
+/* El cambio frente a la vez anterior: si sube, solo la flecha en verde (el número, en negro); si baja, la flecha gris */
 .change {
   display: inline-flex;
   flex: none;
@@ -139,8 +156,12 @@
   height: var(--icon-xs);
 }
 
+.up {
+  color: var(--label);
+}
+
 .up svg {
-  color: var(--streak);
+  color: var(--improve); /* subir es mejorar: verde; el naranja, solo para logros (usuario, 2026-11-20) */
 }
 
 .down svg {

@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  height: calc(var(--photo-card-height) * 1.4); /* 269 */
+  height: var(--session-card-height); /* el mismo alto que la cabecera con foto de Ver sesión */
   overflow: hidden;
   /* El texto abajo, a la altura de «▶ Empezar», con su sitio reservado a la derecha (un nombre largo pasa a dos líneas) */
   padding: var(--space-4) calc(var(--tap-min) * 3 + var(--space-5) * 2) var(--space-4) var(--space-5);
@@ -60,10 +60,14 @@
 }
 
 /* Con tu foto: de fondo, con el degradado de las fotos encima y el texto claro */
+/* Con foto: letra blanca y la foto clara arriba, oscurecida solo abajo, donde va el texto */
 .card.withPhoto {
-  --c-fg: var(--on-session-dark);
-  --c-soft: var(--on-session-dark-soft);
-  --c-line: var(--on-session-dark-line);
+  --c-fg: var(--on-session-light);
+  --c-soft: var(--on-session-light-soft);
+  --c-line: var(--on-session-light-line);
+
+  color: var(--c-fg);
+  text-shadow: var(--session-text-shadow);
 
   background: var(--photo-placeholder);
 }
@@ -72,7 +76,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--photo-scrim);
+  background: var(--photo-card-scrim);
   content: '';
 }
 

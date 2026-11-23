@@ -1,0 +1,65 @@
+/* Filas de un «···» (Tu rutina, Nutrición): icono, nombre con su detalle y «›». */
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: var(--row);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--label);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: var(--badge);
+  color: var(--label);
+}
+
+.icon svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--space-2) 0;
+}
+
+.detail {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.label {
+  font: var(--text-body);
+}
+
+.chevron {
+  display: grid;
+  color: var(--label-2);
+}
+
+.chevron svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}

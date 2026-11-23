@@ -1,6 +1,6 @@
 import { expect, test } from './plan.ts'
 
-// Lo que salió de la hoja «Tu rutina» y vive ahora en su sitio: la foto de la sesión y la cobertura (en Editar rutina) y
+// Lo que salió de la hoja «Tu rutina» y vive ahora en su sitio: la foto de la sesión (en Editar rutina) y
 // ocultar consejos (en «Consejos de hoy»). Con el plan de prueba (MUTA Cuerpo completo, toca B1).
 
 /** Un punto PNG de 1 × 1, como si fuera una foto de la galería. */
@@ -19,7 +19,7 @@ async function editar(page: import('@playwright/test').Page) {
   // En tu semana, la sesión B1: ahí van su foto y su entrenador
   await page
     .getByRole('list', { name: 'Tu semana' })
-    .getByRole('button', { name: /^\d+ Isquios, glúteo y pecho/ })
+    .getByRole('button', { name: /^Isquios, glúteo y pecho/ })
     .click()
   return page.getByRole('dialog', { name: 'Editar rutina' })
 }
@@ -56,31 +56,11 @@ test('foto de la sesión (en Editar rutina): se pone, sale en la tarjeta, sigue 
   await expect(page.getByRole('link', { name: /Isquios, glúteo y pecho/ }).locator('img')).toHaveCount(0)
 })
 
-test('la cobertura del método la dice el entrenador, con «Añadir…» a esta sesión', async ({ page }) => {
-  const hoja = await editar(page)
-  await hoja.getByRole('button', { name: /consejos? del entrenador/ }).click()
-  const consejos = page.getByRole('dialog', { name: 'Consejos del entrenador' })
-  const gluteo = consejos.getByRole('listitem').filter({ hasText: 'Glúteo: falta abducción.' })
-  await expect(gluteo).toContainText('El método pide acortado, estirado y abducción.')
-  await gluteo.getByRole('button', { name: 'Añadir abducción en máquina' }).click()
-  await expect(page.getByText('Abducción en máquina añadido a Isquios, glúteo y pecho')).toBeVisible()
-  await consejos.getByRole('button', { name: 'Cerrar' }).click()
-  await expect(page.getByRole('list', { name: 'Ejercicios de Isquios, glúteo y pecho' })).toContainText(
-    'Abducción en máquina',
-  )
-})
-
-test('en «Consejos de hoy» se oculta un consejo de antes de empezar y se puede volver a enseñar', async ({
-  page,
-}) => {
+test('en «Consejos de hoy» los de antes de empezar se marcan y ya no se ocultan', async ({ page }) => {
   await page.goto('/entreno/sesion/b1')
   await page.getByRole('button', { name: /consejos para esta sesión/ }).click()
   const hoy = page.getByRole('dialog', { name: 'Consejos de hoy' })
   await expect(hoy.getByText('0 de 9')).toBeVisible()
-  await hoy.getByRole('button', { name: /^Ocultar: Decide qué tarea/ }).click()
-  await expect(hoy.getByText('0 de 8')).toBeVisible()
-  await expect(hoy).not.toContainText('Decide qué tarea es la más valiosa')
-  const otra = hoy
-  await otra.getByRole('button', { name: '1 oculto · Volver a enseñar' }).click()
-  await expect(otra.getByText('0 de 9')).toBeVisible()
+  // Los de antes de la primera serie ya no se ocultan (usuario, 2026-11-12)
+  await expect(hoy.getByRole('button', { name: /^Ocultar/ })).toHaveCount(0)
 })

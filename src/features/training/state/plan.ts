@@ -4,6 +4,8 @@ import { computed, signal } from '@preact/signals'
 import type { Level } from '../domain/catalog.ts'
 import { descansosPendientes, hoyTocaDescanso } from '../domain/restDays.ts'
 import { cambioUltimaVez } from '../domain/exerciseProgress.ts'
+import { mejorDeSiempre } from '../domain/records.ts'
+export { recordsDelDia, recordsDelEntreno, type RecordDelDia } from '../domain/records.ts'
 import {
   diasDesde,
   historialDe,
@@ -49,7 +51,11 @@ export const sesiones = computed<SesionPlan[]>(() => {
   if (plan.status !== 'ready') return []
   return plan.semana.map((s) => ({
     ...s,
-    ejercicios: s.ejercicios.map((e) => ({ ...e, ultima: ultimaVez(entrenos.value, e.nombre) })),
+    ejercicios: s.ejercicios.map((e) => ({
+      ...e,
+      ultima: ultimaVez(entrenos.value, e.nombre),
+      mejorDeSiempre: mejorDeSiempre(entrenos.value, e.nombre),
+    })),
   }))
 })
 
@@ -147,6 +153,7 @@ export function enTuPlan(nombre: string): { sigla: string; indice: number; e: Ej
 export type { EjercicioPlan, SesionPlan } from '../domain/workoutPlan.ts'
 export { nombresDeSesiones, textoReps } from '../domain/workoutPlan.ts'
 export { descansosPorSesion, trasDe } from '../domain/restDays.ts'
+export { filasDeSemana, moverFila, type FilaSemana } from '../domain/weekOrder.ts'
 export { progresoDeSesion, semanaDe, seriesPorMusculo } from '../domain/workoutHistory.ts'
 export { avisoTecnica, notaSugerido } from '../domain/workoutPlan.ts'
 export {

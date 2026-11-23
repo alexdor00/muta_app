@@ -25,7 +25,7 @@ type Props = {
 }
 
 /**
- * «Ejercicios» de Ver sesión: una fila por ejercicio con su cambio frente a la vez anterior a la derecha (↑ naranja si
+ * «Ejercicios» de Ver sesión: una fila por ejercicio con su cambio frente a la vez anterior a la derecha (↑ en verde si
  * sube, ↓ si baja) y, arriba, cuántos suben; al tocarla se despliega lo que hiciste la última vez y el enlace a la ficha.
  */
 export function ExerciseList({ ejercicios, abierto, onAbrir, suben }: Props) {
@@ -49,6 +49,9 @@ export function ExerciseList({ ejercicios, abierto, onAbrir, suben }: Props) {
                 aria-controls={`ficha-${i}`}
                 onClick={() => onAbrir(open ? null : i)}
               >
+                <span class={styles.numero} aria-hidden="true">
+                  {i + 1}
+                </span>
                 <span class={styles.text}>
                   <span class={styles.name}>{e.nombre}</span>
                   <span class={styles.detail}>{e.detalle}</span>
@@ -66,7 +69,7 @@ export function ExerciseList({ ejercicios, abierto, onAbrir, suben }: Props) {
                     }
                   >
                     {e.cambio.sentido > 0 ? <ArrowUpIcon /> : e.cambio.sentido < 0 ? <ArrowDownIcon /> : null}
-                    <span aria-hidden="true">{e.cambio.texto}</span>
+                    <span aria-hidden="true">{e.cambio.sentido === 0 ? '=' : e.cambio.texto}</span>
                   </span>
                 )}
                 <span class={`${styles.chevron} ${open ? styles.open : ''}`}>

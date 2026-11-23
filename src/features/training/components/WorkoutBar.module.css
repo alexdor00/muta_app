@@ -1,60 +1,57 @@
-/* Barra de la sesión en curso, fija arriba: «Salir» · tiempo y series · «Terminar» (píldora negra). */
+/* Barra de la sesión en curso, fija arriba: ‹ y el tiempo con las series a la izquierda; «Terminar» a la derecha. */
 
 .bar {
   position: sticky;
   top: 0;
   z-index: 5;
-  display: grid;
-  /* Los lados, siempre iguales: el tiempo no se mueve aunque cambie el texto de debajo */
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
   padding: calc(var(--space-3) + var(--safe-top)) var(--gutter) var(--space-3);
-  border-bottom: var(--hairline) solid var(--separator);
   background: var(--bg);
 }
 
-/* Raya de progreso pegada al borde de abajo de la barra */
-.track {
-  position: absolute;
-  right: 0;
-  bottom: calc(var(--hairline) * -1);
-  left: 0;
-  height: calc(var(--space-1) / 2);
-}
-
-.track i {
-  display: block;
-  height: 100%;
-  background: var(--accent);
-  transition: width var(--duration-sheet) var(--ease);
-}
-
-.exit {
-  justify-self: start;
-  display: grid;
+.left {
+  display: flex;
   align-items: center;
-  min-height: var(--tap-min);
-  font: var(--text-body);
-  font-weight: var(--weight-semibold);
-  color: var(--label);
-  text-decoration: none;
+  gap: var(--space-3);
+  min-width: 0;
 }
 
-.center {
+/* ‹ en un círculo gris; la zona de toque, de 44 */
+.exit {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+}
+
+.exit svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* El tiempo y, debajo con algo de aire, «A2 · 2 de 18 series» */
+.clock {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
 .time {
-  padding: 0 var(--space-2);
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-control);
   background: none;
   color: var(--label);
-  font: var(--text-title-2);
-  font-weight: var(--weight-bold);
+  /* La cifra condensada de siempre, algo más pequeña: más sutil (usuario, 2026-11-14) */
+  font: var(--text-cifra-barra);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
 }
@@ -72,7 +69,7 @@
   border: 0;
   background: none;
   color: var(--label-2);
-  font: var(--text-footnote);
+  font: var(--text-subhead);
   cursor: pointer;
 }
 
@@ -82,8 +79,9 @@
 }
 
 .finish {
-  justify-self: end;
+  position: relative;
   display: grid;
+  flex: none;
   place-items: center;
   height: var(--control-sm);
   padding: 0 var(--space-4);
@@ -93,15 +91,10 @@
   color: var(--on-accent);
   font: var(--text-subhead);
   font-weight: var(--weight-semibold);
-  text-decoration: none;
   cursor: pointer;
 }
 
 /* Se ve pequeño, pero la zona de toque sigue siendo de 44 */
-.finish {
-  position: relative;
-}
-
 .finish::after {
   position: absolute;
   inset: calc((var(--tap-min) - var(--control-sm)) / -2) 0;

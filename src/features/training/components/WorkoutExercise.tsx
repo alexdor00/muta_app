@@ -7,6 +7,7 @@ import {
   PlusIcon,
   StopwatchIcon,
 } from '../../../shared/ui/icons.tsx'
+import { TrophyIcon } from '../../../shared/ui/iconosHoy.tsx'
 import { SetExtras } from './SetExtras.tsx'
 import { useDeslizar } from '../../../shared/ui/useDeslizar.ts'
 import styles from './WorkoutExercise.module.css'
@@ -25,6 +26,10 @@ export type SerieVista = {
   hecha: boolean
   /** Mejor que la misma serie de la vez anterior: estrella en vez de ✓. */
   record: boolean
+  /** Todas las series del ejercicio mejoran la vez anterior: corona en vez de estrella (con su animación). */
+  corona: boolean
+  /** Tu mejor marca de siempre: el trofeo, en naranja (un logro; usuario, 2026-11-20). */
+  trofeo: boolean
   /** Sus bajadas (dropset) o mini-series (rest-pause), con el peso en gris si es el mismo. */
   extra: { kg: string; reps: string; kgGris: string }[]
 }
@@ -36,6 +41,8 @@ type Props = {
   pauta: string[]
   /** Descanso entre series: «2:45». */
   descanso: string
+  /** La vez anterior: «40 kg × 12»; null la primera vez. */
+  antes: string | null
   /** Lo que no dice la rutina y se ha puesto por costumbre, o null. */
   sugerido: string | null
   /** Tus notas de este ejercicio (vacía si no hay): se guardan en su ficha. */
@@ -63,6 +70,16 @@ type Props = {
 }
 
 /** La estrella de una serie récord. */
+/** Corona: el ejercicio entero mejora la vez anterior (todas sus series). */
+export function Corona() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M3 7.5l4.5 4 4.5-7 4.5 7 4.5-4-1.8 10.5H4.8z" />
+      <rect x="4.8" y="19" width="14.4" height="2" rx="1" fill="currentColor" />
+    </svg>
+  )
+}
+
 export function Estrella() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -80,6 +97,11 @@ const CAMPOS = [
   { campo: 'quedan', gris: 'quedanGris', nombre: 'RIR' },
 ] as const
 
+/** La pauta con sus cifras en negro (2 series · 10–15 reps · RIR 1) y el resto en gris. */
+function Cifras({ texto }: { texto: string }) {
+  return <>{texto.split(/(d[d–,.:]*)/).map((t, i) => (i % 2 ? <b key={i}>{t}</b> : t))}</>
+}
+
 /**
  * Una serie: Nº · Kg · Reps · RIR · círculo. Deslizada a la izquierda descubre «Eliminar» (C06); mantenida pulsada,
  * se borra (con «Deshacer» en el aviso).
@@ -87,6 +109,8 @@ const CAMPOS = [
 function FilaSerie(props: {
   i: number
   s: SerieVista
+  /** La serie que toca: la primera sin hacer. */
+  actual: boolean
   activa: CampoSerie | null
   abierta: boolean
   onAbrir: (abierta: boolean) => void
@@ -115,7 +139,7 @@ function FilaSerie(props: {
         </button>
         <div
           ref={fila}
-          class={`${styles.set} ${s.hecha ? styles.doneRow : ''} ${props.abierta ? styles.swiped : ''}`}
+          class={`${styles.set} ${s.hecha ? styles.doneRow : ''} ${props.actual ? styles.actual : ''} ${props.abierta ? styles.swiped : ''}`}
         >
           <span class={styles.index}>{i + 1}</span>
           {CAMPOS.map(({ campo, gris, nombre }) => (
@@ -136,12 +160,32 @@ function FilaSerie(props: {
           ))}
           <button
             type="button"
-            class={`${styles.check} ${s.hecha ? styles.done : ''}`}
+            class={`${styles.check} ${s.hecha ? styles.done : ''} ${s.hecha && s.trofeo ? styles.trofeo : ''}`}
             aria-pressed={s.hecha}
-            aria-label={s.record ? `Serie ${i + 1} hecha, récord` : `Serie ${i + 1} hecha`}
+            aria-label={
+              s.trofeo
+                ? `Serie ${i + 1} hecha, récord: tu mejor marca`
+                : s.corona
+                  ? `Serie ${i + 1} hecha, todo el ejercicio mejora`
+                  : s.record
+                    ? `Serie ${i + 1} hecha, récord`
+                    : `Serie ${i + 1} hecha`
+            }
             onClick={() => props.onMarcar(i)}
           >
-            {s.hecha && (s.record ? <Estrella /> : <CheckIcon />)}
+            {/* La corona entra con su animación (la estrella se convierte en corona) */}
+            {s.hecha &&
+              (s.trofeo ? (
+                <TrophyIcon />
+              ) : s.corona ? (
+                <span class={styles.corona}>
+                  <Corona />
+                </span>
+              ) : s.record ? (
+                <Estrella />
+              ) : (
+                <CheckIcon />
+              ))}
           </button>
         </div>
       </div>
@@ -164,6 +208,7 @@ function FilaSerie(props: {
 export function WorkoutExercise(props: Props) {
   const { numero, nombre, series } = props
   const [abierta, setAbierta] = useState<number | null>(null)
+  const actual = series.findIndex((s) => !s.hecha)
   return (
     <section class={`${styles.exercise} ${styles.open}`} aria-labelledby={`ejercicio-${numero}`}>
       <div class={styles.head}>
@@ -176,7 +221,9 @@ export function WorkoutExercise(props: Props) {
           </h2>
           <ul class={styles.chips} aria-label="Pauta">
             {props.pauta.map((p) => (
-              <li key={p}>{p}</li>
+              <li key={p}>
+                <Cifras texto={p} />
+              </li>
             ))}
             <li>
               <button
@@ -252,6 +299,7 @@ export function WorkoutExercise(props: Props) {
             key={i}
             i={i}
             s={s}
+            actual={i === actual}
             activa={props.activa?.serie === i ? props.activa.campo : null}
             abierta={abierta === i}
             onAbrir={(a) => setAbierta(a ? i : null)}

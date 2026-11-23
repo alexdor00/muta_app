@@ -46,6 +46,42 @@ export function formatDayDate(iso: string): string {
   return `${DIAS[d.getUTCDay()]} ${formatShortDate(iso)}`
 }
 
+const DIAS_LARGOS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+const MESES_LARGOS = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+]
+
+/** Un rato en minutos: «40 min», «1 h», «1 h 10 min». */
+export function formatDuracion(minutos: number): string {
+  const h = Math.floor(minutos / 60)
+  const m = Math.round(minutos % 60)
+  if (!h) return `${m} min`
+  return m ? `${h} h ${m} min` : `${h} h`
+}
+
+/** Fecha larga: «2026-11-09» → «Lunes, 9 de noviembre». */
+export function formatLongDate(iso: string): string {
+  const d = new Date(`${iso}T00:00:00Z`)
+  return `${DIAS_LARGOS[d.getUTCDay()]}, ${d.getUTCDate()} de ${MESES_LARGOS[d.getUTCMonth()]}`
+}
+
+/** El nombre de un mes (AAAA-MM o una fecha): «2026-11» → «Noviembre». */
+export function formatMonthName(mes: string): string {
+  const n = MESES_LARGOS[Number(mes.slice(5, 7)) - 1] ?? ''
+  return n.charAt(0).toUpperCase() + n.slice(1)
+}
+
 /** Texto para buscar: sin tildes y en minúsculas («Glúteo» → «gluteo»). */
 export function plainText(text: string): string {
   return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -89,4 +125,9 @@ export function formatInt(value: number): string {
 /** Un rango de números: «6–10», o «15» si los dos son iguales. */
 export function formatRange([a, b]: readonly [number, number]): string {
   return a === b ? String(a) : `${a}–${b}`
+}
+
+/** La letra del día de la semana: «L», «M», «X»… */
+export function letraDia(iso: string): string {
+  return ['D', 'L', 'M', 'X', 'J', 'V', 'S'][new Date(`${iso}T00:00:00Z`).getUTCDay()]
 }

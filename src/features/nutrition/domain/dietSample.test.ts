@@ -1,6 +1,6 @@
 // La dieta de ejemplo con una base inventada para la prueba (la de verdad, en use-cases/diet.test.ts).
 import { describe, expect, it } from 'vitest'
-import { leerDieta } from './diet.ts'
+import { leerDieta } from './dietArchivo.ts'
 import { ALIMENTOS_DEL_EJEMPLO, dietaDeEjemplo } from './dietSample.ts'
 import type { Alimento } from './food.ts'
 

@@ -1,0 +1,257 @@
+/* Tus ollas: la «!», una olla nueva, el aviso pequeño del modo cocina y la lista */
+.info {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  padding: 0;
+  border: var(--hairline) solid var(--label-3);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--label-2);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.info[aria-expanded='true'] {
+  border-color: var(--label);
+  color: var(--label);
+}
+
+.explica {
+  display: block;
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.nueva {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.campos {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.campo {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-body);
+}
+
+.gramos {
+  display: flex;
+  flex: none;
+  align-items: baseline;
+  gap: var(--space-1);
+  width: 7rem;
+}
+
+.gramos input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  text-align: right;
+  outline: none;
+}
+
+.botones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.guardar {
+  height: var(--control);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.guardar:disabled {
+  opacity: 0.4;
+}
+
+.enlace,
+.anadir {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-footnote);
+  cursor: pointer;
+}
+
+.enlace {
+  text-decoration: underline;
+}
+
+.anadir {
+  padding: var(--space-2) 0;
+  font-weight: var(--weight-semibold);
+}
+
+/* El aviso: una línea pequeña, sin borde, como una nota */
+.aviso {
+  display: flex;
+  flex-direction: column;
+  margin: 0 var(--gutter);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+}
+
+.linea {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.linea > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-2);
+}
+
+.texto {
+  flex: 1;
+  min-width: 0;
+  font: var(--text-footnote);
+}
+
+.pesar {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.quitar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label-3);
+  cursor: pointer;
+}
+
+.quitar svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Tus ollas, en Mi plan › Cocina */
+.tus {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.titulo {
+  font: var(--text-headline);
+}
+
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista > li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.olla {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.olla small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+/* «Tus ollas» se pliega y despliega al tocar su título */
+.plegar {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.plegar small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.flecha {
+  display: grid;
+  margin-left: auto;
+  color: var(--label-3);
+  transition: transform var(--duration-tap);
+}
+
+.flecha svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.girada {
+  transform: rotate(180deg);
+}

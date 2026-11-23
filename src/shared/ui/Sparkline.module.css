@@ -1,0 +1,27 @@
+/* Mini-gráfica: una línea fina del color del texto y su último punto. */
+
+.spark {
+  flex: none;
+  width: var(--sparkline-width);
+  height: var(--sparkline-height);
+  overflow: visible;
+}
+
+.linea {
+  fill: none;
+  stroke: var(--label);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.punto {
+  fill: var(--label);
+}
+
+.vacia {
+  stroke: var(--surface-3);
+  stroke-width: 2;
+  stroke-dasharray: 3 4;
+  stroke-linecap: round;
+}

@@ -1,3 +1,4 @@
+import { useLocation } from 'preact-iso'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { CompactBar } from '../../../../shared/ui/CompactBar.tsx'
@@ -12,9 +13,8 @@ import { TuRutinaSheet } from '../../components/TuRutinaSheet.tsx'
 import { RestDayCard } from '../../components/RestDayCard.tsx'
 import { WeekCard } from '../../components/WeekCard.tsx'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
-import { fotosSesion } from '../../state/fotos.ts'
+import { encuadreDe, fotoDeTarjeta } from '../../state/fotos.ts'
 import { EditarRutinaHoja } from '../editar-rutina/EditarRutinaHoja.tsx'
-import { MusculoHoja } from '../musculo/MusculoHoja.tsx'
 import { localDate } from '../../../../shared/lib/format.ts'
 import {
   descansasHoy,
@@ -27,7 +27,7 @@ import {
   tuSemana,
   type Tono,
 } from '../../state/plan.ts'
-import { MUSCLES, type MuscleId } from '../../state/routines.ts'
+import { MUSCLE_IDS, MUSCLES } from '../../state/routines.ts'
 import { consejosEntrenador } from '../../state/entrenador.ts'
 import { aplicarConsejo, cargarEntrenador, dejarConsejo, noMeInteresa } from '../../use-cases/entrenador.ts'
 import { SinPlan } from '../comun/SinPlan.tsx'
@@ -51,13 +51,14 @@ function TuPlan({ siguiente }: { siguiente: number }) {
   const sheet = useSheet('rutina')
   const biblioteca = useSheet('biblioteca')
   const editar = useSheet('editar')
+  // Desde «Tu entrenador», Editar rutina se abre con ese músculo señalado (?hoja=editar&m=hombro_lat)
+  const { query, route } = useLocation()
   // Al bajar, la cabecera grande se va y arriba queda una barra con el título (como en las listas de rutinas)
   const cabecera = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(0)
   const [periodo, setPeriodo] = useState<Periodo>('hoy')
   const [lado, setLado] = useState<'front' | 'back'>('front')
   const [musculo, setMusculo] = useState<string | null>(null)
-  const [ficha, setFicha] = useState<MuscleId | null>(null)
   useEffect(() => {
     void cargarEntrenador()
   }, [])
@@ -124,6 +125,7 @@ function TuPlan({ siguiente }: { siguiente: number }) {
           onAplicar={(c, a) => void aplicarConsejo(c, a)}
           onDejar={(c) => void dejarConsejo(c)}
           onNoMeInteresa={(c) => void noMeInteresa(c)}
+          onEditar={(c) => editar.showWith({ m: c.musculo })}
         />
         <MusclesCard
           periodo={periodo}
@@ -141,7 +143,7 @@ function TuPlan({ siguiente }: { siguiente: number }) {
           names={NOMBRES}
           onFicha={(m) => {
             setMusculo(null)
-            setFicha(m as MuscleId)
+            route(paths.muscle(m))
           }}
         />
       </div>
@@ -155,8 +157,9 @@ function TuPlan({ siguiente }: { siguiente: number }) {
         />
       )}
       {biblioteca.open && <BibliotecaHoja onClose={biblioteca.close} />}
-      {editar.open && <EditarRutinaHoja onClose={editar.close} />}
-      {ficha && <MusculoHoja musculo={ficha} onClose={() => setFicha(null)} />}
+      {editar.open && (
+        <EditarRutinaHoja musculo={MUSCLE_IDS.find((m) => m === query.m) ?? null} onClose={editar.close} />
+      )}
     </>
   )
 }
@@ -185,7 +188,8 @@ function Carrusel(props: { sesiones: Tarjeta[]; visible: number; onVisible: (i: 
               detalle={s.detalle}
               estado={s.estado}
               tono={s.tono}
-              foto={fotosSesion.value[s.sigla] ?? null}
+              foto={fotoDeTarjeta(s.sigla)}
+              encuadre={encuadreDe(s.sigla)}
             />
           </div>
         ))}

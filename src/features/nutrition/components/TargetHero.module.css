@@ -1,57 +1,80 @@
-/* Tu objetivo: tarjeta negra con la etiqueta lima de la fase. */
+/* Tu objetivo, sin tarjeta, sobre el fondo (usuario, 2026-11-15): la fase en una pastilla gris, las kcal con la letra
+   de cifras de la app, los tres macros en columnas (cifra y nombre debajo) y los botones en gris. */
 
 .hero {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--target-hero);
-  color: var(--on-target-hero);
+  gap: var(--space-4);
+  /* Sin tarjeta (usuario, 2026-11-15): directamente sobre el fondo, como la cabecera de la ficha del ejercicio */
+  padding: 0 var(--space-1);
+  color: var(--label);
 }
 
 .chip {
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-chip);
-  background: var(--target-chip);
-  color: var(--on-target-chip);
+  align-self: flex-start;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label-2);
   font: var(--text-caption);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .kcal {
   display: flex;
-  align-items: flex-end;
+  align-items: baseline;
   gap: var(--space-2);
 }
 
 .number {
-  font: var(--text-session-hero);
+  font: var(--text-cifra-grande);
+  font-variant-numeric: tabular-nums;
 }
 
+/* «kcal al día» en una línea, en gris */
 .unit {
-  padding-bottom: var(--space-1);
-  font: var(--text-headline);
-  color: var(--on-target-hero-soft);
+  color: var(--label-2);
+  font: var(--text-subhead);
 }
 
+/* Los macros: tres columnas iguales y centradas, separadas por una raya fina, la cifra arriba y su nombre debajo */
 .macros {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.macros > span {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  font: var(--text-subhead);
-  color: var(--on-target-hero-soft);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: calc(var(--space-1) / 2);
+}
+
+.macros > span + span {
+  border-left: var(--hairline) solid var(--separator);
 }
 
 .macros b {
-  color: var(--on-target-hero);
+  color: var(--label);
+  font: var(--text-headline);
+  font-variant-numeric: tabular-nums;
+}
+
+/* La nota de los hidratos de hoy (usuario, 2026-11-17: aquí, no en Tu día) */
+.detalle {
+  color: var(--label-2);
+  font: var(--text-footnote);
 }
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
   gap: var(--space-2);
 }
 
@@ -59,13 +82,15 @@
 .actions a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
   min-height: var(--tap-min);
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--target-hero-step);
-  color: var(--on-target-hero);
+  background: var(--surface-2);
+  white-space: nowrap;
+  color: var(--label);
   font: var(--text-subhead);
   font-weight: var(--weight-semibold);
   text-decoration: none;

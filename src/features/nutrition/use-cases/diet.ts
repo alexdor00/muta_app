@@ -4,14 +4,14 @@ import { platform } from '../../../shared/platform/index.ts'
 import { addDays } from '../../../shared/lib/format.ts'
 import { logError } from '../../../shared/lib/logger.ts'
 import {
-  aArchivo,
+  ajusteDe,
   dietaNueva,
   FACTOR_ARROZ,
   inicioSi,
-  leerDieta,
   mediaDelTipo,
   recetaDelDia,
   siguienteMenu,
+  type AjusteDieta,
   type Dieta,
   type DietaActiva,
   type Ingrediente,
@@ -19,10 +19,23 @@ import {
   type RecetaDelDia,
   type TipoDia,
 } from '../domain/diet.ts'
+import { aArchivo, leerDieta } from '../domain/dietArchivo.ts'
 import { dietaDesdeCsv } from '../domain/dietCsv.ts'
+import { INSTRUCCIONES_IA_DIETA } from '../domain/dietPrompt.ts'
+import { cambioHaciaObjetivo } from '../domain/dietTarget.ts'
 import { dietaDeEjemplo } from '../domain/dietSample.ts'
 import { buscarAlimentos, COMIDAS, type Alimento, type ComidaId } from '../domain/food.ts'
-import { diaVisto, dias, dieta, hoy, objetivoHoy, propios } from '../state/comida.ts'
+import {
+  ajustes,
+  diaVisto,
+  dias,
+  dieta,
+  entrenosDeLaSemana,
+  hoy,
+  kcalPorTipo,
+  objetivoHoy,
+  propios,
+} from '../state/comida.ts'
 import { anadir, cargarAlimentos, devolver, quitar } from './foodLog.ts'
 import { guardarCambio, guardarDieta } from './nutritionStore.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
@@ -335,3 +348,49 @@ export function renombrarDieta(nombre: string): Promise<void> {
 
 /** El día de mañana (las propuestas aceptadas valen desde mañana, como en Tu objetivo). */
 export const manana = () => addDays(hoy.value, 1)
+
+/**
+ * Al cambiar tu objetivo siguiendo una dieta: sus kcal (media de cada tipo de día), las de tu objetivo y cuánto moverla.
+ * null sin dieta, sin objetivo o si ya coinciden. Solo propone: se aplica con `ajustarAlObjetivo` (regla 10).
+ */
+export function propuestaHaciaObjetivo(): {
+  dieta: Record<TipoDia, number>
+  objetivo: Record<TipoDia, number>
+  cambio: Record<TipoDia, number>
+} | null {
+  const d = dieta.value
+  const a = ajustes.value
+  if (!d || !a) return null
+  const deDieta = {
+    entreno: mediaDelTipo(d, hoy.value, 'entreno').kcal,
+    descanso: mediaDelTipo(d, hoy.value, 'descanso').kcal,
+  }
+  const objetivo = kcalPorTipo(a, hoy.value)
+  // Sin hidratos según el día, tu objetivo es el mismo cada día: se mueve igual toda la dieta (conserva su reparto)
+  const cambio = cambioHaciaObjetivo(deDieta, objetivo, a.onOff ? null : entrenosDeLaSemana(hoy.value))
+  return cambio ? { dieta: deDieta, objetivo, cambio } : null
+}
+
+/** Ajusta tu dieta desde hoy con ese cambio (como una propuesta de la consulta). Devuelve el ajuste, para deshacerlo. */
+export async function ajustarAlObjetivo(cambio: Record<TipoDia, number>): Promise<string | null> {
+  const d = dieta.value
+  if (!d) return null
+  const base = ajusteDe(d, hoy.value)
+  const ajuste: AjusteDieta = {
+    ...base,
+    id: nuevoId(),
+    desde: hoy.value,
+    kcal: { entreno: base.kcal.entreno + cambio.entreno, descanso: base.kcal.descanso + cambio.descanso },
+  }
+  await guardarDieta({ ...d, ajustes: [...d.ajustes, ajuste] })
+  return ajuste.id
+}
+
+/** Deshace un ajuste de tu dieta (vuelve como estaba). */
+export async function quitarAjuste(id: string): Promise<void> {
+  const d = dieta.value
+  if (d) await guardarDieta({ ...d, ajustes: d.ajustes.filter((x) => x.id !== id) })
+}
+
+/** «Copiar instrucciones para una IA»: el texto que pasa cualquier dieta al CSV de MUTA (dice si se pudo copiar). */
+export const copiarInstruccionesIA = () => platform.copy(INSTRUCCIONES_IA_DIETA)

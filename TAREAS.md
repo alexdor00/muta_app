@@ -4,10 +4,32 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Tarea actual
 
-- **Siguiente: aprobar dos propuestas** (PNG en el escritorio): `MUTA-Hoy-propuesta.png` (Hoy solo con lo de hoy, el
-  «¿Cómo estás hoy?» y pasos) y `MUTA-Frecuencia-propuesta.png` (tu ciclo de 7, 9 o 14 días en Editar rutina). Con su visto
-  bueno, rama `pantalla/hoy` y después la frecuencia. Lo que falta de la guía está en
-  [04](docs/conocimiento/04-guia-culturismo-natural.md) §14 (Hoy y Progreso: check diario y perímetros).
+- **Plan de Nutrición, programado** (usuario, 2026-11-18: «programa todo»; misma rama, sin commit): Plan con «Qué comes» y
+  «Cuándo cocinas», un solo botón arriba, Tu dieta (por días o según el entreno), un menú y sus comidas (nombre, hora,
+  qué días, en todos los menús), un día (menú, tipo, libre), «Cómo se cocina» en el plato, «Cocinas para N personas»,
+  alimentos que no quieres y lo leído al cargar un CSV; **sin congelador**. Falta: probarlo en el móvil con tu dieta; las
+  comidas siguen siendo 4 huecos con nombre y hora (más de 4 comidas separadas cambiaría el modelo: a decidir).
+- **Nutrición como el Word del rediseño** (`Desktop/MUTA-Nutricion-Rediseno/word`, usuario 2026-11-17; misma rama, sin
+  commit). Falta probarlo en el móvil; 44 «¿Cómo voy?» pasa a Pendiente (8). Descartados (usuario, 2026-11-23): el
+  aspecto nuevo de 38, 39, 47 y 48 (ya funcionan), la tira de días de 46 y apuntar con foto o voz (16). Hecho además (usuario, 2026-11-17): **algo más en el menú** (otro plato, una
+  fruta, un yogur, un café… en cualquier comida), «¿Cómo sueles comer?» (repartido, desayuno, comida o cena fuerte), cocinar solo una receta de la tanda, la hoja de una comida y la cantidad más limpias (cifras en una tarjeta, «Volver» a Añadir; cerrar el escáner vuelve a Añadir), **Organizar la semana como una dieta** y **cualquier dieta en CSV, exacta** (ciclo de cualquier largo, «¿cuántas veces a la semana cocinas?», calendario que se toca) y, en tu día, sin «Mañana · Desayuno»: arriba, una tarjeta con foto el
+  día que cocinas o compras (`HoyToca`).
+- **Probar Progreso mes a mes en un móvil real** (rama `pantalla/progreso`, sin commit aún) con `npm run dev` y tus datos
+  (o `/dev/demo`): el mes con ‹ ›, su etapa y sus cifras; Días y la pantalla de cada día; Cuerpo (la foto partida, la tira de
+  meses, «Ver tu cambio», tus medidas y la composición); Fuerza (tus básicos, cada grupo y la hoja de un ejercicio); las
+  fotos del mes con la cámara y su guía (necesita https o `localhost`; por la wifi, la galería); el modo oscuro. Después,
+  commit y PR a `main` detrás de `pantalla/recetas`.
+- **Probar Hoy en un móvil real** (hecho el 2026-11-13 en la misma rama, sin commit): tu día con el anillo, «Te queda» y
+  «Hecho», ¿Cómo estás hoy?, los pasos, marcar la compra y cocinar, y el día completo. Al hacer el commit, separar Hoy en su
+  rama `pantalla/hoy` si se quiere un cambio por rama.
+- **Probar «Tu semana, resuelta» en un móvil real** (hecho el 2026-11-13, misma rama, sin commit; `/dev/demo` la trae):
+  organizar la semana en Tu plan (la compra el día que elijas; cocinar en tus descansos o tus días), la compra con tu
+  despensa, el modo cocina (una receta cada vez, el temporizador, los tápers y «Hecho») y lo de Hoy (la compra, la tanda,
+  tus tápers y pasar a hoy la tanda que no hiciste; sin congelador desde el 2026-11-18). Cada comida en táper, con la carne al momento o
+  al momento (pantalla «Al momento»). Con el recetario de verdad, mirar que «Pesa en
+  crudo» pase a crudo el arroz y la pasta.
+- **Siguiente: aprobar la propuesta de la frecuencia** (`MUTA-Frecuencia-propuesta.png`: tu ciclo de 7, 9 o 14 días en
+  Editar rutina). Lo que falta de la guía está en [04](docs/conocimiento/04-guia-culturismo-natural.md) §14.
 - **Probar Recetas y Menú en un móvil real** (rama `pantalla/recetas`, sale de `pantalla/comida-v2`) con `npm run dev`:
   el recetario con sus fotos, ajustar un plato a lo que falta (y cuando no llega), cuadrar el día, tu producto, tu menú,
   cuándo cocinar, lo de hoy, la compra del menú, los avisos al calendario (.ics) y tu nutricionista. Después, PR a `main`
@@ -19,13 +41,67 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 - **Probar la rama `pantalla/sesion` en un móvil real** con `npm run dev` (dirección «Network», mismo wifi): Tu plan (tarjetas
   con «▶ Empezar», «Editar», Tu semana, Hoy descansas), Editar rutina, la sesión (teclado, dropsets, notas), Ver sesión y las
   fichas. Hasta ahora todo se ha visto solo en el móvil simulado. Después, PR a `main` con la CI en verde.
-- **Entreno y Comida están hechas.** Siguiente área: **Hoy** (luego Progreso). Primero el PNG con sus funcionalidades y las
-  capturas del prototipo que le corresponden, y esperar a que se apruebe (regla de CLAUDE.md); después, su rama `pantalla/hoy`.
-  Hoy ya lleva tu peso y lo de hoy (de Comida, por su `index.ts`); el resto, con su diseño.
 - **Unir `pantalla/estilo-blanco-negro` a `main`**: comprobada (check y e2e en verde, 2026-11-05) y subida; `main` solo acepta
   PR. Abrir el PR en https://github.com/alexdor00/muta_app/compare/main...pantalla/estilo-blanco-negro y unirlo con la CI en verde.
 
 ## Hecho
+
+- **El entrenador de tu objetivo y la cocina, a fondo** (2026-11-21/22; misma rama, sin commit): la revisión semanal
+  como un entrenador (cintura y perímetros, cómo estás, fines de semana, fuerza, proteína, déficit, ritmo > 1,2 %, una
+  semana sola no basta, fase final por grasa, salir al llegar a tu objetivo, pausa si se atraganta, semanas que quedan y
+  tu última definición; datos de Progreso con `cuerpoParaComida`); la recarga de hidratos solo los días que entrenas,
+  contada por sesiones hechas, con «Empezar / Ahora no / Terminar / Deshacer», a mano en «Cambiar objetivo» y su «R» en
+  Progreso, sin revisar ni aprender el gasto durante ella y 2 semanas después; el modo cocina desde cualquier plato
+  (Cocinar, una receta y Hoy cocinas), raciones de más, pasos en tarjeta y justificados, una ración con sus cifras,
+  pesar lo cocinado (todo mezclado o cada cosa aparte) con tus ollas, sus macros por 100 g y lo que aprende de cada
+  receta; «···» en Nutrición (recetas, compra, cocinar); Vitest otra vez en marcha (`pool: 'vmThreads'`); la comida
+  rápida de 7 cadenas (121 productos de FatSecret España, «aproximado»; `scripts/foods-rapida.cjs`). La revisión semanal como un informe corto (estado, titular, cifras y una recomendación) y los consejos en una frase (2026-11-23); pruebas de los casos de uso de tu objetivo y de las ollas, y arreglado: un menú con platos solo de descanso no salía en tu día.
+  Verificado: `npm run check` (pruebas incluidas) y e2e.
+
+- **Nutrición, casi todo como el Word del rediseño** (2026-11-17, naranja solo para logros, sin agua): Hoy con el día
+  redondo (racha y «Mañana · Desayuno»); Añadir (13–14) y la cantidad con favoritos (15); Tu semana con la tira L–D,
+  cambiar un plato solo ese día o en todo el menú, Tus menús, «Proponme un menú» y Organizar en dos pasos (17–22); la compra
+  con Lista · En casa (la despensa, ahora con pantalla) y «¿Compra hecha?» (23–26); Recetas con filtros, guardadas, la
+  categoría y la receta nueva (27–31); Cocinar con su centro, el modo cocina en tres pasos con temporizador, la comida al
+  momento, de crudo a cocinado y cómo pesar (32–40); Tu objetivo con «Cambiar objetivo», «Cómo se calcula» e historial
+  en su pantalla (41–43); y la dieta: sin dieta y su cabecera (45–46). Las pastillas Semana · Compra · Objetivo se quedan
+  (con el aspecto del Word) y Hoy sigue con su carrusel.
+
+- **Editar rutina, más sencilla** (2026-11-14, propuesta `Desktop/MUTA-Editar-rutina-propuesta.png`): tres hojas con el
+  mismo patrón (lista en tarjeta, asa ≡, deslizar para quitar con «Deshacer», «‹» arriba). Tu semana en una lista con
+  sesiones y descansos que se mueven con el dedo; el «+» añade un día de entrenamiento (sesión vacía) o de descanso; la
+  rotación sigue tu orden. La sesión con su foto de cabecera; el ejercicio con todo en − / + y «Más opciones» plegado.
+- **Tu semana, resuelta** (2026-11-13): el piloto automático de compra y cocina (propuesta
+  `Desktop/MUTA-Piloto-automatico-propuesta.png`). En Tu plan, la tarjeta con tus 7 días y la hoja para elegir (la compra
+  el día que decides; cocinar en tus descansos —cambian con tu rutina—, en tus días o sin tandas; qué va en táper); la
+  compra «Tu semana» (lo que falta con tu despensa); tu despensa; el modo cocina (`/comida/tanda/:fecha`); en Hoy, la
+  compra, la tanda, tus tápers (el círculo los apunta), «Saca del congelador» y pasar a hoy la tanda que no hiciste
+  («Aplicar» / «Ahora no»). Recordatorios queda para qué avisar. Ver decisiones.
+
+- 2026-11-13 (rama `pantalla/progreso`): **Hoy** (propuesta 2 aprobada): solo lo que te queda por hacer hoy. Tu día en una
+  tarjeta negra con el anillo continuo, «Faltan N tareas» y tu racha; «Te queda» y «Hecho» con pésate, ¿Cómo estás hoy? (nuevo: sueño,
+  energía, hambre, digestiones y estrés; se ve en el día de Progreso), el entreno con su foto, come, pasos (nuevo), la compra y
+  cocinar (se marcan a mano), la consulta y las medidas del mes el día que tocan. Cada área da sus cosas por su `paraHoy.ts`.
+  El perfil de prueba trae pasos y sensaciones. La ficha del ejercicio ya no cambia el descanso (se ve en su cabecera).
+
+- 2026-11-12 (rama `pantalla/progreso`): **Tarjetas que flotan y una sola escala de letra en toda la app** (propuesta
+  «tarjetas»): fondo gris claro y tarjetas blancas con sombra; títulos, textos y cifras con un solo tipo por papel y más
+  contenidos; la tarjeta de las calorías como la de la captura; el día y el mes encima de su tarjeta. «Tu entrenador» de
+  Entreno, plegado y con «Cambiarlo en Editar rutina».
+- 2026-11-10 (rama `pantalla/progreso`): **Progreso con todo lo del prototipo anterior** (`Desktop/prueba`), sin propuesta
+  por orden del usuario: pestañas Cuerpo · Comida · Entreno; siete medidas con su historial y cómo medir, «Medidas y fotos»
+  cada mes, composición (Marina, calibración, FFMI, objetivo de grasa y evolución), fotos (antes y ahora), recuperación de tus
+  consultas y, después, **mes a mes en una pantalla** (2026-11-11): el mes con su etapa (en una hoja) y Días · Cuerpo (fotos comparadas con
+  otro mes y «Ver tu cambio») · Fuerza; en Hoy, lo que toca cada semana y cada mes; mesociclos (en curso y archivados,
+  detalle con Constancia —con su calendario—, Músculos y Rutina plegada con su foto, renombrar, empezar otro con su balance
+  según la guía, volver a usar una rutina y comparar) y récords del básico de cada grupo. En Nutrición, cambiar tu objetivo
+  siguiendo una dieta propone ajustarla. Ver [decisiones](docs/decisiones.md) (2026-11-10).
+
+- 2026-11-09 (rama `pantalla/progreso`, sale de `pantalla/recetas`): **Progreso**, sin PNG previo por orden del usuario:
+  tu peso (tendencia por periodos y ritmo frente al previsto), tus medidas (brazo, pecho, cintura y muslo, con «Medirme»),
+  la semana de comida (frente al objetivo de cada día, proteína por días), tus entrenos (semana, racha, 8 semanas) y tu
+  fuerza (básicos y marcas del último mes). Ver [decisiones](docs/decisiones.md) y
+  [src/features/progress/CLAUDE.md](src/features/progress/CLAUDE.md).
 
 - 2026-11-09 (rama `pantalla/recetas`): cierre: los Word de `docs/` salen de git (se habían colado en `723bfc1`) y se
   ignoran (`docs/*.docx`, `~$*`).
@@ -188,13 +264,21 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Pendiente (por prioridad)
 
-1. Hoy y Progreso, en ese orden (cada una con su PNG aprobado antes).
-2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión y la sesión ya dicen «Sugerido»).
+1. Hoy (con su PNG aprobado antes). Progreso, hecho (2026-11-09).
+2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión, la sesión y Progreso ya dicen «Sugerido»).
 3. Coach: usar las elecciones guardadas (prioridades, puntos débiles) y `adaptVolume`.
 4. Importar/exportar copia de seguridad en CSV/JSON desde Perfil.
 5. Fotos de categoría y miniaturas de ejercicio.
 6. Quitar el número de días del nombre de otras rutinas (Esencial, Frecuencia alta, PPL, Vuelta al gimnasio) si se quiere el
    mismo criterio que en Powerbuilding.
+7. Progreso › Cuerpo: tarjeta «Lo que comes» (usuario, 2026-11-22; PNG antes de programar), debajo del peso. Dos vistas:
+   **Días** (el mes que ves: una barra por día con lo que comiste y una línea con tu objetivo de ese día; la «R» en los de
+   recarga; vacíos los días sin apuntar) y **Semanas** (una barra por semana con la media diaria y, debajo, cuánto cambió
+   tu peso esa semana: «Sem 14–20 nov · 2.310 kcal de media · −0,4 kg»). Arriba, «2.340 kcal de media este mes · objetivo
+   2.350 · −1,6 kg». Barras en gris y negro; verde solo en la cifra del peso si baja; nada en rojo.
+8. Nutrición · 44 «¿Cómo voy?» del Word del rediseño (usuario, 2026-11-23): tu semana con sus medias, una barra por día,
+   el peso y tu punto flojo. PNG antes de programar; el punto flojo no sale de ningún documento (regla a decidir) y se
+   pisa con la 7: decidir si van las dos.
 
 ## Dudas abiertas
 

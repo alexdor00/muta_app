@@ -1,0 +1,31 @@
+/* ¿Cómo estás hoy? (hoja de Hoy): una tarjeta por pregunta, la pregunta arriba y sus tres respuestas debajo. */
+.preguntas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pregunta {
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.pregunta legend {
+  padding: 0 var(--space-1);
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+/* Las respuestas, las tres del mismo ancho */
+.pregunta fieldset > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Cada respuesta en una línea («Menos de 6 h») */
+.pregunta label {
+  padding: 0 var(--space-1);
+  white-space: nowrap;
+}

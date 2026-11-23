@@ -15,12 +15,50 @@
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--surface);
-  color: var(--label-2);
+  color: var(--label-3);
   font: var(--text-caption);
   font-weight: var(--weight-semibold);
 }
 
+/* El que hay: su color olímpico; el que no, blanco y apagado */
 .on {
-  background: var(--label);
-  color: var(--bg);
+  background: var(--plate-bg);
+  box-shadow: inset 0 0 0 var(--hairline) var(--separator);
+  color: var(--plate-fg);
+}
+
+/* Cada disco con su color olímpico (tokens.css: --plate-*) */
+[data-kg='25'] {
+  --plate-bg: var(--plate-25);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='20'] {
+  --plate-bg: var(--plate-20);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='15'] {
+  --plate-bg: var(--plate-15);
+  --plate-fg: var(--plate-on-light);
+}
+
+[data-kg='10'] {
+  --plate-bg: var(--plate-10);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='5'] {
+  --plate-bg: var(--plate-5);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='2.5'] {
+  --plate-bg: var(--plate-2-5);
+  --plate-fg: var(--plate-on-dark);
+}
+
+[data-kg='1.25'] {
+  --plate-bg: var(--plate-1-25);
+  --plate-fg: var(--plate-on-light);
 }

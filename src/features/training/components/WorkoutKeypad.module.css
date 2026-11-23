@@ -53,13 +53,14 @@
   align-items: center;
 }
 
+/* El tiempo, como el de arriba y el de la tarjeta del descanso; el rótulo, como la pauta (usuario, 2026-11-14) */
 .restText b {
-  font: var(--text-session-value);
+  font: var(--text-cifra-barra);
   font-variant-numeric: tabular-nums;
 }
 
 .restText small {
-  font: var(--text-footnote);
+  font: var(--text-subhead);
   color: var(--label-2);
 }
 
@@ -110,4 +111,18 @@
 .go {
   background: var(--accent);
   color: var(--on-accent);
+}
+
+/* El tiempo del descanso es un botón que lo para o lo sigue */
+.restPausar {
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.restParado b {
+  opacity: 0.55;
 }

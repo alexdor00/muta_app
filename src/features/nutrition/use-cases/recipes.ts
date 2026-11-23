@@ -1,5 +1,6 @@
 // Las recetas: cargar el recetario (el tuyo de private/ o, si no hay, los platos de ejemplo), apuntar un plato (tal cual
 // o ajustado), tus platos, cambiar un ingrediente (tu marca u otro alimento equivalente) y poner un plato en tu dieta.
+import { platform } from '../../../shared/platform/index.ts'
 import { getDb } from '../../../shared/data/db.ts'
 import { localRecipePhoto, readLocalRecipes } from '../../../shared/data/localRecipes.ts'
 import { logError } from '../../../shared/lib/logger.ts'
@@ -13,15 +14,16 @@ import {
   claveDelDia,
   ingredienteDe,
   leerRecetario,
-  platoDeReceta,
   platoEditado,
   platoTuyo,
+  type DatosDeReceta,
   productosVacios,
   type CambioIngrediente,
   type IngredientePlato,
   type Plato,
   type Productos,
 } from '../domain/recipes.ts'
+import { platoDeReceta } from '../domain/dietaAMenus.ts'
 import { dias, diaVisto } from '../state/comida.ts'
 import { recetaComoToca, recetaPorId } from '../state/dieta.ts'
 import {
@@ -29,12 +31,14 @@ import {
   fotos,
   menu,
   platosTuyos,
+  recetasGuardadas,
   productos,
   recetario,
   totalDePlato,
 } from '../state/recetas.ts'
 import { guardarReceta } from './diet.ts'
 import { anadir, cargarAlimentos, quitar } from './foodLog.ts'
+import { cargarFotosDePlatos } from './recipePhotos.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
 
 export const ID_PLATOS = 'platos-tuyos'
@@ -44,6 +48,34 @@ export const ID_PRODUCTOS = 'productos'
 let carga: Promise<void> | null = null
 
 /** Carga los platos, tu menú y tus productos (una vez por visita). */
+export const ID_GUARDADAS = 'recetas-guardadas'
+
+/** Guarda una receta (el marcador) o la quita. Devuelve si queda guardada. */
+export async function alternarRecetaGuardada(id: string): Promise<boolean> {
+  const ya = recetasGuardadas.value.includes(id)
+  recetasGuardadas.value = ya
+    ? recetasGuardadas.value.filter((x) => x !== id)
+    : [...recetasGuardadas.value, id]
+  await (
+    await getDb()
+  ).put('userContent', {
+    id: ID_GUARDADAS,
+    target: 'nutricion',
+    platos: recetasGuardadas.value,
+  })
+  return !ya
+}
+
+/** Comparte una receta como texto (ingredientes y pasos): al móvil o, si no se puede, copiada. */
+export function compartirReceta(p: Plato): Promise<'shared' | 'copied' | 'none'> {
+  const ingredientes = p.ingredientes.map((i) => `· ${i.texto}`).join('\n')
+  const pasos = p.pasos.map((x, k) => `${k + 1}. ${x}`).join('\n')
+  return platform.share(
+    p.nombre,
+    [p.nombre, '', ingredientes, pasos && `\n${pasos}`].filter(Boolean).join('\n'),
+  )
+}
+
 export function cargarRecetas(): Promise<void> {
   carga ??= (async () => {
     estadoRecetas.value = 'cargando'
@@ -51,12 +83,16 @@ export function cargarRecetas(): Promise<void> {
     void cargarAlimentos()
     try {
       const db = await getDb()
-      const [tuyos, guardado, mios, local] = await Promise.all([
+      // La despensa se quitó (usuario, 2026-11-21: «bórrala para siempre»): lo que quedara guardado, fuera
+      void db.delete('userContent', 'despensa')
+      const [tuyos, guardado, mios, local, marcadas] = await Promise.all([
         db.get('userContent', ID_PLATOS) as Promise<{ platos: Plato[] } | undefined>,
         db.get('userContent', ID_MENU),
         db.get('userContent', ID_PRODUCTOS) as Promise<Productos | undefined>,
         readLocalRecipes(),
+        db.get('userContent', ID_GUARDADAS) as Promise<{ platos?: string[] } | undefined>,
       ])
+      recetasGuardadas.value = Array.isArray(marcadas?.platos) ? marcadas.platos : []
       platosTuyos.value = tuyos?.platos ?? []
       menu.value = leerMenu(guardado)
       productos.value = mios ? { ...productosVacios(), ...mios } : null
@@ -78,6 +114,8 @@ export function cargarRecetas(): Promise<void> {
           platos: ejemplo ? ejemplo.recetas.map(platoDeReceta) : [],
         }
       }
+      // Tus fotos encima de las del recetario
+      await cargarFotosDePlatos()
     } catch (error) {
       logError(error, 'cargar las recetas')
       carga = null
@@ -159,6 +197,7 @@ export async function crearPlato(
   nombre: string,
   ingredientes: readonly { alimento: Alimento; gramos: number }[],
   pasos: string[] = [],
+  datos: DatosDeReceta = {},
 ): Promise<string | null> {
   const n = nombre.trim()
   if (!n || !ingredientes.length) return null
@@ -167,6 +206,7 @@ export async function crearPlato(
     n,
     ingredientes.map((i) => ingredienteDe(i.alimento, i.gramos)),
     pasos,
+    datos,
   )
   await guardarTuyos([...platosTuyos.value, p])
   return p.id

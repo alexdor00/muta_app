@@ -1,0 +1,203 @@
+/* Consejos numerados y su tarjeta plegada: «Consejos para esta sesión», «Tu entrenador» y «Tu nutricionista» */
+
+.count {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.tips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* El número pegado a su texto: su columna mide lo justo para «02» y todos los textos empiezan en el mismo sitio */
+.tip {
+  display: grid;
+  grid-template-columns: calc(var(--space-6) + var(--space-1)) 1fr;
+  gap: var(--space-2);
+}
+
+/* 1, 2, 3… sin cero delante, pequeños y en un circulito gris (usuario, 2026-11-19) */
+.number {
+  display: grid;
+  place-items: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+.tipText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* El consejo, en negro: 15 seminegrita (como los títulos de las fichas) */
+.text {
+  font: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+.why {
+  font: var(--text-body);
+  color: var(--label-2);
+}
+
+.fix {
+  align-self: flex-start;
+  min-height: var(--control-sm);
+  margin-top: var(--space-2);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--label);
+  color: var(--on-accent);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+/* Los botones de un consejo del entrenador: en fila, el principal negro, los demás gris y el enlace en texto */
+.pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pie .fix {
+  margin-top: var(--space-2);
+}
+
+.fixSecundario {
+  min-height: var(--control-sm);
+  margin-top: var(--space-2);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+/* En la misma fila que los botones, a su derecha (usuario, 2026-11-14) */
+.fixEnlace {
+  min-height: var(--control-sm);
+  margin-top: var(--space-1);
+  padding: 0;
+  text-align: left;
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-subhead);
+  cursor: pointer;
+}
+
+.done {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.done svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Ver sesión */
+.card {
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.card[open],
+.abierta {
+  padding-bottom: var(--space-4);
+}
+
+/* Plegado: una fila que se toca para abrir */
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--control-lg);
+  font: var(--text-headline);
+  list-style: none;
+  cursor: pointer;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.card[open] .summary svg,
+.abierta .summary svg {
+  transform: rotate(180deg);
+}
+
+.card .tips {
+  margin-top: var(--space-2);
+}
+
+/* La tarjeta plegada con su cabecera: «TU ENTRENADOR» y a su derecha «1 consejo» */
+.titulo {
+  font: inherit;
+}
+
+/* La fila del título es un botón: sin el aspecto de botón */
+.toggle {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+}
+
+.foot {
+  margin-top: var(--space-5);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* La cabecera, igual que la de Músculos: «TU ENTRENADOR» y a su derecha «1 consejo» */
+.cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.eyebrow {
+  font: var(--text-caption);
+  color: var(--label-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.resumen {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  color: var(--label);
+}

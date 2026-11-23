@@ -1,0 +1,275 @@
+/* Crear tu receta: la foto, el nombre, sus datos, lo que aporta y sus ingredientes y pasos */
+.hoja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.nombre {
+  width: 100%;
+  padding: var(--space-1) 0;
+  border: 0;
+  border-bottom: var(--border) solid var(--label);
+  background: none;
+  color: var(--label);
+  font: var(--text-titulo-pantalla);
+}
+
+.datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.dato {
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+.nota {
+  margin: var(--space-1) var(--space-1) 0;
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista > li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.fila svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.filaNombre {
+  flex: 1;
+  min-width: 0;
+}
+
+.gramos {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.gramos input,
+.minutos input {
+  width: 4em;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-align: right;
+}
+
+.buscar {
+  margin-top: var(--space-2);
+}
+
+.paso {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.numero {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+.pasoTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.pasoTexto textarea {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  resize: none;
+}
+
+.minutos {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.asa {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label-3);
+  touch-action: none;
+  cursor: grab;
+}
+
+.asa svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.levantada {
+  opacity: 0.6;
+}
+
+.anadir {
+  font-weight: var(--weight-semibold);
+}
+
+/* A pantalla completa, encima de todo (como una hoja, pero entera): arriba «Cancelar · Tu receta», abajo «Guardar» */
+.pantalla {
+  position: fixed;
+  inset: 0;
+  z-index: 15; /* encima de las pestañas, debajo de las hojas (el escáner) */
+  overflow-y: auto;
+  margin: 0 auto;
+  max-width: var(--app-max-width);
+  padding: 0 var(--gutter) calc(var(--control-lg) + var(--space-10) + var(--safe-bottom));
+  background: var(--bg);
+}
+
+.cabeza {
+  display: grid;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin: 0 calc(-1 * var(--gutter)) var(--space-3);
+  padding: var(--space-4) var(--gutter) var(--space-3);
+  background: var(--bg);
+}
+
+.cabeza h1 {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.cancelar {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-body);
+  cursor: pointer;
+}
+
+.abajo {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+  max-width: var(--app-max-width);
+  padding: var(--space-3) var(--gutter) calc(var(--space-4) + var(--safe-bottom));
+  border-top: var(--hairline) solid var(--separator);
+  background: var(--bg);
+  transform: translateX(-50%);
+}
+
+.abajo > * {
+  width: 100%;
+}
+
+/* La unidad de un ingrediente (g, ml o «huevos»), al lado de su cantidad */
+.unidad {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+.buscarFila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.buscarFila .buscar {
+  flex: 1;
+  margin-top: 0;
+}
+
+.escanear {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control);
+  height: var(--control);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.escanear svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'preact/hooks'
 import { ChevronLeftIcon } from './icons.tsx'
 import { RoundButton } from './RoundButton.tsx'
 import styles from './CompactBar.module.css'
+import { useVolver } from './useVolver.ts'
 
 type Props = {
   title: string
@@ -16,6 +17,8 @@ type Props = {
 
 /** Barra fija arriba que aparece al bajar, cuando la cabecera grande ya no se ve. */
 export function CompactBar({ title, backHref, action, watch }: Props) {
+  // «‹»: a la pantalla de la que vienes (o a `backHref` si entraste directamente)
+  const atras = useVolver(backHref ?? '/')
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -32,7 +35,7 @@ export function CompactBar({ title, backHref, action, watch }: Props) {
   return (
     <div class={`${styles.bar} ${visible ? styles.visible : ''}`} aria-hidden={!visible} inert={!visible}>
       {backHref ? (
-        <RoundButton label="Volver" href={backHref} variant="plain">
+        <RoundButton label="Volver" onClick={atras} variant="plain">
           <ChevronLeftIcon />
         </RoundButton>
       ) : (

@@ -133,6 +133,7 @@
   background: var(--surface);
   color: var(--label);
   text-decoration: none;
+  box-shadow: var(--card-shadow);
 }
 
 .tarjetaFoto {

@@ -1,5 +1,5 @@
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
-import { TipList, type ConsejoVisto } from './SessionTips.tsx'
+import { TipList, type ConsejoVisto } from '../../../shared/ui/Consejos.tsx'
 import styles from './CoachSheet.module.css'
 
 /**

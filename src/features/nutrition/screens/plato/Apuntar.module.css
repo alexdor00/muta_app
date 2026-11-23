@@ -1,0 +1,76 @@
+/* Apuntar una receta: hoy o en un menú, con sus rótulos */
+.hoja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.rotulo {
+  margin: 0 var(--space-1) var(--space-2);
+  color: var(--label-2);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.letras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.letra {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.nota {
+  margin: 0 var(--space-1);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-align: left;
+}
+
+/* Una fila que se toca (Cambiar por): su icono en un círculo, el texto y la flecha */
+.opcionFila {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.opcionFila > svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  color: var(--label-3);
+}
+
+.icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.icono svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.quitar {
+  color: var(--critical-label);
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
 import { paths } from '../../../../shared/lib/paths.ts'
+import { Button } from '../../../../shared/ui/Button.tsx'
 import { BookmarkIcon, InfoIcon } from '../../../../shared/ui/icons.tsx'
 import { PhotoCard } from '../../../../shared/ui/PhotoCard.tsx'
 import { RoundButton } from '../../../../shared/ui/RoundButton.tsx'
@@ -10,7 +11,12 @@ import { useSheet } from '../../../../shared/ui/useSheet.ts'
 import { CsvRoutineCard, CsvRoutineSheet } from '../../components/CsvRoutine.tsx'
 import { RoutineAbout } from '../../components/RoutineAbout.tsx'
 import { aboutOf, countLabel, routines, type About } from '../../state/routines.ts'
-import { empezarRutinaCsv, PLANTILLA_CSV, vistaCsv } from '../../use-cases/importRoutine.ts'
+import {
+  copiarInstruccionesRutina,
+  empezarRutinaCsv,
+  PLANTILLA_CSV,
+  vistaCsv,
+} from '../../use-cases/importRoutine.ts'
 import { loadRoutines } from '../../use-cases/loadRoutines.ts'
 import styles from './ElegirRutinaScreen.module.css'
 
@@ -88,21 +94,29 @@ export function ElegirRutinaScreen() {
       {state.featured && (
         <section class={styles.section} aria-label="Para ti">
           <h2 class={styles.sectionTitle}>Para ti</h2>
-          <div class={styles.list}>
+          {/* La recomendada, como «Tu objetivo, listo» de la bienvenida: tarjeta blanca con su foto, sus datos y un botón
+              (usuario, 2026-11-17: el mismo estilo que los pasos) */}
+          <div class={styles.recomendada}>
             <PhotoCard
               title={state.featured.entry.title}
-              subtitle={`${state.featured.lines[0]} · ${state.featured.lines[1]}`}
+              subtitle=""
               tone={state.featured.entry.tone}
               badge={state.featured.entry.id === state.currentId ? 'Tu rutina' : 'Recomendada'}
               onClick={() => route(paths.routineDetail(state.featured!.entry.id))}
               action={infoButton(state.featured.entry.title, aboutOf(state.featured.entry))}
             />
+            <ul class={styles.datos}>
+              {state.featured.lines.map((l) => (
+                <li key={l}>{l}</li>
+              ))}
+            </ul>
+            <Button href={paths.routineDetail(state.featured.entry.id)}>Ver esta rutina</Button>
           </div>
         </section>
       )}
 
       <section class={styles.section} aria-label="Tipos de entrenamiento">
-        <h2 class={styles.sectionTitle}>Tipos de entrenamiento</h2>
+        <h2 class={styles.sectionTitle}>O elige otro tipo</h2>
         <div class={styles.list}>
           {state.categories.map(({ category, count, forYou }) => (
             <PhotoCard
@@ -120,6 +134,7 @@ export function ElegirRutinaScreen() {
       <section class={styles.section} aria-label="Tu propia rutina">
         <CsvRoutineCard
           plantilla={PLANTILLA_CSV}
+          onCopiar={copiarInstruccionesRutina}
           onArchivo={(nombre, texto) => setCsv({ nombre, vista: vistaCsv(texto) })}
         />
       </section>

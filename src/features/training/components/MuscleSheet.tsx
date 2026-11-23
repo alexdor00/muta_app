@@ -1,11 +1,11 @@
 import type { ComponentChildren } from 'preact'
 import { ChoiceSegmented } from '../../../shared/ui/Choice.tsx'
 import { ChevronDownIcon, ChevronRightIcon, MinusIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
-import { Sheet } from '../../../shared/ui/Sheet.tsx'
-import { TipList, type ConsejoVisto } from './SessionTips.tsx'
+import { TipList, type ConsejoVisto } from '../../../shared/ui/Consejos.tsx'
+import { FichaCabecera } from './ExerciseFicha.tsx'
 import styles from './MuscleSheet.module.css'
 
-// Ficha del músculo (A17–A21 del prototipo anterior): el rango en una barra recta con el punto naranja de tu plan
+// Ficha del músculo (A17–A21 del prototipo anterior): el rango en una barra recta con el punto negro de tu plan
 // (decisión 2026-11-03), y dos pestañas, Resumen y Consejos. Sin énfasis: lo usa el coach, que aún no está.
 
 /** Sin `href` (no está en la biblioteca), la fila no lleva a ninguna ficha. */
@@ -35,12 +35,11 @@ type Props<M extends string> = {
   consejos: { clave: string; tips: ConsejoVisto[]; donde: string | null } | null
   /** «Añadir un ejercicio» de este músculo a una sesión de tu plan (sin plan, no sale). */
   onAnadir?: () => void
-  onClose: () => void
 }
 
 const N = 3
 
-/** La barra del rango: tu rango en negro, sus números debajo, y lo que hace tu plan como punto naranja. */
+/** La barra del rango: tu rango en negro, sus números debajo, y lo que hace tu plan como punto negro. */
 function RangeBar(p: { series: number; rango: [number, number]; max: number; veredicto: string }) {
   const pct = (v: number) => `${(Math.min(Math.max(v, 0), p.max) / p.max) * 100}%`
   const [lo, hi] = p.rango
@@ -119,7 +118,8 @@ function Plegable(p: { titulo: string; children: ComponentChildren }) {
 export function MuscleSheet<M extends string>(p: Props<M>) {
   const tips = p.consejos?.tips ?? []
   return (
-    <Sheet title={p.titulo} onClose={p.onClose} large>
+    <>
+      <FichaCabecera nombre={p.titulo} musculos={[]} pauta={[]} />
       {p.hermanos && (
         <div class={styles.siblings} role="group" aria-label="Hombro">
           {p.hermanos.map((h) => (
@@ -139,6 +139,7 @@ export function MuscleSheet<M extends string>(p: Props<M>) {
       {p.consejos && (
         <div class={styles.tabs}>
           <ChoiceSegmented
+            grande
             name="pestana-musculo"
             legend="Secciones"
             options={[
@@ -197,9 +198,6 @@ export function MuscleSheet<M extends string>(p: Props<M>) {
                 </div>
               ))}
             </div>
-            <p class={styles.note}>
-              Se guarda solo. Para volver al recomendado, toca una de las tres opciones.
-            </p>
           </details>
           <h3 class={styles.label}>Dónde lo entrenas</h3>
           {p.directos.length ? (
@@ -251,6 +249,6 @@ export function MuscleSheet<M extends string>(p: Props<M>) {
           )}
         </>
       )}
-    </Sheet>
+    </>
   )
 }

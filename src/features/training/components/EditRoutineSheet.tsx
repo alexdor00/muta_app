@@ -1,15 +1,7 @@
-import { useRef, useState } from 'preact/hooks'
-import { Button } from '../../../shared/ui/Button.tsx'
-import {
-  CameraIcon,
-  ChatIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  GripIcon,
-  PencilIcon,
-  PlusIcon,
-} from '../../../shared/ui/icons.tsx'
+import { useState } from 'preact/hooks'
+import { CameraIcon, PencilIcon, PlusIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
+import { EditList, FilaAnadir } from './EditList.tsx'
 import styles from './EditRoutineSheet.module.css'
 
 export type FilaEditar = {
@@ -20,52 +12,37 @@ export type FilaEditar = {
   nota: string | null
   /** En superserie: el primero, uno de en medio o el último (null si va solo). */
   superserie: 'inicio' | 'medio' | 'fin' | null
+  /** Desde «Tu entrenador»: entrena ese músculo (su nombre, o null). */
+  marca?: string | null
 }
 
 /**
- * Editar rutina (A11), una sesión: «‹ Tu semana» para volver, su foto, su nombre (el lápiz lo cambia), los consejos del
- * entrenador en una fila que abre su hoja y sus ejercicios (tocar uno lo edita; su asa, o las flechas sobre ella, lo mueve).
- * «Añadir ejercicio» y volver esta sesión a la original.
+ * Editar rutina, una sesión: «‹ Tu semana» arriba; su nombre (el lápiz lo cambia, la cámara pone su foto) y sus cifras;
+ * sus ejercicios en la lista de Editar rutina (tocar uno lo edita, el asa lo
+ * mueve, deslizar lo quita) con «Añadir ejercicio» al final; y volver esta sesión a la original.
  */
 export function EditRoutineSheet(props: {
   /** El nombre de la sesión («Torso 1»). */
   nombre: string
-  /** «‹ Tu semana»: vuelve a la lista de la semana. */
+  /** «8 ejercicios · 20 series · 65 min». */
+  detalle: string
+  /** Si la sesión tiene foto tuya (la cámara dice «Cambiar» o «Poner»). */
+  fotoPropia: boolean
   onSemana: () => void
-  foto: string | null
   onFoto: () => void
   onRenombrar: (nombre: string) => void
-  /** Cuántos consejos tiene el entrenador para esta sesión (0: no sale la fila). */
-  consejos: number
-  onConsejos: () => void
+  /** Desde «Tu entrenador»: qué tocar en esta sesión (null si no lleva ese músculo o se abre desde «Tu rutina»). */
+  guia?: string | null
   filas: FilaEditar[]
   onAbrir: (i: number) => void
   onMover: (de: number, a: number) => void
+  onQuitar: (i: number) => void
   onAnadir: () => void
   onVolver: () => void
   onClose: () => void
 }) {
-  const lista = useRef<HTMLOListElement>(null)
-  const [arrastre, setArrastre] = useState<{ de: number; a: number } | null>(null)
   const [renombrando, setRenombrando] = useState<string | null>(null)
   const nombre = props.nombre
-
-  // Mientras se arrastra, la lista se ve ya con el ejercicio en su sitio nuevo
-  const orden = props.filas.map((_, i) => i)
-  if (arrastre) {
-    const [x] = orden.splice(arrastre.de, 1)
-    orden.splice(arrastre.a, 0, x)
-  }
-
-  const puestoEn = (y: number) => {
-    const filas = [...(lista.current?.children ?? [])]
-    const i = filas.findIndex((f) => {
-      const r = f.getBoundingClientRect()
-      return y < r.top + r.height / 2
-    })
-    return i < 0 ? filas.length - 1 : i
-  }
-
   const guardarNombre = () => {
     if (renombrando !== null && renombrando.trim() && renombrando.trim() !== nombre)
       props.onRenombrar(renombrando.trim())
@@ -73,21 +50,15 @@ export function EditRoutineSheet(props: {
   }
 
   return (
-    <Sheet title="Editar rutina" onClose={props.onClose} large>
-      <button type="button" class={styles.back} onClick={props.onSemana}>
-        <ChevronLeftIcon />
-        Tu semana
-      </button>
-
-      <div class={styles.head}>
-        <button
-          type="button"
-          class={styles.thumb}
-          aria-label={props.foto ? `Cambiar la foto de ${nombre}` : `Añadir una foto a ${nombre}`}
-          onClick={props.onFoto}
-        >
-          {props.foto ? <img src={props.foto} alt="" /> : <CameraIcon />}
-        </button>
+    <Sheet
+      alta
+      title="Editar rutina"
+      onClose={props.onClose}
+      large
+      atras={{ label: 'Tu semana', onClick: props.onSemana }}
+    >
+      {/* Su nombre (el lápiz lo cambia), la cámara para su foto y sus cifras; sin foto grande ni consejos */}
+      <div class={styles.cabecera}>
         {renombrando !== null ? (
           <input
             class={styles.nameInput}
@@ -103,81 +74,47 @@ export function EditRoutineSheet(props: {
             }}
           />
         ) : (
-          <>
+          <div class={styles.nombreFila}>
             <h3 class={styles.title}>{nombre}</h3>
             <button
               type="button"
-              class={styles.rename}
+              class={styles.icono}
               aria-label={`Cambiar el nombre de ${nombre}`}
               onClick={() => setRenombrando(nombre)}
             >
               <PencilIcon />
             </button>
-          </>
-        )}
-      </div>
-
-      {props.consejos > 0 && (
-        <button type="button" class={styles.coach} onClick={props.onConsejos}>
-          <ChatIcon />
-          <span>
-            {props.consejos === 1 ? '1 consejo del entrenador' : `${props.consejos} consejos del entrenador`}
-          </span>
-          <ChevronRightIcon />
-        </button>
-      )}
-
-      <ol ref={lista} class={styles.list} aria-label={`Ejercicios de ${nombre}`}>
-        {orden.map((i) => {
-          const f = props.filas[i]
-          return (
-            <li
-              key={f.nombre}
-              class={`${arrastre?.de === i ? styles.lifted : ''} ${f.superserie ? styles.joined : ''}`}
+            <button
+              type="button"
+              class={styles.icono}
+              aria-label={props.fotoPropia ? `Cambiar la foto de ${nombre}` : `Poner una foto a ${nombre}`}
+              onClick={props.onFoto}
             >
-              <button type="button" class={styles.row} onClick={() => props.onAbrir(i)}>
-                {f.superserie === 'inicio' && <span class={styles.ssLabel}>Superserie</span>}
-                <span class={styles.name}>{f.nombre}</span>
-                <span class={styles.detail}>{f.detalle}</span>
-                {f.nota && <span class={styles.note}>{f.nota}</span>}
-              </button>
-              <button
-                type="button"
-                class={styles.handle}
-                aria-label={`Mover ${f.nombre}`}
-                onPointerDown={(e) => {
-                  e.currentTarget.setPointerCapture(e.pointerId)
-                  setArrastre({ de: i, a: i })
-                }}
-                onPointerMove={(e) => {
-                  if (arrastre) setArrastre({ ...arrastre, a: puestoEn(e.clientY) })
-                }}
-                onPointerUp={() => {
-                  if (arrastre && arrastre.a !== arrastre.de) props.onMover(arrastre.de, arrastre.a)
-                  setArrastre(null)
-                }}
-                onPointerCancel={() => setArrastre(null)}
-                onKeyDown={(e) => {
-                  const a = e.key === 'ArrowUp' ? i - 1 : e.key === 'ArrowDown' ? i + 1 : null
-                  if (a === null || a < 0 || a >= props.filas.length) return
-                  e.preventDefault()
-                  props.onMover(i, a)
-                }}
-              >
-                <GripIcon />
-              </button>
-            </li>
-          )
-        })}
-      </ol>
-      <div class={styles.add}>
-        <Button onClick={props.onAnadir}>
-          <span class={styles.addLabel}>
-            <PlusIcon />
-            Añadir ejercicio
-          </span>
-        </Button>
+              <CameraIcon />
+            </button>
+          </div>
+        )}
+        <p class={styles.cifras}>{props.detalle}</p>
       </div>
+
+      {props.guia && <p class={styles.guia}>{props.guia}</p>}
+
+      <EditList
+        etiqueta={`Ejercicios de ${nombre}`}
+        onMover={props.onMover}
+        filas={props.filas.map((f, i) => ({
+          key: f.nombre,
+          insignia: i + 1,
+          titulo: f.nombre,
+          detalle: f.detalle,
+          nota: f.nota,
+          unida: f.superserie,
+          marca: f.marca ? `Entrena ${f.marca.toLowerCase()} · toca para cambiar sus series` : null,
+          onAbrir: () => props.onAbrir(i),
+          quitar: { ariaLabel: `Quitar ${f.nombre}`, onQuitar: () => props.onQuitar(i) },
+        }))}
+        pie={<FilaAnadir texto="Añadir ejercicio" icono={<PlusIcon />} onClick={props.onAnadir} />}
+      />
       <button type="button" class={styles.restore} onClick={props.onVolver}>
         Volver esta sesión a la original
       </button>

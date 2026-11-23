@@ -8,6 +8,7 @@ import {
   PlusIcon,
   ShareIcon,
 } from '../../../shared/ui/icons.tsx'
+import { TrophyIcon } from '../../../shared/ui/iconosHoy.tsx'
 import { RoundButton } from '../../../shared/ui/RoundButton.tsx'
 import styles from './WorkoutSummary.module.css'
 
@@ -25,9 +26,12 @@ type Props = {
   cifras: { valor: string; unidad: string; nombre: string }[]
   /** «3 de 4 suben». */
   suben: string
+  /** Los récords de hoy (tu mejor marca de siempre): ejercicio y la serie («100 kg × 8»). */
+  records: { nombre: string; marca: string }[]
   ejercicios: {
     nombre: string
-    series: { texto: string; mejor: boolean }[]
+    /** Cada serie de hoy, la misma de la vez anterior (null si no la hubo) y cómo queda: 1 mejor, 0 igual, −1 peor. */
+    series: { texto: string; antes: string | null; frente: -1 | 0 | 1 | null }[]
     /** Frente a la vez anterior: subió el peso, más reps, bajó o igual (null sin vez anterior). */
     cambio: { texto: string; tipo: 'kg' | 'reps' | 'baja' | 'igual' } | null
   }[]
@@ -58,7 +62,8 @@ export function WorkoutSummary(props: Props) {
 
       <section class={styles.week} aria-label="Tu racha">
         <p class={styles.weekText}>
-          <span class={styles.flame}>
+          {/* Un solo naranja por pantalla: con récords, la racha sin color (usuario, 2026-11-20) */}
+          <span class={`${styles.flame} ${props.records.length ? styles.sinColor : ''}`}>
             <FlameIcon />
           </span>
           <b>{props.racha}</b> {props.racha === 1 ? 'día' : 'días'} de racha · {props.semanaTexto}
@@ -73,6 +78,25 @@ export function WorkoutSummary(props: Props) {
         </ol>
       </section>
 
+      {props.records.length > 0 && (
+        <section class={styles.records} aria-labelledby="records">
+          <h2 id="records" class={styles.recordsHead}>
+            <span class={styles.trofeo}>
+              <TrophyIcon />
+            </span>
+            {props.records.length} {props.records.length === 1 ? 'récord hoy' : 'récords hoy'}
+          </h2>
+          <ul class={styles.recordsList}>
+            {props.records.map((x) => (
+              <li key={x.nombre}>
+                <span>{x.nombre}</span>
+                <b>{x.marca}</b>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <ul class={styles.tiles}>
         {props.cifras.map((c) => (
           <li key={c.nombre} class={styles.tile}>
@@ -85,7 +109,7 @@ export function WorkoutSummary(props: Props) {
         ))}
       </ul>
 
-      <section aria-labelledby="frente">
+      <section class={styles.compare} aria-labelledby="frente">
         <div class={styles.listHead}>
           <h2 id="frente">Frente a la última vez</h2>
           <span>{props.suben}</span>
@@ -93,19 +117,47 @@ export function WorkoutSummary(props: Props) {
         <ul class={styles.list}>
           {props.ejercicios.map((e) => (
             <li key={e.nombre} class={styles.row}>
-              <div class={styles.rowText}>
-                <p class={styles.name}>{e.nombre}</p>
-                <p class={styles.sets}>
+              <p class={styles.name}>{e.nombre}</p>
+              <table class={styles.tabla} aria-label={e.nombre}>
+                <thead>
+                  <tr>
+                    <th scope="col">Serie</th>
+                    <th scope="col">Hoy</th>
+                    <th scope="col">Sesión anterior</th>
+                    <th scope="col">
+                      <span class={styles.hidden}>Cómo queda</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
                   {e.series.map((s, j) => (
-                    <span key={j} class={s.mejor ? styles.better : ''}>
-                      {s.mejor && '★ '}
-                      {s.texto}
-                    </span>
+                    <tr key={j} class={s.frente === 1 ? styles.mejora : ''}>
+                      <td class={styles.num}>{j + 1}</td>
+                      <td class={styles.hoy}>{s.texto}</td>
+                      <td class={styles.antes}>{s.antes ?? '—'}</td>
+                      <td class={styles.marca}>
+                        {s.frente === 1 ? (
+                          <>
+                            <ArrowUpIcon />
+                            <span class={styles.hidden}>mejor</span>
+                          </>
+                        ) : s.frente === -1 ? (
+                          <>
+                            <ArrowDownIcon />
+                            <span class={styles.hidden}>peor</span>
+                          </>
+                        ) : s.frente === 0 ? (
+                          '='
+                        ) : (
+                          ''
+                        )}
+                      </td>
+                    </tr>
                   ))}
-                </p>
-              </div>
+                </tbody>
+              </table>
               {e.cambio && (
-                <span class={`${styles.change} ${styles[e.cambio.tipo]}`}>
+                <p class={`${styles.change} ${styles[e.cambio.tipo]}`}>
                   <span class={styles.sign}>
                     {e.cambio.tipo === 'kg' && <ArrowUpIcon />}
                     {e.cambio.tipo === 'reps' && <PlusIcon />}
@@ -113,7 +165,7 @@ export function WorkoutSummary(props: Props) {
                     {e.cambio.tipo === 'igual' && '='}
                   </span>
                   {e.cambio.texto}
-                </span>
+                </p>
               )}
             </li>
           ))}

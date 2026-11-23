@@ -8,6 +8,8 @@ import type { Revision } from '../domain/consult.ts'
 import type { DietaActiva } from '../domain/diet.ts'
 import type { Alimento, Apunte } from '../domain/food.ts'
 import { fuerzaEnBasicos, rendimientoReciente, tiposDeDia } from '../../training/index.ts'
+import { cuerpoParaComida } from '../../progress/index.ts'
+import { ritmoSemanal } from '../domain/weight.ts'
 import { tituloCambio } from '../domain/review.ts'
 import {
   ajustes,
@@ -16,18 +18,18 @@ import {
   dias,
   dieta,
   estado,
-  fuerzaBasicos,
-  rendimientoComida,
   guardadas,
   hoy,
+  pasosDias,
   pesajes,
   propios,
-  revisionDeHoy,
+  serie,
   tiposEntreno,
   type Ajustes,
   type Cambio,
   type ComidaGuardada,
 } from '../state/comida.ts'
+import { cuerpoProgreso, fuerzaBasicos, rendimientoComida, revisionDeHoy } from '../state/entrenador.ts'
 import { compra, consultas, revisiones, type Compra, type Consulta } from '../state/dieta.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
 
@@ -40,11 +42,20 @@ export const ID_COMPRA = 'compra'
 export const REVISION = 'checkin'
 /** Tipo de los pesajes en `bodyLog`. */
 export const PESO = 'weight'
+/** Tipo de tus pasos de un día en `bodyLog` (se apuntan en Hoy). */
+export const PASOS_TIPO = 'steps'
 /** Cada cuántos días revisa el entrenador. */
 const CADA = 7
 
 type DiaGuardado = { date: string; apuntes: Apunte[]; createdAt: string; updatedAt: string }
 type PesajeGuardado = { date: string; type: typeof PESO; kg: number; createdAt: string; updatedAt: string }
+type PasosGuardados = {
+  date: string
+  type: typeof PASOS_TIPO
+  pasos: number
+  createdAt: string
+  updatedAt: string
+}
 type RevisionGuardada = Revision & {
   date: string
   type: typeof REVISION
@@ -62,7 +73,7 @@ export function cargarComida(): Promise<void> {
       hoy.value = localDate()
       diaVisto.value = hoy.value
       const desde = addDays(hoy.value, -35)
-      const [a, log, cuerpo, coach, mios, comidas, activa, lista, checkins] = await Promise.all([
+      const [a, log, cuerpo, coach, mios, comidas, activa, lista, checkins, pasos] = await Promise.all([
         db.get('userContent', ID_AJUSTES) as Promise<Ajustes | undefined>,
         db.getAll('foodLog', IDBKeyRange.lowerBound(desde)) as Promise<DiaGuardado[]>,
         db.getAllFromIndex('bodyLog', 'type', PESO) as Promise<PesajeGuardado[]>,
@@ -72,10 +83,12 @@ export function cargarComida(): Promise<void> {
         db.get('userContent', ID_DIETA) as Promise<DietaActiva | undefined>,
         db.get('userContent', ID_COMPRA) as Promise<Compra | undefined>,
         db.getAllFromIndex('bodyLog', 'type', REVISION) as Promise<RevisionGuardada[]>,
+        db.getAllFromIndex('bodyLog', 'type', PASOS_TIPO) as Promise<PasosGuardados[]>,
       ])
       ajustes.value = a ?? null
       dias.value = Object.fromEntries(log.map((d) => [d.date, d.apuntes]))
       pesajes.value = cuerpo.map((p) => ({ date: p.date, kg: p.kg }))
+      pasosDias.value = Object.fromEntries(pasos.map((p) => [p.date, p.pasos]))
       cambios.value = coach.filter((c) => c.area === 'nutricion')
       consultas.value = (coach as unknown[] as Consulta[]).filter((c) => c.area === 'dieta')
       dieta.value = activa ? { ...activa, originales: activa.originales ?? {} } : null
@@ -98,7 +111,7 @@ export function cargarComida(): Promise<void> {
       propios.value = mios?.alimentos ?? []
       guardadas.value = comidas?.comidas ?? []
       // Sin esperar: la pantalla se pinta ya. La revisión semanal va detrás, cuando se sepa tu fuerza (en volumen la mira)
-      void cargarFuerza()
+      void Promise.all([cargarFuerza(), cargarCuerpo()])
         .then(() => revisarSemana())
         .catch((error: unknown) => logError(error, 'revisar la semana'))
     } catch (error) {
@@ -118,6 +131,25 @@ async function cargarFuerza(): Promise<void> {
     if (ajustes.value?.fase === 'definicion') rendimientoComida.value = await rendimientoReciente(hoy.value)
   } catch (error) {
     logError(error, 'leer tu fuerza en los básicos')
+  }
+}
+
+/**
+ * Lo de tu cuerpo que guarda Progreso (usuario, 2026-11-22): tus perímetros, cómo estás y tu grasa con tu objetivo, para
+ * que la revisión decida como un entrenador.
+ */
+export async function cargarCuerpo(): Promise<void> {
+  const a = ajustes.value
+  if (!a) return
+  try {
+    cuerpoProgreso.value = await cuerpoParaComida({
+      sexo: a.cuerpo.sexo,
+      alturaCm: a.cuerpo.alturaCm,
+      pesoKg: serie.value.at(-1)?.tendencia ?? a.cuerpo.pesoKg,
+      ritmoPct: ritmoSemanal(serie.value, hoy.value)?.pctSemana ?? null,
+    })
+  } catch (error) {
+    logError(error, 'leer tus medidas y cómo estás')
   }
 }
 
@@ -157,9 +189,32 @@ async function revisarSemana(): Promise<void> {
   }
 }
 
-export async function guardarAjustes(a: Ajustes): Promise<void> {
+export async function guardarAjustes(nuevo: Ajustes): Promise<void> {
+  const a = conLaDefinicion(ajustes.value, nuevo)
   ajustes.value = a
   await (await getDb()).put('userContent', a)
+}
+
+/**
+ * Al cambiar de fase (usuario, 2026-11-22): al empezar una, tus kcal de entonces; al dejar una definición, cómo fue (de qué
+ * kcal a cuáles, cuánto duró y si se atragantó), para la siguiente.
+ */
+function conLaDefinicion(previo: Ajustes | null, a: Ajustes): Ajustes {
+  if (!previo || previo.fase === a.fase) return a
+  // Al deshacer, lo que se guardó de antes manda
+  const deshaciendo = a.kcalAlEmpezar !== previo.kcalAlEmpezar
+  const conInicio = deshaciendo ? a : { ...a, kcalAlEmpezar: a.kcal }
+  if (deshaciendo) return a
+  if (previo.fase !== 'definicion') return conInicio
+  return {
+    ...conInicio,
+    ultimaDefinicion: {
+      desde: previo.faseDesde ?? previo.creado,
+      hasta: hoy.value,
+      kcalInicio: previo.kcalAlEmpezar ?? null,
+      kcalFinal: previo.kcal,
+    },
+  }
 }
 
 /** Guarda un cambio nuevo en el historial. */
@@ -208,6 +263,22 @@ export async function apuntarPeso(kg: number, date = hoy.value): Promise<void> {
   await db.put('bodyLog', fila)
 }
 
+/** Apunta tus pasos de un día (si ya había, los cambia). */
+export async function apuntarPasos(pasos: number, date = hoy.value): Promise<void> {
+  pasosDias.value = { ...pasosDias.value, [date]: pasos }
+  const db = await getDb()
+  const antes = (await db.get('bodyLog', [date, PASOS_TIPO])) as PasosGuardados | undefined
+  const at = new Date().toISOString()
+  const fila: PasosGuardados = {
+    date,
+    type: PASOS_TIPO,
+    pasos,
+    createdAt: antes?.createdAt ?? at,
+    updatedAt: at,
+  }
+  await db.put('bodyLog', fila)
+}
+
 export async function guardarPropios(alimentos: Alimento[]): Promise<void> {
   propios.value = alimentos
   await (await getDb()).put('userContent', { id: ID_PROPIOS, target: 'nutricion', alimentos })
@@ -219,13 +290,21 @@ export async function guardarGuardadas(comidas: ComidaGuardada[]): Promise<void>
 }
 
 /** Qué días son de entreno según tu rutina (4 semanas atrás y 3 adelante: la consulta, el menú y la compra). */
-export async function cargarTipos(): Promise<void> {
-  try {
-    tiposEntreno.value = await tiposDeDia(hoy.value, addDays(hoy.value, -28), 49)
-  } catch (error) {
-    logError(error, 'leer tus días de entreno')
-  }
+let tipos: Promise<void> | null = null
+
+export function cargarTipos(): Promise<void> {
+  tipos = (async () => {
+    try {
+      tiposEntreno.value = await tiposDeDia(hoy.value, addDays(hoy.value, -28), 49)
+    } catch (error) {
+      logError(error, 'leer tus días de entreno')
+    }
+  })()
+  return tipos
 }
+
+/** Espera a tus días de entreno (tu semana resuelta cocina en tus descansos). */
+export const tiposLeidos = () => tipos ?? Promise.resolve()
 
 export async function guardarDieta(activa: DietaActiva | null): Promise<void> {
   dieta.value = activa

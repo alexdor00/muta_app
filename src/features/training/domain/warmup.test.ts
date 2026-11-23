@@ -10,6 +10,9 @@ const base: EjercicioACalentar = {
   salto: 2.5,
 }
 
+/** La rampa de un básico de femoral con esos kilos, como si fuera el primero. */
+const rampaDe = (kilos: number) => planCalentamiento([{ ...base, kilos }])[0]
+
 describe('rampa', () => {
   it('básico de músculo grande con 30 kg o más: 50 % × 8, 70 % × 5, 85 % × 3', () => {
     expect(rampa(base)).toEqual([
@@ -38,19 +41,26 @@ describe('planCalentamiento', () => {
     ])
   })
 
-  it('solo calienta el primer ejercicio de cada músculo, contando los secundarios', () => {
+  it('el aislamiento de un músculo ya calentado no calienta; el básico sí, y el secundario no cuenta', () => {
     const plan = planCalentamiento([
       { ...base, secundarios: ['gluteo'] },
       { ...base, musculo: 'femoral', compuesto: false, kilos: 40 },
-      { ...base, musculo: 'gluteo', kilos: 80 },
+      { ...base, musculo: 'gluteo', compuesto: false, kilos: 80 },
       { ...base, musculo: 'pecho', kilos: 24, salto: 2 },
     ])
+    // Femoral ya calentó: el aislamiento no repite
     expect(plan[1]).toBeNull()
-    expect(plan[2]).toBeNull()
+    // Glúteo solo trabajó como secundario: calienta en su ejercicio
+    expect(plan[2]).not.toBeNull()
     expect(plan[3]).toEqual([
       { kilos: 12, reps: 10 },
       { kilos: 18, reps: 5 },
     ])
+  })
+
+  it('un básico de un músculo que ya calentó lleva su rampa completa', () => {
+    const plan = planCalentamiento([base, { ...base, kilos: 80 }])
+    expect(plan[1]).toEqual(rampaDe(80))
   })
 
   it('quita los kilos que salen 0, repetidos o iguales al peso de trabajo, y sin peso no hay plan', () => {

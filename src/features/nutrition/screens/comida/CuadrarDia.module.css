@@ -1,0 +1,46 @@
+/* Cuadrar tu día (usuario, 2026-11-19: «hazlo más bonito»): lo que te queda en grande y las comidas como en Mi plan. */
+.queda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  text-align: center;
+}
+
+.etiqueta {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.kcal {
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.kcal b {
+  color: var(--label);
+  font: var(--text-cifra);
+}
+
+.macros {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.para {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.lista {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}

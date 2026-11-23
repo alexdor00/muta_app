@@ -16,6 +16,13 @@ export type Alimento = {
   servingLabel: string
   /** Su código de barras, si lo escaneaste (solo los tuyos). */
   codigo?: string
+  /**
+   * Sus valores son de una ración, no de 100 g (comida rápida de cadenas: se sabe lo que aporta, no lo que pesa;
+   * usuario, 2026-11-21). Se guarda con `servingG: 100` y se apunta solo en raciones.
+   */
+  porRacion?: boolean
+  /** Cifras de una tabla de terceros (FatSecret España, comida de cadenas): se dicen «aproximadas» (usuario, 2026-11-21). */
+  aproximado?: boolean
 }
 
 export type Macros = { kcal: number; protein: number; carbs: number; fat: number }
@@ -103,9 +110,55 @@ export function gramosDe(alimento: Alimento, cantidad: number, modo: Modo): numb
   return modo === 'racion' ? cantidad * alimento.servingG : cantidad
 }
 
-/** Lo que suma o resta cada toque de − / +: media ración o 10 g. */
-export function pasoDe(modo: Modo): number {
-  return modo === 'racion' ? 0.5 : 10
+/**
+ * Lo que se cuenta por piezas (usuario, 2026-11-21: «1 huevo, 2 huevos»): de una en una; lo demás, por medias raciones.
+ * Solo cambia cómo se cuenta; el peso de cada una es el de la base (`servingG`).
+ */
+const POR_PIEZAS =
+  /^(unidad|huevo|filete|rebanada|galleta|loncha|pieza|barrita|pincho|biscote|tostada|diente|mazorca|hoja|tallo|yema|clara|tortita|bocadillo|onza|pastilla|sobre|bolsita|lata|botella|brik|tarrina|vaso|taza|copa|chupito|cucharada|cucharadita|bola|cuña|trozo|tajada|bolsa|torta|bloque|racimo|base|pizza|tupper)\b/i
+
+export const porPiezas = (alimento: Pick<Alimento, 'servingLabel'>) => POR_PIEZAS.test(alimento.servingLabel)
+
+/** Lo que suma o resta cada toque de − / +: una pieza, media ración o 10 g. */
+export function pasoDe(modo: Modo, alimento?: Pick<Alimento, 'servingLabel'>): number {
+  if (modo === 'gramos') return 10
+  return alimento && porPiezas(alimento) ? 1 : 0.5
+}
+
+/**
+ * Lo que se bebe va en mililitros (usuario, 2026-11-21): bebidas, leches, zumos, caldos y lo que se sirve en vaso o botella.
+ * La base va por 100 g y se cuenta 1 ml como 1 g (en líquidos de este tipo, casi exacto); el aceite y la leche en polvo o condensada siguen en gramos.
+ */
+export function unidadDe(alimento: Pick<Alimento, 'name' | 'category' | 'servingLabel'>): 'ml' | 'g' {
+  if (/aceite|polvo|condensada/i.test(alimento.name)) return 'g'
+  return alimento.category === 'Bebidas' ||
+    /^(leche|bebida|zumo|caldo|batido|agua|refresco|kéfir|horchata|gazpacho|salmorejo|consomé)/i.test(
+      alimento.name,
+    ) ||
+    /^(vaso|botella|brik|copa|chupito|caña)/i.test(alimento.servingLabel)
+    ? 'ml'
+    : 'g'
+}
+
+/** Una palabra en plural: «huevo» → «huevos», «ración» → «raciones», «unidad» → «unidades», «pequeña» → «pequeñas». */
+function plural(p: string): string {
+  if (p.length < 2 || p === 'de') return p
+  if (/[aeiouáéó]$/i.test(p)) return `${p}s`
+  if (/z$/i.test(p)) return `${p.slice(0, -1)}ces`
+  if (/s$/i.test(p)) return p
+  const sinTilde = p.replace(/[áéíóú](?=[nls]$)/, (v) => 'aeiou'['áéíóú'.indexOf(v)])
+  return `${sinTilde}es`
+}
+
+/**
+ * Cómo se dice una cantidad de raciones: «1 huevo L», «2 huevos L», «1,5 raciones», «3 rebanadas». Si la ración ya lleva
+ * un número o es «medio/media» («2 onzas», «media pizza»), «2 × media pizza».
+ */
+export function nombreRacion(alimento: Pick<Alimento, 'servingLabel'>, n: number): string {
+  const label = alimento.servingLabel
+  const cifra = String(n).replace('.', ',')
+  if (/\d|^medi[oa]\b/i.test(label)) return `${cifra} × ${label}`
+  return `${cifra} ${n === 1 ? label : label.split(' ').map(plural).join(' ')}`
 }
 
 /** Al cambiar de raciones a gramos (o al revés), la misma cantidad: en raciones, al cuarto más cercano. */
@@ -116,6 +169,7 @@ export function cantidadAlCambiar(alimento: Alimento, cantidad: number, a: Modo)
 
 /** Se apunta en gramos lo que se pesa (ración de 100 g o escrita en gramos); el resto, en raciones. */
 export function modoInicial(alimento: Alimento): Modo {
+  if (alimento.porRacion) return 'racion'
   return alimento.servingG === 100 || /^\d+([.,]\d+)?\s*g\b/i.test(alimento.servingLabel)
     ? 'gramos'
     : 'racion'

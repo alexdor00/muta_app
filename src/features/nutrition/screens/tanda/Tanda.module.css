@@ -1,0 +1,409 @@
+/* El modo cocina: la tanda arriba, en negro, con sus pasos; una tarjeta por paso y los botones abajo. */
+.cabeza {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--target-hero);
+  color: var(--on-target-hero);
+  box-shadow: var(--float-shadow);
+}
+
+.cuando {
+  margin: 0;
+  font: var(--text-footnote);
+  color: var(--on-target-hero-soft);
+}
+
+.titulo {
+  margin: 0;
+  font: var(--text-titulo-seccion);
+}
+
+.titulo::first-letter {
+  text-transform: uppercase;
+}
+
+/* Una raya por paso: hechos en blanco, el de ahora a medias */
+.pasos {
+  display: flex;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pasos li {
+  flex: 1;
+  height: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.pasos li.hecho {
+  background: var(--label);
+}
+
+.pasos li.ahora {
+  background: var(--label-2);
+}
+
+/* Dónde vas en el modo cocina (sin tarjeta) */
+.progreso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.progresoTexto {
+  margin: 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: center;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ingrediente {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+  font: var(--text-body);
+}
+
+.ingrediente:first-child {
+  border-top: 0;
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.receta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Los pasos de la receta: el número a la izquierda y el texto justificado (sin hueco a la derecha); se tachan al tocarlos */
+.paso {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  text-align: justify; /* justificado, como en un Word (usuario, 2026-11-22) */
+  hyphens: auto;
+  cursor: pointer;
+}
+
+.paso > span:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.paso > span:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.numero {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+}
+
+.numero svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Una línea fina une los números (línea de tiempo) */
+.lista > li:has(> .paso) {
+  position: relative;
+}
+
+.lista > li:has(> .paso):not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--space-2) + var(--icon));
+  bottom: calc(var(--space-2) * -1);
+  left: calc(var(--icon) / 2);
+  width: var(--hairline);
+  background: var(--separator);
+}
+
+.pasoHecho {
+  color: var(--label-2);
+  text-decoration: line-through;
+}
+
+.pasoHecho .numero {
+  background: var(--surface-2);
+  color: var(--label);
+}
+
+.nota {
+  color: var(--on-target-hero-soft);
+}
+
+.nota {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* Los tápers, uno debajo de otro */
+.tapers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.taper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--hairline) solid var(--separator);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-subhead);
+}
+
+.etiqueta {
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-transform: uppercase;
+}
+
+.botones {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.botones > * {
+  flex: 1;
+}
+
+.sinHacer {
+  align-self: center;
+  min-height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label-2);
+  font: var(--text-subhead);
+  cursor: pointer;
+}
+
+/* La receta en el modo cocina: la foto grande con su nombre encima y, debajo, ingredientes y pasos con aire */
+.recetaCard {
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+/* La foto, arriba de la tarjeta de borde a borde (sin oscurecer) */
+.portada {
+  aspect-ratio: 16 / 10;
+  background: var(--surface-2);
+}
+
+.portada img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* El nombre y su detalle, debajo de la foto */
+.portadaTexto {
+  padding: var(--space-4) var(--space-5) 0;
+}
+
+.recetaNombre {
+  margin: 0;
+  font: var(--text-titulo-seccion);
+}
+
+/* Su detalle, en píldoras («Merienda», «hoy», «10 min») */
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.etiquetas li {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+}
+
+.recetaCuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+}
+
+.recetaNota {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-body);
+  text-align: left;
+  hyphens: manual;
+}
+
+.apartado {
+  margin: var(--space-2) 0 0;
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Los ingredientes, en baldosas de dos en dos: sus gramos grandes (la letra de las cifras) y su nombre */
+.ingredientes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ingrediente2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+  hyphens: manual;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.gramos {
+  font: var(--text-headline);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.gramos small {
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+}
+
+.ingNombre {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.alGusto {
+  margin: 0;
+  font: var(--text-body);
+  color: var(--label-2);
+}
+
+/* El carrusel, pegado a la barra de arriba (sin el hueco de la página) */
+.carruselCaja {
+  margin-top: calc(var(--gap-block) * -1 + var(--space-1));
+}
+
+/* Tus comidas de hoy: un carrusel de fotos que se desliza (como el de tu rutina en Entreno) y sus puntos */
+.carrusel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.diapositiva {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+
+.puntos {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.punto {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--separator);
+}
+
+.puntoAqui {
+  width: var(--space-5);
+  background: var(--label);
+}
+
+/* Una tarjeta del carrusel con su botón justo debajo */
+.conBoton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Lo que se cuece: sus gramos son en crudo (lo que va a la olla) */
+.enCrudo {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+/* Con los puntos debajo (el carrusel de días): sin subir sobre lo de encima, y los puntos con aire arriba */
+.puntosDebajo {
+  margin-top: 0;
+}
+
+.puntosDebajo .puntos {
+  margin: var(--space-3) 0 0;
+}

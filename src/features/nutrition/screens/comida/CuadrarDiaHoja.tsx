@@ -1,8 +1,8 @@
 import { useState } from 'preact/hooks'
-import { paths } from '../../../../shared/lib/paths.ts'
+import { formatInt } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
-import { PlatoFila } from '../../components/Platos.tsx'
+import { FilaComida } from '../../components/FilaComida.tsx'
 import { diaVisto, objetivoDia, totalDia, type ComidaId } from '../../state/comida.ts'
 import {
   comidasQueQuedan,
@@ -11,12 +11,17 @@ import {
   grasaDeMas,
   fotos,
   mejoresPara,
-  platos,
+  horaDeComida,
+  menu,
+  nombreDeComida,
+  platosQueQuieres,
   repartir,
+  repartoActual,
 } from '../../state/recetas.ts'
 import { apuntarPlato, desapuntar } from '../../use-cases/recipes.ts'
 import { Comparacion } from '../comun/Comparacion.tsx'
-import { comidaDe, macrosCortos } from '../comun/platos.ts'
+import { comidaDe } from '../comun/platos.ts'
+import styles from './CuadrarDia.module.css'
 import type { Aviso } from '../comun/useAviso.ts'
 import h from '../comun/Hojas.module.css'
 
@@ -40,7 +45,7 @@ export function CuadrarDiaHoja({ onClose, avisar }: Props) {
       </Sheet>
     )
   }
-  const dia = cuadrarDia(platos.value, falta, quedan, elegidos)
+  const dia = cuadrarDia(platosQueQuieres.value, falta, quedan, elegidos)
   const despues = dia.reduce(
     (t, d) => ({
       kcal: t.kcal + d.encaje.ajuste.total.kcal,
@@ -51,9 +56,9 @@ export function CuadrarDiaHoja({ onClose, avisar }: Props) {
     totalDia.value,
   )
   const cambiar = (comida: ComidaId, actual: string) => {
-    const partes = repartir(falta, quedan)
+    const partes = repartir(falta, quedan, repartoActual.value)
     const usados = dia.filter((d) => d.comida !== comida).map((d) => d.encaje.plato.id)
-    const opciones = mejoresPara(platos.value, comida, partes[comida], 12, usados)
+    const opciones = mejoresPara(platosQueQuieres.value, comida, partes[comida], 12, usados)
     const i = opciones.findIndex((e) => e.plato.id === actual)
     const siguiente = opciones[(i + 1) % opciones.length]
     if (siguiente) setElegidos({ ...elegidos, [comida]: siguiente.plato.id })
@@ -86,41 +91,44 @@ export function CuadrarDiaHoja({ onClose, avisar }: Props) {
       }
     >
       <div class={h.stack}>
-        <p class={`${h.sub} ${h.datos}`}>
-          Te quedan {quedan.map((c) => comidaDe(c).nombre.toLowerCase()).join(', ')} ·{' '}
-          <b>{macrosCortos(falta)}</b>
-        </p>
+        {/* Lo que te queda, en grande y sencillo (usuario, 2026-11-19: «hazlo más bonito») */}
+        <section class={styles.queda} aria-label="Lo que te queda hoy">
+          <span class={styles.etiqueta}>Te quedan</span>
+          <span class={styles.kcal}>
+            <b>{formatInt(falta.kcal)}</b> kcal
+          </span>
+          <span class={styles.macros}>
+            {formatInt(falta.protein)} g prot. · {formatInt(falta.carbs)} g hidr. · {formatInt(falta.fat)} g
+            grasa
+          </span>
+          <span class={styles.para}>
+            Para{' '}
+            {quedan
+              .map((c) => comidaDe(c).nombre.toLowerCase())
+              .join(', ')
+              .replace(/, ([^,]*)$/, ' y $1')}
+          </span>
+        </section>
         {grasaDeMas.value > 0 && (
-          <p class={h.sub}>
-            Llevas {grasaDeMas.value} g de grasa de más: los platos van con menos grasa y menos hidratos para
-            que el día cuadre.
+          <p class={h.foot}>
+            Llevas {grasaDeMas.value} g de grasa de más: los platos van con menos grasa y menos hidratos.
           </p>
         )}
-        <ul class={h.list}>
+        <ul class={styles.lista} aria-label="Lo que te propongo">
           {dia.map((d) => (
-            <PlatoFila
+            <FilaComida
               key={d.comida}
-              nombre={`${comidaDe(d.comida).nombre} · ${d.encaje.plato.nombre}`}
               foto={fotos.value[d.encaje.plato.id] ?? null}
-              lineas={[macrosCortos(d.encaje.ajuste.total)]}
-              href={paths.dish(d.encaje.plato.id, { comida: d.comida, fecha })}
-              accion={
-                <button
-                  type="button"
-                  class={h.textButton}
-                  onClick={() => cambiar(d.comida, d.encaje.plato.id)}
-                >
-                  Cambiar
-                </button>
-              }
+              etiqueta={`${horaDeComida(menu.value, d.comida)} · ${nombreDeComida(menu.value, d.comida)}`}
+              nombre={d.encaje.plato.nombre}
+              kcal={Math.round(d.encaje.ajuste.total.kcal)}
+              etiquetaAccesible={`${comidaDe(d.comida).nombre}: ${d.encaje.plato.nombre}, cambiar por otro`}
+              onClick={() => cambiar(d.comida, d.encaje.plato.id)}
             />
           ))}
         </ul>
+        <p class={h.foot}>Toca una comida para cambiarla por otra receta.</p>
         <Comparacion titulo="Tu día con esto" total={despues} objetivo={objetivo} />
-        <p class={h.foot}>
-          Lo que falta se reparte entre las comidas que quedan (sugerido: desayuno 25 %, comida 35 %, merienda
-          15 %, cena 25 %).
-        </p>
       </div>
     </Sheet>
   )

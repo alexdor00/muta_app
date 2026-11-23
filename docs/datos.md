@@ -112,6 +112,29 @@ semana; la primera fila son los títulos (da igual mayúsculas y tildes; separad
 Una fila con `Descanso` en la columna de la sesión es un día de descanso obligatorio en ese punto. Lo que no se rellena se
 pone por costumbre y sale como «sugerido». Se guarda en `programs` (id `mia:…`), solo en el móvil.
 
+## Tu dieta desde un CSV (Nutrición · Tu dieta)
+
+«Importar un archivo» (y «Descargar plantilla»). Lo lee `domain/dietCsv.ts` (usuario, 2026-11-17: «cualquier dieta, que
+detecte todo de forma exacta»). Una fila por ingrediente, separada por `;` o `,`; da igual el orden de las columnas, las
+mayúsculas y las tildes.
+
+| Columna                                   | Qué es                                                                                                                                                                                                                                                               |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| comida, receta, ingrediente               | Obligatorias. Comida: desayuno, comida (o almuerzo), merienda o cena.                                                                                                                                                                                                |
+| gramos · gramos entreno · gramos descanso | Sus gramos (los dos últimos, si cambian según el día: el arroz, el pan).                                                                                                                                                                                             |
+| cantidad                                  | En texto: «2 tortillas», «al gusto», «1 diente». Sin gramos, va sin cantidad que cuente.                                                                                                                                                                             |
+| menú · días · cocinar                     | Su nombre («Todos» o vacío: todos los días, como el batido); los días del ciclo de ese menú («1-2 7»); el día del ciclo en que se cocina. El ciclo dura lo que diga el día más alto (6, 7, 14…); los días que nadie dice siguen al anterior; sin días, 7 por turnos. |
+| solo                                      | «entreno» o «descanso» (el preentreno, solo los días de entreno).                                                                                                                                                                                                    |
+| nombre                                    | Cómo sale en el menú («Comida 1», «Batido»).                                                                                                                                                                                                                         |
+| kcal, proteína, hidratos, grasa           | Por 100 g. O «kcal total», «proteína total»…: lo del ingrediente con sus gramos de entreno. Si no trae ninguno, se busca en la base.                                                                                                                                 |
+| ajusta                                    | «sí» en lo que se mueve cuando cambian tus kcal (si no, lo que cambia según el día o lo que más hidratos tiene).                                                                                                                                                     |
+| paso · nota                               | Una fila con solo la receta y su paso (o su nota) se lo añade.                                                                                                                                                                                                       |
+
+«Pasar los menús de tu dieta a tus menús» (`menusDeTuDieta`, `domain/dietaAMenus.ts`) lo lleva tal cual a tus menús: cada
+menú con su receta en cada comida y lo demás como extras (`ExtraMenu.solo`), los gramos de la receta (`fijos`; los de
+descanso, `Plato.gramosDescanso`) y el ciclo con su inicio y sus días de cocinar (`MenuSemanal.ciclo`). Probado con un plan
+de 3 menús de 2 días (`private/dietas/plan-fase-1.csv`, fuera de git): los totales de cada día salen como en su PDF.
+
 ## El recetario (Comida · Recetas)
 
 Es de terceros: **fuera de git**, en `private/recetas/` (`recetas.json` tal cual del documento, `recetario.json` el que lee la

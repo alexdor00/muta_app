@@ -12,6 +12,8 @@ type Props<T> = {
   options: ChoiceOption<T>[]
   value: T
   onChange: (value: T) => void
+  /** Más grande (control segmentado de pestañas, como Resumen · Consejos): 44 px de alto y letra de texto. */
+  grande?: boolean
 }
 
 type Look = 'card' | 'pill' | 'circle' | 'chip' | 'list' | 'segment'
@@ -28,7 +30,7 @@ function Group<T extends string | number>(props: Props<T> & { look: Look }) {
   return (
     <fieldset class={styles.group}>
       <legend class={props.showLegend ? styles.legend : styles.hiddenLegend}>{props.legend}</legend>
-      <div class={LIST[props.look]}>
+      <div class={`${LIST[props.look]} ${props.grande ? styles.grande : ''}`}>
         {props.options.map((option) => {
           const selected = option.value === props.value
           return (
@@ -63,6 +65,11 @@ function Group<T extends string | number>(props: Props<T> & { look: Look }) {
                     {selected && <CheckIcon />}
                   </span>
                 </>
+              ) : option.icon ? (
+                <span class={styles.conIcono}>
+                  {option.icon}
+                  {option.label}
+                </span>
               ) : (
                 option.label
               )}

@@ -1,0 +1,88 @@
+/* Barras de Progreso con la raya de la meta (la de todas, o una por barra). */
+
+.chart {
+  margin: 0;
+}
+
+.area {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  height: var(--bars-height);
+}
+
+.col {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.bar {
+  width: 100%;
+  min-height: var(--space-1);
+  border-radius: var(--radius-chip);
+  background: var(--label);
+}
+
+.enCurso {
+  background: var(--surface-3);
+}
+
+/* La meta de una sola barra: una raya discontinua sobre ella */
+.tick {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-top: var(--border) dashed var(--goal-line);
+}
+
+.goal {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  border-top: var(--border) dashed var(--goal-line);
+}
+
+.goalLabel {
+  position: absolute;
+  right: 0;
+  bottom: var(--space-1);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-chip);
+  background: var(--surface);
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+}
+
+.labels {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.labels span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--text-caption);
+  color: var(--label-2);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.labels .labelEnCurso {
+  color: var(--label);
+  font-weight: var(--weight-bold);
+}
+
+.hidden {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+}

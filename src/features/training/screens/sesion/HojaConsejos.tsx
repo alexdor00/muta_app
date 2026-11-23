@@ -9,12 +9,7 @@ import {
 } from '../../state/ordenHoy.ts'
 import { guardarSesion, type SesionEnCurso } from '../../state/sesionEnCurso.ts'
 import type { SessionTip } from '../../state/routines.ts'
-import {
-  consejosAntesVisibles,
-  consejosOcultos,
-  mostrarConsejos,
-  ocultarConsejo,
-} from '../../use-cases/myTips.ts'
+import { consejosAntesVisibles, consejosOcultos, mostrarConsejos } from '../../use-cases/myTips.ts'
 
 const ETIQUETA = { invertir: 'Invertir hoy', subir: 'Subirlo hoy' } as const
 
@@ -57,11 +52,6 @@ export function HojaConsejos(props: {
         hecho: Boolean(en.marcados[k]),
       }))}
       onMarcar={(k) => guardarSesion(marcarConsejo(en, k))}
-      onOcultar={(k) => {
-        const c = consejosAntesVisibles.value[k]
-        if (c) ocultarConsejo(c.clave)
-        props.onAviso('Consejo oculto')
-      }}
       ocultos={consejosOcultos.value}
       onMostrarOcultos={mostrarConsejos}
       alEmpezar={consejosAlEmpezar.value}

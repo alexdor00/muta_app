@@ -7,8 +7,11 @@ export type EjercicioHecho = { nombre: string; hechas: SerieHecha[]; antes: Seri
 
 export type ResumenEjercicio = {
   nombre: string
-  /** Las series de hoy, con las que mejoran la misma serie de la vez anterior marcadas. */
-  series: (SerieHecha & { mejor: boolean })[]
+  /**
+   * Las series de hoy, con la misma serie de la vez anterior (`antes`, null si no la hubo) y cómo queda frente a ella
+   * (`frente`: 1 mejor, 0 igual, −1 peor, null sin comparar); `mejor` marca las que mejoran.
+   */
+  series: (SerieHecha & { mejor: boolean; antes: SerieHecha | null; frente: -1 | 0 | 1 | null })[]
   /** La serie de hoy con más 1RM estimado, y la de la vez anterior. */
   mejor: SerieHecha
   mejorAntes: SerieHecha | null
@@ -46,7 +49,7 @@ export function resumenSesion(ejercicios: readonly EjercicioHecho[]) {
       const c = compararConAntes(s, e.antes[j] ?? null)
       if (c !== null) comparables++
       if (c === 1) superadas++
-      return { ...s, mejor: c === 1 }
+      return { ...s, mejor: c === 1, antes: e.antes[j] ?? null, frente: c }
     })
     porEjercicio.push({ nombre: e.nombre, series: conMarca, mejor, mejorAntes, cambio })
   }

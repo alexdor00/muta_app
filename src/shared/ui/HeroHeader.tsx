@@ -2,6 +2,7 @@ import type { ComponentChildren, RefObject } from 'preact'
 import { ChevronLeftIcon } from './icons.tsx'
 import { RoundButton } from './RoundButton.tsx'
 import styles from './HeroHeader.module.css'
+import { useVolver } from './useVolver.ts'
 
 type Props = {
   title: string
@@ -18,12 +19,14 @@ type Props = {
 
 /** Cabecera de una categoría o una rutina: foto a todo el ancho y el título encima. */
 export function HeroHeader({ title, description, photo, tone = 1, backHref, heroRef, action }: Props) {
+  // «‹»: a la pantalla de la que vienes (o a `backHref` si entraste directamente)
+  const atras = useVolver(backHref)
   return (
     <header class={`${styles.hero} ${styles[`t${tone}`]}`} ref={heroRef}>
       {photo && <img class={styles.photo} src={photo} alt="" />}
       <div class={styles.scrim} />
       <div class={styles.back}>
-        <RoundButton label="Volver" href={backHref}>
+        <RoundButton label="Volver" onClick={atras}>
           <ChevronLeftIcon />
         </RoundButton>
       </div>

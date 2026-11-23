@@ -1,0 +1,78 @@
+/* Opciones de un menú (usuario, 2026-11-19): su letra y su nombre; Duplicar y Quitar, iguales */
+.cabeza {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.texto small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.nombre {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--label-2);
+  cursor: text;
+}
+
+.nombre input {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-titulo-seccion); /* --text-title-3 no existía */
+}
+
+.nombre svg {
+  flex: none;
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.botones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.botones button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.botones button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.botones svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+.botones .quitar {
+  color: var(--critical-label);
+}

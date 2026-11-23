@@ -2,20 +2,19 @@
 // sobrevive a recargar la app. Lleva una copia de los ejercicios con los que empezó (con la vez anterior).
 import { signal } from '@preact/signals'
 import { formatDecimal, parseDecimal } from '../../../shared/lib/format.ts'
-import { effortLabel, rirProgresivo } from '../domain/effort.ts'
+import { rirProgresivo } from '../domain/effort.ts'
 import { planCalentamiento } from '../domain/warmup.ts'
 import {
   kilosDeHoy,
   mismoPeso,
   repsDeSerie,
-  sugerenciaDe,
   TECNICAS,
-  textoReps,
   type EjercicioPlan,
   type SesionPlan,
 } from '../domain/workoutPlan.ts'
 import { compararConAntes, descansoTras, revisarNumeros, type SerieHecha } from '../domain/workoutSet.ts'
 import { resumenSesion } from '../domain/workoutSummary.ts'
+import { serieRecord } from '../domain/records.ts'
 
 /** Una bajada (dropset) o mini-serie (rest-pause) dentro de una serie, tal cual se teclea. */
 export type ExtraEnCurso = { kg: string; reps: string }
@@ -208,6 +207,19 @@ export const terminado = (x: EjercicioEnCurso) => x.series.every((s) => s.hecha)
 export const esRecord = (e: EjercicioPlan, x: EjercicioEnCurso, j: number) =>
   x.series[j].hecha && compararConAntes(numeros(e, x, j), antesDe(e, x)[j] ?? null) === 1
 
+/** La serie récord de hoy (tu mejor marca de siempre; usuario, 2026-11-20), o −1; nada si hoy se cambió el ejercicio. */
+export const serieRecordHoy = (e: EjercicioPlan, x: EjercicioEnCurso) =>
+  x.cambiadoPor
+    ? -1
+    : serieRecord(
+        x.series.map((s, j) => (s.hecha ? numeros(e, x, j) : null)),
+        e.mejorDeSiempre ?? 0,
+      )
+
+/** Corona (usuario, 2026-11-14): todas las series del ejercicio hechas y mejores que las de la vez anterior. */
+export const esCorona = (e: EjercicioPlan, x: EjercicioEnCurso) =>
+  x.series.length > 0 && x.series.every((_, j) => esRecord(e, x, j))
+
 /** La técnica de hoy (dropset o rest-pause); null si no lleva o si hoy se hace otro ejercicio en su lugar. */
 const tecnicaHoy = (e: EjercicioPlan, x: EjercicioEnCurso) => (x.cambiadoPor ? null : (e.tecnica ?? null))
 
@@ -218,11 +230,22 @@ const tecnicaHoy = (e: EjercicioPlan, x: EjercicioEnCurso) => (x.cambiadoPor ? n
  */
 export function seriesVistas(e: EjercicioPlan, x: EjercicioEnCurso) {
   const tecnica = tecnicaHoy(e, x)
+  const corona = esCorona(e, x)
+  const trofeo = serieRecordHoy(e, x)
   return x.series.map((s, j) => {
     const g = grises(e, x, j)
     const extras = s.extra?.length ? s.extra : tecnica ? [{ kg: '', reps: '' }] : []
     const extra = extras.map((y) => ({ ...y, kgGris: mismoPeso(tecnica) ? s.kg || g.kg : '' }))
-    return { ...s, kgGris: g.kg, repsGris: g.reps, quedanGris: g.quedan, record: esRecord(e, x, j), extra }
+    return {
+      ...s,
+      kgGris: g.kg,
+      repsGris: g.reps,
+      quedanGris: g.quedan,
+      record: esRecord(e, x, j),
+      corona: corona && s.hecha,
+      trofeo: j === trofeo,
+      extra,
+    }
   })
 }
 
@@ -233,37 +256,42 @@ export function filaHoy(e: EjercicioPlan, x: EjercicioEnCurso): string | null {
 }
 
 /** La pauta del ejercicio en la sesión: «3 series», «8–12 reps», «RIR 2» y, si la lleva, la técnica. */
+// Solo el rango de repeticiones (y la técnica): las series son las filas y el RIR sale en gris en cada una (usuario, 2026-11-14)
 export function pautaHoy(e: EjercicioPlan, x: EjercicioEnCurso): string[] {
   const tecnica = tecnicaHoy(e, x)
   return [
-    `${e.series} series`,
-    `${textoReps(e)} reps`,
-    effortLabel(e.rir),
+    // Con cada serie distinta, el rango de todas (usuario, 2026-11-14)
+    `${e.reps} reps`,
     ...(tecnica ? [TECNICAS[tecnica].nombre] : []),
   ]
 }
 
-/**
- * Un ejercicio cerrado: pendiente, «Hoy 24 kg · antes 22 kg × 12»; terminado, lo hecho con ★ en las series récord, y
- * si alguna lo fue.
- */
+/** La primera serie de la vez anterior: «40 kg × 12» (o «12 reps» sin peso); null la primera vez o si hoy se cambió. */
+export function textoAntes(e: EjercicioPlan, x: EjercicioEnCurso): string | null {
+  const antes = antesDe(e, x)[0]
+  if (!antes) return null
+  return antes.kg != null ? `${formatDecimal(antes.kg)} kg × ${antes.reps}` : `${antes.reps} reps`
+}
+
+/** Un ejercicio cerrado: pendiente, nada (o «Cambiado solo para hoy»); terminado, lo hecho y su marca (✓, ★, corona o trofeo). */
 export function filaCerrada(e: EjercicioPlan, x: EjercicioEnCurso) {
   if (!terminado(x)) {
-    const antes = e.ultima[0]
-    const hoy = sugerenciaDe(e)
-    const texto = hoy.kg != null ? `${formatDecimal(hoy.kg)} kg` : `${hoy.reps} reps`
+    // Sin «Hoy 170 kg · antes 165 kg × 13» (usuario, 2026-11-14): la vez anterior ya sale en gris en sus casillas
     return {
       estado: 'pendiente' as const,
-      resumen: x.cambiadoPor
-        ? 'Cambiado solo para hoy'
-        : e.ultima.length
-          ? `Hoy ${texto} · antes ${antes.kg != null ? `${formatDecimal(antes.kg)} kg × ` : ''}${antes.reps}${antes.kg == null ? ' reps' : ''}`
-          : `Primera vez: ${e.reps} reps`,
+      resumen: x.cambiadoPor ? 'Cambiado solo para hoy' : null,
     }
   }
   const records = x.series.map((_, j) => esRecord(e, x, j))
   return {
-    estado: records.some(Boolean) ? ('record' as const) : ('hecho' as const),
+    estado:
+      serieRecordHoy(e, x) >= 0
+        ? ('trofeo' as const)
+        : esCorona(e, x)
+          ? ('corona' as const)
+          : records.some(Boolean)
+            ? ('record' as const)
+            : ('hecho' as const),
     resumen: x.series.map((s, j) => `${records[j] ? '★ ' : ''}${s.kg} kg × ${s.reps}`).join(' · '),
   }
 }
@@ -281,6 +309,8 @@ export type Apunte =
       sesion: SesionEnCurso
       /** 1 mejor que la vez anterior, 0 igual, −1 peor, null sin vez anterior. */
       comparacion: -1 | 0 | 1 | null
+      /** Esta serie es tu nuevo récord (tu mejor marca de siempre). */
+      record: boolean
       /** Segundos de descanso; null tras la última serie de la sesión. */
       descanso: number | null
       bajada: { de: number; a: number } | null
@@ -319,6 +349,7 @@ export function apuntarSerie(en: SesionEnCurso, ej: number, j: number, confirmad
     tipo: 'hecha',
     sesion: { ...en, ejercicios },
     comparacion: compararConAntes({ kg, reps }, antesDe(e, x)[j] ?? null),
+    record: serieRecordHoy(e, ejercicios[ej]) === j,
     descanso: fin ? null : d.segundos,
     bajada: fin ? null : d.bajada,
     ejercicioTerminado: nuevas.every((s) => s.hecha),

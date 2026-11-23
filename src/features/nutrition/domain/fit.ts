@@ -10,7 +10,20 @@ export const LIMITES = { min: 0.5, max: 2.5 }
 export const PASO_G = 5
 
 /** Qué parte del día va en cada comida al repartir un objetivo (sugerido: ningún documento lo fija). */
-export const REPARTO: Record<ComidaId, number> = { desayuno: 0.25, comida: 0.35, merienda: 0.15, cena: 0.25 }
+export type Reparto = Record<ComidaId, number>
+
+/** Cómo sueles comer (usuario, 2026-11-17: una pregunta sencilla en vez de porcentajes). */
+export type ComoComes = 'repartido' | 'desayuno' | 'comida' | 'cena'
+
+/** El reparto de cada forma de comer (sugerido: ningún documento lo fija). */
+export const REPARTOS: Record<ComoComes, Reparto> = {
+  repartido: { desayuno: 0.25, comida: 0.35, merienda: 0.15, cena: 0.25 },
+  desayuno: { desayuno: 0.35, comida: 0.3, merienda: 0.1, cena: 0.25 },
+  comida: { desayuno: 0.2, comida: 0.45, merienda: 0.1, cena: 0.25 },
+  cena: { desayuno: 0.2, comida: 0.3, merienda: 0.15, cena: 0.35 },
+}
+
+export const REPARTO: Reparto = REPARTOS.repartido
 
 /** Los valores por 100 g con los que cuenta cada ingrediente (tu producto en vez del genérico); null, el del plato. */
 export type Valores = readonly (Macros | null)[]
@@ -114,7 +127,7 @@ function movibles(p: Plato, valores: Valores, sinGrasa = false) {
 }
 
 /** Error de un total frente al objetivo, en kcal de cada macro (al cuadrado). */
-function error(t: Macros, o: Macros): number {
+export function error(t: Macros, o: Macros): number {
   return MACROS.reduce((s, m) => s + ((t[m.id] - o[m.id]) * m.kcalPorG) ** 2, 0)
 }
 
@@ -184,11 +197,15 @@ export function llegaHasta(p: Plato, macro: MacroId, valores: Valores = []): num
 }
 
 /** Lo que falta repartido entre comidas según el reparto (normalizado a las que quedan). */
-export function repartir(falta: Macros, comidas: readonly ComidaId[]): Record<string, Macros> {
-  const suma = comidas.reduce((s, c) => s + REPARTO[c], 0) || 1
+export function repartir(
+  falta: Macros,
+  comidas: readonly ComidaId[],
+  reparto: Reparto = REPARTO,
+): Record<string, Macros> {
+  const suma = comidas.reduce((s, c) => s + reparto[c], 0) || 1
   return Object.fromEntries(
     comidas.map((c) => {
-      const f = REPARTO[c] / suma
+      const f = reparto[c] / suma
       return [
         c,
         {
@@ -250,6 +267,48 @@ export function mejoresPara(
       )
       .slice(0, n)
   )
+}
+
+/**
+ * Parecidos a un plato en calorías y proteína (para cambiarlo en tu menú; usuario, 2026-11-17): los de esa comida, por la
+ * diferencia relativa de sus kcal y su proteína (con sus gramos de la receta).
+ */
+export function parecidos(platos: readonly Plato[], actual: Plato, comida: ComidaId, n = 3): Plato[] {
+  const a = actual.total
+  const dif = (p: Plato) =>
+    Math.abs(p.total.kcal - a.kcal) / Math.max(a.kcal, 1) +
+    Math.abs(p.total.protein - a.protein) / Math.max(a.protein, 1)
+  return platos
+    .filter((p) => p.id !== actual.id && p.raciones === 1 && vaCon(p, comida))
+    .sort((x, y) => dif(x) - dif(y))
+    .slice(0, n)
+}
+
+/**
+ * Un menú propuesto (sugerido; «Proponme un menú»): para cada comida, el plato que mejor encaja con su parte de tu
+ * objetivo (el reparto sugerido), sin repetir.
+ */
+export function menuPropuesto(
+  platos: readonly Plato[],
+  objetivo: Macros,
+  reparto: Reparto = REPARTO,
+): Partial<Record<ComidaId, string>> {
+  const usados: string[] = []
+  const menu: Partial<Record<ComidaId, string>> = {}
+  for (const comida of Object.keys(reparto) as ComidaId[]) {
+    const f = reparto[comida]
+    const parte = {
+      kcal: objetivo.kcal * f,
+      protein: objetivo.protein * f,
+      carbs: objetivo.carbs * f,
+      fat: objetivo.fat * f,
+    }
+    const e = mejoresPara(platos, comida, parte, 1, usados)[0]
+    if (!e) continue
+    menu[comida] = e.plato.id
+    usados.push(e.plato.id)
+  }
+  return menu
 }
 
 /**

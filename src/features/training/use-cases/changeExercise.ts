@@ -3,7 +3,7 @@ import type { EjercicioPlan } from '../domain/workoutPlan.ts'
 import { sesiones } from '../state/plan.ts'
 import { descansoDe } from '../state/sesionEnCurso.ts'
 import { idPorNombre } from './exerciseLibrary.ts'
-import { cambiarEnPlan, editarSesion } from './training.ts'
+import { cambiarEnPlan, editarSesion } from './editPlan.ts'
 
 /**
  * Cambia un ejercicio de una sesión de tu plan por otro, para las próximas veces (Editar rutina y el «···» de la ficha).

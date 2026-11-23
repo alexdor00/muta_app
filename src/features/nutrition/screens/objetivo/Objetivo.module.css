@@ -1,4 +1,5 @@
-/* Tu objetivo: barra con atrás, la tarjeta negra, «Cómo sale», la revisión y el historial. */
+/* Tu objetivo: barra con atrás, la tarjeta del objetivo, «Cómo se calcula», la revisión y el historial, con el patrón del resto
+   (usuario, 2026-11-15): títulos pequeños en mayúsculas y las listas en tarjetas blancas. */
 
 .page {
   display: flex;
@@ -19,13 +20,24 @@
   text-align: center;
 }
 
+/* El título de una sección: pequeño y en mayúsculas, como «TU SEMANA» */
 .title {
-  font: var(--text-title-2);
+  margin: 0 0 var(--space-2);
+  padding: 0 var(--space-4);
+  color: var(--label-2);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
+/* Sus filas, en una tarjeta blanca */
 .list {
   margin: 0;
-  padding: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
   list-style: none;
 }
 
@@ -109,6 +121,7 @@
   padding: var(--space-4);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .reviewHead {
@@ -118,8 +131,61 @@
   gap: var(--space-2);
 }
 
+.reviewEyebrow {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .reviewTitle {
   font: var(--text-headline);
+}
+
+.estado {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+/* Las cifras de la revisión: etiqueta a la izquierda, cifra a la derecha */
+.reviewDatos > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+  font: var(--text-subhead);
+}
+
+.reviewDatos dt {
+  color: var(--label-2);
+}
+
+.reviewDatos dd {
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.reviewConsejos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.reviewConsejos ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-4);
+  font: var(--text-footnote);
+  color: var(--label);
 }
 
 .badge {
@@ -183,17 +249,20 @@
   cursor: pointer;
 }
 
+/* «Próxima revisión»: una nota gris, sin tarjeta */
+/* Con aire respecto a lo de arriba (usuario, 2026-11-19) */
 .next {
-  padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  font: var(--text-subhead);
+  margin-top: var(--space-2);
+  padding: 0 var(--space-4);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-align: center;
 }
 
 /* La sugerencia */
 .suggestionTitle {
   margin-top: var(--space-1);
-  font: var(--text-title-2);
+  font: var(--text-titulo-tarjeta);
 }
 
 .change {
@@ -250,6 +319,272 @@
   background: none;
   color: var(--label);
   font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+/* «Cómo se calcula» e «Historial», plegados: su título pequeño en mayúsculas con la flecha; al abrir, su tarjeta */
+/* Cada plegable, una tarjeta blanca como las secciones de arriba */
+.plegable {
+  padding: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+/* Dentro, la lista va lisa (la tarjeta ya es el plegable) */
+.plegable .list {
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.plegable[open] {
+  padding-bottom: var(--space-4);
+}
+
+/* «Tu dieta»: una fila blanca que lleva a su vista, como los plegables */
+.fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--row);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  text-decoration: none;
+}
+
+.filaNombre {
+  font: var(--text-headline);
+}
+
+.fila svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+}
+
+.plegable summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--row);
+  padding: 0 var(--space-4);
+  list-style: none;
+  cursor: pointer;
+}
+
+.plegable summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Como «Más ajustes» */
+.plegable summary h2 {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.plegable summary svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.plegable[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.plegable[open] > :not(summary) {
+  margin-top: var(--space-2);
+}
+
+/* Rediseño 41: listas de filas en tarjetas blancas */
+.lista {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.lista li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.filaLista {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row);
+  padding: var(--space-3) 0;
+  color: var(--label);
+  text-decoration: none;
+}
+
+.filaLista > span:first-child {
+  flex: 1;
+}
+
+.filaLista > svg {
+  flex: none;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+}
+
+.historial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.historialTitulo {
+  margin: 0;
+  padding: 0 var(--space-1);
+  font: var(--text-headline);
+}
+
+/* La «ⓘ» pequeña junto a las kcal: abre cómo se calcula (usuario, 2026-11-19) */
+/* Centrada con la cifra (usuario, 2026-11-22): sin alto propio, para no empujar la línea; el toque sigue siendo amplio */
+.info {
+  display: grid;
+  align-self: center;
+  place-items: center;
+  width: var(--tap-min);
+  height: auto;
+  margin: calc(var(--space-2) * -1) 0 calc(var(--space-2) * -1) calc(var(--space-2) * -1);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--label-3);
+  cursor: pointer;
+}
+
+.info svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* Tu actividad: otros deportes con sus horas a la semana (usuario, 2026-11-19) */
+.deporte {
+  margin-top: var(--space-3); /* aire tras tu trabajo (usuario, 2026-11-19) */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.deporte > span:first-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.deporte small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.horas {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.horas b {
+  min-width: var(--space-10);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+}
+
+.horas button {
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.horas svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Tu trabajo: tres tarjetas pequeñas con su ejemplo (usuario, 2026-11-19: «más bonito») */
+.actTitulo {
+  font: var(--text-headline);
+}
+
+.trabajos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.trabajo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--label);
+  text-align: center;
+  cursor: pointer;
+}
+
+.trabajo b {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.trabajo small {
+  color: var(--label-2);
+  font: var(--text-caption);
+}
+
+/* La elegida, en gris oscuro (usuario, 2026-11-19) */
+.trabajo[aria-pressed='true'] {
+  background: var(--label-2);
+  color: var(--on-accent);
+}
+
+.trabajo[aria-pressed='true'] small {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.verHistorial {
+  align-self: flex-start;
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+/* «Empezar» / «Terminar» la recarga: gris, como los botones secundarios */
+.botonFila {
+  flex: none;
+  height: var(--control);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
   font-weight: var(--weight-semibold);
   cursor: pointer;
 }

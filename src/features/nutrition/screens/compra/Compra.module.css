@@ -1,0 +1,341 @@
+/* La compra (rediseño 23 y 24): cabecera con botones redondos, tarjetas por sección y círculos para marcar. */
+.segmento {
+  margin-bottom: var(--space-2);
+}
+
+.cabeza {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cabezaTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cabezaTexto b {
+  font: var(--text-headline);
+}
+
+.cabezaTexto span {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.redondo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  cursor: pointer;
+}
+
+.redondo svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.seccion li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--row);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.circulo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border: var(--border) solid var(--label-3);
+  border-radius: var(--radius-pill);
+  color: var(--on-accent);
+}
+
+.circulo svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Marcado: tick gris y el nombre tachado en gris suave (usuario, 2026-11-19) */
+.marcado .circulo {
+  border-color: var(--surface-2);
+  background: var(--surface-2);
+  color: var(--label-2);
+}
+
+/* Tachado, pero legible (axe: --label-3 no llega a 4,5:1) */
+.marcado .itemNombre {
+  color: var(--label-2);
+  text-decoration: line-through;
+  text-decoration-color: var(--label-3);
+}
+
+.itemTexto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.itemNombre {
+  font: var(--text-body);
+}
+
+.detalle,
+.cantidad {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.cantidad {
+  flex: none;
+}
+
+.botones {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.textoBoton {
+  min-height: var(--control);
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-headline);
+  cursor: pointer;
+}
+
+.frase {
+  color: var(--label-2);
+  font: var(--text-body);
+}
+
+.frase b {
+  color: var(--label);
+}
+
+.quedan {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.quedan b {
+  font: var(--text-headline);
+}
+
+.contador {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}
+
+/* La compra (usuario, 2026-11-19): el resumen arriba, las secciones en pastillas y el periodo */
+.resumen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.resumenCabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.periodo {
+  flex: none;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.menus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.menu {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  font: var(--text-footnote);
+}
+
+.barra {
+  height: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.barra i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.resumenPie {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--label-2);
+  font: var(--text-subhead);
+}
+
+.resumenPie span {
+  flex: 1;
+}
+
+.resumenPie b {
+  color: var(--label);
+}
+
+.pastillas {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 0 var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pastillas button {
+  flex: none;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pastillas button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.pastillas .hecha {
+  background: var(--surface-2);
+  box-shadow: none;
+  color: var(--label-2);
+}
+
+.rotulo {
+  margin: 0 0 var(--space-2) var(--space-1);
+  color: var(--label-2);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tarjeta {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  list-style: none;
+}
+
+.nota {
+  margin: var(--space-2) var(--space-1) 0;
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.periodos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.periodoOpcion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.periodoOpcion[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 var(--border) var(--label);
+}
+
+.periodoOpcion span {
+  display: flex;
+  flex-direction: column;
+}
+
+.periodoOpcion small {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.periodoOpcion svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}

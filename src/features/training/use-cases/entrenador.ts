@@ -3,7 +3,7 @@ import { logError } from '../../../shared/lib/logger.ts'
 import { cambiarPauta } from '../domain/routineEdit.ts'
 import { marcaAplicado, marcaDe, vistosEntrenador, type ConsejoEntrenador } from '../state/entrenador.ts'
 import { elegirModo } from '../state/musculos.ts'
-import { editarSesion } from './training.ts'
+import { editarSesion } from './editPlan.ts'
 
 const ID = 'entrenador-vistos'
 type Fila = { id: typeof ID; target: 'entrenador'; vistos: string[] }

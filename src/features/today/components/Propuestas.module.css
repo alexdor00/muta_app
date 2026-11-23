@@ -1,0 +1,58 @@
+/* Hoy · lo que te proponen: una tarjeta blanca con su borde fino (sin naranja: no es un logro). */
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 var(--gutter);
+  padding: 0;
+  list-style: none;
+}
+
+.propuesta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--hairline) solid var(--separator); /* una propuesta no es un logro: sin naranja (usuario, 2026-11-20) */
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.titulo {
+  margin: 0;
+  font: var(--text-headline);
+}
+
+.detalle {
+  margin: 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.botones {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.ahoraNo,
+.aplicar {
+  flex: 1;
+  min-height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.ahoraNo {
+  background: var(--surface-2);
+  color: var(--label);
+}
+
+.aplicar {
+  background: var(--accent);
+  color: var(--on-accent);
+}

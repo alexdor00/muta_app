@@ -47,9 +47,13 @@ const deSuper = (filas: readonly FilaSuper[]): Alimento[] =>
  * detrás, sin esperar, los productos de supermercado de Open Food Facts con su marca y su código. Quedan en el móvil.
  */
 export function cargarAlimentos(): Promise<Alimento[]> {
-  descarga ??= import('../../../shared/content/foods.json')
-    .then((m) => {
-      base.value = m.default as Alimento[]
+  // Los genéricos y la comida rápida de cadenas (aproximada; usuario, 2026-11-21: para los días libres)
+  descarga ??= Promise.all([
+    import('../../../shared/content/foods.json'),
+    import('../../../shared/content/foods-rapida.json'),
+  ])
+    .then(([m, r]) => {
+      base.value = [...(m.default as Alimento[]), ...(r.default as Alimento[])]
       void cargarSupermercados()
       return base.value
     })
@@ -174,6 +178,24 @@ export async function guardarComida(nombre: string, comida: ComidaId): Promise<v
   ])
 }
 
+/** Un alimento en tus favoritos (el corazón de la cantidad): una comida guardada con solo ese alimento. */
+export const favoritoDe = (alimentoId: string) =>
+  guardadas.value.find((g) => g.apuntes.length === 1 && g.apuntes[0].alimentoId === alimentoId) ?? null
+
+/** Pone o quita un alimento de tus favoritos, con la cantidad que tienes puesta. */
+export async function alternarFavorito(apunte: Omit<Apunte, 'id'>): Promise<boolean> {
+  const ya = apunte.alimentoId ? favoritoDe(apunte.alimentoId) : null
+  if (ya) {
+    await borrarGuardada(ya.id)
+    return false
+  }
+  await guardarGuardadas([
+    { id: nuevoId(), nombre: apunte.nombre, apuntes: [{ ...apunte, id: nuevoId() }] },
+    ...guardadas.value,
+  ])
+  return true
+}
+
 export async function borrarGuardada(id: string): Promise<void> {
   await guardarGuardadas(guardadas.value.filter((g) => g.id !== id))
 }
@@ -232,6 +254,8 @@ export function textoCantidad(a: Pick<Apunte, 'raciones' | 'racion' | 'gramos'>)
 
 /** La ración habitual en palabras: «1 filete (150 g)»; si la ración ya son gramos, «100 g». */
 export function textoRacion(a: Alimento): string {
+  // De una cadena: lo que aporta una ración, sin gramos (no se saben)
+  if (a.porRacion) return `1 ${a.servingLabel}`
   if (enGramos(a.servingLabel)) return `${formatInt(a.servingG)} g`
   return `1 ${a.servingLabel} (${formatInt(a.servingG)} g)`
 }

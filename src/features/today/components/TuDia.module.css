@@ -1,0 +1,114 @@
+/* Hoy · tu día: tarjeta blanca (como tu día en Nutrición) con el anillo continuo a la izquierda. */
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0 var(--gutter);
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--label);
+  box-shadow: var(--card-shadow);
+}
+
+.anillo {
+  flex: none;
+  width: var(--day-ring);
+  height: var(--day-ring);
+}
+
+.anillo circle {
+  fill: none;
+  stroke-width: var(--day-ring-stroke);
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--duration-screen) var(--ease);
+}
+
+.vacia {
+  stroke: var(--surface-2);
+}
+
+.llena {
+  stroke: var(--label);
+}
+
+/* «0/5» recto, sin inclinar (usuario, 2026-11-19) */
+.cuenta {
+  fill: var(--label);
+  font: var(--text-dato);
+  font-style: normal;
+}
+
+.texto {
+  min-width: 0;
+}
+
+.fecha {
+  margin: 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.fecha::first-letter {
+  text-transform: uppercase;
+}
+
+.frase {
+  margin: var(--space-1) 0 0;
+  font: var(--text-titulo-seccion);
+}
+
+.queda {
+  margin: var(--space-1) 0 0;
+  text-align: left; /* una frase corta: sin justificar ni partir palabras */
+  hyphens: manual;
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+/* La racha, en una píldora; solo el fuego en naranja */
+.racha {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--bg);
+  font: var(--text-caption);
+  font-weight: var(--weight-bold);
+}
+
+.fuego {
+  display: flex;
+  color: var(--streak);
+}
+
+.fuego.sinColor {
+  color: var(--label);
+}
+
+.fuego svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Con todo hecho: el centro del anillo en negro con su ✓ (lo demás, igual) */
+.anillo .centro {
+  fill: var(--label);
+  stroke: none;
+}
+
+.anillo .tick {
+  fill: none;
+  stroke: var(--surface);
+  stroke-width: var(--day-ring-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anillo circle {
+    transition: none;
+  }
+}

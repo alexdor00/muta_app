@@ -22,18 +22,28 @@ pantalla. Letra pequeña (pie o subtítulo) y, si hay cifras, en cajitas como el
   `--label-2` #6E6E73/#98989F · `--separator` #E3E3E6/#38383A · `--accent` #111113/#F2F2F7 con `--on-accent` #FFF/#000 · estados
   `--good/--warning/--critical`. **Sin naranja** (decisión 2026-10-29): el documento original usaba #FF5A12/#FF6A2A como acento; donde este
   resumen diga «naranja» (descanso, check…), se usa el acento neutro: blanco y negro, y el énfasis por tamaño, peso y contraste.
-- **Tipografía** (fuente del sistema, cifras de ancho fijo): título grande 34/41 · título 1 28/34 · título 2 22/28 · titular 17/22 · cuerpo 17/22 ·
-  subtítulo 15/20 · nota 13/18 · leyenda 12/16 · cifra grande 48/52.
-  **Un tamaño por papel, igual en todas las áreas** (el de Entreno; decisión 2026-11-05): título de pestaña 24 · hoja grande 28 ·
-  sección y nombre en cabecera 22 · título de fila, botón y título de hoja 17 · dato de fila, explicación, píldora y chip 15 ·
-  nota, segmento y día 13 · rótulo en mayúsculas 12 · cifra protagonista 40 (`--text-session-hero`) · cifra de tarjeta 30
-  (`--text-session-value`) · contador («4 de 5») 22 en cursiva. Ninguna área lleva tamaños propios.
-- **Espacio**: rejilla de 4 · margen lateral 20 · entre bloques 24, dentro 12 · radios 8 chip, 12 control, 20 tarjeta, 28 hoja, 999 píldora ·
-  toque ≥ 44 px (botón principal 52) · sin sombras · 150 ms toque, 250 ms hoja, 350 ms pantalla, curva `cubic-bezier(.32,.72,0,1)`.
+  **Mejora y logro** (usuario, 2026-11-20): lo que mejora frente a la última vez (+kg, +reps, la flecha, un %) va en verde
+  (`--improve`) en toda la app; el naranja (`--streak`) solo para un logro: la racha, el día completado y un récord.
+- **Tipografía** (fuente del sistema, cifras de ancho fijo). **Una escala cerrada para toda la app** (usuario, 2026-11-12:
+  «que todos los títulos, subtítulos, letras y números midan lo mismo», sin letras ni números enormes): título de pantalla y
+  de hoja 22 (`--text-titulo-pantalla`; usuario, 2026-11-20) · título de sección 20 (`--text-titulo-seccion`) · título de tarjeta o fila 17
+  (`--text-titulo-tarjeta`) · texto 16 · secundario 15 · nota 13 · etiqueta en mayúsculas 12 · cifras: 22 (la de la cabecera y la de una
+  tarjeta: nunca más grandes que un título de pantalla) · 20 (en una fila). Una palabra en negrita (`<b>`) va en seminegrita, como el resto. Los nombres de antes
+  (`--text-title-2`, `--text-session-value`…) son alias del tipo que les toca. Ninguna área lleva tamaños propios.
+- **Espacio**: rejilla de 4 · margen lateral 20 · entre bloques 24, dentro 12 · radios 8 chip, 12 control, 24 tarjeta, 28 hoja, 999 píldora ·
+  toque ≥ 44 px (botón principal 52) · **fondo gris muy claro y tarjetas blancas que flotan con una sombra suave** (`--card-shadow`; en
+  oscuro, sin sombra); lo de dentro de una tarjeta (cajitas, barras, controles), gris (`--bg`) · secundario gris (`--surface-2`) · 150 ms toque, 250 ms hoja, 350 ms pantalla, curva `cubic-bezier(.32,.72,0,1)`.
 - **Tacto y sonido**: marcar serie = toque ligero + clic; mejor que la vez anterior = dos notas; récord = tres notas que suben; fin de descanso = tres pitidos.
 - **Componentes base**: botón principal (píldora negra 52 px, «›» si lleva a otra pantalla), botón sobre foto (blanco), secundario (gris), celda de lista (64 px),
   control segmentado, tarjeta (radio 20), hoja (desde abajo, se cierra deslizando), círculo de día (36 px), teclado numérico propio (−/+ del salto de peso),
   anillo de descanso, aviso con Deshacer (4 s).
+- **Lo que sale en varios sitios es igual en todos** (usuario, 2026-11-14): un mismo elemento (la cabecera de una sesión, su
+  gráfica, una fila de Hoy…) se ve y se comporta igual en cada pantalla donde aparece. Se programa **una vez**, como
+  componente en `shared/ui`, y cada pantalla lo usa con sus datos; no se copia ni se rehace con otro estilo. Si un sitio
+  necesita algo distinto, se cambia el componente para todos. Los que ya son comunes: `SessionHero` (la cabecera con la foto
+  de la sesión: Ver sesión y un día de Progreso), `SessionChart` (la gráfica de una sesión, Tonelaje · Repeticiones ·
+  Duración: Ver sesión y un día de Progreso), `SessionProgress` (la gráfica de la ficha, Progreso y Nutrición), `DayNav`,
+  `TrendChart`, `ListRow`, `Sheet`, `Button`.
 
 ## Pestañas y pantallas
 
@@ -90,7 +100,7 @@ con el diseño, matices aprobados, recorrido probado) · 5 Tus datos (importar c
 
 ## Checklist de cada pantalla
 
-Coincide con su diseño aprobado · vive en su área y solo importa de otra por `index.ts` · solo llama a casos de uso y lee estado · solo variables de `tokens.css` ·
+Coincide con su diseño aprobado · lo que ya sale en otra pantalla, con el mismo componente · vive en su área y solo importa de otra por `index.ts` · solo llama a casos de uso y lee estado · solo variables de `tokens.css` ·
 una sola acción principal en la mitad inferior · todo lo tocable ≥ 44 px · estados (vacío, cargando, en curso, error) con texto que dice qué hacer · pantalla de error
 propia · modo oscuro y letra al máximo, axe sin errores · botones con nombre y contraste 4,5:1 · «reducir movimiento» = solo fundidos · Deshacer en lo reversible,
 confirmación solo en lo destructivo · funciona sin internet y no pierde datos · presupuesto de rendimiento · prueba de recorrido y captura; CI en verde.

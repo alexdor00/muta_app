@@ -1,13 +1,11 @@
 // La dieta con recetas hechas a mano (las cifras de la base de verdad, en use-cases/diet.test.ts).
 import { describe, expect, it } from 'vitest'
 import {
-  aArchivo,
   ajusteDe,
   diaDeDieta,
   diaDelCiclo,
   dietaNueva,
   inicioSi,
-  leerDieta,
   menuDe,
   recetaDelDia,
   recetaQueAjusta,
@@ -20,6 +18,7 @@ import {
   type Ingrediente,
   type Receta,
 } from './diet.ts'
+import { aArchivo, leerDieta } from './dietArchivo.ts'
 
 const ing = (nombre: string, kcal: number, entreno: number, descanso = entreno): Ingrediente => ({
   nombre,

@@ -183,6 +183,11 @@ describe('la semana y la rotación', () => {
     expect(avanzar(programa, { bloque: 1, semana: 0, siguiente: 0 }, 0)).toEqual(INICIO)
   })
 
+  it('con una sesión tuya añadida, la semana tiene una más antes de pasar', () => {
+    expect(avanzar(programa, INICIO, 1, 3)).toEqual({ bloque: 0, semana: 0, siguiente: 2 })
+    expect(avanzar(programa, INICIO, 2, 3)).toEqual({ bloque: 0, semana: 1, siguiente: 0 })
+  })
+
   it('dónde vas', () => {
     expect(dondeVas(programa, { bloque: 0, semana: 1, siguiente: 0 })).toBe('Fase 1 · semana 2 de 2')
     expect(dondeVas({ blocks: [programa.blocks[0]] }, INICIO)).toBe('Semana 1 de 2')

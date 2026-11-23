@@ -6,7 +6,6 @@ import {
   ingredienteDe,
   leerRecetario,
   macroDe,
-  platoDeReceta,
   platoTuyo,
   cambioEn,
   claveDelDia,
@@ -15,6 +14,7 @@ import {
   productosVacios,
   vaCon,
 } from './recipes.ts'
+import { platoDeReceta } from './dietaAMenus.ts'
 
 const arroz: Alimento = {
   id: 'f_arroz',

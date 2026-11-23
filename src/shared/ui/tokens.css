@@ -14,24 +14,40 @@
 
 :root {
   /* Color · claro */
-  --bg: #ffffff;
-  --surface: #f4f4f5;
-  --surface-2: #e9e9eb;
+  /* Fondo gris muy claro y tarjetas blancas que flotan encima (propuesta «tarjetas», 2026-11-12). Lo que va dentro de
+     una tarjeta usa --bg: las cajitas y los controles salen grises sobre el blanco. */
+  --bg: #f2f2f4;
+  --surface: #ffffff;
+  --surface-2: #e6e6e9;
   --surface-3: #dcdcdf; /* un tono más: la serie hecha sobre las filas de la sesión */
+  --card-shadow:
+    0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 5%); /* la tarjeta que flota (en oscuro, sin sombra) */
   --label: #111113;
   --label-2: #48484a; /* gris de los textos secundarios: más oscuro para que se lea mejor (decisión 2026-11-04) */
+  --label-3: #aeaeb2; /* gris suave: lo que se ve de fondo y se escribe encima (la vez anterior en una serie) */
   --separator: #e3e3e6;
   --accent: #111113; /* sin color: el énfasis es negro en claro y blanco en oscuro */
   --on-accent: #ffffff; /* texto o icono sobre un fondo --accent */
   --good: #34c759;
+  /* Discos: el color olímpico de cada peso (norma IWF); los de ajuste (5, 2,5 y 1,25), acero que se aclara cuanto menos pesan (usuario, 2026-11-14) */
+  --plate-25: #d7262e;
+  --plate-20: #1f5fd1;
+  --plate-15: #f2c200;
+  --plate-10: #23803a;
+  --plate-5: #3a3a40;
+  --plate-2-5: #6b6e75;
+  --plate-1-25: #b9bdc4;
+  --plate-on-light: #111113;
+  --plate-on-dark: #ffffff;
+  --improve: #1b7f3a; /* lo que mejora (flecha y cifra): verde, no naranja (usuario, 2026-11-12); 4,5:1 sobre blanco */
   --warning: #ff9f0a;
   --critical: #ff3b30;
   --critical-label: #d70015; /* rojo para texto: contraste 4,5:1 sobre el fondo */
   --on-photo: #ffffff;
-  --streak: #ff7a1a; /* racha y mejoras del resumen final, como en el prototipo anterior (decisión 2026-11-02) */
+  --streak: #ff7a1a; /* solo los logros: la racha, el día completado y un récord; una mejora va en --improve (usuario, 2026-11-20) */
   --range-dot: var(
-    --streak
-  ); /* lo que hace tu plan sobre el rango de un músculo (A17), naranja como en el prototipo */
+    --accent
+  ); /* lo que hace tu plan sobre el rango de un músculo (A17): no es un logro, en negro (usuario, 2026-11-20) */
   --rest-bg: #111113; /* píldora del descanso en la sesión (C03) */
   --rest-fg: #ffffff;
   --rest-step: rgb(255 255 255 / 16%);
@@ -69,41 +85,88 @@
   --target-hero-step: var(--rest-step);
   --target-chip: var(--on-session-light);
   --on-target-chip: var(--on-session-dark);
+  --goal-line: var(--label-2); /* la raya del objetivo en las barras de Progreso (sin naranja) */
+  --bars-height: 96px; /* alto de las barras de Progreso (la semana de comida, tus semanas de entreno) */
+  --sparkline-width: 64px; /* mini-gráfica de una medida o una señal de Progreso */
+  --sparkline-height: 24px;
+  --rail: 8px; /* barra de un rango (series de un músculo, RIR, % de grasa) */
+  --rail-dot: 16px; /* el punto que dice dónde estás en esa barra */
+  --progress-photo: 220px; /* alto de una foto de progreso (antes y ahora) */
+  --calendar-cell: 40px; /* día del calendario de entrenos */
+  --day-ring: 88px; /* Hoy: el anillo de tu día, partido en tantas piezas como cosas que hacer */
+  --day-ring-stroke: 8px;
+  --task-photo-height: 128px; /* Hoy: la fila del entreno, con su foto */
   --float-shadow:
     0 6px 18px rgb(0 0 0 / 28%), 0 1px 3px rgb(0 0 0 / 18%); /* botón que flota sobre una tarjeta («▶ Empezar») */
-  --photo-card-scrim: linear-gradient(180deg, rgb(0 0 0 / 0%) 45%, rgb(0 0 0 / 55%) 100%);
+  --photo-card-scrim: linear-gradient(
+    180deg,
+    rgb(0 0 0 / 0%) 60%,
+    rgb(0 0 0 / 22%) 100%
+  ); /* casi la foto original: solo un velo abajo para el texto (usuario, 2026-11-14) */
   --photo-card-height: 192px; /* tarjeta de rutina: proporción de la captura de referencia */
   --avatar: 40px;
   --hero-height: 58dvh; /* cabecera con foto de una categoría o rutina */
-  --session-hero-height: 44dvh; /* cabecera de color de Ver sesión (proporción del diseño) */
+  --session-card-height: calc(var(--photo-card-height) * 1.55); /* 298: la tarjeta de una sesión en Tu plan */
+  --session-hero-height: calc(
+    var(--photo-card-height) * 1.7 + var(--radius-card)
+  ); /* la foto de Ver sesión y de un día de Progreso: algo más alta que la tarjeta (usuario, 2026-11-14) */
   --thumb: 100px; /* miniatura cuadrada de una fila de lista */
   --bar-height: 52px; /* barra compacta superior */
   --tab-bar-height: 60px; /* barra de pestañas (sin la zona segura de abajo); lo fijo abajo va encima */
   --sheet-max: 88dvh; /* alto máximo de una hoja */
   --scrim-sheet: rgb(0 0 0 / 40%); /* fondo oscurecido detrás de una hoja */
-  --photo-scrim: linear-gradient(180deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 35%) 45%, rgb(0 0 0 / 85%) 100%);
+  --photo-scrim: var(
+    --photo-card-scrim
+  ); /* el mismo en toda la app: el de la tarjeta de sesión de Entrenamiento (usuario, 2026-11-14) */
 
-  /* Tipografía: fuente del sistema (SF Pro en iPhone, Roboto en Android). Tamaños en rem. */
+  /*
+   * Tipografía: fuente del sistema (SF Pro en iPhone, Roboto en Android). Tamaños en rem.
+   * Una escala cerrada (usuario, 2026-11-12: «que todos los títulos, subtítulos, letras y números midan lo mismo»): cada
+   * texto de cada pantalla es uno de estos tipos y nada más. Ni letras ni números enormes.
+   *   Título de pantalla (y de hoja grande) · 22   --text-titulo-pantalla
+   *   Título de sección (Comidas, Ejercicios…) · 20 --text-titulo-seccion
+   *   Título de tarjeta o de fila · 17             --text-titulo-tarjeta (= headline)
+   *   Texto · 16                                   --text-body
+   *   Secundario (filas, botones) · 15             --text-subhead
+   *   Nota (en gris) · 13                          --text-footnote
+   *   Etiqueta (MAYÚSCULAS, ejes) · 12             --text-caption
+   *   Cifras (negrita poco inclinada): 22 (la de la cabecera y la de una tarjeta: nunca más grandes que un título de pantalla) ·
+   *   20 (dentro de una fila)                      --text-cifra-grande · --text-cifra · --text-cifra-fila
+   * Los nombres de antes se quedan como alias del tipo que les toca, para que todo siga la misma escala.
+   */
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', Roboto, 'Segoe UI', sans-serif;
-  --text-large-title: 700 2.125rem / 2.5625rem var(--font); /* 34 / 41 */
-  --text-title-1: 700 1.75rem / 2.125rem var(--font); /* 28 / 34 */
-  --text-title-tab: 700 1.5rem / 1.875rem var(--font); /* 24 / 30: título en fila con el perfil (Entrenamiento, como en el diseño) */
-  --text-title-2: 600 1.375rem / 1.75rem var(--font); /* 22 / 28 */
-  --text-headline: 600 1.0625rem / 1.375rem var(--font); /* 17 / 22 */
-  --text-body: 400 1.0625rem / 1.375rem var(--font); /* 17 / 22 */
+  --font-condensed: 'Barlow Condensed', 'Futura Condensed ExtraBold', 'Arial Narrow', sans-serif;
+  --text-titulo-pantalla: 700 1.375rem / 1.75rem var(--font); /* 22 / 28: más pequeño (usuario, 2026-11-20) */
+  --text-titulo-seccion: 700 1.25rem / 1.625rem var(--font); /* 20 / 26 */
+  --text-titulo-tarjeta: 600 1.0625rem / 1.375rem var(--font); /* 17 / 22 */
+  --text-letra-grande: italic 900 2.125rem / 1 var(--font-condensed); /* 34: siglas y nombres en letra estrecha */
+  --text-letra-fila: italic 900 1.25rem / 1 var(--font-condensed); /* 20 */
+  /* Las cifras (usuario, 2026-11-15): como «2.375 kcal al día», poco inclinadas; seminegrita, menos negra, y nunca más
+     grandes que el título de una pantalla (usuario, 2026-11-19) */
+  --text-cifra-grande: oblique 6deg 600 1.375rem / 1 var(--font); /* 22, como el título de pantalla (usuario, 2026-11-20) */
+  --text-cifra: oblique 6deg 600 1.375rem / 1 var(--font); /* 22 */
+  --text-cifra-fila: oblique 6deg 600 1.25rem / 1 var(--font); /* 20 */
+  --text-cifra-barra: oblique 6deg 600 1.4375rem / 1 var(--font); /* 23: el tiempo de la sesión, arriba, y el del descanso */
+  --text-dato: var(--text-cifra); /* 22, como «2.375 kcal al día» */
+  --text-dato-fila: var(--text-headline);
+  --text-large-title: var(--text-titulo-pantalla); /* título de pantalla */
+  --text-title-1: var(--text-titulo-pantalla); /* título de pantalla (hoja grande, ficha) */
+  --text-title-tab: var(--text-titulo-pantalla); /* título de pantalla */
+  --text-title-2: var(--text-titulo-seccion); /* título de sección */
+  --text-headline: var(--text-titulo-tarjeta); /* título de tarjeta */
+  --text-body: 400 1rem / 1.375rem var(--font); /* 16 / 22 */
   --text-subhead: 400 0.9375rem / 1.25rem var(--font); /* 15 / 20 */
   --text-footnote: 400 0.8125rem / 1.125rem var(--font); /* 13 / 18 */
   --text-caption: 500 0.75rem / 1rem var(--font); /* 12 / 16 */
-  --text-big-number: 700 3rem / 3.25rem var(--font); /* 48 / 52 */
-  --font-condensed: 'Barlow Condensed', 'Futura Condensed ExtraBold', 'Arial Narrow', sans-serif;
-  --text-session-sigla: italic 900 1.125rem / 1.2 var(--font-condensed); /* 18: sigla de la tarjeta de sesión (como en el diseño) */
-  --text-session-title: italic 900 1.375rem / 1.1 var(--font-condensed); /* 22 */
-  --text-summary-sigla: italic 900 5rem / 0.9 var(--font-condensed); /* 80: sigla del resumen final */
-  --text-session-hero: italic 900 2.5rem / 1 var(--font-condensed); /* 40: cifra protagonista (sigla de Ver sesión; en Comida, kcal por comer, tu objetivo y la ración) */
-  --text-session-label: italic 900 1.375rem / 1 var(--font-condensed); /* 22: nombre en la burbuja de un músculo */
-  --text-session-value: italic 900 1.875rem / 1 var(--font-condensed); /* 30: cifra de tarjeta (tonelaje de Ver sesión; en Comida, la media, el peso y la sugerencia) */
-  --text-timer: 700 4.5rem / 1 var(--font); /* 72: número del cronómetro de una serie */
-  --text-set-value: 700 1.375rem / 1 var(--font); /* 22: kilos de una serie en la sesión */
+  --text-big-number: var(--text-cifra); /* cifra */
+  --text-session-sigla: italic 900 1.125rem / 1.2 var(--font-condensed); /* 18: sigla en una tarjeta de sesión */
+  --text-session-title: var(--text-letra-fila); /* cifra de fila: nombre condensado de una tarjeta */
+  --text-summary-sigla: var(--text-letra-grande); /* cifra grande: sigla del resumen final */
+  --text-session-hero: var(--text-letra-grande); /* cifra grande */
+  --text-session-label: var(--text-letra-fila); /* cifra de fila */
+  --text-session-value: var(--text-cifra); /* cifra */
+  --text-timer: 600 3rem / 1 var(--font); /* 48: el cronómetro de una serie (lo único que se lee de lejos) */
+  --text-set-value: 600 1.25rem / 1 var(--font); /* 20: kilos de una serie en la sesión */
   --text-chart-axis: 500 0.8125rem / 1 var(--font); /* 13: números y fechas de los ejes de una gráfica */
   --text-session-ghost: italic 900 11.875rem / 0.8 var(--font-condensed); /* 190: sigla de fondo, solo contorno */
   --text-brand: 800 4rem / 1 var(--font); /* 64: solo el logotipo MUTA de la bienvenida */
@@ -124,7 +187,7 @@
   /* Forma */
   --radius-chip: 8px;
   --radius-control: 12px;
-  --radius-card: 20px;
+  --radius-card: 24px;
   --radius-sheet: 28px;
   --radius-pill: 999px;
   --app-max-width: 430px; /* ancho de un iPhone grande */
@@ -165,6 +228,15 @@
 
   /* Zonas seguras del móvil (muesca, barra de inicio) */
   --safe-top: env(safe-area-inset-top, 0px);
+  /* El color suave de cada menú de Nutrición (A, B, C…), con la letra siempre oscura: igual en claro y en oscuro (Plan, 2026-11-18) */
+  --menu-1: #eee4d5;
+  --menu-2: #dce8df;
+  --menu-3: #e6deef;
+  --menu-4: #dfe6ef;
+  --menu-5: #f0dede;
+  --menu-6: #e9ecd6;
+  --menu-7: #e3e3e3;
+  --on-menu: #111113;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
   color-scheme: light dark;
@@ -179,14 +251,17 @@
     --surface-3: #3a3a3c;
     --label: #f2f2f7;
     --label-2: #aeaeb2;
+    --label-3: #636366;
     --separator: #38383a;
     --accent: #f2f2f7;
     --on-accent: #000000;
     --good: #30d158;
+    --improve: #30d158;
     --warning: #ffd60a;
     --critical: #ff453a;
     --critical-label: #ff6961;
     --rest-bg: #2c2c2e;
+    --card-shadow: none;
   }
 }
 
@@ -197,14 +272,17 @@
   --surface-3: #3a3a3c;
   --label: #f2f2f7;
   --label-2: #aeaeb2;
+  --label-3: #636366;
   --separator: #38383a;
   --accent: #f2f2f7;
   --on-accent: #000000;
   --good: #30d158;
+  --improve: #30d158;
   --warning: #ffd60a;
   --critical: #ff453a;
   --critical-label: #ff6961;
   --rest-bg: #2c2c2e;
+  --card-shadow: none;
   color-scheme: dark;
 }
 

@@ -1,0 +1,53 @@
+/* Un paso de la bienvenida: barras de progreso arriba, título grande, contenido y el botón abajo (usuario, 2026-11-17). */
+.pantalla {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: calc(var(--space-4) + var(--safe-top)) var(--gutter) calc(var(--space-6) + var(--safe-bottom));
+  background: var(--bg);
+}
+
+.barras {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.barras span {
+  flex: 1;
+  height: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.barras .hecha {
+  background: var(--label);
+}
+
+.titulo {
+  margin-top: var(--space-6);
+  font: var(--text-title-1);
+  text-wrap: balance;
+}
+
+.intro {
+  margin-top: var(--space-2);
+  color: var(--label-2);
+  font: var(--text-subhead);
+  text-align: left;
+  text-wrap: pretty;
+}
+
+.contenido {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--gap-block);
+}
+
+.pie {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--gap-block);
+}

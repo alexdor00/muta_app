@@ -2,6 +2,7 @@ import type { ComponentChildren, FunctionComponent } from 'preact'
 import { useEffect } from 'preact/hooks'
 import { getDb } from '../shared/data/db.ts'
 import { ErrorBoundary, LocationProvider, Route, Router, lazy, useLocation } from 'preact-iso'
+import { apuntarPantalla } from '../shared/lib/historial.ts'
 import { logError } from '../shared/lib/logger.ts'
 import { isFullScreen, paths, patterns } from '../shared/lib/paths.ts'
 import { Pending } from '../shared/ui/Pending.tsx'
@@ -49,6 +50,9 @@ const Sesion = screen(() =>
 const Resumen = screen(() =>
   import('../features/training/screens/resumen/ResumenScreen.tsx').then((m) => m.ResumenScreen),
 )
+const FichaMusculo = screen(() =>
+  import('../features/training/screens/musculo/MusculoScreen.tsx').then((m) => m.MusculoScreen),
+)
 const FichaEjercicio = screen(() =>
   import('../features/training/screens/ejercicio/FichaEjercicioScreen.tsx').then(
     (m) => m.FichaEjercicioScreen,
@@ -61,6 +65,9 @@ const Comida = screen(() =>
 const ObjetivoComida = screen(() =>
   import('../features/nutrition/screens/objetivo/ObjetivoScreen.tsx').then((m) => m.ObjetivoScreen),
 )
+const ComoCocinas = screen(() =>
+  import('../features/nutrition/screens/cocinas/ComoCocinasScreen.tsx').then((m) => m.ComoCocinasScreen),
+)
 const RecetaComida = screen(() =>
   import('../features/nutrition/screens/receta/RecetaScreen.tsx').then((m) => m.RecetaScreen),
 )
@@ -69,6 +76,15 @@ const CompraComida = screen(() =>
 )
 const CocinaComida = screen(() =>
   import('../features/nutrition/screens/cocina/CocinaScreen.tsx').then((m) => m.CocinaScreen),
+)
+const TandaComida = screen(() =>
+  import('../features/nutrition/screens/tanda/TandaScreen.tsx').then((m) => m.TandaScreen),
+)
+const AlMomentoComida = screen(() =>
+  import('../features/nutrition/screens/tanda/AlMomentoScreen.tsx').then((m) => m.AlMomentoScreen),
+)
+const CocinarPlato = screen(() =>
+  import('../features/nutrition/screens/tanda/CocinarPlatoScreen.tsx').then((m) => m.CocinarPlatoScreen),
 )
 const ConsultaComida = screen(() =>
   import('../features/nutrition/screens/consulta/ConsultaScreen.tsx').then((m) => m.ConsultaScreen),
@@ -85,6 +101,7 @@ const Nutricionista = screen(() =>
 const Progreso = screen(() =>
   import('../features/progress/screens/progreso/ProgresoScreen.tsx').then((m) => m.ProgresoScreen),
 )
+const Dia = screen(() => import('../features/progress/screens/dia/DiaScreen.tsx').then((m) => m.DiaScreen))
 const Perfil = screen(() =>
   import('../features/profile/screens/perfil/PerfilScreen.tsx').then((m) => m.PerfilScreen),
 )
@@ -94,6 +111,13 @@ const Bienvenida = screen(() =>
 
 const OnboardingStep = screen(() =>
   import('../features/profile/screens/onboarding/OnboardingScreen.tsx').then((m) => m.OnboardingScreen),
+)
+
+/** Los pasos de comida de la bienvenida: los pone Nutrición (se pueden saltar). */
+const BienvenidaComida = screen(() =>
+  import('../features/nutrition/screens/bienvenida/BienvenidaComidaScreen.tsx').then(
+    (m) => m.BienvenidaComidaScreen,
+  ),
 )
 
 /** Al abrir la app: la primera vez (sin perfil) va a la bienvenida; después, a Hoy. */
@@ -138,9 +162,12 @@ const Rutina = screen(() =>
   import('../features/training/screens/rutina/RutinaScreen.tsx').then((m) => m.RutinaScreen),
 )
 const DevUi = screen(() => import('./dev/DevUiScreen.tsx').then((m) => m.DevUiScreen))
+const DevDemo = screen(() => import('./dev/DemoScreen.tsx').then((m) => m.DemoScreen))
 
 function Layout() {
-  const { path } = useLocation()
+  const { path, url } = useLocation()
+  // Cada pantalla apunta cuántas de MUTA tiene detrás, para que «‹» vuelva a la anterior (shared/lib/historial.ts)
+  useEffect(() => apuntarPantalla(), [url])
   return (
     <>
       <main>
@@ -159,21 +186,29 @@ function Layout() {
             <Route path={patterns.summary} component={Resumen} />
             <Route path={patterns.session} component={Sesion} />
             <Route path={patterns.exercise} component={FichaEjercicio} />
+            <Route path={patterns.muscle} component={FichaMusculo} />
             <Route path={paths.nutrition} component={Comida} />
             <Route path={paths.nutritionTarget} component={ObjetivoComida} />
+            <Route path={paths.cooking} component={ComoCocinas} />
             <Route path={patterns.recipe} component={RecetaComida} />
             <Route path={paths.shopping} component={CompraComida} />
             <Route path={paths.kitchen} component={CocinaComida} />
+            <Route path={patterns.batch} component={TandaComida} />
+            <Route path={patterns.cookNow} component={AlMomentoComida} />
+            <Route path={patterns.cookDish} component={CocinarPlato} />
             <Route path={paths.checkIn} component={ConsultaComida} />
             <Route path={patterns.dishes} component={CategoriaPlatos} />
             <Route path={patterns.dish} component={PlatoComida} />
             <Route path={paths.nutritionist} component={Nutricionista} />
             <Route path={paths.progress} component={Progreso} />
+            <Route path={patterns.progressDay} component={Dia} />
             <Route path={paths.profile} component={Perfil} />
             <Route path={paths.welcome} component={Bienvenida} />
+            <Route path={patterns.welcomeFood} component={BienvenidaComida} />
             <Route path={patterns.onboarding} component={OnboardingStep} />
             <Route path="/dev/fallo" component={import.meta.env.DEV ? DevCrash : NotFound} />
             <Route path="/dev/ui" component={DevUi} />
+            <Route path="/dev/demo" component={DevDemo} />
             <Route default component={NotFound} />
           </Router>
         </ErrorBoundary>

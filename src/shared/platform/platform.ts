@@ -14,13 +14,15 @@ export interface Platform {
   notify(title: string, body: string): Promise<void>
   /** Compartir un texto (hoja del sistema); si no hay, se copia. Dice cuál de las dos pasó. */
   share(title: string, text: string): Promise<'shared' | 'copied' | 'none'>
+  /** Copiar un texto al portapapeles (las instrucciones para una IA); dice si se pudo. */
+  copy(text: string): Promise<boolean>
   /** Compartir un archivo (la imagen del resumen); si no se puede, se guarda en el móvil. Dice cuál de las dos pasó. */
   shareFile(title: string, file: File): Promise<'shared' | 'saved' | 'none'>
   saveFile(fileName: string, contents: Blob): Promise<void>
   pickFile(accept: string): Promise<File | null>
   /**
-   * La cámara de atrás en un <video> (escanear un código de barras). Devuelve cómo apagarla, o null si no hay cámara o
-   * no se da permiso.
+   * La cámara en un <video>: la de atrás (escanear un código de barras) o la de delante (`'user'`, las fotos de progreso).
+   * Devuelve cómo apagarla, o null si no hay cámara o no se da permiso.
    */
-  startCamera(video: HTMLVideoElement): Promise<(() => void) | null>
+  startCamera(video: HTMLVideoElement, facing?: 'environment' | 'user'): Promise<(() => void) | null>
 }

@@ -4,6 +4,7 @@
   padding: var(--space-5);
   border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
 
 .head {
@@ -58,14 +59,14 @@
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-control);
   background: var(--label);
-  color: var(--bg);
+  color: var(--on-accent);
   text-align: center;
   white-space: nowrap;
   transform: translate(-50%, calc(-100% - var(--space-2)));
 }
 
 .bubble strong {
-  font: var(--text-session-label);
+  font: var(--text-session-label); /* el nombre del músculo, en la letra de antes (usuario, 2026-11-19) */
   text-transform: uppercase;
 }
 
@@ -84,7 +85,7 @@
   margin: calc(var(--space-1) * -1) 0 calc(var(--space-2) * -1);
   border: 0;
   background: none;
-  color: var(--bg);
+  color: var(--on-accent);
   font: var(--text-footnote);
   font-weight: var(--weight-semibold);
   text-decoration: underline;
