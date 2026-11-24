@@ -1,6 +1,6 @@
 import { getDb, runTx } from '../../../shared/data/db.ts'
 import { logError } from '../../../shared/lib/logger.ts'
-import { leerRutinaCsv, PREFIJO_MIA, type RutinaMia } from '../domain/csvRoutine.ts'
+import { leerRutinaCsv, PREFIJO_MIA, rutinaParecida, type RutinaMia } from '../domain/csvRoutine.ts'
 import type { ProgramData } from '../domain/program.ts'
 import { platform } from '../../../shared/platform/index.ts'
 import { INSTRUCCIONES_IA_RUTINA } from '../domain/routinePrompt.ts'
@@ -16,14 +16,32 @@ export const PLANTILLA_CSV = [
   'Pierna;Curl femoral sentado;3;10-15;1;1:30;Ejemplo: borra estas filas y pon las tuyas',
 ].join('\n')
 
-/** Empieza tu rutina del CSV: se guarda como un programa tuyo y pasa a ser tu plan (desde su primera sesión). */
+/** Una rutina tuya de antes que parece la del CSV (se llama igual o lleva los mismos ejercicios), o null. */
+export async function rutinaTuyaParecida(nombre: string, programa: ProgramData): Promise<RutinaMia | null> {
+  try {
+    const db = await getDb()
+    const tuyas = ((await db.getAll('programs')) as RutinaMia[])
+      .filter((p) => typeof p.id === 'string' && p.id.startsWith(PREFIJO_MIA))
+      .sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }))
+    return rutinaParecida(nombre, programa, tuyas)
+  } catch (error) {
+    logError(error, 'buscar tu rutina de antes')
+    return null
+  }
+}
+
+/**
+ * Empieza tu rutina del CSV: se guarda como un programa tuyo y pasa a ser tu plan (desde su primera sesión). Con `mismaId`
+ * (es tu rutina de antes: usuario, 2026-11-23), se guarda con su id: sus etapas se comparan y su historia sigue.
+ */
 export async function empezarRutinaCsv(
   nombre: string,
   programa: ProgramData,
   ahora = new Date(),
+  mismaId?: string,
 ): Promise<boolean> {
   try {
-    const id = `${PREFIJO_MIA}${ahora.getTime()}`
+    const id = mismaId ?? `${PREFIJO_MIA}${ahora.getTime()}`
     const db = await getDb()
     await runTx(db, ['programs', 'plans', 'rotation'], async (tx) => {
       const mia: RutinaMia = { ...programa, id, title: nombre.trim() || 'Mi rutina' }

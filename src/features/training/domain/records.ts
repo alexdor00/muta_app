@@ -2,7 +2,7 @@
 // Mejorar la vez anterior es una mejora (verde); superar tu mejor marca de siempre es un récord (naranja, solo ese día).
 import { e1rm } from './e1rm.ts'
 import { mejorDe } from './mesocycles.ts'
-import type { Entreno } from './workoutHistory.ts'
+import type { Clave, Entreno } from './workoutHistory.ts'
 import type { SerieHecha } from './workoutSet.ts'
 
 /** Más de un 1 % por encima, como «Récord» en Progreso (`ejercicioEnMes`): así un redondeo no da un récord. */
@@ -11,10 +11,15 @@ const MARGEN = 1.01
 const fuerza = (s: SerieHecha) => e1rm(s.kg, s.reps, 0)
 
 /** Tu mejor 1RM estimado de siempre en un ejercicio, en los entrenos que se le pasan; 0 si nunca lo has hecho. */
-export function mejorDeSiempre(entrenos: readonly Entreno[], nombre: string): number {
+export function mejorDeSiempre(
+  entrenos: readonly Entreno[],
+  nombre: string,
+  clave: Clave = (n) => n,
+): number {
+  const k = clave(nombre)
   let mejor = 0
   for (const x of entrenos)
-    for (const e of x.ejercicios) if (e.nombre === nombre) mejor = Math.max(mejor, mejorDe(e).valor)
+    for (const e of x.ejercicios) if (clave(e.nombre) === k) mejor = Math.max(mejor, mejorDe(e).valor)
   return mejor
 }
 
@@ -34,11 +39,15 @@ export function serieRecord(hoy: readonly (SerieHecha | null)[], antes: number):
 export type RecordDelDia = { nombre: string; serie: SerieHecha; e1rm: number }
 
 /** Los récords de un entreno frente a todos los anteriores a él: cada ejercicio con su mejor serie y su 1RM. */
-export function recordsDelEntreno(entreno: Entreno, entrenos: readonly Entreno[]): RecordDelDia[] {
+export function recordsDelEntreno(
+  entreno: Entreno,
+  entrenos: readonly Entreno[],
+  clave: Clave = (n) => n,
+): RecordDelDia[] {
   const anteriores = entrenos.filter((x) => x.id !== entreno.id && x.inicio < entreno.inicio)
   const out: RecordDelDia[] = []
   for (const e of entreno.ejercicios) {
-    const j = serieRecord(e.series, mejorDeSiempre(anteriores, e.nombre))
+    const j = serieRecord(e.series, mejorDeSiempre(anteriores, e.nombre, clave))
     if (j >= 0)
       out.push({ nombre: e.nombre, serie: e.series[j], e1rm: Math.round(fuerza(e.series[j]) * 10) / 10 })
   }
@@ -46,6 +55,10 @@ export function recordsDelEntreno(entreno: Entreno, entrenos: readonly Entreno[]
 }
 
 /** Los récords de un día (de todos sus entrenos), frente a todo lo de antes. */
-export function recordsDelDia(fecha: string, entrenos: readonly Entreno[]): RecordDelDia[] {
-  return entrenos.filter((x) => x.fecha === fecha).flatMap((x) => recordsDelEntreno(x, entrenos))
+export function recordsDelDia(
+  fecha: string,
+  entrenos: readonly Entreno[],
+  clave: Clave = (n) => n,
+): RecordDelDia[] {
+  return entrenos.filter((x) => x.fecha === fecha).flatMap((x) => recordsDelEntreno(x, entrenos, clave))
 }

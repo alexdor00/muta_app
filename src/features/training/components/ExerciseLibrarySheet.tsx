@@ -11,8 +11,8 @@ type Props<M extends string> = {
   muscles: { id: M; label: string }[]
   muscle: M | null
   onMuscle: (id: M | null) => void
-  /** Ejercicios que coinciden: nombre y «Pecho, barra»; los que no se hacen con tu material van al final, en gris. */
-  rows: { id: string; name: string; line: string; noTienes?: boolean }[]
+  /** Ejercicios que coinciden: nombre y «Pecho, barra». */
+  rows: { id: string; name: string; line: string }[]
   /** Con `hrefOf`, cada fila lleva a su ficha (›); con `onPick`, se elige (+). */
   hrefOf?: (id: string) => string
   onPick?: (id: string) => void
@@ -44,8 +44,8 @@ export function ExerciseLibrarySheet<M extends string>({
       <span class={styles.chevron}>{onPick ? <PlusIcon /> : <ChevronRightIcon />}</span>
     </>
   )
-  const lista = (rs: Props<M>['rows'], clase = '') => (
-    <ul class={`${styles.list} ${clase}`}>
+  const lista = (rs: Props<M>['rows']) => (
+    <ul class={styles.list}>
       {rs.map((r) => (
         <li key={r.id}>
           {onPick ? (
@@ -88,22 +88,7 @@ export function ExerciseLibrarySheet<M extends string>({
           </button>
         ))}
       </div>
-      {rows.length ? (
-        <>
-          {lista(rows.filter((r) => !r.noTienes))}
-          {rows.some((r) => r.noTienes) && (
-            <>
-              <h3 class={styles.section}>No está en tu material</h3>
-              {lista(
-                rows.filter((r) => r.noTienes),
-                styles.dim,
-              )}
-            </>
-          )}
-        </>
-      ) : (
-        <p class={styles.empty}>Sin resultados.</p>
-      )}
+      {rows.length ? lista(rows) : <p class={styles.empty}>Sin resultados.</p>}
     </Sheet>
   )
 }

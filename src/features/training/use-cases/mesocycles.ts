@@ -11,6 +11,8 @@ import type { Mesociclo, SesionDelMeso } from '../domain/mesocycles.ts'
 import { faseActual } from '../state/fase.ts'
 import { entrenos, sesiones, tuPlan } from '../state/plan.ts'
 import { cargarFase } from './fase.ts'
+import { nombreDeVuelta } from '../domain/vueltas.ts'
+import { quitarFinDeRutina } from './finDeRutina.ts'
 import { cargarPlan } from './training.ts'
 
 /** Como se guarda: `startDate` es el índice del almacén (el mismo día que `inicio`). */
@@ -76,13 +78,22 @@ async function cerrar(actual: Mesociclo, inicio: string): Promise<void> {
   else await guardar({ ...actual, fin: addDays(inicio, -1) })
 }
 
+/** La cola de `mesociclosAlDia`: uno detrás de otro, nunca dos a la vez. */
+let enCola: Promise<unknown> = Promise.resolve()
+
 /**
  * Tus mesociclos al día (con tu plan ya cargado): crea el primero, cierra el de otra rutina y guarda en el que está en
- * curso tu plan y tus sesiones de ahora. Devuelve el que está en curso (null sin rutina) y los archivados.
+ * curso tu plan y tus sesiones de ahora. Devuelve el que está en curso (null sin rutina) y los archivados. Van en cola:
+ * si dos pantallas lo piden a la vez (Progreso y el aviso de tu logro), la segunda ve lo que guardó la primera; si no,
+ * cada una creaba su primera etapa y quedaban dos (2026-11-24).
  */
-export async function mesociclosAlDia(
-  hoy: string,
-): Promise<{ actual: Mesociclo | null; archivados: Mesociclo[] }> {
+export function mesociclosAlDia(hoy: string): Promise<{ actual: Mesociclo | null; archivados: Mesociclo[] }> {
+  const r = enCola.then(() => alDia(hoy))
+  enCola = r.catch(() => undefined)
+  return r
+}
+
+async function alDia(hoy: string): Promise<{ actual: Mesociclo | null; archivados: Mesociclo[] }> {
   await cargarPlan()
   await cargarFase()
   const todos = await leerTodos()
@@ -153,6 +164,29 @@ export async function empezarMesociclo(nombre: string, hoy: string): Promise<boo
     return true
   } catch (error) {
     logError(error, 'empezar un mesociclo')
+    return false
+  }
+}
+
+/**
+ * «Repetirla» al terminar tu rutina (usuario, 2026-11-23): la etapa de ahora se archiva y empieza hoy otra con la misma
+ * rutina («Definición» → «Definición · vuelta 2»), que se compara con ella a la misma semana. La rotación ya está en la
+ * semana 1.
+ */
+export async function repetirRutina(hoy: string): Promise<boolean> {
+  try {
+    const { actual } = await mesociclosAlDia(hoy)
+    if (!actual) return false
+    // Una etapa que empezó hoy no tiene nada que archivar (se borraría): sigue ella, ya con la rutina en la semana 1
+    if (actual.inicio >= hoy) {
+      await quitarFinDeRutina()
+      return true
+    }
+    const ok = await empezarMesociclo(nombreDeVuelta(actual.nombre), hoy)
+    if (ok) await quitarFinDeRutina()
+    return ok
+  } catch (error) {
+    logError(error, 'repetir la rutina')
     return false
   }
 }

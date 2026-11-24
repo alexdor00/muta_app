@@ -1,3 +1,5 @@
+import type { ComponentChildren } from 'preact'
+import { formatRest } from '../../../shared/lib/format.ts'
 import { Button } from '../../../shared/ui/Button.tsx'
 import {
   ArrowDownIcon,
@@ -35,6 +37,12 @@ type Props = {
     /** Frente a la vez anterior: subió el peso, más reps, bajó o igual (null sin vez anterior). */
     cambio: { texto: string; tipo: 'kg' | 'reps' | 'baja' | 'igual' } | null
   }[]
+  /** Tus descansos, revisados con lo de hoy (02-reglas § 3): se proponen, no se cambian solos. */
+  descansos: { nombre: string; de: number; a: number; motivo: string; aplicado: boolean }[]
+  onDescanso: (nombre: string, segundos: number) => void
+  onDejarDescanso: (nombre: string) => void
+  /** Lo que va debajo de la racha (terminaste tu rutina). */
+  aviso?: ComponentChildren
   onHecho: () => void
   onCompartir: () => void
   onVolver: () => void
@@ -77,6 +85,8 @@ export function WorkoutSummary(props: Props) {
           ))}
         </ol>
       </section>
+
+      {props.aviso}
 
       {props.records.length > 0 && (
         <section class={styles.records} aria-labelledby="records">
@@ -171,6 +181,34 @@ export function WorkoutSummary(props: Props) {
           ))}
         </ul>
       </section>
+
+      {props.descansos.length > 0 && (
+        <section class={styles.compare} aria-labelledby="descansos">
+          <h2 id="descansos" class={styles.descansosTitulo}>
+            Tus descansos
+          </h2>
+          <ul class={styles.descansos}>
+            {props.descansos.map((d) => (
+              <li key={d.nombre} class={styles.descanso}>
+                <span class={styles.descansoNombre}>
+                  {d.nombre}: {formatRest(d.de)} → {formatRest(d.a)}
+                </span>
+                <span class={styles.descansoMotivo}>{d.motivo}</span>
+                {d.aplicado ? (
+                  <span class={styles.descansoMotivo}>Aplicado: desde la próxima vez.</span>
+                ) : (
+                  <span class={styles.descansoBotones}>
+                    <Button onClick={() => props.onDescanso(d.nombre, d.a)}>Aplicar</Button>
+                    <Button variant="secondary" onClick={() => props.onDejarDescanso(d.nombre)}>
+                      Ahora no
+                    </Button>
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div class={styles.actions}>
         <Button onClick={props.onHecho}>Hecho</Button>

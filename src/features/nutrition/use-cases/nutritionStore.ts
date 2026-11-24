@@ -7,7 +7,12 @@ import { logError } from '../../../shared/lib/logger.ts'
 import type { Revision } from '../domain/consult.ts'
 import type { DietaActiva } from '../domain/diet.ts'
 import type { Alimento, Apunte } from '../domain/food.ts'
-import { fuerzaEnBasicos, rendimientoReciente, tiposDeDia } from '../../training/index.ts'
+import {
+  entrenoParaNutricion,
+  fuerzaEnBasicos,
+  rendimientoReciente,
+  tiposDeDia,
+} from '../../training/index.ts'
 import { cuerpoParaComida } from '../../progress/index.ts'
 import { ritmoSemanal } from '../domain/weight.ts'
 import { tituloCambio } from '../domain/review.ts'
@@ -29,9 +34,16 @@ import {
   type Cambio,
   type ComidaGuardada,
 } from '../state/comida.ts'
-import { cuerpoProgreso, fuerzaBasicos, rendimientoComida, revisionDeHoy } from '../state/entrenador.ts'
+import {
+  cuerpoProgreso,
+  deEntreno,
+  fuerzaBasicos,
+  rendimientoComida,
+  revisionDeHoy,
+} from '../state/entrenador.ts'
 import { compra, consultas, revisiones, type Compra, type Consulta } from '../state/dieta.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
+import { empezarLectura, estaLeido, leerLaRacha, olvidarLectura } from './diasLeidos.ts'
 
 export const ID_AJUSTES = 'nutricion'
 export const ID_PROPIOS = 'alimentos-propios'
@@ -47,7 +59,7 @@ export const PASOS_TIPO = 'steps'
 /** Cada cuántos días revisa el entrenador. */
 const CADA = 7
 
-type DiaGuardado = { date: string; apuntes: Apunte[]; createdAt: string; updatedAt: string }
+export type DiaGuardado = { date: string; apuntes: Apunte[]; createdAt: string; updatedAt: string }
 type PesajeGuardado = { date: string; type: typeof PESO; kg: number; createdAt: string; updatedAt: string }
 type PasosGuardados = {
   date: string
@@ -87,6 +99,7 @@ export function cargarComida(): Promise<void> {
       ])
       ajustes.value = a ?? null
       dias.value = Object.fromEntries(log.map((d) => [d.date, d.apuntes]))
+      empezarLectura(desde)
       pesajes.value = cuerpo.map((p) => ({ date: p.date, kg: p.kg }))
       pasosDias.value = Object.fromEntries(pasos.map((p) => [p.date, p.pasos]))
       cambios.value = coach.filter((c) => c.area === 'nutricion')
@@ -107,7 +120,8 @@ export function cargarComida(): Promise<void> {
           nota,
         }))
         .sort((x, y) => x.fecha.localeCompare(y.fecha))
-      void cargarTipos()
+      void cargarTipos().then(() => leerLaRacha())
+      vigilarElDia()
       propios.value = mios?.alimentos ?? []
       guardadas.value = comidas?.comidas ?? []
       // Sin esperar: la pantalla se pinta ya. La revisión semanal va detrás, cuando se sepa tu fuerza (en volumen la mira)
@@ -123,8 +137,29 @@ export function cargarComida(): Promise<void> {
   return carga
 }
 
+let vigilando = false
+/**
+ * Con la app abierta de fondo al pasar la medianoche (usuario, 2026-11-23): al volver a ella, si ya es otro día, se vuelve a
+ * cargar Nutrición con el día nuevo (lo que apuntes va a hoy, no a ayer).
+ */
+function vigilarElDia(): void {
+  if (vigilando || typeof document === 'undefined') return
+  vigilando = true
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible' || carga === null || localDate() === hoy.value) return
+    carga = null
+    olvidarLectura()
+    void cargarComida()
+  })
+}
+
 /** En volumen, tu fuerza en los básicos: la revisión la mira antes de proponer más kcal (guía G1 §6). */
-async function cargarFuerza(): Promise<void> {
+export async function cargarFuerza(): Promise<void> {
+  try {
+    deEntreno.value = await entrenoParaNutricion(hoy.value)
+  } catch (error) {
+    logError(error, 'leer lo de Entreno')
+  }
   if (ajustes.value?.fase !== 'volumen' && ajustes.value?.fase !== 'definicion') return
   try {
     fuerzaBasicos.value = (await fuerzaEnBasicos(hoy.value))?.cambio ?? null
@@ -245,10 +280,16 @@ export async function marcarCambio(id: string, status: Cambio['status']): Promis
 }
 
 /** Guarda lo apuntado en un día. */
-export async function guardarDia(date: string, apuntes: Apunte[]): Promise<void> {
-  dias.value = { ...dias.value, [date]: apuntes }
+export async function guardarDia(date: string, lista: Apunte[]): Promise<void> {
+  // Un día que no se había leído: lo guardado se conserva y lo nuevo se suma (usuario, 2026-11-23: nada se borra sin
+  // quitarlo tú). Si se había leído, la lista es la que ves y lo que falta es lo que quitaste; se pinta al momento.
+  const leido = estaLeido(date)
+  if (leido) dias.value = { ...dias.value, [date]: lista }
   const db = await getDb()
   const antes = (await db.get('foodLog', date)) as DiaGuardado | undefined
+  const nuevos = new Set(lista.map((x) => x.id))
+  const apuntes = !leido && antes ? [...antes.apuntes.filter((x) => !nuevos.has(x.id)), ...lista] : lista
+  if (!leido) dias.value = { ...dias.value, [date]: apuntes }
   const at = new Date().toISOString()
   await db.put('foodLog', { date, apuntes, createdAt: antes?.createdAt ?? at, updatedAt: at })
 }
@@ -345,4 +386,5 @@ export async function guardarConsulta(c: Consulta): Promise<void> {
 /** Para las pruebas: vuelve a cargar desde la base de datos. */
 export function olvidarCarga(): void {
   carga = null
+  olvidarLectura()
 }

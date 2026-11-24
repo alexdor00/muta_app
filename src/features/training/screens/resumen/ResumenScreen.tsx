@@ -1,13 +1,32 @@
 import { useEffect, useState } from 'preact/hooks'
 import { useLocation } from 'preact-iso'
-import { formatDayDate, formatDecimal, formatTons, localDate } from '../../../../shared/lib/format.ts'
+import {
+  formatChange,
+  formatDayDate,
+  formatDecimal,
+  formatTons,
+  localDate,
+} from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { Toast } from '../../../../shared/ui/Toast.tsx'
 import { WorkoutSummary } from '../../components/WorkoutSummary.tsx'
-import { descansosPorSemana, entrenos, recordsDelEntreno, semanaDe, sesiones } from '../../state/plan.ts'
-import { guardarSesion, resumenDe, segundosSesion, sesionEnCurso } from '../../state/sesionEnCurso.ts'
+import {
+  claveEjercicio,
+  descansosPorSemana,
+  entrenos,
+  recordsDelEntreno,
+  semanaDe,
+  sesiones,
+} from '../../state/plan.ts'
+import { elegirDescanso, guardarSesion, resumenDe, sesionEnCurso } from '../../state/sesionEnCurso.ts'
+import { segundosSesion } from '../../state/tiempoSesion.ts'
+import { descansosPropuestos, descansosVistos } from '../../state/descansos.ts'
 import { diasDeRacha } from '../../state/routines.ts'
 import { reabrirEntreno } from '../../use-cases/training.ts'
+import { FinDeRutinaCard } from '../../components/FinDeRutinaCard.tsx'
+import { finDeRutina } from '../../state/finDeRutina.ts'
+import { cifrasDeLaRutina, quitarFinDeRutina } from '../../use-cases/finDeRutina.ts'
+import { repetirRutina } from '../../use-cases/mesocycles.ts'
 import { compartirImagen } from '../../use-cases/shareImage.ts'
 import { compartir } from '../../use-cases/workoutFeedback.ts'
 import { usePlan } from '../comun/usePlan.ts'
@@ -54,6 +73,13 @@ export function ResumenScreen(props: { sessionId: string }) {
     if (sinResumen && enResumen && plan.status !== 'loading')
       route(ultimo ? paths.progressDay(ultimo.fecha) : paths.training, true)
   }, [sinResumen, enResumen, plan.status, ultimo, route])
+  // Con esta sesión terminaste tu rutina (usuario, 2026-11-23): la tarjeta con las cifras de la etapa y qué hacer ahora
+  const fin = finDeRutina.value
+  const terminaAqui = !!fin && !!ultimo && fin.entrenoId === ultimo.id
+  const [cifrasFin, setCifrasFin] = useState<Awaited<ReturnType<typeof cifrasDeLaRutina>>>(null)
+  useEffect(() => {
+    if (terminaAqui) void cifrasDeLaRutina(localDate()).then(setCifrasFin)
+  }, [terminaAqui])
   if (sinResumen || !en || en.terminada === null) return null
   const sesion = en
   const r = resumenDe(en)
@@ -70,7 +96,17 @@ export function ResumenScreen(props: { sessionId: string }) {
   const racha = diasDeRacha([...entrenos.value.map((x) => x.fecha), hoy], descansosPorSemana.value, hoy)
   const comparados = r.ejercicios.filter((e) => e.cambio !== null)
   // Los récords de hoy: tu mejor marca de siempre, frente a todos los entrenos de antes (el de hoy ya está guardado)
-  const records = ultimo && ultimo.fecha === hoy ? recordsDelEntreno(ultimo, entrenos.value) : []
+  const records =
+    ultimo && ultimo.fecha === hoy ? recordsDelEntreno(ultimo, entrenos.value, claveEjercicio.value) : []
+  // Tus descansos, revisados con lo de hoy (02-reglas § 3): se proponen con «Aplicar»
+  const vistos = descansosVistos.value
+  const descansos =
+    // Con un rato largo sin apuntar, el tiempo no es fiable: no se revisan (usuario, 2026-11-23)
+    ultimo && ultimo.fecha === hoy && ultimo.sigla === en.sigla && !en.conHueco
+      ? descansosPropuestos(ultimo, sesiones.value.find((x) => x.sigla === en.sigla) ?? null, minutos)
+          .filter((d) => vistos[d.nombre] !== 'no')
+          .map((d) => ({ ...d, aplicado: vistos[d.nombre] === 'aplicado' }))
+      : []
 
   return (
     <>
@@ -97,6 +133,54 @@ export function ResumenScreen(props: { sessionId: string }) {
           })),
           cambio: cambioDe(e.mejor, e.mejorAntes),
         }))}
+        aviso={
+          terminaAqui &&
+          fin && (
+            <FinDeRutinaCard
+              titulo={`Has completado ${fin.rutina}`}
+              texto={`${fin.semanas} semanas. Si la repites, empieza una etapa nueva y verás cada semana frente a la misma de esta.`}
+              cifras={
+                cifrasFin
+                  ? [
+                      {
+                        valor:
+                          cifrasFin.fuerza === null
+                            ? '—'
+                            : Math.round(cifrasFin.fuerza * 100) === 0
+                              ? '='
+                              : formatChange(cifrasFin.fuerza),
+                        nombre: 'tu fuerza',
+                        tono: (cifrasFin.fuerza ?? 0) > 0 ? 'mejora' : undefined,
+                      },
+                      { valor: String(cifrasFin.sesiones), nombre: 'sesiones' },
+                      {
+                        valor: String(cifrasFin.records),
+                        nombre: 'récords',
+                        tono: cifrasFin.records ? 'logro' : undefined,
+                      },
+                    ]
+                  : undefined
+              }
+              onRepetir={() =>
+                void repetirRutina(localDate()).then((ok) => {
+                  guardarSesion(null)
+                  route(paths.training)
+                  if (!ok) setAviso('No se pudo: inténtalo desde Tu plan')
+                })
+              }
+              hrefCambiar={paths.chooseRoutine}
+              onAhoraNo={() => void quitarFinDeRutina()}
+            />
+          )
+        }
+        descansos={descansos}
+        onDescanso={(nombre, segundos) => {
+          elegirDescanso(nombre, segundos)
+          descansosVistos.value = { ...descansosVistos.value, [nombre]: 'aplicado' }
+        }}
+        onDejarDescanso={(nombre) => {
+          descansosVistos.value = { ...descansosVistos.value, [nombre]: 'no' }
+        }}
         onHecho={() => {
           guardarSesion(null)
           route(paths.training)

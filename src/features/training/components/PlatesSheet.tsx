@@ -13,7 +13,7 @@ const BARRAS = [
 
 /**
  * Calculadora de discos (C14): peso total, barra y los discos de cada lado dibujados sobre la barra, con los discos que
- * hay en tu gimnasio (se cambian aquí mismo o en Tu material).
+ * hay en tu gimnasio (se encienden y apagan aquí mismo).
  */
 export function PlatesSheet(props: {
   total: string

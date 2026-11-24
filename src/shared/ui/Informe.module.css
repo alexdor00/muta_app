@@ -1,0 +1,156 @@
+/* El informe de los entrenadores (Nutrición y Entreno): estado, titular, cifras en filas y una nota */
+/* La tarjeta: blanca, como las demás, con su rótulo arriba */
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.informe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.titulo {
+  font: var(--text-headline);
+  text-align: left;
+}
+
+.estado,
+.destacado {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+.destacado {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.filas > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+  font: var(--text-subhead);
+}
+
+.filas dt {
+  color: var(--label-2);
+}
+
+.filas dd {
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.filas .bien {
+  color: var(--improve);
+}
+
+/* Las explicaciones, justificadas (como los consejos de Entreno); titulares y cifras, no */
+.nota {
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.semana {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rotulo {
+  font: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--label-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.semana ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-4);
+  font: var(--text-footnote);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Plegable (la de Entreno): una fila que se toca para abrir, con el rótulo, el resumen y la flecha */
+.cabezaPlegable {
+  font: inherit;
+}
+
+.plegar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  text-align: left;
+  cursor: pointer;
+}
+
+.resumen {
+  flex: 1;
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.plegar svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--label-2);
+  transition: transform var(--duration-tap) var(--ease);
+}
+
+.plegar[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.contenido[hidden] {
+  display: none;
+}
+
+.enlace {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}

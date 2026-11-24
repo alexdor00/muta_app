@@ -5,6 +5,7 @@ import {
   semanaDe,
   seriesPorMusculo,
   ultimaVez,
+  unificarNombres,
   type Entreno,
 } from './workoutHistory.ts'
 import type { SesionPlan } from './workoutPlan.ts'
@@ -116,5 +117,65 @@ describe('tu semana', () => {
     })
     // Ya entrenaste hoy: cuenta lo hecho, no lo que tocaba
     expect(seriesPorMusculo(ENTRENOS, '2026-10-27', toca).hoy).toEqual({ cuadriceps: 2 })
+  })
+})
+
+describe('el mismo ejercicio con otro nombre (usuario, 2026-11-23)', () => {
+  // «A1: Press banca» y «Press banca con barra» son el mismo de la biblioteca; la serie de descarga, también
+  const clave = (n: string) => (/press banca/i.test(n) ? 'press_banca' : n)
+  const con = (fecha: string, programId: string, ejercicios: [string, number][]): Entreno => ({
+    id: `${fecha}-${programId}`,
+    fecha,
+    inicio: Date.parse(`${fecha}T18:00:00Z`),
+    segundos: 3600,
+    sigla: 'A1',
+    nombre: 'Torso',
+    programId,
+    ejercicios: ejercicios.map(([nombre, kg], i) => ({
+      nombre,
+      musculo: 'pecho',
+      puesto: i + 1,
+      series: [{ kg, reps: 8 }],
+    })),
+  })
+  const lista = [
+    con('2026-01-05', 'vieja', [['Press banca con barra', 80]]),
+    con('2026-03-02', 'nueva', [
+      ['Serie top: Press banca', 90],
+      ['Press banca (serie de descarga)', 70],
+    ]),
+  ]
+
+  it('al cambiar de rutina, la vez anterior sale de la otra aunque se llame distinto', () => {
+    expect(ultimaVez(lista.slice(0, 1), 'A1: Press banca', clave)).toEqual([{ kg: 80, reps: 8 }])
+  })
+
+  it('pero si ya lo hiciste con su nombre exacto, manda ese: la serie top no toma la de descarga', () => {
+    expect(ultimaVez(lista, 'Serie top: Press banca', clave)).toEqual([{ kg: 90, reps: 8 }])
+    expect(ultimaVez(lista, 'Press banca (serie de descarga)', clave)).toEqual([{ kg: 70, reps: 8 }])
+  })
+
+  it('la ficha (todo): cada día con todas sus variantes juntas', () => {
+    const h = historialDe(lista, 'Press banca', clave, true)
+    expect(h.map((v) => [v.fecha, v.series.length])).toEqual([
+      ['2026-01-05', 1],
+      ['2026-03-02', 2],
+    ])
+  })
+
+  it('Progreso: un solo nombre por ejercicio, el de la biblioteca (y, sin él, el último que usaste)', () => {
+    const u = unificarNombres(lista, clave, (k) => (k === 'press_banca' ? 'Press banca' : null))
+    expect(u.flatMap((x) => x.ejercicios.map((e) => e.nombre))).toEqual([
+      'Press banca',
+      'Press banca',
+      'Press banca',
+    ])
+    const sinBiblioteca = unificarNombres(lista, clave)
+    expect(sinBiblioteca[0].ejercicios[0].nombre).toBe('Press banca (serie de descarga)')
+  })
+
+  it('la gráfica de una sesión, por rutina: la A1 de otra rutina no se mezcla', () => {
+    expect(progresoDeSesion(lista, 'A1').length).toBe(2)
+    expect(progresoDeSesion(lista, 'A1', 'nueva').length).toBe(1)
   })
 })

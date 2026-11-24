@@ -131,6 +131,7 @@ export function ProgresoScreen() {
           onMusculos={() => hojas.musculos.show()}
           onRutina={() => hojas.rutina.show()}
           onComparar={() => hojas.comparar.show()}
+          avisar={setAviso}
         />
       )}
       {d && <HojasEtapa d={d} avisar={setAviso} />}
@@ -180,7 +181,7 @@ export function ProgresoScreen() {
       )}
       {hojas.calibrar.open && <CalibrarHoja onClose={hojas.calibrar.close} avisar={setAviso} />}
       {hojas.mes.open && <MesHoja onClose={hojas.mes.close} avisar={setAviso} />}
-      {hojas.comparar.open && <CompararHoja onClose={hojas.comparar.close} />}
+      {hojas.comparar.open && d && <CompararHoja d={d} onClose={hojas.comparar.close} />}
       <Toast message={aviso} />
     </>
   )

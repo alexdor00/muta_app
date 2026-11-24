@@ -1,7 +1,7 @@
 import styles from './PlateToggles.module.css'
 
 /**
- * Los discos que hay en tu gimnasio: uno por peso, encendido si lo hay. Sale en Tu material (Perfil) y en la calculadora
+ * Los discos que hay en tu gimnasio: uno por peso, encendido si lo hay. Sale en la calculadora
  * de discos de la sesión.
  */
 export function PlateToggles(props: {

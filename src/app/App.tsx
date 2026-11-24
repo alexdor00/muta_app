@@ -6,7 +6,12 @@ import { apuntarPantalla } from '../shared/lib/historial.ts'
 import { logError } from '../shared/lib/logger.ts'
 import { isFullScreen, paths, patterns } from '../shared/lib/paths.ts'
 import { Pending } from '../shared/ui/Pending.tsx'
-import { ScreenErrorBoundary } from './ScreenErrorBoundary.tsx'
+import { PantallaDeError, ScreenErrorBoundary } from './ScreenErrorBoundary.tsx'
+import { AvisoCopia } from '../features/profile/copia.ts'
+import { AvisoLogro, logroAbierto } from '../features/progress/logro.ts'
+
+/** Las pantallas de pestaña: al volver a una se mira si toca tu logro. */
+const PESTANAS: string[] = [paths.today, paths.training, paths.nutrition, paths.progress]
 import { TabBar } from './TabBar.tsx'
 
 function ScreenGuard(props: { children: ComponentChildren }) {
@@ -18,9 +23,47 @@ function ScreenGuard(props: { children: ComponentChildren }) {
  * Una pantalla: se descarga solo cuando se abre (abrir Entreno no descarga Comida)
  * y va dentro de su propia pantalla de error, que se reinicia al cambiar de ruta.
  */
+/** En la sesión del navegador: ya se recargó la app una vez porque una pantalla no cargaba. */
+const RECARGADA = 'muta-recargada'
+
+/**
+ * Carga una pantalla. Si no carga (piezas viejas tras una actualización o con la app abierta mientras cambia: usuario,
+ * 2026-11-24, «no se abre el perfil»), la app se recarga sola una vez; si sigue sin cargar, enseña la pantalla de error
+ * con el detalle, en vez de quedarse quieta en la anterior.
+ */
+function cargarPantalla<C>(load: () => Promise<C>, deError: (detalle: string) => C): () => Promise<C> {
+  return () =>
+    load().then(
+      (m) => {
+        try {
+          sessionStorage.removeItem(RECARGADA)
+        } catch {
+          // Sin sessionStorage: no pasa nada
+        }
+        return m
+      },
+      (error: unknown) => {
+        logError(error, 'cargar una pantalla')
+        try {
+          if (!sessionStorage.getItem(RECARGADA)) {
+            sessionStorage.setItem(RECARGADA, '1')
+            window.location.reload()
+            return new Promise<C>(() => {})
+          }
+          sessionStorage.removeItem(RECARGADA)
+        } catch {
+          // Sin sessionStorage: se enseña el error
+        }
+        return deError(error instanceof Error ? error.message : String(error))
+      },
+    )
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- cada pantalla tiene sus propias props
 function screen<P extends Record<string, any>>(load: () => Promise<FunctionComponent<P>>) {
-  const Lazy = lazy<FunctionComponent<P>>(load)
+  const Lazy = lazy<FunctionComponent<P>>(
+    cargarPantalla(load, (detalle) => () => <PantallaDeError detalle={detalle} />),
+  )
   return function Screen(props: P) {
     return (
       <ScreenGuard>
@@ -168,6 +211,9 @@ function Layout() {
   const { path, url } = useLocation()
   // Cada pantalla apunta cuántas de MUTA tiene detrás, para que «‹» vuelva a la anterior (shared/lib/historial.ts)
   useEffect(() => apuntarPantalla(), [url])
+  // Los avisos que salen solos (tu logro, la copia): ni en la bienvenida ni en una sesión ni en las de desarrollo
+  const avisos =
+    !path.startsWith(paths.welcome) && !path.startsWith(paths.session('')) && !path.startsWith('/dev/')
   return (
     <>
       <main>
@@ -214,6 +260,10 @@ function Layout() {
         </ErrorBoundary>
       </main>
       {!isFullScreen(path) && <TabBar />}
+      {/* Tu logro o tu premio, cuando toca: al abrir o al volver a una pestaña (no en la bienvenida ni en una sesión) */}
+      <AvisoLogro activo={avisos} ruta={PESTANAS.includes(path) ? path : ''} />
+      {/* Una vez al mes, al abrir: «Haz tu copia de seguridad» (no a la vez que tu logro) */}
+      <AvisoCopia activo={avisos && !logroAbierto.value} />
     </>
   )
 }

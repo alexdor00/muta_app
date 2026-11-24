@@ -384,11 +384,6 @@
   cursor: default;
 }
 
-/* Lo que no se hace con tu material: al final y en gris */
-.dim .title {
-  color: var(--label-2);
-}
-
 /* Cada disco con su color olímpico (tokens.css: --plate-*) */
 [data-kg='25'] {
   --plate-bg: var(--plate-25);

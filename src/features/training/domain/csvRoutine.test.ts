@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { leerRutinaCsv, segundosDeDescanso } from './csvRoutine.ts'
+import { leerRutinaCsv, rutinaParecida, segundosDeDescanso } from './csvRoutine.ts'
 import { rirDe, descansoDe } from './workoutPlan.ts'
 
 const CSV = `Sesión;Ejercicio;Series;Repeticiones;RIR;Descanso
@@ -58,5 +58,35 @@ describe('repeticiones serie a serie en el CSV', () => {
     expect(r.errores).toEqual([])
     const d = r.programa.blocks[0].weeks[0].days[0]
     expect('exercises' in d ? d.exercises[0].reps : null).toBe('4,6,8')
+  })
+})
+
+describe('¿es tu rutina de antes? (usuario, 2026-11-23)', () => {
+  const programa = leerRutinaCsv(CSV).programa
+  const mia = (id: string, title: string, csv = CSV) => ({ ...leerRutinaCsv(csv).programa, id, title })
+  const otra = mia('mia:2', 'Fuerza', 'Sesión;Ejercicio;Series;Repeticiones\nDía;Peso muerto;3;5')
+
+  it('se llama igual (sin mayúsculas, tildes ni espacios de más): la misma', () => {
+    expect(
+      rutinaParecida(
+        '  mi RUTINA  ',
+        leerRutinaCsv('Sesión;Ejercicio;Series;Repeticiones\nA;Curl;3;10').programa,
+        [mia('mia:1', 'Mi rutina')],
+      )?.id,
+    ).toBe('mia:1')
+    expect(rutinaParecida('Definición', programa, [mia('mia:1', 'Definicion')])?.id).toBe('mia:1')
+  })
+
+  it('lleva los mismos ejercicios aunque se llame distinto: la misma', () => {
+    expect(rutinaParecida('Otro nombre', programa, [otra, mia('mia:1', 'X')])?.id).toBe('mia:1')
+  })
+
+  it('ni el nombre ni los ejercicios: no se pregunta', () => {
+    expect(rutinaParecida('Nueva', programa, [otra])).toBeNull()
+    expect(rutinaParecida('Nueva', programa, [])).toBeNull()
+  })
+
+  it('si hay varias, la más reciente', () => {
+    expect(rutinaParecida('X', programa, [mia('mia:1', 'X'), mia('mia:5', 'X')])?.id).toBe('mia:5')
   })
 })

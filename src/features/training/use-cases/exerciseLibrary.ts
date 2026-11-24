@@ -45,16 +45,24 @@ const sinPrefijo = (n: string) =>
 
 /** Un ejercicio de la biblioteca por su nombre (sin mirar mayúsculas ni el prefijo de superserie) o su alias, o null. */
 export function porNombre(nombre: string): LibraryExercise | null {
+  // Cada nombre se busca una vez (la biblioteca no cambia mientras la app está abierta): Progreso pregunta por cada
+  // ejercicio de cada entreno, y con años de datos son miles (problema 9 de docs/problemas-con-el-tiempo.md)
+  if (buscados.has(nombre)) return buscados.get(nombre) ?? null
+  let hallado: LibraryExercise | null = null
   for (const k of new Set([nombre, sinPrefijo(nombre)])) {
     const n = k.toLowerCase()
     const exacto = BIBLIOTECA.find(
       (e) => e.name.toLowerCase() === n || e.alias?.some((a) => a.toLowerCase() === n),
     )
-    if (exacto) return exacto
-    if (ALIAS[k]) return ejercicioDeBiblioteca(ALIAS[k])
+    hallado = exacto ?? (ALIAS[k] ? ejercicioDeBiblioteca(ALIAS[k]) : null)
+    if (hallado) break
   }
-  return null
+  buscados.set(nombre, hallado)
+  return hallado
 }
+
+/** Los nombres ya buscados en la biblioteca y lo que se halló. */
+const buscados = new Map<string, LibraryExercise | null>()
 
 /**
  * Los ejercicios de la biblioteca que hacen lo mismo que uno de tu sesión (mismo músculo, misma zona; domain/equivalence.ts).

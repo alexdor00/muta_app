@@ -1,6 +1,15 @@
 import 'fake-indexeddb/auto'
 import { describe, expect, it } from 'vitest'
-import { BackupError, exportBackup, importBackup, needsBackupReminder } from './backup/backup.ts'
+import {
+  BackupError,
+  copiaEnTexto,
+  exportBackup,
+  importBackup,
+  leerCopia,
+  marcarCopia,
+  needsBackupReminder,
+  resumenCopia,
+} from './backup/backup.ts'
 import { openDatabase, runTx } from './db.ts'
 import { readErrors, saveError } from './errorLog.ts'
 import { SCHEMA_VERSION } from './migrations/index.ts'
@@ -53,9 +62,9 @@ describe('copia de seguridad', () => {
     expect(await b.get('exerciseHistory', ['press_banca', '2026-10-27'])).toMatchObject({ e1rm: 84 })
   })
 
-  it('exportar apunta la fecha de la última copia', async () => {
+  it('al guardar la copia se apunta la fecha de la última', async () => {
     const db = await freshDb()
-    await exportBackup(db, new Date('2026-10-27T10:00:00Z'))
+    await marcarCopia(db, new Date('2026-10-27T10:00:00Z'))
     expect(await db.get('meta', 'lastBackupAt')).toEqual({
       key: 'lastBackupAt',
       value: '2026-10-27T10:00:00.000Z',
@@ -88,11 +97,52 @@ describe('copia de seguridad', () => {
     await expect(importBackup(db, future)).rejects.toThrow('versión más nueva')
   })
 
-  it('avisa de hacer copia cada 14 días o si nunca se hizo', () => {
+  it('recuerda la copia cada mes; sin ninguna, a la semana de empezar; «Ahora no» la deja otro mes', () => {
     const now = new Date('2026-10-27T10:00:00Z')
-    expect(needsBackupReminder(null, now)).toBe(true)
     expect(needsBackupReminder('2026-10-20T10:00:00Z', now)).toBe(false)
-    expect(needsBackupReminder('2026-10-13T10:00:00Z', now)).toBe(true)
+    expect(needsBackupReminder('2026-09-27T10:00:00Z', now)).toBe(true)
+    // Sin ninguna: a la semana de empezar
+    expect(needsBackupReminder(null, now, '2026-10-25T10:00:00Z')).toBe(false)
+    expect(needsBackupReminder(null, now, '2026-10-20T10:00:00Z')).toBe(true)
+    expect(needsBackupReminder(null, now)).toBe(true)
+    // «Ahora no» hace 10 días: aún no
+    expect(needsBackupReminder('2026-08-01T10:00:00Z', now, null, '2026-10-17T10:00:00Z')).toBe(false)
+    expect(needsBackupReminder('2026-08-01T10:00:00Z', now, null, '2026-09-20T10:00:00Z')).toBe(true)
+  })
+
+  it('la copia en un archivo lleva las fotos y se recupera igual', async () => {
+    const a = await freshDb()
+    const foto = new Blob([new Uint8Array([1, 2, 3, 250])], { type: 'image/jpeg' })
+    await a.put('photos', { id: 'f1', date: '2026-10-01', pose: 'frente', imagen: foto })
+    await a.put('workouts', { id: 'w1', date: '2026-10-01', status: 'finished' })
+    await a.put('foodLog', { date: '2026-10-01', apuntes: [] })
+    const texto = await copiaEnTexto(await exportBackup(a))
+    const copia = leerCopia(texto)
+    expect(resumenCopia(copia)).toMatchObject({ entrenos: 1, dias: 1, fotos: 1 })
+    const b = await freshDb()
+    await importBackup(b, copia)
+    const vuelta = (await b.get('photos', 'f1')) as { imagen: Blob }
+    expect(vuelta.imagen).toBeInstanceOf(Blob)
+    expect(vuelta.imagen.type).toBe('image/jpeg')
+    expect([...new Uint8Array(await vuelta.imagen.arrayBuffer())]).toEqual([1, 2, 3, 250])
+  })
+
+  it('un archivo que no es una copia lo dice', () => {
+    expect(() => leerCopia('hola')).toThrow('no es una copia de MUTA')
+    expect(() => leerCopia('{"a":1}')).toThrow('no es una copia de MUTA')
+  })
+
+  it('una copia de una versión anterior se puede recuperar (lo que no traía queda vacío)', async () => {
+    const db = await freshDb()
+    const vieja = {
+      format: 'muta-backup',
+      schemaVersion: 1,
+      exportedAt: '2025-01-01T00:00:00Z',
+      stores: { workouts: [{ id: 'w9', date: '2025-01-01', status: 'finished' }] },
+    }
+    await importBackup(db, vieja)
+    expect(await db.getAllKeys('workouts')).toEqual(['w9'])
+    expect(await db.getAllKeys('programs')).toEqual([])
   })
 })
 

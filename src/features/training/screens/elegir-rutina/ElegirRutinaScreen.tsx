@@ -15,6 +15,7 @@ import {
   copiarInstruccionesRutina,
   empezarRutinaCsv,
   PLANTILLA_CSV,
+  rutinaTuyaParecida,
   vistaCsv,
 } from '../../use-cases/importRoutine.ts'
 import { loadRoutines } from '../../use-cases/loadRoutines.ts'
@@ -37,6 +38,7 @@ export function ElegirRutinaScreen() {
   const [info, setInfo] = useState<{ title: string; about: About } | null>(null)
   /** Tu rutina del CSV, leída: su nombre (el del archivo) y lo que se enseña. */
   const [csv, setCsv] = useState<{ nombre: string; vista: ReturnType<typeof vistaCsv> } | null>(null)
+  const [pregunta, setPregunta] = useState<{ nombre: string; id: string; titulo: string } | null>(null)
   const infoButton = (title: string, about: About | null) =>
     about && (
       <RoundButton
@@ -146,10 +148,40 @@ export function ElegirRutinaScreen() {
           dias={csv.vista.dias}
           resumen={csv.vista.resumen}
           onEmpezar={async (nombre) => {
+            // ¿Es tu rutina de antes? (usuario, 2026-11-23): si se llama igual o lleva lo mismo, se pregunta
+            const parecida = await rutinaTuyaParecida(nombre, csv.vista.programa)
+            if (parecida) return setPregunta({ nombre, id: parecida.id, titulo: parecida.title })
             if (await empezarRutinaCsv(nombre, csv.vista.programa)) route(paths.training)
           }}
           onClose={() => setCsv(null)}
         />
+      )}
+
+      {pregunta && csv && (
+        <Sheet title={`¿Es tu rutina «${pregunta.titulo}» de antes?`} onClose={() => setPregunta(null)}>
+          <p class={styles.pregunta}>
+            Se llama igual o lleva los mismos ejercicios. Si es la misma, su historia sigue y sus etapas se
+            comparan con las de antes; si no, empieza como una rutina nueva.
+          </p>
+          <div class={styles.preguntaBotones}>
+            <Button
+              onClick={async () => {
+                if (await empezarRutinaCsv(pregunta.nombre, csv.vista.programa, new Date(), pregunta.id))
+                  route(paths.training)
+              }}
+            >
+              Sí, es la misma
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                if (await empezarRutinaCsv(pregunta.nombre, csv.vista.programa)) route(paths.training)
+              }}
+            >
+              No, es otra
+            </Button>
+          </div>
+        </Sheet>
       )}
 
       {infoSheet.open && info && (

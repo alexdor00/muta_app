@@ -1,7 +1,8 @@
 import { localDate, parseDecimal } from '../../../shared/lib/format.ts'
 import { esfuerzoApuntado } from '../domain/effort.ts'
 import type { Entreno } from '../domain/workoutHistory.ts'
-import { ejerciciosDe, nombreHoy, segundosSesion, type SesionEnCurso } from '../state/sesionEnCurso.ts'
+import { ejerciciosDe, nombreHoy, type SesionEnCurso } from '../state/sesionEnCurso.ts'
+import { segundosSesion } from '../state/tiempoSesion.ts'
 import { extrasHechos } from '../state/seriesEspeciales.ts'
 import { nuevoId } from '../../../shared/lib/id.ts'
 

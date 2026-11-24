@@ -6,6 +6,7 @@ import { sinAnimaciones, test } from './plan.ts'
 test('tu día: el anillo, lo que queda y lo hecho; cada cosa lleva a su sitio o abre su hoja', async ({
   page,
 }) => {
+  test.slow() // recorre todo Hoy, recarga y pasa axe: con todos los recorridos a la vez pasaba de 30 s
   await page.goto('/hoy')
   const anillo = page.getByRole('img', { name: /^0 de \d+ hechas$/ })
   await expect(anillo).toBeVisible()

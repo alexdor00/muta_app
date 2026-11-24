@@ -164,6 +164,12 @@ export function consejosDeLaSemana(d: {
   medidas?: readonly Perimetros[]
   /** Tu proteína de media, en g por kilo (null sin datos). */
   proteina?: number | null
+  /** En volumen, la revisión propone subir kcal (o te pararía por la fuerza): antes, el reparto de los hidratos. */
+  subirKcal?: boolean
+  /** Llevas «Hidratos según el día» (ON/OFF). */
+  onOff?: boolean
+  /** Vuelves de un parón (en mantenimiento, con sus mesetas). */
+  paron?: boolean
 }): string[] {
   const out: string[] = []
   const senales = d.animo && d.hoy ? senalesDeLaSemana(d.animo, d.hoy) : []
@@ -179,6 +185,16 @@ export function consejosDeLaSemana(d: {
     d.animo && d.hoy ? d.animo.filter((x) => x.date > addDays(d.hoy ?? '', -7) && x.digestiones === 2) : []
   if (digestiones.length >= 3)
     out.push('Digestiones pesadas. Se recomienda simplificar las fuentes de hidratos.')
+  // Volumen: antes de subir kcal, los hidratos alrededor del entreno y más los días de entreno (guía § 6 y § 13)
+  if (d.fase === 'volumen' && d.subirKcal)
+    out.push(
+      d.onOff
+        ? 'Antes de subir kcal: los hidratos, alrededor del entreno.'
+        : 'Antes de subir kcal: los hidratos alrededor del entreno y más los días de entreno («Hidratos según el día»).',
+    )
+  // Vuelta de un parón (guía § 10, paso 6): más actividad y más comida mejor que menos de ambas
+  if (d.paron)
+    out.push('Vuelves de un parón: se recomienda actividad moderada-alta, más los días de descanso.')
   if (d.fase !== 'definicion') return out
   if (d.lento) out.push('Si la grasa no baja: hidratos más simples, menos fibra y menos estrés.')
   if (d.final && d.fuerza != null && d.fuerza <= FUERZA_BAJA_FINAL)
@@ -193,4 +209,28 @@ export function consejosDeLaSemana(d: {
       out.push('Brazos o muslos a la baja. Se recomienda no acelerar el ritmo.')
   }
   return out
+}
+
+/**
+ * Lo que falla en tu comida, en una frase con su cifra, para el entrenador de Entreno (usuario, 2026-11-23: que en vez de
+ * «revisa la comida» diga qué). En este orden: proteína baja (§ 5), bajas demasiado rápido en definición (§ 5, 1,2 %) y
+ * déficit al máximo (75 % de lo que gastas). null si nada.
+ */
+export function comidaParaEntreno(d: {
+  fase: Fase
+  proteina: number | null
+  /** Tu ritmo de peso, en % por semana (null sin datos). */
+  pct: number | null
+  /** Qué parte de lo que gastas comes (null sin datos). */
+  parte: number | null
+}): string | null {
+  const es = (n: number) => n.toLocaleString('es-ES')
+  if (d.proteina !== null && d.proteina < PROTEINA_MINIMA)
+    return `Proteína baja: ${es(d.proteina)} g por kilo. Se recomienda ${es(PROTEINA_MINIMA)} como mínimo.`
+  if (d.fase !== 'definicion') return null
+  if (d.pct !== null && d.pct < -RAPIDO_PCT)
+    return `Bajas un ${es(Math.round(Math.abs(d.pct) * 10) / 10)} % por semana: demasiado rápido para rendir.`
+  if (d.parte !== null && d.parte < DEFICIT_MAXIMO)
+    return `Comes el ${Math.round(d.parte * 100)} % de lo que gastas: el déficit ya está al máximo.`
+  return null
 }

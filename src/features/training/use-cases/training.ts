@@ -21,9 +21,13 @@ import { PREFIJO_MIA, type RutinaMia } from '../domain/csvRoutine.ts'
 import { descansosDeRutina } from '../domain/restDays.ts'
 import { ordenarSemana, sesionVacia } from '../domain/weekOrder.ts'
 import { elecciones } from '../state/musculos.ts'
-import { entrenos, tuPlan } from '../state/plan.ts'
+import { claveEjercicio, entrenos, tuPlan } from '../state/plan.ts'
 import { descansosElegidos, sesionEnCurso, type SesionEnCurso } from '../state/sesionEnCurso.ts'
+import { finDeLaSesion } from '../state/tiempoSesion.ts'
 import { porNombre } from './exerciseLibrary.ts'
+import { cargarFinDeRutina, marcarFinDeRutina, quitarFinDeRutina } from './finDeRutina.ts'
+import { semanasDelPrograma, terminaLaRutina } from '../domain/finDeRutina.ts'
+import { finDeRutina } from '../state/finDeRutina.ts'
 import { cargarEditado, editado, guardarEnPlan, type PlanGuardado } from './planEditado.ts'
 import { cargarNotas } from './exerciseNotes.ts'
 import { entrenoDe } from './workoutRecord.ts'
@@ -49,12 +53,29 @@ let carga: Promise<void> | null = null
 let ultimoGuardado: { id: string; rotacion: Rotacion } | null = null
 
 /** Carga tu plan, tus entrenos, la sesión en curso, tus fotos, tus consejos y tu material (una vez; `forzar` tras cambiar de rutina). */
+/** Un ejercicio se reconoce por su ejercicio de la biblioteca o, sin él, por su nombre (cada nombre se busca una vez). */
+const claves = new Map<string, string>()
+function claveDe(nombre: string): string {
+  let k = claves.get(nombre)
+  if (k === undefined) {
+    k = porNombre(nombre)?.id ?? nombre
+    claves.set(nombre, k)
+  }
+  return k
+}
+
 export function cargarPlan(forzar = false): Promise<void> {
+  claveEjercicio.value = claveDe
   void cargarMisConsejos()
   void cargarMaterial()
   void cargarNotas()
   void cargarFase()
-  if (!carga || forzar) carga = leer()
+  // La marca de «Terminaste tu rutina», solo al leer el plan: si se leyera a cada llamada, una lectura en curso
+  // podía devolverla justo después de «Ahora no»
+  if (!carga || forzar) {
+    carga = leer()
+    void cargarFinDeRutina()
+  }
   return carga
 }
 
@@ -182,11 +203,16 @@ async function guardarEnCurso(en: SesionEnCurso | null): Promise<void> {
  */
 export async function terminarEntreno(en: SesionEnCurso, ahora: number): Promise<void> {
   const plan = tuPlan.value
-  sesionEnCurso.value = { ...en, terminada: ahora }
+  // Si la dejaste sin apuntar nada más de 30 min, acabó con tu última serie (usuario, 2026-11-23)
+  const fin = finDeLaSesion(en, ahora)
+  sesionEnCurso.value = { ...en, terminada: fin }
   if (plan.status !== 'ready' || !programa) return
-  const entreno = entrenoDe(en, plan.programId, ahora)
+  const entreno = entrenoDe(en, plan.programId, fin)
   const hecha = plan.semana.findIndex((s) => s.sigla === en.sigla)
   const rotacion = hecha >= 0 ? avanzar(programa, plan.rotacion, hecha, plan.semana.length) : plan.rotacion
+  // Era la última sesión de la última semana de una rutina con final (usuario, 2026-11-23)
+  const termina = terminaLaRutina(programa, plan.rotacion, hecha, plan.semana.length)
+  const semanas = semanasDelPrograma(programa)
   try {
     const db = await getDb()
     if (entreno.ejercicios.length) {
@@ -197,6 +223,14 @@ export async function terminarEntreno(en: SesionEnCurso, ahora: number): Promise
     if (entreno.ejercicios.length) entrenos.value = [...entrenos.value, entreno]
     ultimoGuardado = { id: entreno.id, rotacion: plan.rotacion }
     ponerPlan(plan.programId, plan.rutina, plan.nivel, rotacion)
+    if (termina)
+      await marcarFinDeRutina({
+        programId: plan.programId,
+        rutina: plan.rutina,
+        fecha: entreno.fecha,
+        semanas,
+        entrenoId: entreno.id,
+      })
   } catch (error) {
     logError(error, 'terminar el entreno')
   }
@@ -215,6 +249,7 @@ export async function reabrirEntreno(en: SesionEnCurso): Promise<void> {
     await guardarRotacion(plan.programId, deshacer.rotacion)
     entrenos.value = entrenos.value.filter((x) => x.id !== deshacer.id)
     ponerPlan(plan.programId, plan.rutina, plan.nivel, deshacer.rotacion)
+    if (finDeRutina.value?.entrenoId === deshacer.id) await quitarFinDeRutina()
   } catch (error) {
     logError(error, 'reabrir el entreno')
   }

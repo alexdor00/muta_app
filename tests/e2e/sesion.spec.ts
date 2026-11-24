@@ -331,6 +331,12 @@ test('lo apuntado se guarda: sigue al recargar y, al terminar, el entreno queda 
   await page.reload()
   await expect(page.getByLabel('Kilos de la serie 1')).toHaveValue('60')
   await expect(page.getByText('B1 · 1 de 17 series')).toBeVisible()
+  // A medias (usuario, 2026-11-23: «la dejo y la termino luego en casa»): en Tu plan, «Seguir», no «Empezar»
+  await page.goto('/entreno')
+  await expect(page.getByRole('link', { name: 'Seguir B1' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Empezar B1' })).toHaveCount(0)
+  await page.getByRole('link', { name: 'Seguir B1' }).click()
+  await expect(page.getByLabel('Kilos de la serie 1')).toHaveValue('60')
 
   await page.getByRole('button', { name: 'Terminar' }).click()
   await page
@@ -342,7 +348,7 @@ test('lo apuntado se guarda: sigue al recargar y, al terminar, el entreno queda 
   await page.getByRole('button', { name: /Me faltó un ejercicio/ }).click()
   await expect(page).toHaveURL('/entreno/sesion/b1')
   await page.goto('/entreno')
-  await expect(page.getByRole('link', { name: 'Empezar B1' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Seguir B1' })).toBeVisible()
 
   await page.goto('/entreno/sesion/b1')
   await page.getByRole('button', { name: 'Terminar' }).click()
@@ -353,7 +359,21 @@ test('lo apuntado se guarda: sigue al recargar y, al terminar, el entreno queda 
   await page.getByRole('button', { name: 'Hecho' }).click()
   await expect(page).toHaveURL('/entreno')
   await page.reload()
-  await expect(page.getByRole('link', { name: 'Empezar A2' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Empezar A2' })).toBeAttached()
+  // Hoy ya entrenaste (usuario, 2026-11-23): la primera tarjeta es la de hoy, hecha; la siguiente no es «Hoy»
+  const tarjetas = page.getByRole('group', { name: 'Sesiones de tu rutina' })
+  await expect(tarjetas.getByRole('link', { name: /B1/ }).first()).toContainText('Hecha hoy')
+  await expect(tarjetas.getByRole('link', { name: /A2/ }).first()).toContainText(/Mañana|Siguiente/)
+  await expect(tarjetas.getByText('Hoy', { exact: true })).toHaveCount(0)
+  // Hecha hoy: ya no se puede volver a empezar
+  await expect(page.getByRole('link', { name: 'Empezar B1' })).toHaveCount(0)
+  // Tocarla abre lo que hiciste hoy en Progreso (lo mismo que abre Hoy), ya con la sesión recién hecha
+  await tarjetas.getByRole('link', { name: /Hecha hoy/ }).click()
+  await expect(page).toHaveURL(/\/progreso\/dia\/\d{4}-\d{2}-\d{2}/)
+  await expect(page.getByText('Peso muerto rumano').first()).toBeVisible()
+  // «‹» vuelve a Entreno, de donde vienes (no a Progreso)
+  await page.getByRole('link', { name: 'Volver', exact: true }).click()
+  await expect(page).toHaveURL('/entreno')
   // La próxima B1 tiene como «vez anterior» lo de hoy: 60 × 10 en la serie 1
   await page.goto('/entreno/rutina/b1')
   await page.getByRole('button', { name: /Peso muerto rumano/ }).click()

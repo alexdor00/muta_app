@@ -1034,3 +1034,17 @@
   font-weight: var(--weight-semibold);
   pointer-events: none;
 }
+
+/* Tu peso objetivo (volumen): − kg + */
+.pasos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.pasos b {
+  min-width: 6ch;
+  font: var(--text-cifra);
+  text-align: center;
+}

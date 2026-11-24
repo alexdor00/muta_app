@@ -4,7 +4,6 @@ import { SwapSheet } from '../../components/SwapSheet.tsx'
 import type { LibraryExercise } from '../../state/routines.ts'
 import { cambiarEjercicioDelPlan, enTuPlan } from '../../use-cases/changeExercise.ts'
 import { equivalentesDe } from '../../use-cases/exerciseLibrary.ts'
-import { fueraDeTuMaterial } from '../../use-cases/myEquipment.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import { ElegirSesionHoja } from '../comun/ElegirSesionHoja.tsx'
 
@@ -55,7 +54,6 @@ export function MasFichaHoja(props: {
         soloPlan
         equivalentes={equivalentes}
         sustitutos={donde.e.sustitutos}
-        noTienes={fueraDeTuMaterial([...equivalentes.map((q) => q.nombre), ...donde.e.sustitutos])}
         enLugarDe={donde.e.enLugarDe ?? null}
         onElegir={cambiar}
         onBiblioteca={() => setHoja('biblioteca')}

@@ -267,6 +267,20 @@ export const totalDia = computed(() => sumar(apuntesDia.value))
 export const totalDe = (fecha: string) => sumar(dias.value[fecha] ?? [])
 export const serie = computed(() => tendencia(pesajes.value))
 
+/** Día redondo (usuario, 2026-11-17): lo comido, a un 5 % del objetivo de ese día. */
+export function diaRedondo(fecha: string): boolean {
+  const o = objetivoDelDia(fecha)
+  const t = totalDe(fecha)
+  return !!o && t.kcal > 0 && Math.abs(o.kcal - t.kcal) <= o.kcal * 0.05
+}
+
+/** Los días redondos seguidos hasta hoy, sin tope (usuario, 2026-11-23): un día sin apuntar la corta. */
+export const rachaRedonda = computed(() => {
+  let n = 0
+  while (diaRedondo(addDays(hoy.value, -n))) n++
+  return n
+})
+
 export const totales = computed(() =>
   Object.fromEntries(Object.entries(dias.value).map(([d, a]) => [d, sumar(a)])),
 )

@@ -29,30 +29,90 @@ export type Entreno = {
   ejercicios: EjercicioGuardado[]
 }
 
+/**
+ * Cómo se reconoce un ejercicio entre rutinas (usuario, 2026-11-23): su ejercicio de la biblioteca o, si no tiene, su
+ * nombre. Así el mismo ejercicio sigue su historia aunque en otra rutina se llame distinto. De serie, el nombre.
+ */
+export type Clave = (nombre: string) => string
+const porSuNombre: Clave = (n) => n
+
+/**
+ * Tus entrenos con un solo nombre por ejercicio (los que comparten `clave`): el de la biblioteca (`nombreDe`) o, si no
+ * está en ella, el último con el que lo hiciste. Lo que agrupa por nombre (Progreso) los cuenta como uno aunque en otra
+ * rutina se llamara distinto (usuario, 2026-11-23); «Serie top: Press banca» y su serie de descarga salen como «Press banca».
+ */
+export function unificarNombres(
+  entrenos: readonly Entreno[],
+  clave: Clave,
+  nombreDe: (clave: string) => string | null = () => null,
+): Entreno[] {
+  const ultimo = new Map<string, string>()
+  for (const x of enOrden(entrenos))
+    for (const e of x.ejercicios) {
+      const k = clave(e.nombre)
+      ultimo.set(k, nombreDe(k) ?? e.nombre)
+    }
+  return entrenos.map((x) => ({
+    ...x,
+    ejercicios: x.ejercicios.map((e) => ({ ...e, nombre: ultimo.get(clave(e.nombre)) ?? e.nombre })),
+  }))
+}
+
 /** Los entrenos de más antiguo a más reciente. */
 const enOrden = (entrenos: readonly Entreno[]) => [...entrenos].sort((a, b) => a.inicio - b.inicio)
 
+/**
+ * Cómo se busca un ejercicio en tu historia: por su nombre exacto si alguna vez lo hiciste con ese nombre (así una serie
+ * top no toma la vez anterior de su serie de descarga, que es el mismo ejercicio con otra pauta); si nunca, por su
+ * `clave` (lo hiciste en otra rutina con otro nombre).
+ */
+function buscador(entrenos: readonly Entreno[], nombre: string, clave: Clave, exactoPrimero = true) {
+  const exacto =
+    exactoPrimero && entrenos.some((x) => x.ejercicios.some((y) => y.nombre === nombre && y.series.length))
+  const k = clave(nombre)
+  return (y: EjercicioGuardado) => (exacto ? y.nombre === nombre : clave(y.nombre) === k)
+}
+
 /** Lo que hiciste la última vez en un ejercicio (serie a serie); vacío si nunca. */
-export function ultimaVez(entrenos: readonly Entreno[], nombre: string): SerieHecha[] {
+export function ultimaVez(
+  entrenos: readonly Entreno[],
+  nombre: string,
+  clave: Clave = porSuNombre,
+): SerieHecha[] {
+  const es = buscador(entrenos, nombre, clave)
   for (const x of enOrden(entrenos).reverse()) {
-    const e = x.ejercicios.find((y) => y.nombre === nombre)
+    const e = x.ejercicios.find(es)
     if (e?.series.length) return e.series
   }
   return []
 }
 
-/** Cada vez que se hizo un ejercicio, la más antigua primero, con su puesto en la sesión. */
-export function historialDe(entrenos: readonly Entreno[], nombre: string): VezEjercicio[] {
+/**
+ * Cada vez que se hizo un ejercicio, la más antigua primero, con su puesto en la sesión. Con `todo` (la ficha), todas
+ * sus variantes por su `clave`: si un día lo hiciste dos veces (serie top y de descarga), van juntas.
+ */
+export function historialDe(
+  entrenos: readonly Entreno[],
+  nombre: string,
+  clave: Clave = porSuNombre,
+  todo = false,
+): VezEjercicio[] {
+  const es = buscador(entrenos, nombre, clave, !todo)
   return enOrden(entrenos).flatMap((x) => {
-    const e = x.ejercicios.find((y) => y.nombre === nombre)
-    return e?.series.length ? [{ fecha: x.fecha, series: e.series, puesto: e.puesto }] : []
+    const hechos = x.ejercicios.filter((y) => es(y) && y.series.length)
+    const [e] = hechos
+    if (!e) return []
+    return [{ fecha: x.fecha, series: todo ? hechos.flatMap((y) => y.series) : e.series, puesto: e.puesto }]
   })
 }
 
-/** Cada vez que se hizo una sesión (la más antigua primero): toneladas, repeticiones y minutos. */
-export function progresoDeSesion(entrenos: readonly Entreno[], sigla: string) {
+/**
+ * Cada vez que se hizo una sesión (la más antigua primero): toneladas, repeticiones y minutos. Con `programId`, solo
+ * las de esa rutina (usuario, 2026-11-23: la A1 de otra rutina es otra sesión).
+ */
+export function progresoDeSesion(entrenos: readonly Entreno[], sigla: string, programId?: string) {
   return enOrden(entrenos)
-    .filter((x) => x.sigla === sigla)
+    .filter((x) => x.sigla === sigla && (programId === undefined || x.programId === programId))
     .map((x) => {
       // Las bajadas y mini-series también suman al volumen
       const series = x.ejercicios.flatMap((e) => e.series.flatMap((s) => [s, ...(s.extra ?? [])]))

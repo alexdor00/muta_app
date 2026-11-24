@@ -27,7 +27,18 @@ async function snapshotBeforeMigration(name: string, version: number): Promise<v
   const old = await openDB(name, version)
   const stores = await readAll(old)
   old.close()
+  await guardarAparte(name, version, stores)
+}
 
+/**
+ * Guarda una copia de todo en una base aparte (`muta-backups`): antes de migrar y antes de recuperar una copia (por si te
+ * equivocas: usuario, 2026-11-24). Se guardan las últimas 3.
+ */
+export async function guardarAparte(
+  name: string,
+  version: number,
+  stores: Record<string, unknown[]>,
+): Promise<void> {
   const snapshots = await openDB(SNAPSHOTS_DB, 1, {
     upgrade(db) {
       db.createObjectStore('snapshots', { keyPath: 'createdAt' })

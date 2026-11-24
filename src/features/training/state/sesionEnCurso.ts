@@ -16,6 +16,7 @@ import { compararConAntes, descansoTras, revisarNumeros, type SerieHecha } from 
 import { resumenSesion } from '../domain/workoutSummary.ts'
 import { serieRecord } from '../domain/records.ts'
 
+import { sinTiempoMuerto } from './tiempoSesion.ts'
 /** Una bajada (dropset) o mini-serie (rest-pause) dentro de una serie, tal cual se teclea. */
 export type ExtraEnCurso = { kg: string; reps: string }
 
@@ -64,6 +65,10 @@ export type SesionEnCurso = {
   marcados: boolean[]
   consejosVistos: boolean
   aplicados: string[]
+  /** La última serie apuntada: cuándo y cuánta pausa llevaba entonces (para el tiempo muerto). */
+  ultimoApunte?: { en: number; pausaMs: number }
+  /** Hubo un rato largo sin apuntar nada: el tiempo no es fiable para revisar tus descansos. */
+  conHueco?: boolean
 }
 
 type Campo = keyof Omit<SerieEnCurso, 'hecha' | 'extra'>
@@ -123,19 +128,6 @@ export function nuevaSesion(sesion: SesionPlan, inicio: number, semana = 0): Ses
   }
 }
 
-/** Segundos que lleva la sesión, sin contar las pausas. */
-export function segundosSesion(en: SesionEnCurso, ahora: number): number {
-  const fin = en.terminada ?? en.pausadaEn ?? ahora
-  return Math.max(0, (fin - en.inicio - en.pausaMs) / 1000)
-}
-
-/** Para o vuelve a poner en marcha el tiempo de la sesión. */
-export function alternarPausa(en: SesionEnCurso, ahora: number): SesionEnCurso {
-  return en.pausadaEn === null
-    ? { ...en, pausadaEn: ahora }
-    : { ...en, pausadaEn: null, pausaMs: en.pausaMs + (ahora - en.pausadaEn) }
-}
-
 // El ejercicio que hay que abrir al volver a la sesión («Empezar ejercicio» en su ficha)
 let pedido: number | null = null
 
@@ -159,11 +151,6 @@ export function elegirDescanso(nombre: string, segundos: number): void {
 
 /** El descanso entre series de un ejercicio: el elegido o, si no, el del plan. */
 export const descansoDe = (e: EjercicioPlan) => descansosElegidos.value[e.nombre] ?? e.descanso
-
-/** Vuelve a contar el tiempo desde ahora (si la sesión se empezó sin querer). */
-export function contarDesdeAhora(en: SesionEnCurso, ahora: number): SesionEnCurso {
-  return { ...en, inicio: ahora, pausaMs: 0, pausadaEn: null }
-}
 
 /** El nombre de lo que se hace hoy (el del plan o el que lo sustituye). */
 export const nombreHoy = (e: EjercicioPlan, x: EjercicioEnCurso) => x.cambiadoPor ?? e.nombre
@@ -321,7 +308,13 @@ export type Apunte =
  * Apunta una serie con lo escrito o, si está vacía, con lo gris (un toque basta). Si los números no valen, lo dice
  * sin apuntar. La serie siguiente sin tocar hereda los kilos si cambiaste el peso.
  */
-export function apuntarSerie(en: SesionEnCurso, ej: number, j: number, confirmado: boolean): Apunte {
+export function apuntarSerie(
+  en: SesionEnCurso,
+  ej: number,
+  j: number,
+  confirmado: boolean,
+  ahora = Date.now(),
+): Apunte {
   const e = ejerciciosDe(en)[ej]
   const x = en.ejercicios[ej]
   const g = grises(e, x, j)
@@ -347,7 +340,7 @@ export function apuntarSerie(en: SesionEnCurso, ej: number, j: number, confirmad
   const fin = ejercicios.every(terminado)
   return {
     tipo: 'hecha',
-    sesion: { ...en, ejercicios },
+    sesion: sinTiempoMuerto({ ...en, ejercicios }, ahora, descansoDe(e)),
     comparacion: compararConAntes({ kg, reps }, antesDe(e, x)[j] ?? null),
     record: serieRecordHoy(e, ejercicios[ej]) === j,
     descanso: fin ? null : d.segundos,

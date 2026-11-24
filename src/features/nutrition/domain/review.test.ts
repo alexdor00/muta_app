@@ -214,3 +214,35 @@ describe('como un entrenador real (usuario, 2026-11-22)', () => {
     })
   })
 })
+
+describe('en equipo con el entrenador de Entreno (usuario, 2026-11-23)', () => {
+  it('vuelves de un parón: a mantenimiento, para subir en dos mesetas; una vez en ello, no se repite', () => {
+    const r = revisar({ ...base, paron: true, mantenimiento: 2700 })
+    expect(r.tipo === 'cambio' && [r.a, r.extra]).toEqual([
+      2700,
+      { fase: 'mantenimiento', situacion: 'paron' },
+    ])
+    const ya = revisar({
+      ...base,
+      fase: 'mantenimiento',
+      situacion: 'paron',
+      mesetas: 0,
+      paron: true,
+      mantenimiento: 2700,
+    })
+    expect(ya.tipo === 'cambio' && ya.extra?.situacion).not.toBe('paron')
+    // Sin saber tu mantenimiento, no se propone
+    const sinMantenimiento = revisar({ ...base, paron: true })
+    expect(sinMantenimiento.tipo === 'cambio' ? sinMantenimiento.extra?.situacion : null).not.toBe('paron')
+  })
+
+  it('en volumen y subiendo lento: si el entrenador te acaba de subir series, se espera antes de subir kcal', () => {
+    const volumen = { ...base, fase: 'volumen' as const, serie: serie(-0.3) }
+    const sin = revisar(volumen)
+    expect(sin.tipo === 'cambio' && sin.a).toBe(base.kcal + 150)
+    const r = revisar({ ...volumen, cambioEntreno: addDays(HOY, -3) })
+    expect(r).toEqual({ tipo: 'esperar', dias: 7 })
+    // Hace más de 10 días: ya se vio su efecto
+    expect(revisar({ ...volumen, cambioEntreno: addDays(HOY, -12) }).tipo).toBe('cambio')
+  })
+})

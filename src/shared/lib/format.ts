@@ -34,16 +34,23 @@ export function formatRest(seconds: number): string {
   return seconds > 0 ? formatClock(seconds) : 'sin descanso'
 }
 
-/** Fecha corta (AAAA-MM-DD): «2026-09-18» → «18 sep». */
-export function formatShortDate(iso: string): string {
+/**
+ * El año detrás, solo si no es el de `hoy` (usuario, 2026-11-23: con más de un año de datos, «24 nov – 28 sep» no decía
+ * de qué año era cada fecha; problema 8 de docs/problemas-con-el-tiempo.md).
+ */
+const conAno = (iso: string, hoy: string) =>
+  iso.slice(0, 4) === hoy.slice(0, 4) ? '' : ` ${iso.slice(0, 4)}`
+
+/** Fecha corta (AAAA-MM-DD): «2026-09-18» → «18 sep»; de otro año, «18 sep 2024». */
+export function formatShortDate(iso: string, hoy = localDate()): string {
   const d = new Date(`${iso}T00:00:00Z`)
-  return `${d.getUTCDate()} ${MESES[d.getUTCMonth()]}`
+  return `${d.getUTCDate()} ${MESES[d.getUTCMonth()]}${conAno(iso, hoy)}`
 }
 
-/** Fecha con el día de la semana: «2026-10-23» → «Vie 23 oct». */
-export function formatDayDate(iso: string): string {
+/** Fecha con el día de la semana: «2026-10-23» → «Vie 23 oct»; de otro año, «Vie 23 oct 2024». */
+export function formatDayDate(iso: string, hoy = localDate()): string {
   const d = new Date(`${iso}T00:00:00Z`)
-  return `${DIAS[d.getUTCDay()]} ${formatShortDate(iso)}`
+  return `${DIAS[d.getUTCDay()]} ${formatShortDate(iso, hoy)}`
 }
 
 const DIAS_LARGOS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -71,9 +78,10 @@ export function formatDuracion(minutos: number): string {
 }
 
 /** Fecha larga: «2026-11-09» → «Lunes, 9 de noviembre». */
-export function formatLongDate(iso: string): string {
+export function formatLongDate(iso: string, hoy = localDate()): string {
   const d = new Date(`${iso}T00:00:00Z`)
-  return `${DIAS_LARGOS[d.getUTCDay()]}, ${d.getUTCDate()} de ${MESES_LARGOS[d.getUTCMonth()]}`
+  const ano = conAno(iso, hoy)
+  return `${DIAS_LARGOS[d.getUTCDay()]}, ${d.getUTCDate()} de ${MESES_LARGOS[d.getUTCMonth()]}${ano ? ` de${ano}` : ''}`
 }
 
 /** El nombre de un mes (AAAA-MM o una fecha): «2026-11» → «Noviembre». */

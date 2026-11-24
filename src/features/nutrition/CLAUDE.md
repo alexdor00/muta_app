@@ -43,7 +43,7 @@ hidratos según cómo estás (guía G1, decisiones del 2026-11-08 en `docs/conoc
   estás, perímetros, fines de semana, proteína, déficit, grasa final y los consejos de la semana) y `review.ts` (las reglas
   4–8 de la consulta también sin dieta, la salida al llegar a tu grasa objetivo y la pausa); `state/entrenador.ts` (lo que
   gastas, la revisión de hoy, la recarga y los consejos; `cuerpoProgreso`, lo que da Progreso con `cuerpoParaComida`,
-  que `cargarCuerpo` lee al cargar y al abrir la revisión). Los textos, en `screens/objetivo/textoRevision.ts` (`resumenRevision`: estado, titular, cifras en filas y una recomendación; usuario, 2026-11-23: «más profesional y acotado»). Una
+  que `cargarCuerpo` lee al cargar y al abrir la revisión). En equipo con el entrenador de Entreno (2026-11-23): le da `nutricionParaEntreno` (`use-cases/forEntreno.ts`: fase, recarga, último cambio de kcal, `comidaParaEntreno` y cómo estás) y recibe `deEntreno` (parón y la última subida de series) para la revisión. Los textos, en `screens/objetivo/textoRevision.ts` (`resumenRevision`: estado, titular, cifras en filas y una recomendación; usuario, 2026-11-23: «más profesional y acotado»). Una
   sugerencia puede cambiar de fase (`extra.fase`, con «Deshacer»); al dejar una definición se guarda cómo fue
   (`ultimaDefinicion`, que «Cambiar objetivo» enseña al volver a definir). La recarga (`domain/refeed.ts`): por
   rendimiento o por cómo estás, solo los días que entrenas, acaba al hacer las sesiones de una vuelta (`recargaEfectiva`);
@@ -66,7 +66,7 @@ hidratos según cómo estás (guía G1, decisiones del 2026-11-08 en `docs/conoc
 - `state/recetas.ts` — los platos, las fotos, tu menú, tus productos, lo que falta, la siguiente comida y sus platos, lo de
   hoy y las propuestas (`propuestas`).
 - `state/dieta.ts` — el menú del día que ves, tu semana con la dieta, cifras, `recetaComoToca`, la compra y las consultas.
-- `use-cases/nutritionStore.ts` — carga y guarda todo; con dieta no hace la revisión de kcal. `cargarTipos()` pide a Entreno
+- `use-cases/nutritionStore.ts` — carga y guarda todo (al volver a la app otro día, se recarga con hoy: `vigilarElDia`); los días en memoria, en `use-cases/diasLeidos.ts` (los últimos 35 al abrir; la racha de días redondos, `rachaRedonda`, lee más si hace falta; guardar un día no leído conserva lo que tenía); Progreso lee toda tu comida (`forProgreso.ts · totalesDeSiempre`); con dieta no hace la revisión de kcal. `cargarTipos()` pide a Entreno
   (por su `index.ts`, en diferido) qué días son de entreno. `target.ts`, `foodLog.ts` como en la versión 1.
 - `use-cases/recipes.ts` (cargar el recetario de `private/` o los de ejemplo, apuntar un plato, tus platos, cambiar un
   ingrediente y sus equivalentes, poner un plato en tu dieta) y `menu.ts` (cuántos menús y qué día, el plato de cada comida,

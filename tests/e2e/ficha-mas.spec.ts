@@ -1,60 +1,25 @@
 import { expect, test } from './plan.ts'
 
-// El «···» de la ficha del ejercicio, tu material (Perfil) y la imagen para compartir el resumen (C25).
+// El «···» de la ficha del ejercicio, los discos del gimnasio en la calculadora y la imagen para compartir el resumen (C25).
 
-test('tu material (Perfil): lo que no tienes baja al final de la biblioteca y de «Cambiar ejercicio»', async ({
+test('los discos del gimnasio (en la calculadora): solo se usan los que hay y se recuerdan', async ({
   page,
 }) => {
-  await page.goto('/perfil')
-  await expect(page.getByRole('heading', { name: 'Perfil', level: 1 })).toBeVisible()
-  const maquinas = page.getByRole('switch', { name: 'Máquinas' })
-  await expect(maquinas).toHaveAttribute('aria-checked', 'true')
-  await maquinas.click()
-  await page.getByRole('switch', { name: 'Poleas' }).click()
-  await page.reload()
-  await expect(page.getByRole('switch', { name: 'Máquinas' })).toHaveAttribute('aria-checked', 'false')
-
-  await page.goto('/entreno/sesion/b1')
-  await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
-  await page.getByRole('button', { name: 'Cambiar', exact: true }).click()
-  await page
-    .getByRole('dialog', { name: 'Cambiar ejercicio' })
-    .getByRole('button', { name: /Elegir cualquier/ })
-    .click()
-  const biblioteca = page.getByRole('dialog', { name: 'Elegir ejercicio' })
-  await expect(biblioteca.getByRole('heading', { name: 'No está en tu material' })).toBeVisible()
-  // Las máquinas, después del título
-  const textos = await biblioteca.locator('h3, li').allInnerTexts()
-  const titulo = textos.findIndex((t) => t === 'No está en tu material')
-  const maquina = textos.findIndex((t) => /máquina/i.test(t))
-  expect(maquina).toBeGreaterThan(titulo)
-})
-
-test('los discos del gimnasio (Perfil o la calculadora): solo se usan los que hay', async ({ page }) => {
-  await page.goto('/perfil')
-  const pequenos = page.getByRole('button', { name: 'Discos de 1,25 kg' })
-  await expect(pequenos).toHaveAttribute('aria-pressed', 'true')
-  await pequenos.click()
-  await page.reload()
-  await expect(page.getByRole('button', { name: 'Discos de 1,25 kg' })).toHaveAttribute(
-    'aria-pressed',
-    'false',
-  )
-  // Sin barra no salen
-  await page.getByRole('switch', { name: 'Barra y discos' }).click()
-  await expect(page.getByRole('group', { name: 'Discos del gimnasio' })).toHaveCount(0)
-  await page.getByRole('switch', { name: 'Barra y discos' }).click()
-
   await page.goto('/entreno/sesion/b1')
   await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
   await page.getByRole('button', { name: 'Discos' }).click()
   const hoja = page.getByRole('dialog', { name: 'Discos por lado' })
   await hoja.getByLabel('Peso total').fill('62,5')
-  await expect(hoja).toContainText('Por lado: 20 (faltan 1,25 kg por lado con estos discos)')
-  // Sin discos de 20, dos de 10; y se vuelven a poner los de 1,25 desde aquí
+  await expect(hoja).toContainText('Por lado: 20 + 1,25')
+  // Sin discos de 20 en tu gimnasio: los menos discos posibles con los que hay
   await hoja.getByRole('button', { name: 'Discos de 20 kg' }).click()
-  await hoja.getByRole('button', { name: 'Discos de 1,25 kg' }).click()
   await expect(hoja).toContainText('Por lado: 15 + 5 + 1,25')
+  await page.reload()
+  await page.getByRole('button', { name: 'Opciones de Peso muerto rumano' }).click()
+  await page.getByRole('button', { name: 'Discos' }).click()
+  await expect(
+    page.getByRole('dialog', { name: 'Discos por lado' }).getByRole('button', { name: 'Discos de 20 kg' }),
+  ).toHaveAttribute('aria-pressed', 'false')
 })
 
 test('compartir el resumen hace una imagen', async ({ page }) => {

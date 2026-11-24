@@ -222,6 +222,83 @@ describe('revisionEntrenador', () => {
     })
     expect(mant).toEqual([])
   })
+
+  // Usuario, 2026-11-23: igual de potente que el nutricionista y en equipo con él
+  it('por debajo de tu rango: +1 serie sin esperar 3 semanas; no si esta semana no se sube', () => {
+    const una = semanas(m(6, 3))
+    const rangos = { cuadriceps: { series: 3, rango: [8, 14] as [number, number] } }
+    const r = revisionEntrenador({ ...base, semanas: { cuadriceps: una }, rangos })
+    expect(r[0]).toMatchObject({ lectura: 'subir', propuesta: { de: 3, a: 4 } })
+    expect(r[0].titulo).toContain('por debajo de tu rango (8–14)')
+    const parado = revisionEntrenador({ ...base, semanas: { cuadriceps: una }, rangos, sinSubir: true })
+    expect(parado[0].propuesta).toBeNull()
+    // Yendo peor, no: primero recuperar
+    const cae = revisionEntrenador({ ...base, semanas: { cuadriceps: semanas(m(6, 3, 1)) }, rangos })
+    expect(cae[0].lectura).toBe('cae')
+  })
+
+  it('en definición solo sube volumen en Prioridad; con «sin subir», nadie', () => {
+    const def = revisionEntrenador({ ...base, definicion: true, semanas: { cuadriceps: tres } })
+    expect(def[0]).toMatchObject({ lectura: 'dulce', propuesta: null })
+    expect(def[0].detalle).toContain('solo se sube volumen en tus músculos con Prioridad')
+    const prio = revisionEntrenador({
+      ...base,
+      definicion: true,
+      modos: { cuadriceps: 'priority' },
+      semanas: { cuadriceps: tres },
+    })
+    expect(prio[0].propuesta).toMatchObject({ de: 3, a: 4 })
+    const parado = revisionEntrenador({ ...base, semanas: { cuadriceps: tres }, sinSubir: true })
+    expect(parado[0]).toMatchObject({ lectura: 'dulce', propuesta: null })
+  })
+
+  it('por encima de tu rango y yendo peor: −1 a la primera; con «sin quitar», solo aviso', () => {
+    const rangos = { cuadriceps: { series: 16, rango: [8, 14] as [number, number] } }
+    const una = semanas(m(6, 3, 1))
+    const r = revisionEntrenador({ ...base, semanas: { cuadriceps: una }, rangos })
+    expect(r[0].propuesta).toMatchObject({ campo: 'series', de: 3, a: 2 })
+    expect(r[0].detalle).toContain('Por encima de tu rango (14 series)')
+    const espera = revisionEntrenador({
+      ...base,
+      semanas: { cuadriceps: semanas(m(6, 3, 1), m(6, 2, 2)) },
+      sinQuitar: true,
+    })
+    expect(espera[0].propuesta).toBeNull()
+    expect(espera[0].detalle).toContain('no se quitan series')
+  })
+
+  it('la comida, con su cifra, en vez de «revisa la comida»', () => {
+    const comida = 'Proteína baja: 1,2 g por kilo. Se recomienda 1,4 como mínimo.'
+    const cae = revisionEntrenador({ ...base, semanas: { cuadriceps: semanas(m(6, 3, 1)) }, comida })
+    expect(cae[0].detalle).toContain(comida)
+    const igual = revisionEntrenador({ ...base, semanas: { cuadriceps: semanas(m(6, 0)) }, comida })
+    expect(igual[0].detalle).toContain(comida)
+    expect(igual[0].detalle).toContain('No cambies de ejercicio')
+  })
+
+  it('vas peor: primero, que no te pases del RIR; hasta respetarlo, no se quitan series', () => {
+    const r = revisionEntrenador({
+      ...base,
+      semanas: { cuadriceps: semanas(m(6, 3, 1), m(6, 2, 2)) },
+      alFallo: { cuadriceps: ['Prensa'] },
+    })
+    expect(r[0]).toMatchObject({ lectura: 'cae', propuesta: null })
+    expect(r[0].detalle).toContain('Primero, tu RIR: en Prensa vas más al fallo de lo que toca')
+    // Sin pasarte del RIR, como siempre: −1 serie a la segunda semana
+    const sin = revisionEntrenador({ ...base, semanas: { cuadriceps: semanas(m(6, 3, 1), m(6, 2, 2)) } })
+    expect(sin[0].propuesta).toMatchObject({ de: 3, a: 2 })
+  })
+
+  it('en definición, mantener las marcas no es ningún drama: nada que cambiar aunque se alargue', () => {
+    const igual = m(6, 0)
+    const def = revisionEntrenador({
+      ...base,
+      definicion: true,
+      semanas: { cuadriceps: semanas(igual, igual, igual, igual) },
+    })
+    expect(def[0]).toMatchObject({ propuesta: null })
+    expect(def[0].detalle).toContain('no es ningún drama')
+  })
 })
 
 describe('lunesDe', () => {

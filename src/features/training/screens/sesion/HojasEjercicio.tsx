@@ -17,7 +17,7 @@ import {
 import { discosPorLado, MAX_TOTAL_DISCOS } from '../../state/routines.ts'
 import { equivalentesDe, idPorNombre } from '../../use-cases/exerciseLibrary.ts'
 import { notaDe } from '../../use-cases/exerciseNotes.ts'
-import { discosDelGimnasio, fueraDeTuMaterial, tenerDisco } from '../../use-cases/myEquipment.ts'
+import { discosDelGimnasio, tenerDisco } from '../../use-cases/myEquipment.ts'
 import { BibliotecaHoja } from '../biblioteca/BibliotecaHoja.tsx'
 import { useCronometro } from './useCronometro.ts'
 
@@ -79,7 +79,6 @@ export function HojasEjercicio(props: Props) {
       <SwapSheet
         equivalentes={equivalentesDe(e).map((q) => ({ nombre: q.ex.name, motivo: q.motivo }))}
         sustitutos={e.sustitutos}
-        noTienes={fueraDeTuMaterial([...equivalentesDe(e).map((q) => q.ex.name), ...e.sustitutos])}
         enLugarDe={e.enLugarDe ?? null}
         onElegir={onCambiar}
         onBiblioteca={(a) => {

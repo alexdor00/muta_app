@@ -54,7 +54,11 @@ export const medidas = signal<Medida[]>([])
 export const sensaciones = signal<Sensaciones[]>([])
 
 /** Una foto de progreso con su imagen ya abierta (`url`). */
-export type FotoVista = Foto & { url: string }
+export type FotoVista = Foto & {
+  url: string
+  /** Su miniatura (la tira de meses, elegir la foto); sin ella aún, la grande. */
+  mini: string
+}
 export const fotos = signal<FotoVista[]>([])
 
 /**
@@ -65,8 +69,15 @@ export type AjustesCuerpo = {
   calibracion: Calibracion | null
   objetivo: number | null
   diaMedidas: number | null
+  /** Tu peso objetivo en volumen (kg): al llegar, tu premio (usuario, 2026-11-24). */
+  pesoObjetivo?: number | null
 }
-export const ajustesCuerpo = signal<AjustesCuerpo>({ calibracion: null, objetivo: null, diaMedidas: null })
+export const ajustesCuerpo = signal<AjustesCuerpo>({
+  calibracion: null,
+  objetivo: null,
+  diaMedidas: null,
+  pesoObjetivo: null,
+})
 
 /** El detalle del mesociclo abierto (null si no existe; 'cargando' mientras llega). */
 export const detalle = signal<DetalleMeso | null | 'cargando'>('cargando')

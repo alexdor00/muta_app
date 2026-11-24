@@ -1,4 +1,4 @@
-import { formatClock } from '../../../../shared/lib/format.ts'
+import { formatClock, formatLongDate, localDate } from '../../../../shared/lib/format.ts'
 import {
   DangerSheet,
   RestChoiceSheet,
@@ -6,15 +6,8 @@ import {
   SessionTimeSheet,
 } from '../../components/WorkoutSheets.tsx'
 import type { EjercicioPlan, SesionPlan } from '../../state/plan.ts'
-import {
-  alternarPausa,
-  contarDesdeAhora,
-  cuentaSeries,
-  elegirDescanso,
-  guardarSesion,
-  segundosSesion,
-  type SesionEnCurso,
-} from '../../state/sesionEnCurso.ts'
+import { cuentaSeries, elegirDescanso, guardarSesion, type SesionEnCurso } from '../../state/sesionEnCurso.ts'
+import { alternarPausa, contarDesdeAhora, segundosSesion } from '../../state/tiempoSesion.ts'
 import type { SessionTip } from '../../state/routines.ts'
 import { HojaConsejos } from './HojaConsejos.tsx'
 
@@ -24,7 +17,17 @@ export type HojaSesion =
   | { tipo: 'cambiar' }
   | { tipo: 'descartar' }
   | { tipo: 'consejos' }
+  | { tipo: 'otroDia' }
   | { tipo: 'descanso'; ejercicio: EjercicioPlan; segundos: number }
+
+/**
+ * La hoja que se abre al entrar en la sesión: si es de otro día y sin terminar, preguntar qué hacer (usuario, 2026-11-23);
+ * si no, los consejos con «Mostrar al empezar» mientras no hay ninguna serie hecha.
+ */
+export function hojaAlEntrar(en: SesionEnCurso | null, consejosAlEmpezar: boolean): HojaSesion | null {
+  if (en && !en.terminada && localDate(new Date(en.inicio)) !== localDate()) return { tipo: 'otroDia' }
+  return consejosAlEmpezar && !(en && cuentaSeries(en).hechas) ? { tipo: 'consejos' } : null
+}
 
 type Props = {
   hoja: HojaSesion
@@ -37,6 +40,8 @@ type Props = {
   /** Cambiar de sesión o descartarla: se borra lo apuntado y se vuelve a Tu plan. */
   onSalir: () => void
   onAviso: (texto: string) => void
+  /** La sesión es de otro día y la guardas como estaba (acaba con tu última serie). */
+  onGuardarComoEstaba: () => void
   /** Se añadió un ejercicio (C19): su número, para abrirlo. */
 }
 
@@ -88,6 +93,20 @@ export function HojasSesion(props: Props) {
         texto="Se borra lo apuntado hoy y la rotación no avanza."
         accion="Descartar"
         onSi={props.onSalir}
+        onClose={cerrar}
+      />
+    )
+  }
+  // Vuelves a una sesión empezada otro día (usuario, 2026-11-23): sigues con ella o se guarda como estaba
+  if (hoja.tipo === 'otroDia') {
+    return (
+      <DangerSheet
+        titulo={`Empezaste esta sesión el ${formatLongDate(localDate(new Date(en.inicio))).toLowerCase()}`}
+        texto="Si la guardas, queda en ese día con lo que apuntaste y acaba con tu última serie."
+        accion="Guardarla como estaba"
+        cancelar="Seguir con ella"
+        normal
+        onSi={props.onGuardarComoEstaba}
         onClose={cerrar}
       />
     )

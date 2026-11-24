@@ -16,7 +16,12 @@ export type ConsejoVisto = {
 }
 
 /** Las clases de los botones de un consejo: el principal (negro) y los demás (gris), y el enlace en texto. */
-export const TIP_BOTON = { principal: styles.fix, secundario: styles.fixSecundario, enlace: styles.fixEnlace }
+export const TIP_BOTON = {
+  principal: styles.fix,
+  secundario: styles.fixSecundario,
+  enlace: styles.fixEnlace,
+  fila: styles.pie,
+}
 
 /** La tarjeta y su fila de título, las de «Consejos para esta sesión» (también para «Tu entrenador»). */
 export const TIP_TARJETA = {

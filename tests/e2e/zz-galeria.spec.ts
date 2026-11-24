@@ -229,7 +229,7 @@ conPlan('galería · Entreno con tu plan', async ({ page }) => {
       'Biblioteca de ejercicios',
       'Buscar y filtrar por músculo.',
     ],
-    ['/perfil', '24-perfil', 'Perfil · Tu material', 'Tu material y los discos del gimnasio.'],
+    ['/perfil', '24-perfil', 'Perfil · Copia de seguridad', 'Guardar y recuperar tu copia.'],
     ['/hoy', '25-hoy', 'Hoy', 'Lo que te queda por hacer hoy.'],
     ['/comida', '26-comida', 'Comida (pendiente)', 'Pendiente de diseño.'],
     [

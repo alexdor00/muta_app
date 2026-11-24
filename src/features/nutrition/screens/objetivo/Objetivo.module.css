@@ -114,87 +114,12 @@
   cursor: pointer;
 }
 
-.review {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  box-shadow: var(--card-shadow);
-}
-
-.reviewHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .reviewEyebrow {
   font: var(--text-caption);
   font-weight: var(--weight-semibold);
   color: var(--label-2);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-}
-
-.reviewTitle {
-  font: var(--text-headline);
-}
-
-.estado {
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  background: var(--surface-2);
-  color: var(--label);
-  font: var(--text-caption);
-  font-weight: var(--weight-semibold);
-}
-
-/* Las cifras de la revisión: etiqueta a la izquierda, cifra a la derecha */
-.reviewDatos > div {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-2) 0;
-  border-top: var(--hairline) solid var(--separator);
-  font: var(--text-subhead);
-}
-
-.reviewDatos dt {
-  color: var(--label-2);
-}
-
-.reviewDatos dd {
-  font-weight: var(--weight-semibold);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.reviewConsejos {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin-top: var(--space-2);
-}
-
-.reviewConsejos ul {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding-left: var(--space-4);
-  font: var(--text-footnote);
-  color: var(--label);
-}
-
-.badge {
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  background: var(--accent);
-  color: var(--on-accent);
-  font: var(--text-caption);
-  font-weight: var(--weight-bold);
 }
 
 .see {

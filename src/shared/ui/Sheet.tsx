@@ -71,7 +71,10 @@ export function Sheet({ title, onClose, children, footer, large, atras, alta, ac
             </RoundButton>
           </span>
         </header>
-        <div class={styles.body}>{children}</div>
+        {/* Se desplaza: con el teclado también (accesibilidad: una zona que se desplaza tiene que poder enfocarse) */}
+        <div class={styles.body} tabIndex={0}>
+          {children}
+        </div>
         {footer && <footer class={styles.footer}>{footer}</footer>}
       </section>
     </div>

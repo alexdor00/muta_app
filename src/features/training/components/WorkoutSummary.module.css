@@ -426,3 +426,39 @@
 .mejora .marca {
   color: var(--improve);
 }
+
+/* Tus descansos, revisados con lo de hoy: cada ejercicio con su propuesta, «Aplicar» y «Ahora no» */
+.descansosTitulo {
+  font: var(--text-headline);
+  text-align: left;
+}
+
+.descansos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  text-align: left;
+}
+
+.descanso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.descansoNombre {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+.descansoMotivo {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.descansoBotones {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}

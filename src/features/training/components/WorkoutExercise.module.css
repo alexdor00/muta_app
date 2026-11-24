@@ -342,17 +342,18 @@
   caret-color: transparent;
 }
 
-/* La serie que toca: casillas blancas sin filo (las demás, grises) y su número en negro */
-.actual .cell {
-  background: var(--surface);
-}
-
+/* La serie que toca: su número en negro. Todas las casillas, del gris del fondo de la pantalla (usuario, 2026-11-23: más
+   contraste sobre la tarjeta blanca) */
 .actual .index {
   color: var(--label);
   font-weight: var(--weight-semibold);
 }
 
-/* Hecha: sin fondo, las cifras en negro */
+/* Hecha: la fila entera en una franja gris suave y las cifras sin casilla (como la franja de color de otras apps, en gris) */
+.doneRow {
+  background: var(--bg);
+}
+
 .doneRow .cell {
   background: none;
 }
@@ -376,9 +377,10 @@
   width: var(--control);
   height: var(--control);
   padding: 0;
-  border: var(--border) solid var(--separator);
+  border: var(--border) solid var(--bg);
   border-radius: var(--radius-pill);
-  background: var(--surface);
+  /* Del gris del fondo, como las casillas de kilos, reps y RIR (usuario, 2026-11-23) */
+  background: var(--bg);
   color: var(--label);
   cursor: pointer;
   transition:

@@ -1,0 +1,183 @@
+/* Comparar dos vueltas de una misma rutina (CompararHoja.tsx). Lo común de las hojas, en Progreso.module.css. */
+
+.veredicto {
+  margin: var(--space-1) 0 0;
+  font: var(--text-titulo-tarjeta);
+}
+
+.carrera {
+  margin: var(--space-3) 0 0;
+}
+
+.carrera svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.lineaAntes,
+.lineaAhora {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.lineaAntes {
+  stroke: var(--label-3);
+  stroke-width: 2.5;
+  stroke-dasharray: 6 5;
+}
+
+.lineaAhora {
+  stroke: var(--label);
+  stroke-width: 3;
+}
+
+.punto {
+  fill: var(--label);
+}
+
+.ventaja,
+.desventaja {
+  stroke-width: 2;
+}
+
+.ventaja {
+  stroke: var(--improve);
+}
+
+.desventaja {
+  stroke: var(--label-3);
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.leyenda b {
+  margin-left: auto;
+}
+
+.marcaAhora,
+.marcaAntes {
+  display: inline-block;
+  width: var(--space-4);
+  height: 0;
+  margin-right: var(--space-1);
+  vertical-align: middle;
+  border-top: var(--space-1) solid var(--label);
+}
+
+.marcaAntes {
+  border-top: var(--space-1) dashed var(--label-3);
+}
+
+.cifras {
+  margin: 0;
+  list-style: none;
+}
+
+.cifras li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  font: var(--text-subhead);
+}
+
+.cifras li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.sesiones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  list-style: none;
+}
+
+.cabeza {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-1);
+}
+
+.sigla {
+  font: var(--text-letra-fila);
+}
+
+.barra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.barraNombre {
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.pista {
+  display: block;
+  height: var(--space-2);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.pista i {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--label);
+}
+
+.pista.antes i {
+  background: var(--label-3);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--text-footnote);
+}
+
+.tabla th {
+  padding-bottom: var(--space-2);
+  color: var(--label-2);
+  font: var(--text-caption);
+  text-align: right;
+}
+
+.tabla th:first-child,
+.tabla td:first-child {
+  text-align: left;
+}
+
+.tabla td {
+  padding: var(--space-2) 0;
+  border-top: var(--hairline) solid var(--separator);
+  text-align: right;
+}
+
+.tabla td + td {
+  padding-left: var(--space-2);
+}
+
+.mejora {
+  color: var(--improve);
+  font-weight: var(--weight-semibold);
+}
+
+.gris {
+  color: var(--label-2);
+}

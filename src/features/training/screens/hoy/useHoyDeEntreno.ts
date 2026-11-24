@@ -3,6 +3,7 @@ import { addDays, localDate } from '../../../../shared/lib/format.ts'
 import { paths } from '../../../../shared/lib/paths.ts'
 import { ORDEN_TAREA, type TareaDeHoy } from '../../../../shared/lib/tareaDeHoy.ts'
 import {
+  claveEjercicio,
   descansasHoy,
   descansosPorSemana,
   entrenos,
@@ -96,6 +97,6 @@ export function useHoyDeEntreno(): HoyDeEntreno {
   )
   // Mañana: si hoy ya entrenaste (o descansas), la que toca es la de mañana, salvo que mañana toque descanso
   const manana = descansasHoy(addDays(hoy, 1)) ? 'Descansas' : toca ? `${toca.sigla} · ${toca.nombre}` : null
-  const records = recordsDelDia(hoy, entrenos.value).map((r) => r.nombre)
+  const records = recordsDelDia(hoy, entrenos.value, claveEjercicio.value).map((r) => r.nombre)
   return { listo: true, tareas, descansas: descansa, racha: racha || null, manana, records }
 }

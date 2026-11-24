@@ -1,0 +1,40 @@
+/* La sugerencia del entrenador, en un recuadro gris dentro de la tarjeta (como la recarga en la revisión de Nutrición) */
+.sugerencia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+}
+
+.titulo {
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+}
+
+/* El porqué, justificado como los demás textos de explicación */
+.detalle {
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.enlace {
+  align-self: flex-start;
+  color: var(--label);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.pie {
+  font: var(--text-caption);
+  color: var(--label-2);
+}
+
+/* Sobre el recuadro gris, los botones secundarios en blanco (si no, no se ven) */
+.sugerencia .secundario {
+  background: var(--surface);
+}

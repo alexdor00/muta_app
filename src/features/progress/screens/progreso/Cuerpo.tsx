@@ -107,7 +107,7 @@ export function Cuerpo({ mes, onFoto, onCambio, onMedida, onComposicion, onMedir
                 aria-pressed={x.foto.id === antes?.id}
                 onClick={() => setElegidoAntes(x.mes)}
               >
-                <img src={x.foto.url} alt="" />
+                <img src={x.foto.mini} alt="" />
                 <span>{mesCorto(x.mes, mes)}</span>
               </button>
             ))}

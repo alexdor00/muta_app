@@ -272,6 +272,8 @@ export function DangerSheet(props: {
   texto: string
   accion: string
   normal?: boolean
+  /** El botón de no hacer nada (de serie, «Cancelar»). */
+  cancelar?: string
   onSi: () => void
   onClose: () => void
 }) {
@@ -280,7 +282,7 @@ export function DangerSheet(props: {
       <p class={styles.lead}>{props.texto}</p>
       <div class={styles.pair}>
         <Button variant="secondary" onClick={props.onClose}>
-          Cancelar
+          {props.cancelar ?? 'Cancelar'}
         </Button>
         {props.normal ? (
           <Button onClick={props.onSi}>{props.accion}</Button>

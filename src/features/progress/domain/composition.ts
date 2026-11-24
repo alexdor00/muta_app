@@ -76,7 +76,6 @@ export function composicionDe(datos: {
   const grasa = Math.max(3, bruta + (calibracion?.diferencia ?? 0))
   const margen = calibracion ? 2 : 3.5
   const magraKg = pesoKg * (1 - grasa / 100)
-  const metros = alturaCm / 100
   return {
     grasa: r1(grasa),
     rango: [r1(Math.max(3, grasa - margen)), r1(grasa + margen)],
@@ -84,8 +83,14 @@ export function composicionDe(datos: {
     bruta: r1(bruta),
     magraKg: r1(magraKg),
     grasaKg: r1(pesoKg - magraKg),
-    ffmi: r1(magraKg / metros ** 2 + 6.1 * (1.8 - metros)),
+    ffmi: ffmiDe(magraKg, alturaCm),
   }
+}
+
+/** FFMI: masa magra ÷ altura², corregido a 1,80 m (02-reglas § 9). */
+export function ffmiDe(magraKg: number, alturaCm: number): number {
+  const metros = alturaCm / 100
+  return r1(magraKg / metros ** 2 + 6.1 * (1.8 - metros))
 }
 
 /** El peso que tendrías con ese % de grasa conservando tu masa magra. */

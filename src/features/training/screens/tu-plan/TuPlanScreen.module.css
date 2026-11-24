@@ -61,3 +61,8 @@
   width: var(--icon-sm);
   height: var(--icon-sm);
 }
+
+/* Terminaste tu rutina, arriba del carrusel */
+.fin {
+  padding: 0 var(--gutter) var(--gap-block);
+}

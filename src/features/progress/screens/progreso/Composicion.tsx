@@ -16,6 +16,7 @@ import {
 } from '../../state/progreso.ts'
 import { elegirObjetivoGrasa } from '../../use-cases/progress.ts'
 import propios from './Composicion.module.css'
+import { PesoObjetivo } from './PesoObjetivo.tsx'
 import styles from './Progreso.module.css'
 
 /** El círculo va del 5 al 40 % de grasa (tres cuartos de vuelta). */
@@ -186,6 +187,8 @@ export function Composicion({ onCalibrar, onMedir, avisar }: Props) {
           )}
         </p>
       )}
+
+      <PesoObjetivo avisar={avisar} />
 
       <p class={`${styles.nota} ${styles.justificado}`}>
         Fórmula de la Marina de EE. UU. con tus medidas y tu peso de tendencia ({formatDecimal(peso)} kg):

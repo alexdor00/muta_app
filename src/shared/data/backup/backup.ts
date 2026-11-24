@@ -3,7 +3,9 @@ import { SCHEMA_VERSION } from '../migrations/index.ts'
 import { STORES, STORE_NAMES, type StoreName } from '../schema.ts'
 
 export const BACKUP_FORMAT = 'muta-backup'
-export const BACKUP_EVERY_DAYS = 14
+/** Cada cuánto se recuerda guardar la copia (usuario, 2026-11-24: cada mes) y, sin ninguna, a los cuántos días de empezar. */
+export const BACKUP_EVERY_DAYS = 30
+export const PRIMERA_COPIA_DIAS = 7
 
 export type Backup = {
   format: typeof BACKUP_FORMAT
@@ -15,15 +17,29 @@ export type Backup = {
 /** Todo lo guardado, en un objeto listo para escribir en un archivo JSON. */
 export async function exportBackup(db: Db, now = new Date()): Promise<Backup> {
   const stores = await readAll(db)
-  await db.put('meta', { key: 'lastBackupAt', value: now.toISOString() })
   return { format: BACKUP_FORMAT, schemaVersion: SCHEMA_VERSION, exportedAt: now.toISOString(), stores }
 }
 
-/** ¿Toca avisar de hacer copia? Cada 14 días, o si nunca se ha hecho. */
-export function needsBackupReminder(lastBackupAt: string | null, now = new Date()): boolean {
-  if (!lastBackupAt) return true
-  const days = (now.getTime() - new Date(lastBackupAt).getTime()) / 86_400_000
-  return days >= BACKUP_EVERY_DAYS
+/** Apunta cuándo se guardó la última copia (solo si de verdad se guardó: compartir se puede cancelar). */
+export async function marcarCopia(db: Db, now = new Date()): Promise<void> {
+  await db.put('meta', { key: 'lastBackupAt', value: now.toISOString() })
+}
+
+const diasDesde = (iso: string, now: Date) => (now.getTime() - new Date(iso).getTime()) / 86_400_000
+
+/**
+ * ¿Toca recordar la copia? Cada mes desde la última; sin ninguna, a la semana de empezar a usar la app (`desde`). «Ahora
+ * no» (`pospuesta`) la deja otro mes.
+ */
+export function needsBackupReminder(
+  lastBackupAt: string | null,
+  now = new Date(),
+  desde: string | null = null,
+  pospuesta: string | null = null,
+): boolean {
+  if (pospuesta && diasDesde(pospuesta, now) < BACKUP_EVERY_DAYS) return false
+  if (lastBackupAt) return diasDesde(lastBackupAt, now) >= BACKUP_EVERY_DAYS
+  return !desde || diasDesde(desde, now) >= PRIMERA_COPIA_DIAS
 }
 
 export class BackupError extends Error {}
@@ -47,10 +63,8 @@ export function validateBackup(data: unknown): Backup {
       'La copia es de una versión más nueva de la app. Actualiza MUTA e inténtalo otra vez.',
     )
   }
-  if (backup.schemaVersion < SCHEMA_VERSION) {
-    // Cuando haya versión 2, aquí se migran los datos de la copia antes de importarlos.
-    throw new BackupError('La copia es de una versión anterior que esta app todavía no sabe convertir.')
-  }
+  // Una copia de una versión anterior vale (problema 13): las migraciones hasta hoy solo añaden almacenes, que quedan
+  // vacíos. Si una migración cambia el formato de algo, aquí se convierte la copia antes de importarla.
   if (typeof backup.stores !== 'object' || backup.stores === null) {
     throw new BackupError('La copia está incompleta.')
   }
@@ -77,4 +91,71 @@ export async function importBackup(db: Db, data: unknown): Promise<void> {
       for (const row of backup.stores[name] ?? []) await store.put(row)
     }
   })
+}
+
+/** Una foto (o cualquier archivo) dentro de la copia: su tipo y su contenido en base64. */
+type BlobEnCopia = { __blob: string; base64: string }
+
+const esBlobEnCopia = (x: unknown): x is BlobEnCopia =>
+  typeof x === 'object' && x !== null && '__blob' in x && 'base64' in x
+
+async function aBase64(b: Blob): Promise<string> {
+  const bytes = new Uint8Array(await b.arrayBuffer())
+  let s = ''
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000))
+  return btoa(s)
+}
+
+/** Cambia cada foto (Blob) por su base64, en cualquier sitio de los datos (el JSON no sabe guardar archivos). */
+async function sinBlobs(x: unknown): Promise<unknown> {
+  if (x instanceof Blob) return { __blob: x.type, base64: await aBase64(x) }
+  if (Array.isArray(x)) return Promise.all(x.map(sinBlobs))
+  if (typeof x === 'object' && x !== null) {
+    const out: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(x)) out[k] = await sinBlobs(v)
+    return out
+  }
+  return x
+}
+
+/** Lo contrario de `sinBlobs`: el base64 vuelve a ser una foto. */
+function conBlobs(x: unknown): unknown {
+  if (esBlobEnCopia(x)) {
+    const bin = atob(x.base64)
+    const bytes = new Uint8Array(bin.length)
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+    return new Blob([bytes], { type: x.__blob })
+  }
+  if (Array.isArray(x)) return x.map(conBlobs)
+  if (typeof x === 'object' && x !== null)
+    return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, conBlobs(v)]))
+  return x
+}
+
+/** La copia en texto (JSON), con las fotos dentro. */
+export async function copiaEnTexto(backup: Backup): Promise<string> {
+  return JSON.stringify(await sinBlobs(backup))
+}
+
+/** Lee una copia de su texto: la comprueba y devuelve las fotos a su forma. Lanza BackupError si no vale. */
+export function leerCopia(texto: string): Backup {
+  let datos: unknown
+  try {
+    datos = JSON.parse(texto)
+  } catch {
+    throw new BackupError('El archivo no es una copia de MUTA.')
+  }
+  return conBlobs(validateBackup(datos)) as Backup
+}
+
+/** Lo que trae una copia, para enseñarlo antes de recuperarla. */
+export function resumenCopia(b: Backup): { fecha: string; entrenos: number; dias: number; fotos: number } {
+  const n = (s: StoreName, si: (x: Record<string, unknown>) => boolean = () => true) =>
+    ((b.stores[s] ?? []) as Record<string, unknown>[]).filter(si).length
+  return {
+    fecha: b.exportedAt,
+    entrenos: n('workouts', (x) => x.status === 'finished'),
+    dias: n('foodLog'),
+    fotos: n('photos'),
+  }
 }

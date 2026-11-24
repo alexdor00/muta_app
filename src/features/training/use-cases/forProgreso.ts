@@ -1,7 +1,8 @@
 // Lo que Progreso necesita de Entreno (por el index.ts del área): tus mesociclos —tus etapas— con su fuerza (con su
 // detalle y la comparación de dos), tu fuerza semana a semana y desde que empezaste, tus entrenos (el calendario) y el
 // récord del básico de cada grupo. Lee tu plan con cargarPlan(); solo guarda lo de tus mesociclos (use-cases/mesocycles.ts).
-import { formatDecimal } from '../../../shared/lib/format.ts'
+import { computed } from '@preact/signals'
+import { addDays, formatDecimal } from '../../../shared/lib/format.ts'
 import { effortLabel } from '../domain/effort.ts'
 import { fotosDeRutina } from './sessionPhotos.ts'
 import {
@@ -23,13 +24,9 @@ import {
   type MusculoDelMeso,
 } from '../domain/mesocycles.ts'
 import { GRUPOS_RECORDS, recordsPorGrupo, type RecordGrupo } from '../domain/groupRecords.ts'
-import {
-  balanceDe,
-  comparar,
-  veredictoComparado,
-  type Balance,
-  type BarraComparada,
-} from '../domain/mesocycleReview.ts'
+import { balanceDe, type Balance } from '../domain/mesocycleReview.ts'
+import { compararVueltas, comparables, parejaDe, type Vueltas } from '../domain/vueltas.ts'
+import { lunesDe } from '../domain/trainingProgress.ts'
 import { MUSCLES, type MuscleId } from '../domain/muscles.ts'
 import {
   basicosDe,
@@ -39,11 +36,16 @@ import {
   type BasicoEnTramo,
   type EjercicioEnElTiempo,
 } from '../domain/strengthHistory.ts'
-import { progresoDeSesion, type Entreno } from '../domain/workoutHistory.ts'
+import { progresoDeSesion, unificarNombres, type Entreno } from '../domain/workoutHistory.ts'
 import type { SerieHecha } from '../domain/workoutSet.ts'
 import { rangoMusculo } from '../state/musculos.ts'
-import { entrenos, tonoDe, type Tono } from '../state/plan.ts'
-import { idPorNombre, porNombre } from './exerciseLibrary.ts'
+import { claveEjercicio, entrenos as todos, tonoDe, type Tono } from '../state/plan.ts'
+
+// Para Progreso, cada ejercicio con un solo nombre aunque lo hicieras con otro en otra rutina (usuario, 2026-11-23)
+const entrenos = computed(() =>
+  unificarNombres(todos.value, claveEjercicio.value, (k) => ejercicioDeBiblioteca(k)?.name ?? null),
+)
+import { ejercicioDeBiblioteca, idPorNombre, porNombre } from './exerciseLibrary.ts'
 import { leerBasicos, mesociclosAlDia } from './mesocycles.ts'
 import { cargarPlan } from './training.ts'
 
@@ -107,7 +109,22 @@ export type EntrenoParaProgreso = {
 const esCompuesto = (nombre: string) => porNombre(nombre)?.kind === 'compound'
 
 /** Tus básicos de siempre (los compuestos que más repites). */
-const basicos = () => basicosDe(entrenos.value, esCompuesto)
+const deBasicos = computed(() => basicosDe(entrenos.value, esCompuesto))
+const basicos = () => deBasicos.value
+
+/**
+ * Cada sesión de cada rutina con su gráfica (`progresoDeSesion`), calculada una vez por sesión: antes se calculaba por cada
+ * entreno, y con años de datos Progreso tardaba segundos en abrir (problema 9 de docs/problemas-con-el-tiempo.md).
+ */
+const porSesion = computed(() => {
+  const claves = new Set(entrenos.value.map((x) => `${x.programId}|${x.sigla}`))
+  return new Map(
+    [...claves].map((k) => {
+      const [programId, sigla] = [k.slice(0, k.lastIndexOf('|')), k.slice(k.lastIndexOf('|') + 1)]
+      return [k, progresoDeSesion(entrenos.value, sigla, programId)]
+    }),
+  )
+})
 
 /** Tu fuerza en un tramo, con la ficha de cada básico. */
 function fuerzaDe(desde: string | null, hasta: string | null): FuerzaTramo | null {
@@ -119,7 +136,7 @@ const aEntrenoDelDia = (x: Entreno): EntrenoDelDia => ({
   id: x.id,
   fecha: x.fecha,
   sigla: x.sigla,
-  veces: progresoDeSesion(entrenos.value, x.sigla).filter((v) => v.fecha <= x.fecha),
+  veces: (porSesion.value.get(`${x.programId}|${x.sigla}`) ?? []).filter((v) => v.fecha <= x.fecha),
   programId: x.programId,
   tono: tonoDe(x.sigla),
   nombre: x.nombre,
@@ -220,11 +237,18 @@ export type DetalleMeso = {
   balance: Balance[]
   /** Tu fuerza en la etapa: tus básicos de su principio a su final. */
   fuerza: FuerzaTramo | null
+  /** Con cuál se compara de serie (la misma rutina; primero, el mismo objetivo) y cuántas hay con su rutina. */
+  pareja: { id: string; nombre: string } | null
+  comparables: { id: string; nombre: string }[]
+}
+
+async function todas(hoy: string): Promise<Mesociclo[]> {
+  const { actual, archivados } = await mesociclosAlDia(hoy)
+  return [...archivados, ...(actual ? [actual] : [])]
 }
 
 async function buscar(id: string, hoy: string): Promise<Mesociclo | null> {
-  const { actual, archivados } = await mesociclosAlDia(hoy)
-  return [actual, ...archivados].find((m) => m?.id === id) ?? null
+  return (await todas(hoy)).find((m) => m.id === id) ?? null
 }
 
 /** El detalle de un mesociclo: Constancia, Músculos y Rutina. null si no existe. */
@@ -233,10 +257,12 @@ export async function mesocicloParaProgreso(
   hoy: string,
   peso: PesoEnTramo,
 ): Promise<DetalleMeso | null> {
-  const m = await buscar(id, hoy)
+  const lasEtapas = await todas(hoy)
+  const m = lasEtapas.find((x) => x.id === id)
   if (!m) return null
   const lista = entrenos.value
   const suyos = entrenosDe(m, lista, hoy)
+  const pareja = parejaDe(m, lasEtapas)
   const semanas = semanasDe(m, lista, hoy)
   const porSemana = m.sesionesPorSemana
   const resumen = resumenDe(m, lista, hoy)
@@ -305,69 +331,47 @@ export async function mesocicloParaProgreso(
       bajos,
       formato: (n) => formatDecimal(Math.round(n * 100) / 100),
     }),
+    pareja: pareja && { id: pareja.id, nombre: pareja.nombre },
+    comparables: comparables(m, lasEtapas).map((x) => ({ id: x.id, nombre: x.nombre })),
   }
 }
 
-export type Comparacion = {
+/**
+ * Dos vueltas de una misma rutina comparadas a la misma semana (usuario, 2026-11-23): `a` es la anterior y `b` la
+ * posterior, con su tarjeta, y cuánto cambió tu peso en cada una hasta esa semana.
+ */
+export type Comparacion = Vueltas & {
   a: TarjetaMeso
   b: TarjetaMeso
-  barras: BarraComparada[]
-  veredicto: string
-  /** Cuánto cambió tu peso en cada uno (null sin pesajes). */
   peso: { a: number | null; b: number | null }
-  /** Los ejercicios que hiciste en los dos, con su mejor 1RM estimado en cada uno. */
-  comunes: { nombre: string; a: number; b: number }[]
 }
 
-/** Compara dos mesociclos por semana (duran distinto). null si alguno no existe. */
+/** Compara dos etapas con la misma rutina (rutinas distintas no se comparan: null). */
 export async function compararParaProgreso(
   idA: string,
   idB: string,
   hoy: string,
   peso: PesoEnTramo,
 ): Promise<Comparacion | null> {
-  const [ma, mb] = [await buscar(idA, hoy), await buscar(idB, hoy)]
-  if (!ma || !mb) return null
-  const lista = entrenos.value
-  const [ra, rb] = [resumenDe(ma, lista, hoy), resumenDe(mb, lista, hoy)]
-  const [wa, wb] = [semanasQueDura(ma, hoy), semanasQueDura(mb, hoy)]
-  const f = (n: number) => formatDecimal(Math.round(n * 10) / 10)
-  const barras = [
-    comparar(
-      'Sesiones por semana',
-      ra.sesiones / wa,
-      rb.sesiones / wb,
-      f(ra.sesiones / wa),
-      f(rb.sesiones / wb),
-    ),
-    comparar(
-      'Toneladas por semana',
-      ra.toneladas / wa,
-      rb.toneladas / wb,
-      f(ra.toneladas / wa),
-      f(rb.toneladas / wb),
-    ),
-    comparar('Récords por semana', ra.records / wa, rb.records / wb, f(ra.records / wa), f(rb.records / wb)),
-    // Lo que hace crecer es el volumen que acumulas (04-guia § 5), no que suba cada ejercicio
-    comparar('Series por semana', ra.series / wa, rb.series / wb, f(ra.series / wa), f(rb.series / wb)),
-  ]
+  const [x, y] = [await buscar(idA, hoy), await buscar(idB, hoy)]
+  if (!x || !y || x.programId !== y.programId || x.id === y.id) return null
+  const [antes, ahora] = x.inicio <= y.inicio ? [x, y] : [y, x]
+  const v = compararVueltas(antes, ahora, entrenos.value, hoy, basicos())
+  if (!v) return null
+  // El peso hasta la misma semana de cada una
   const cambio = (m: Mesociclo) => {
-    const p = peso(m.inicio, m.fin ?? hoy)
+    const p = peso(m.inicio, minFecha(addDays(lunesDe(m.inicio), 7 * v.semana - 1), m.fin ?? hoy))
     return p ? Math.round((p.fin - p.inicio) * 10) / 10 : null
   }
-  const deB = new Map(rb.ejercicios.map((e) => [e.nombre, e.mejor]))
   return {
-    a: tarjeta(ma, hoy),
-    b: tarjeta(mb, hoy),
-    barras,
-    veredicto: veredictoComparado(barras, ma.nombre, mb.nombre),
-    peso: { a: cambio(ma), b: cambio(mb) },
-    comunes: ra.ejercicios
-      .filter((e) => deB.has(e.nombre))
-      .slice(0, 12)
-      .map((e) => ({ nombre: e.nombre, a: Math.round(e.mejor), b: Math.round(deB.get(e.nombre) ?? 0) })),
+    ...v,
+    a: tarjeta(antes, hoy),
+    b: tarjeta(ahora, hoy),
+    peso: { a: cambio(antes), b: cambio(ahora) },
   }
 }
+
+const minFecha = (a: string, b: string) => (a < b ? a : b)
 
 /** Para un día de Progreso: la foto de serie de esa sesión (la que le tocó). */
 export { encuadreDeEntreno, fotoDeSerieDe } from './sessionPhotos.ts'

@@ -141,8 +141,10 @@ test('tu mes: Días, Cuerpo y Fuerza; la hoja de la etapa; lo de Hoy', async ({ 
   await expect(press.getByRole('columnheader', { name: /^Sesión anterior/ })).toBeVisible()
   await page.screenshot({ path: 'tests/e2e/capturas/progreso-dia.png', fullPage: true })
   expect((await axe(page)).violations).toEqual([])
-  await page.getByRole('link', { name: 'Volver a Progreso' }).click()
-  await expect(page).toHaveURL(/ver=dias/)
+  // «‹» vuelve a la pantalla de la que vienes (usuario, 2026-11-23)
+  await page.getByRole('link', { name: 'Volver', exact: true }).click()
+  await expect(page).not.toHaveURL(/dia/)
+  await expect(page).toHaveURL(/progreso/)
   await page.screenshot({ path: 'tests/e2e/capturas/progreso.png', fullPage: true })
   expect((await axe(page)).violations).toEqual([])
   await page.goto('/progreso')
@@ -234,7 +236,10 @@ test('renombrar la etapa, empezar otra y compararlas', async ({ page }) => {
 
   await page.getByRole('button', { name: /^Etapa / }).click()
   await page.getByRole('button', { name: 'Comparar con otra etapa' }).click()
-  await expect(page.getByRole('dialog', { name: 'Comparar etapas' })).toContainText('Lo que dicen los datos')
+  // La misma rutina: se comparan a la misma semana (usuario, 2026-11-23)
+  await expect(page.getByRole('dialog', { name: 'Comparar etapas' })).toContainText(
+    'a la semana 1 de las dos',
+  )
   await sinAnimaciones(page)
   expect((await axe(page)).violations).toEqual([])
 })

@@ -99,3 +99,36 @@ export function leerRutinaCsv(texto: string): RutinaCsv {
     errores,
   }
 }
+
+/** Para comparar nombres sin mayúsculas, tildes ni espacios de más. */
+const normal = (s: string) => s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ')
+
+/** Los ejercicios de una rutina, sin repetir y en orden alfabético (la «huella» para reconocerla). */
+const huella = (p: ProgramData) =>
+  [
+    ...new Set(
+      p.blocks.flatMap((b) =>
+        b.weeks.flatMap((w) =>
+          w.days.flatMap((d) => ('exercises' in d ? d.exercises.map((e) => normal(e.name)) : [])),
+        ),
+      ),
+    ),
+  ]
+    .sort()
+    .join('|')
+
+/**
+ * Una rutina tuya de antes que parece la misma que el CSV que cargas (usuario, 2026-11-23): se llama igual o lleva los
+ * mismos ejercicios. Si la hay, se pregunta; si dices que sí, se usa la misma y su historia y sus etapas siguen.
+ */
+export function rutinaParecida(
+  nombre: string,
+  programa: ProgramData,
+  tuyas: readonly RutinaMia[],
+): RutinaMia | null {
+  const n = normal(nombre)
+  const h = huella(programa)
+  return (
+    [...tuyas].reverse().find((r) => (n && normal(r.title) === n) || (h !== '' && huella(r) === h)) ?? null
+  )
+}

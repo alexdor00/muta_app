@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { addDays } from '../../../shared/lib/format.ts'
 import {
   cambioDePerimetro,
+  comidaParaEntreno,
   consejosDeLaSemana,
   findesDeMas,
   grasaFinal,
@@ -104,5 +105,43 @@ describe('consejosDeLaSemana', () => {
     expect(c[1]).toContain('duermes poco')
     expect(c.some((x) => x.includes('Fuerza a la baja'))).toBe(true)
     expect(c.at(-1)).toContain('conservas el músculo')
+  })
+})
+
+describe('comidaParaEntreno (para el entrenador de Entreno, usuario 2026-11-23)', () => {
+  const nada = { fase: 'definicion' as const, proteina: 1.8, pct: -0.6, parte: 0.8 }
+  it('lo que falla, con su cifra, en orden: proteína, ritmo y déficit', () => {
+    expect(comidaParaEntreno(nada)).toBeNull()
+    expect(comidaParaEntreno({ ...nada, proteina: 1.2, pct: -1.5, parte: 0.6 })).toBe(
+      'Proteína baja: 1,2 g por kilo. Se recomienda 1,4 como mínimo.',
+    )
+    expect(comidaParaEntreno({ ...nada, pct: -1.46, parte: 0.6 })).toBe(
+      'Bajas un 1,5 % por semana: demasiado rápido para rendir.',
+    )
+    expect(comidaParaEntreno({ ...nada, parte: 0.72 })).toBe(
+      'Comes el 72 % de lo que gastas: el déficit ya está al máximo.',
+    )
+  })
+  it('fuera de la definición, solo la proteína; sin datos, nada', () => {
+    expect(comidaParaEntreno({ ...nada, fase: 'volumen', pct: -1.5, parte: 0.6 })).toBeNull()
+    expect(comidaParaEntreno({ ...nada, fase: 'volumen', proteina: 1.3 })).toContain('Proteína baja')
+    expect(comidaParaEntreno({ fase: 'definicion', proteina: null, pct: null, parte: null })).toBeNull()
+  })
+})
+
+describe('consejos del volumen y del parón (guía § 6, § 10 y § 13)', () => {
+  it('antes de subir kcal en volumen: los hidratos alrededor del entreno (y ON/OFF si no lo llevas)', () => {
+    expect(consejosDeLaSemana({ fase: 'volumen', lento: false, subirKcal: true })[0]).toContain(
+      'Hidratos según el día',
+    )
+    expect(consejosDeLaSemana({ fase: 'volumen', lento: false, subirKcal: true, onOff: true })).toEqual([
+      'Antes de subir kcal: los hidratos, alrededor del entreno.',
+    ])
+    expect(consejosDeLaSemana({ fase: 'volumen', lento: false })).toEqual([])
+  })
+  it('vuelta de un parón: más actividad, sobre todo los días de descanso', () => {
+    expect(consejosDeLaSemana({ fase: 'mantenimiento', lento: false, paron: true })[0]).toContain(
+      'actividad moderada-alta',
+    )
   })
 })

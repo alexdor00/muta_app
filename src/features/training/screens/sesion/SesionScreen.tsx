@@ -19,7 +19,6 @@ import {
   primeroSinTerminar,
 } from '../../state/ordenHoy.ts'
 import {
-  alternarPausa,
   apuntarSerie,
   cambiarEjercicio,
   avisoAlTerminar,
@@ -32,7 +31,6 @@ import {
   guardarSesion,
   nombreHoy,
   nuevaSesion,
-  segundosSesion,
   SERIE_VACIA,
   seriesVistas,
   pautaHoy,
@@ -43,13 +41,14 @@ import {
   type EjercicioEnCurso,
   type SerieEnCurso,
 } from '../../state/sesionEnCurso.ts'
+import { alternarPausa, segundosSesion } from '../../state/tiempoSesion.ts'
 import { anadirExtra, cambiarExtra, enSuperserie, quitarExtra } from '../../state/seriesEspeciales.ts'
 import { effortLabel } from '../../state/routines.ts'
 import { guardarNota, notaDe } from '../../use-cases/exerciseNotes.ts'
 import { consejosDeSesion } from '../../use-cases/sessionTips.ts'
 import { avisar } from '../../use-cases/workoutFeedback.ts'
 import { HojasEjercicio } from './HojasEjercicio.tsx'
-import { HojasSesion, type HojaSesion } from './HojasSesion.tsx'
+import { hojaAlEntrar, HojasSesion, type HojaSesion } from './HojasSesion.tsx'
 import { useAviso } from './useAviso.ts'
 import { useReloj } from './useReloj.ts'
 import { useTeclado } from './useTeclado.ts'
@@ -94,9 +93,8 @@ export function SesionScreen(props: { sessionId: string }) {
   const [hojaDe, setHojaDe] = useState<number | null>(null)
   const [terminar, setTerminar] = useState<{ titulo: string; texto: string } | null>(null)
   // «Mostrar al empezar»: la hoja de consejos se abre al entrar si aún no hay ninguna serie hecha
-  const [hoja, setHoja] = useState<HojaSesion | null>(() =>
-    consejosAlEmpezar.value && !(en && cuentaSeries(en).hechas) ? { tipo: 'consejos' } : null,
-  )
+  // Al entrar: una sesión de otro día pregunta antes; si no, los consejos con «Mostrar al empezar»
+  const [hoja, setHoja] = useState<HojaSesion | null>(() => hojaAlEntrar(en, consejosAlEmpezar.value))
 
   const semanaDelBloque = plan.status === 'ready' ? plan.rotacion.semana : 0
   useEffect(() => {
@@ -340,6 +338,7 @@ export function SesionScreen(props: { sessionId: string }) {
           ahora={ahora}
           onSalir={salirSinGuardar}
           onAviso={decir}
+          onGuardarComoEstaba={terminarYa}
         />
       )}
 

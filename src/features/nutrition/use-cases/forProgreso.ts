@@ -1,6 +1,8 @@
 // Lo que Progreso necesita de Comida (por el index.ts del área): tus pesajes con su tendencia y su ritmo frente al
 // previsto de tu fase, lo que comiste cada día frente a tu objetivo, la cintura de tus consultas y tu sexo y tu altura (la composición corporal). Lee con cargarComida(); no
 // guarda nada.
+import { getDb } from '../../../shared/data/db.ts'
+import { sumar, type Apunte, type Macros } from '../domain/food.ts'
 import { ritmoPrevisto } from '../domain/review.ts'
 import type { Fase } from '../domain/targets.ts'
 import { ritmoSemanal, type PuntoPeso, type Ritmo } from '../domain/weight.ts'
@@ -38,6 +40,16 @@ export type ComidaParaProgreso = {
   recarga: string[]
 }
 
+/**
+ * Lo que sumó cada día que apuntaste, desde el primero (usuario, 2026-11-23: una etapa de hace meses también tiene su
+ * comida). Nutrición solo tiene leídos los últimos días; lo de memoria manda (lo último que apuntaste).
+ */
+async function totalesDeSiempre(): Promise<Record<string, Macros>> {
+  const db = await getDb()
+  const todos = (await db.getAll('foodLog')) as { date: string; apuntes: Apunte[] }[]
+  return { ...Object.fromEntries(todos.map((d) => [d.date, sumar(d.apuntes)])), ...totales.value }
+}
+
 export async function comidaParaProgreso(): Promise<ComidaParaProgreso> {
   await cargarComida()
   // Con hidratos según el día, el objetivo de cada día depende de si entrenas: hace falta tu rutina
@@ -50,7 +62,7 @@ export async function comidaParaProgreso(): Promise<ComidaParaProgreso> {
     fase: a?.fase ?? null,
     // El de la etapa en que vas, si sigues la velocidad por fases (como la revisión semanal)
     previsto: a ? ritmoPrevisto(a.fase, a.ritmoTramo ?? a.ritmo) : null,
-    dias: Object.entries(totales.value)
+    dias: Object.entries(await totalesDeSiempre())
       .filter(([, t]) => t.kcal > 0)
       .map(([date, t]) => ({
         date,

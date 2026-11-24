@@ -82,7 +82,11 @@ export function VerSesionScreen(props: { sessionId: string }) {
       />
       <div class={styles.panel}>
         <SessionChart
-          veces={progresoDeSesion(entrenos.value, sesion.sigla)}
+          veces={progresoDeSesion(
+            entrenos.value,
+            sesion.sigla,
+            plan.status === 'ready' ? plan.programId : undefined,
+          )}
           etiqueta="Progreso de la sesión"
         />
         <SessionTipsCard

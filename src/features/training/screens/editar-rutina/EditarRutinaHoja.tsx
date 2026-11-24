@@ -33,7 +33,6 @@ import { descansoDe, elegirDescanso } from '../../state/sesionEnCurso.ts'
 import { MUSCLES, muscleInPlan, type MuscleId } from '../../state/routines.ts'
 import { huecosDelPlan } from '../../use-cases/muscleSheet.ts'
 import { equivalentesDe } from '../../use-cases/exerciseLibrary.ts'
-import { fueraDeTuMaterial } from '../../use-cases/myEquipment.ts'
 import { cambiarEjercicioDelPlan } from '../../use-cases/changeExercise.ts'
 import { fotosSesion } from '../../state/fotos.ts'
 import { FotoSesionHoja } from '../foto-sesion/FotoSesionHoja.tsx'
@@ -242,7 +241,6 @@ export function EditarRutinaHoja({
         soloPlan
         equivalentes={equivalentesDe(e).map((q) => ({ nombre: q.ex.name, motivo: q.motivo }))}
         sustitutos={e.sustitutos}
-        noTienes={fueraDeTuMaterial([...equivalentesDe(e).map((q) => q.ex.name), ...e.sustitutos])}
         enLugarDe={e.enLugarDe ?? null}
         onElegir={elegir}
         onBiblioteca={() => setHoja('biblioteca')}

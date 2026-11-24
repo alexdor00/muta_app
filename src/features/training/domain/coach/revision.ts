@@ -212,7 +212,17 @@ export function revisionEntrenador(datos: {
   definicion: boolean
   modos: Partial<Record<MuscleId, Mode>>
   aplicadoHace?: ReadonlySet<MuscleId>
+  /** Lo que manda esta semana (semana.ts): no subir (cómo estás, parón…) o no quitar (recarga, comida recién cambiada). */
+  sinSubir?: boolean
+  sinQuitar?: boolean
+  /** Lo que falla en tu comida, con su cifra (de Nutrición): sustituye a «revisa la comida». */
+  comida?: string | null
+  /** Las series directas a la semana de cada músculo en tu plan y su rango (Mantener · Desarrollar · Prioridad). */
+  rangos?: Partial<Record<MuscleId, { series: number; rango: Range }>>
+  /** Por músculo, sus ejercicios que esta semana van más al fallo de lo que toca (RIR 1,5 o más por debajo). */
+  alFallo?: Partial<Record<MuscleId, string[]>>
 }): ConsejoEntrenador[] {
+  const revisa = datos.comida ?? 'Revisa el sueño, el estrés y la comida.'
   const out: ConsejoEntrenador[] = []
   const lista = (Object.entries(datos.semanas) as [MuscleId, Semanas][]).sort(
     ([a], [b]) => ORDEN_MODO[datos.modos[a] ?? 'develop'] - ORDEN_MODO[datos.modos[b] ?? 'develop'],
@@ -228,6 +238,23 @@ export function revisionEntrenador(datos: {
     const espera = datos.aplicadoHace?.has(musculo) ?? false
     const base = { musculo, mejora: ahora, propuesta: null, noMeInteresa: false }
     const extra = sinRirTexto(ahora)
+    const r = datos.rangos?.[musculo]
+
+    // Por debajo de tu rango: una serie más aunque no lleve 3 semanas (02-reglas § 6, «bajo el mínimo»), si recuperas
+    if (r && r.series < r.rango[0] && lectura !== 'cae' && !datos.sinSubir && !espera && !yaSube) {
+      const propuesta = propuestaDeSerie(datos.semana, musculo)
+      if (propuesta) {
+        yaSube = true
+        out.push({
+          ...base,
+          lectura: 'subir',
+          titulo: `${nombre}: ${r.series} series a la semana, por debajo de tu rango (${r.rango[0]}–${r.rango[1]})`,
+          propuesta,
+          detalle: `Te propongo una serie más en ${propuesta.nombre} (${propuesta.sigla}).` + extra,
+        })
+        continue
+      }
+    }
 
     if (lectura === 'subir') {
       if (modo === 'maintain') continue
@@ -236,6 +263,10 @@ export function revisionEntrenador(datos: {
       const dulce = (detalle: string) =>
         out.push({ ...base, lectura: 'dulce', titulo, detalle: detalle + extra })
       if (espera) dulce('Ya le subiste volumen: esta semana vemos cómo responde.')
+      else if (datos.sinSubir) dulce('Progresas, pero esta semana no se sube volumen.')
+      // En definición el margen es estrecho (guía § 2 y § 7): solo se sube en tus músculos con Prioridad
+      else if (datos.definicion && modo !== 'priority')
+        dulce('Progresas. En definición solo se sube volumen en tus músculos con Prioridad.')
       else if (semanas < SEMANAS_PARA_SUBIR)
         dulce(
           `Progresas en casi todas (${semanas} de ${SEMANAS_PARA_SUBIR} semanas seguidas). Si sigue así, te propondré subir volumen.`,
@@ -265,8 +296,25 @@ export function revisionEntrenador(datos: {
     }
 
     if (lectura === 'cae') {
+      // Lo primero, que no te pases del RIR (usuario, 2026-11-23; guía § 3): ir más al fallo de lo que toca ya explica
+      // rendir peor. Hasta respetarlo, no se quitan series
+      const alFallo = datos.alFallo?.[musculo] ?? []
+      if (alFallo.length) {
+        out.push({
+          ...base,
+          lectura,
+          titulo: `${nombre}: vas peor en ${ahora.peores} de ${ahora.comparables} series`,
+          detalle:
+            `Primero, tu RIR: en ${alFallo.slice(0, 2).join(' y ')} vas más al fallo de lo que toca. Respeta la pauta antes de quitar series: dosificar el RIR saca más tonelaje.` +
+            extra,
+        })
+        continue
+      }
       const repite = lecturaMejora(s[1]) === 'cae'
-      const propuesta = repite && !espera ? propuestaDeQuitar(datos.semana, musculo) : null
+      // Por encima de tu rango y sin recuperar: −1 ya (02-reglas § 6); si no, a la segunda semana
+      const encima = r ? r.series > r.rango[1] : false
+      const propuesta =
+        (repite || encima) && !espera && !datos.sinQuitar ? propuestaDeQuitar(datos.semana, musculo) : null
       out.push({
         ...base,
         lectura,
@@ -274,8 +322,10 @@ export function revisionEntrenador(datos: {
         titulo: `${nombre}: vas peor en ${ahora.peores} de ${ahora.comparables} series`,
         detalle:
           (propuesta
-            ? `Segunda semana yendo peor: te propongo una serie menos en ${propuesta.nombre} (${propuesta.sigla}) para recuperar. Y sigue cuidando el sueño, el estrés y la comida.`
-            : 'Antes de quitar series, revisa el sueño, el estrés y la comida. Si la semana que viene sigues igual, te propondré una serie menos.') +
+            ? `${encima ? `Por encima de tu rango (${r?.rango[1]} series)` : 'Segunda semana yendo peor'}: te propongo una serie menos en ${propuesta.nombre} (${propuesta.sigla}) para recuperar. ${revisa}`
+            : datos.sinQuitar
+              ? `Esta semana no se quitan series: se espera a ver el efecto de tu comida. ${revisa}`
+              : `Antes de quitar series: ${revisa} Si la semana que viene sigues igual, te propondré una serie menos.`) +
           extra,
       })
       continue
@@ -291,22 +341,22 @@ export function revisionEntrenador(datos: {
           lectura,
           titulo,
           detalle:
-            'En definición, mantener tus marcas ya está bien. Si se alarga, revisa el sueño y que comes lo de tu plan.' +
-            extra,
+            'En definición, mantener tus marcas no es ningún drama: es buena señal. No se toca nada.' + extra,
         })
         continue
       }
       const semanas = seguidas(s, 'estancado')
-      const propuesta = espera
-        ? null
-        : semanas === 3
-          ? propuestaDeIntensidad(datos.semana, musculo)
-          : semanas >= 4
-            ? propuestaDeQuitar(datos.semana, musculo)
-            : null
+      const propuesta =
+        espera || (datos.sinQuitar && semanas >= 4)
+          ? null
+          : semanas === 3
+            ? propuestaDeIntensidad(datos.semana, musculo)
+            : semanas >= 4
+              ? propuestaDeQuitar(datos.semana, musculo)
+              : null
       const detalle =
         semanas === 1
-          ? 'Primero lo básico: duerme bien, come lo que marca tu plan y baja el estrés. No cambies de ejercicio: eso no arregla un estancamiento.'
+          ? `Primero lo básico: ${datos.comida ?? 'duerme bien, come lo que marca tu plan y baja el estrés.'} No cambies de ejercicio: eso no arregla un estancamiento.`
           : semanas === 2
             ? 'Segunda semana igual: revisa que llegas al RIR que toca en cada serie; si te sobran repeticiones, acércate más.'
             : semanas === 3

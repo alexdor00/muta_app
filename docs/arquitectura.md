@@ -47,7 +47,7 @@ cambiar llevan `slot` (nunca se borran) y el resto del código decide qué hacer
 ## Flujo de datos: entrenar
 
 ```
-IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `userContent`: fotos, notas, consejos ocultos y tu material)
+IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `userContent`: fotos, notas, consejos ocultos y los discos del gimnasio)
         │
         ▼  use-cases/training.ts · cargarPlan()   (cada pantalla de Entreno, con screens/comun/usePlan)
         │  la rutina: del catálogo o tuya (`programs`, id `mia:…`, cargada desde un CSV: use-cases/importRoutine.ts)
@@ -59,8 +59,8 @@ IndexedDB `plans/current` + `programs` + `rotation/current` + `workouts` (+ `use
         ▼  «Terminar» → terminarEntreno: `workouts` (terminado) y la rotación avanza → `rotation/current`
 ```
 
-El Perfil (área `profile`) enseña «Tu material» con `TuMaterial`, que Entreno exporta en su `index.ts`: es la única
-pieza de un área que usa otra. Lo que eliges se guarda en `userContent/material` y Entreno lo lee al cargar el plan.
+El Perfil (área `profile`) es tu copia de seguridad (`CopiaDeSeguridad`, que `profile/copia.ts` da también a la pantalla de
+error de `src/app`) y su cuadro al abrir la app una vez al mes (`AvisoCopia`, también por `profile/copia.ts`). La copia la hace `shared/data/backup`.
 
 Todo lo que se enseña de tus entrenos (la vez anterior, gráficas, tu semana, series por músculo, racha) se calcula
 desde `workouts`; no hay otra copia.

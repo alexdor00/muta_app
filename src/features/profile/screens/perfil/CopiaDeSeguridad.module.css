@@ -1,0 +1,93 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.titulo {
+  margin: 0;
+  font: var(--text-titulo-tarjeta);
+}
+
+.estado {
+  margin: 0;
+  font: var(--text-subhead);
+}
+
+/* Sin copia o de hace más de un mes: en negrita (sin color: el naranja es para los logros) */
+.aviso {
+  font-weight: var(--weight-semibold);
+}
+
+.texto {
+  margin: 0;
+  color: var(--label-2);
+  font: var(--text-footnote);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.botones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* «Recuperar una copia»: el botón gris de siempre, con el archivo dentro */
+.recuperar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-headline);
+  cursor: pointer;
+}
+
+.recuperar:focus-within {
+  outline: var(--focus-ring);
+}
+
+.archivo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.lista {
+  margin: 0 0 var(--space-3);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  list-style: none;
+}
+
+.lista li {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  font: var(--text-subhead);
+}
+
+.lista li + li {
+  border-top: var(--hairline) solid var(--separator);
+}
+
+.avisoCaja {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  font: var(--text-footnote);
+  text-align: justify;
+  hyphens: auto;
+}

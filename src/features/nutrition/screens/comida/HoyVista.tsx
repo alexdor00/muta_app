@@ -15,8 +15,10 @@ import { MenuList } from '../../components/MenuList.tsx'
 import {
   ajustes,
   comidasDia,
+  diaRedondo,
   diaVisto,
   hoy,
+  rachaRedonda,
   objetivoDelDia,
   objetivoDia,
   pendiente,
@@ -128,13 +130,8 @@ export function HoyVista({
   // Si la cena aún está por apuntar
   const cenaLibre = !comidasDia.value.find((c) => c.id === 'cena')?.apuntes.length
   // Día redondo (usuario, 2026-11-17): lo comido, a un 5 % del objetivo; la racha, los días seguidos así hasta hoy
-  const redondo = (f: string) => {
-    const o = objetivoDelDia(f)
-    const t = totalDe(f)
-    return !!o && t.kcal > 0 && Math.abs(o.kcal - t.kcal) <= o.kcal * 0.05
-  }
-  let racha = 0
-  while (racha < 60 && redondo(addDays(hoy.value, -racha))) racha++
+  const redondo = diaRedondo
+  const racha = rachaRedonda.value
   // Los días del carrusel: los siete hasta hoy, o desde el que ves si es de antes
   const primero = fecha < addDays(hoy.value, -6) ? fecha : addDays(hoy.value, -6)
   const fechas: string[] = []

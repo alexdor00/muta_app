@@ -23,15 +23,27 @@ flecha naranja (`Cambio`), las cifras protagonistas en letra condensada y cada s
     plana; al abrir uno, sus ejercicios (sus básicos primero) con su mejor serie del mes frente a la de antes y «Récord». Un
     ejercicio abre `EjercicioHoja` (`?hoja=ejercicio`): su mejor serie, su gráfica, cada día del mes con sus series y su ficha.
   - `EtapaHoja` (`?hoja=etapa`): fechas, semana y rutina; peso, fuerza y récords desde que empezó; filas a Constancia, Tus
-    músculos y Tu rutina (`../mesociclo/Pestanas.tsx`, cada una su hoja; atrás vuelve a la etapa); su comida; `AccionesEtapa`
+    músculos y Tu rutina (`../mesociclo/Pestanas.tsx`, cada una su hoja; atrás vuelve a la etapa); su comida; la fila «Frente a «…» ›» con la otra vuelta de su misma rutina (`d.pareja`; su frase, `veredicto`) y `AccionesEtapa`
     (renombrar, «Empezar otra etapa» o «Volver a usar esta rutina»; sus hojas, `HojasEtapa`, en la pantalla) y comparar
-    (`CompararHoja`).
+    (`CompararHoja`: solo etapas de la misma rutina, a la misma semana —la carrera contra ti mismo, cifras antes → ahora, sesión a sesión y ejercicio a ejercicio—; sin otra con su rutina, no sale).
   - `Piezas.tsx` (`Grafica`: la gráfica de Entreno, `SessionProgress`, para tus básicos, un ejercicio y una medida;
     `Cambio`, `TituloSeccion` y `FilaHoja`) y `formato.ts` (cómo se escriben
     las cifras). Estilos en `Progreso.module.css`; «Ver tu cambio», en `TuCambio.module.css`; el círculo, en
     `Composicion.module.css`; la rutina, en `../mesociclo/Mesociclo.module.css`.
+- **Tu logro y tu premio** (usuario, 2026-11-24; `Desktop/MUTA-Logro-Instagram-propuesta.png`, `Desktop/MUTA-Premio-objetivo-propuesta.png`):
+  el **logro** sale al acabar una etapa y cada 6 meses de la que llevas (`domain/logro.ts · pendientes`, `mesesCumplidos`), con la
+  foto de una sesión; el **premio**, al cumplir tu objetivo (`objetivoCumplido`: definición, tu grasa objetivo; volumen, tu peso
+  objetivo —`PesoObjetivo` en «Tu composición», `ajustesCuerpo.pesoObjetivo`—), con tu antes y después (`antesYAhora`: la
+  última foto de antes de la etapa y la última de ella). Cifras: el logro, toneladas, fuerza, récords, tu cuerpo según el objetivo
+  (cintura en definición, si no peso), constancia, horas y tu ejercicio estrella (`estrellaDe`); el premio, grasa → (estimada),
+  cintura, masa magra, peso (definición) o FFMI (`ffmiDe`), masa magra y los perímetros que crecen (volumen), fuerza y récords.
+  `use-cases/logros.ts` (cuáles tocan, con lo visto en `userContent/logros` —`desde`: lo de antes de la función no se
+  celebra—, y sus datos), `use-cases/imagenLogro.ts` (la imagen 1080 × 1920 en canvas, oscura; compartir o guardar en Fotos),
+  `screens/logro/LogroHoja.tsx` (la imagen tal cual, elegir la foto, «Compartir en Instagram · Guardar en Fotos · Ahora no») y
+  `AvisoLogro` (sale solo al abrir la app o una pestaña, uno cada vez; `logro.ts`, aparte del `index.ts`, lo da a `src/app`). En
+  `EtapaHoja`, «Tu logro» y «Tu premio» para abrirlos cuando quieras.
 - `screens/dia/DiaScreen.tsx` (`/progreso/dia/:fecha`, a pantalla completa), igual que Ver sesión: `SessionHero` con la foto de
-  esa sesión (`fotoDelEntreno`; sin la tuya, la de serie de su tono), su gráfica (`SessionChart`, hasta ese día) y «Ejercicios», cada uno con una tabla, serie a serie, frente a la «Sesión anterior» (`laVezAnterior`, `domain/day.ts`) y el cambio de su 1RM; desde Hoy (`?de=hoy`), «‹» vuelve a Hoy.
+  esa sesión (`fotoDelEntreno`; sin la tuya, la de serie de su tono), su gráfica (`SessionChart`, hasta ese día) y «Ejercicios», cada uno con una tabla, serie a serie, frente a la «Sesión anterior» (`laVezAnterior`, `domain/day.ts`) y el cambio de su 1RM; desde Hoy (`?de=hoy`), «‹» vuelve a Hoy. Se vuelve a leer cada vez que se abre: recién entrenado, trae la sesión de hoy. Arriba la gráfica y debajo los ejercicios; «Cómo estabas», al final. «‹» vuelve a la pantalla de la que vienes (`useVolver`, dentro de `SessionHero`).
 - `screens/hoy/` — `useHoyDeProgreso`, para la pestaña Hoy (por `paraHoy.ts`): ¿Cómo estás hoy? (`SensacionesHoja`, cinco
   preguntas de tres opciones, `domain/feelings.ts`; `bodyLog` tipo `sensaciones`, `apuntarSensaciones`; se ve en el día de
   Progreso) y, el día que tocan, las medidas y fotos del mes (abre `MesHoja`; si no, «Próximo: …», que también la abre). El día del mes lo escribes en `MesHoja` (del 1 al último de este mes, `diasDelMes`; en un mes más corto, su último día; `diaMedidas`, en los ajustes de `userContent/composicion`; `cuandoToca`: desde ese día hasta que las hagas; sin día, a las 4 semanas). Apuntar se hace en Hoy;
@@ -45,7 +57,7 @@ flecha naranja (`Cambio`), las cifras protagonistas en letra condensada y cada s
   composición, el detalle de la etapa del mes y lo que se calcula (`enEtapa`, `primerMes`, `etapaDelMes`, `serieDeMedida`, `cuerpoEl`,
   `composicion`, `evolucion`, `resumen` y `toca`).
 - `use-cases/progress.ts` — `cargarProgreso()` (cada vez que se abre), `abrirCamara()` (la de delante o la de atrás), `apuntarMedidas()` (`bodyLog`, tipo `perimetros`),
-  `guardarFotos()`/`borrarFoto()` (almacén `photos`, reducidas a 1200 px con `reducirImagen`) y la composición
+  `guardarFotos()`/`borrarFoto()` (almacén `photos`, reducidas a 1200 px con `reducirImagen` y con su miniatura de 320 px —las de antes la reciben de fondo—; cada foto se abre en memoria solo al enseñarla: `url` y `mini` de `FotoVista`) y la composición
   (`userContent/composicion`). `use-cases/mesocycles.ts` — abrir una etapa, compararlas, renombrar, empezar otra, volver a
   usar una rutina: todo lo hace Entreno; aquí se le pasa tu peso de cada tramo.
 

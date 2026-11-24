@@ -1,0 +1,70 @@
+/* Tu logro o tu premio: la imagen (1080 × 1920) tal cual se guarda, elegir la foto y sus botones. */
+
+.hoja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.imagen {
+  display: block;
+  width: 62%;
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+  border-radius: var(--radius-card);
+  background: var(--surface-2);
+  box-shadow: var(--card-shadow);
+  object-fit: cover;
+}
+
+.fotos {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.leyenda {
+  margin-bottom: var(--space-2);
+  color: var(--label-2);
+  font: var(--text-footnote);
+}
+
+.foto {
+  display: flex;
+  flex: 1;
+  gap: var(--hairline);
+  min-height: var(--tap-min);
+  height: var(--thumb);
+  padding: 0;
+  overflow: hidden;
+  border: var(--space-1) solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+}
+
+.foto span {
+  flex: 1;
+  background-position: center 20%;
+  background-size: cover;
+}
+
+.elegida {
+  border-color: var(--accent);
+}
+
+.botones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ahoraNo {
+  min-height: var(--tap-min);
+  border: 0;
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  text-decoration: underline;
+}

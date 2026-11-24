@@ -42,9 +42,11 @@ async function acquireWakeLock() {
 }
 
 // El navegador suelta el wake lock al cambiar de app: se vuelve a pedir al volver.
-document.addEventListener('visibilitychange', () => {
-  if (wantScreenOn && document.visibilityState === 'visible') void acquireWakeLock()
-})
+// (Solo en el navegador: en las pruebas no hay document)
+if (typeof document !== 'undefined')
+  document.addEventListener('visibilitychange', () => {
+    if (wantScreenOn && document.visibilityState === 'visible') void acquireWakeLock()
+  })
 
 export const webPlatform: Platform = {
   haptic(kind) {

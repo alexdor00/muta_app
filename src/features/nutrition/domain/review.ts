@@ -130,6 +130,9 @@ export type DatosRevision = {
   gasto?: number | null
   grasa?: { actual: number; objetivo: number | null } | null
   mantenimiento?: number
+  /** De Entreno (usuario, 2026-11-23: que trabajen en equipo): vuelves de un parón y cuándo te subió series por última vez. */
+  paron?: boolean
+  cambioEntreno?: string | null
 }
 
 /**
@@ -195,6 +198,22 @@ export function revisar(d: DatosRevision): Revision {
         extra: { ritmoTramo: toca },
       }
   }
+
+  // Vuelves de un parón (lo ve Entreno: 14 días o más sin entrenar, sugerido): media normocalórica y dos mesetas antes de
+  // definir o seguir subiendo (guía § 10). El entrenador, a la vez, propone menos volumen.
+  if (d.paron && !(d.fase === 'mantenimiento' && d.situacion === 'paron') && d.mantenimiento)
+    return {
+      tipo: 'cambio',
+      de: d.kcal,
+      a: d.mantenimiento,
+      lento: d.mantenimiento > d.kcal,
+      pct,
+      kgSemana,
+      previsto,
+      comprobaciones: comprobacionesBase,
+      motivo: 'Vuelves de un parón: mantenimiento y subir en dos mesetas',
+      extra: { fase: 'mantenimiento', situacion: 'paron' },
+    }
 
   // Vuelta de un parón o salida de una definición: +200 kcal en hidratos cada vez que el peso se estabiliza
   if (d.fase === 'mantenimiento' && d.situacion) {
@@ -279,6 +298,10 @@ export function revisar(d: DatosRevision): Revision {
   const bajar = pct > previsto.max
   const lento = defi ? bajar : d.fase === 'volumen' ? !bajar : false
   if (desde < DIAS_ENTRE_CAMBIOS) return { tipo: 'esperar', dias: DIAS_ENTRE_CAMBIOS - desde }
+  // Un cambio cada vez entre los dos: si el entrenador acaba de subirte series, antes de subir kcal se ve su efecto
+  const entreno = d.cambioEntreno ? daysBetween(d.cambioEntreno, d.hoy) : Infinity
+  if (d.fase === 'volumen' && lento && entreno < DIAS_ENTRE_CAMBIOS)
+    return { tipo: 'esperar', dias: DIAS_ENTRE_CAMBIOS - entreno }
   // Peso parado en volumen: si progresas en tus básicos, no se suben las kcal (antes, descanso, perímetros…)
   if (d.fase === 'volumen' && lento && d.fuerza != null && d.fuerza >= 0)
     return { tipo: 'progresas', pct, fuerza: d.fuerza }

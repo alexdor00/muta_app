@@ -1,8 +1,10 @@
 // Lo que Comida necesita de Entreno (por el index.ts del área): qué días son de entreno según tu rutina, cómo va tu fuerza
 // en los básicos y tu rendimiento sesión a sesión (para la recarga de hidratos). Lee tu plan con cargarPlan(); no guarda nada.
+import { diasDeParon } from '../domain/coach/semana.ts'
 import { rendimientoReciente, type Rendimiento } from '../domain/rendimiento.ts'
 import { fuerzaEnBasicos, type FuerzaBasicos } from '../domain/strengthTrend.ts'
 import { diasPrevistos, entrenos, tuPlan } from '../state/plan.ts'
+import { leerUltimaSubida } from './entrenador.ts'
 import { porNombre } from './exerciseLibrary.ts'
 import { cargarPlan } from './training.ts'
 
@@ -39,4 +41,15 @@ export async function rendimientoParaComida(
   const plan = tuPlan.value
   if (plan.status !== 'ready') return null
   return { rendimiento: rendimientoReciente(entrenos.value, hoy), sesionesDelCiclo: plan.semana.length }
+}
+
+/**
+ * Para la revisión semanal de Nutrición (usuario, 2026-11-23: «que hagan equipo»): si vuelves de un parón (14 días o más
+ * sin entrenar, sugerido) y el último día que el entrenador te subió series (antes de subir kcal en volumen, se espera).
+ */
+export async function entrenoParaNutricion(
+  hoy: string,
+): Promise<{ paron: boolean; cambioEntreno: string | null }> {
+  await cargarPlan()
+  return { paron: diasDeParon(entrenos.value, hoy) !== null, cambioEntreno: await leerUltimaSubida() }
 }

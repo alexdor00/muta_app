@@ -24,7 +24,7 @@ import {
 } from './comida.ts'
 
 // Lo que las pantallas necesitan de las reglas del entrenador
-export { NOMBRE_SENAL, RAPIDO_PCT } from '../domain/senales.ts'
+export { FUERZA_BAJA, NOMBRE_SENAL, RAPIDO_PCT } from '../domain/senales.ts'
 export type { Revision } from '../domain/review.ts'
 
 /** Lo que gastas medido con tus datos (null hasta tener 8 pesajes y 8 días de comida en 14). */
@@ -44,6 +44,9 @@ export const gastoReal = computed(() => {
 
 /** Cambio de tu fuerza en los básicos (de Entreno); null hasta cargarlo o sin datos. */
 export const fuerzaBasicos = signal<number | null>(null)
+
+/** Lo que da Entreno: si vuelves de un parón y cuándo te subió series (null hasta cargarlo). */
+export const deEntreno = signal<{ paron: boolean; cambioEntreno: string | null } | null>(null)
 
 /** Lo de tu cuerpo que da Progreso: perímetros, cómo estás y tu grasa (null hasta cargarlo). */
 export const cuerpoProgreso = signal<CuerpoParaComida | null>(null)
@@ -97,6 +100,8 @@ export const revisionDeHoy = computed<Revision | null>(() => {
     gasto: a.gastoAprendido ?? calcularObjetivo(a).gasto,
     grasa: c?.grasa ?? null,
     mantenimiento: calcularObjetivo({ ...a, fase: 'mantenimiento' }).kcal,
+    paron: deEntreno.value?.paron ?? false,
+    cambioEntreno: deEntreno.value?.cambioEntreno ?? null,
   })
 })
 
@@ -158,5 +163,8 @@ export const consejosSemana = computed<string[]>(() => {
     animo: c?.sensaciones,
     medidas: c?.medidas,
     proteina: proteinaPorKilo(comidaConObjetivo.value, hoy.value, a.cuerpo.pesoKg),
+    subirKcal: a.fase === 'volumen' && ((r.tipo === 'cambio' && r.a > r.de) || r.tipo === 'progresas'),
+    onOff: Boolean(a.onOff),
+    paron: a.fase === 'mantenimiento' && a.situacion === 'paron',
   })
 })

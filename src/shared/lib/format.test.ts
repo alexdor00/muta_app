@@ -44,15 +44,24 @@ describe('formatClock', () => {
 })
 
 describe('fechas', () => {
+  const HOY = '2026-11-24'
+
   it('día y mes abreviado, sin punto; con el día de la semana delante', () => {
-    expect(formatShortDate('2026-09-18')).toBe('18 sep')
-    expect(formatDayDate('2026-10-23')).toBe('Vie 23 oct')
-    expect(formatDayDate('2026-01-04')).toBe('Dom 4 ene')
+    expect(formatShortDate('2026-09-18', HOY)).toBe('18 sep')
+    expect(formatDayDate('2026-10-23', HOY)).toBe('Vie 23 oct')
+    expect(formatDayDate('2026-01-04', HOY)).toBe('Dom 4 ene')
+  })
+
+  it('de otro año, con el año (problema 8: con años de datos no se sabía de cuál era)', () => {
+    expect(formatShortDate('2024-09-18', HOY)).toBe('18 sep 2024')
+    expect(formatShortDate('2027-01-02', HOY)).toBe('2 ene 2027')
+    expect(formatDayDate('2025-10-23', HOY)).toBe('Jue 23 oct 2025')
+    expect(formatLongDate('2025-11-09', HOY)).toBe('Domingo, 9 de noviembre de 2025')
   })
 
   it('fecha larga, con el día de la semana y el mes enteros', () => {
-    expect(formatLongDate('2026-11-09')).toBe('Lunes, 9 de noviembre')
-    expect(formatLongDate('2026-03-01')).toBe('Domingo, 1 de marzo')
+    expect(formatLongDate('2026-11-09', HOY)).toBe('Lunes, 9 de noviembre')
+    expect(formatLongDate('2026-03-01', HOY)).toBe('Domingo, 1 de marzo')
   })
 
   it('el nombre del mes, con mayúscula', () => {

@@ -1,6 +1,7 @@
 import { ArrowLeftIcon, DumbbellIcon } from './icons.tsx'
 import styles from './SessionHero.module.css'
 import tones from './sessionTone.module.css'
+import { useVolver } from './useVolver.ts'
 
 type Props = {
   sigla: string
@@ -32,11 +33,21 @@ export function SessionHero({
   backHref,
   backLabel = 'Volver a Tu plan',
 }: Props) {
+  // «‹» vuelve a la pantalla de la que vienes (Tu plan, Hoy, Progreso…); entrando directo, a backHref (useVolver)
+  const volver = useVolver(backHref)
   return (
     <header class={`${styles.hero} ${foto ? styles.conFoto : tones[`tone${tono}`]}`}>
       {foto && <img class={styles.foto} src={foto} alt="" style={{ objectPosition: encuadre }} />}
       <div class={styles.bar}>
-        <a class={styles.back} href={backHref} aria-label={backLabel}>
+        <a
+          class={styles.back}
+          href={backHref}
+          aria-label={backLabel}
+          onClick={(e) => {
+            e.preventDefault()
+            volver()
+          }}
+        >
           <ArrowLeftIcon />
         </a>
         <span class={styles.barTitle} aria-hidden="true">

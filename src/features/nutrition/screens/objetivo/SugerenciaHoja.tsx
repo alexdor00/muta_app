@@ -98,7 +98,9 @@ export function SugerenciaHoja({ onClose, avisar }: Props) {
           <p class={h.figures}>
             {r.extra.situacion === 'salida'
               ? 'Salida de la definición: mantenimiento desde mañana y, con el peso estable, +200 kcal en hidratos.'
-              : 'Pausa en mantenimiento unas semanas. Después, vuelta a la definición.'}
+              : r.extra.situacion === 'paron'
+                ? 'Vuelta de un parón: mantenimiento desde mañana y dos subidas de +200 kcal, cada una con el peso estable.'
+                : 'Pausa en mantenimiento unas semanas. Después, vuelta a la definición.'}
           </p>
         )}
         {antes && despues && diferencia !== 0 && (

@@ -46,6 +46,14 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- **MUTA para años y tu logro** (2026-11-23/24): el entrenador de Entreno igual de potente que el nutricionista y en equipo
+  con él; la sesión (casillas, «Seguir», «Hecha hoy», descansos revisados, tiempo muerto y sesión de otro día); terminar
+  la rutina («Repetirla») y comparar tus vueltas a la misma semana (solo la misma rutina); un CSV repetido pregunta si es
+  tu rutina de antes; los problemas con el tiempo de uso (todos menos el 11: ver
+  [docs/problemas-con-el-tiempo.md](docs/problemas-con-el-tiempo.md)); la copia de seguridad (Perfil, el cuadro cada mes y
+  en la pantalla de error); fuera «Tu material»; tu logro (al acabar una etapa y cada 6 meses) y tu premio (al cumplir tu
+  objetivo, con tu antes y después) para Instagram, con el peso objetivo en volumen.
+
 - **El entrenador de tu objetivo y la cocina, a fondo** (2026-11-21/22; misma rama, sin commit): la revisión semanal
   como un entrenador (cintura y perímetros, cómo estás, fines de semana, fuerza, proteína, déficit, ritmo > 1,2 %, una
   semana sola no basta, fase final por grasa, salir al llegar a tu objetivo, pausa si se atraganta, semanas que quedan y
@@ -55,7 +63,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
   (Cocinar, una receta y Hoy cocinas), raciones de más, pasos en tarjeta y justificados, una ración con sus cifras,
   pesar lo cocinado (todo mezclado o cada cosa aparte) con tus ollas, sus macros por 100 g y lo que aprende de cada
   receta; «···» en Nutrición (recetas, compra, cocinar); Vitest otra vez en marcha (`pool: 'vmThreads'`); la comida
-  rápida de 7 cadenas (121 productos de FatSecret España, «aproximado»; `scripts/foods-rapida.cjs`). La revisión semanal como un informe corto (estado, titular, cifras y una recomendación) y los consejos en una frase (2026-11-23); pruebas de los casos de uso de tu objetivo y de las ollas, y arreglado: un menú con platos solo de descanso no salía en tu día.
+  rápida de 7 cadenas (121 productos de FatSecret España, «aproximado»; `scripts/foods-rapida.cjs`). La revisión semanal como un informe corto (estado, titular, cifras y una recomendación) y los consejos en una frase (2026-11-23); pruebas de los casos de uso de tu objetivo y de las ollas, y arreglado: un menú con platos solo de descanso no salía en tu día. El entrenador de Entreno, igual de potente que el nutricionista y en equipo con él (2026-11-23; ver decisiones), con el mismo informe.
   Verificado: `npm run check` (pruebas incluidas) y e2e.
 
 - **Nutrición, casi todo como el Word del rediseño** (2026-11-17, naranja solo para logros, sin agua): Hoy con el día
@@ -267,7 +275,7 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 1. Hoy (con su PNG aprobado antes). Progreso, hecho (2026-11-09).
 2. Marcar los datos rellenados o estimados en las pantallas que aún no lo hacen (Ver sesión, la sesión y Progreso ya dicen «Sugerido»).
 3. Coach: usar las elecciones guardadas (prioridades, puntos débiles) y `adaptVolume`.
-4. Importar/exportar copia de seguridad en CSV/JSON desde Perfil.
+4. Copia de seguridad: hecha (2026-11-24, ver docs/problemas-con-el-tiempo.md, problema 10).
 5. Fotos de categoría y miniaturas de ejercicio.
 6. Quitar el número de días del nombre de otras rutinas (Esencial, Frecuencia alta, PPL, Vuelta al gimnasio) si se quiere el
    mismo criterio que en Powerbuilding.
@@ -279,6 +287,9 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 8. Nutrición · 44 «¿Cómo voy?» del Word del rediseño (usuario, 2026-11-23): tu semana con sus medias, una barra por día,
    el peso y tu punto flojo. PNG antes de programar; el punto flojo no sale de ningún documento (regla a decidir) y se
    pisa con la 7: decidir si van las dos.
+
+9. Problemas con el tiempo de uso: hechos todos menos el **11, las gráficas por meses** («3 m · 6 m · 1 año · Todo»; PNG
+   antes de programar): [docs/problemas-con-el-tiempo.md](docs/problemas-con-el-tiempo.md).
 
 ## Dudas abiertas
 

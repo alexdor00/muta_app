@@ -54,17 +54,31 @@ function marcas(valores: number[]) {
   return { bajo, alto, lista }
 }
 
-/** Curva suave que pasa por la mitad entre cada par de puntos (no se sale por arriba ni por abajo). */
-function curva(xy: (readonly [number, number])[]) {
-  if (xy.length < 2) return ''
+/**
+ * Curva suave que pasa justo por cada punto y no se pasa de ellos (cúbica monótona, Fritsch–Carlson): el punto que tocas
+ * cae siempre sobre la línea (usuario, 2026-11-23: con la de antes, que cortaba por la mitad entre puntos, se salía).
+ */
+export function curva(xy: readonly (readonly [number, number])[]): string {
+  const n = xy.length
+  if (n < 2) return ''
+  const dx = (i: number) => xy[i + 1][0] - xy[i][0]
+  const pend = Array.from({ length: n - 1 }, (_, i) => (dx(i) ? (xy[i + 1][1] - xy[i][1]) / dx(i) : 0))
+  // La pendiente en cada punto: 0 en los picos y valles (así no se sale), la media armónica en lo demás
+  const t = xy.map((_, i) => {
+    if (i === 0) return pend[0]
+    if (i === n - 1) return pend[n - 2]
+    const a = pend[i - 1]
+    const b = pend[i]
+    return a * b <= 0 ? 0 : (2 * a * b) / (a + b)
+  })
   let d = `M${xy[0][0]},${xy[0][1]}`
-  for (let i = 1; i < xy.length - 1; i++) {
-    const [x, y] = xy[i]
-    const [nx, ny] = xy[i + 1]
-    d += ` Q${x},${y} ${(x + nx) / 2},${(y + ny) / 2}`
+  for (let i = 0; i < n - 1; i++) {
+    const [x0, y0] = xy[i]
+    const [x1, y1] = xy[i + 1]
+    const h = (x1 - x0) / 3
+    d += ` C${x0 + h},${y0 + t[i] * h} ${x1 - h},${y1 - t[i + 1] * h} ${x1},${y1}`
   }
-  const [lx, ly] = xy[xy.length - 1]
-  return `${d} L${lx},${ly}`
+  return d
 }
 
 /**

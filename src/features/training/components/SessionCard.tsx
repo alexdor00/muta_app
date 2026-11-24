@@ -15,18 +15,32 @@ type Props = {
   foto?: string | null
   /** Dónde está centrada la foto («50% 30%»). */
   encuadre?: string
+  /** El botón de abajo: «Empezar» (de serie), «Seguir» si la dejaste a medias o ninguno si ya la hiciste hoy. */
+  accion?: 'empezar' | 'seguir' | null
+  /** Adónde lleva tocarla: de serie, Ver sesión; hecha hoy, ese día en Progreso (lo mismo que abre Hoy). */
+  href?: string
 }
 
 /**
  * Tarjeta de color de una sesión, con la sigla de fondo (o tu foto): al tocarla se abre Ver sesión; la píldora blanca
  * «▶ Empezar» de abajo la empieza.
  */
-export function SessionCard({ sigla, nombre, detalle, estado, tono, foto, encuadre }: Props) {
+export function SessionCard({
+  sigla,
+  nombre,
+  detalle,
+  estado,
+  tono,
+  foto,
+  encuadre,
+  accion = 'empezar',
+  href,
+}: Props) {
   return (
     <div class={styles.wrap}>
       <a
         class={`${styles.card} ${tones[`tone${tono}`]} ${tono === 2 || foto ? styles.noGhost : ''} ${foto ? styles.withPhoto : ''}`}
-        href={paths.sessionView(sigla.toLowerCase())}
+        href={href ?? paths.sessionView(sigla.toLowerCase())}
       >
         {foto && <img class={styles.photo} src={foto} alt="" style={{ objectPosition: encuadre }} />}
         <span class={styles.ghost} aria-hidden="true">
@@ -37,10 +51,16 @@ export function SessionCard({ sigla, nombre, detalle, estado, tono, foto, encuad
         <h2 class={styles.name}>{nombre}</h2>
         <span class={styles.detail}>{detalle}</span>
       </a>
-      <a class={styles.play} href={paths.session(sigla.toLowerCase())} aria-label={`Empezar ${sigla}`}>
-        <PlayIcon />
-        Empezar
-      </a>
+      {accion && (
+        <a
+          class={styles.play}
+          href={paths.session(sigla.toLowerCase())}
+          aria-label={`${accion === 'seguir' ? 'Seguir' : 'Empezar'} ${sigla}`}
+        >
+          <PlayIcon />
+          {accion === 'seguir' ? 'Seguir' : 'Empezar'}
+        </a>
+      )}
     </div>
   )
 }

@@ -41,15 +41,16 @@ type SensacionesGuardadas = Sensaciones & {
   updatedAt: string
 }
 
-/** Una foto en `photos`: la imagen reducida, solo en tu móvil. */
-type FotoGuardada = Foto & { imagen: Blob; createdAt: string }
+/** Una foto en `photos`: la imagen reducida y su miniatura (las de antes del 2026-11-24 la reciben de fondo), solo en tu móvil. */
+type FotoGuardada = Foto & { imagen: Blob; mini?: Blob; createdAt: string }
 
 /** En `userContent`: la calibración, tu objetivo de grasa y tu día de medidas. */
 export const AJUSTES = 'composicion'
 type AjustesGuardados = AjustesCuerpo & { id: typeof AJUSTES; target: 'composicion' }
 
-/** El lado mayor de una foto guardada. */
+/** El lado mayor de una foto guardada y el de su miniatura (sugerido: la tira de meses y elegir la foto). */
 const LADO = 1200
+const LADO_MINI = 320
 
 const soloMedidas = (m: MedidaGuardada): Medida => {
   const limpia: Medida = { date: m.date }
@@ -57,11 +58,59 @@ const soloMedidas = (m: MedidaGuardada): Medida => {
   return limpia
 }
 
+/** Las direcciones en memoria de las fotos que ya se enseñaron (se sueltan al volver a leerlas). */
+const abiertas: string[] = []
+
+/**
+ * Una foto para la pantalla: su imagen (y su miniatura) se abren en memoria solo cuando algo la enseña, no todas al cargar
+ * (problema 12 de docs/problemas-con-el-tiempo.md: con años de fotos, Progreso cargaba cientos).
+ */
+function vistaDe(f: FotoGuardada): FotoVista {
+  let [grande, pequena]: (string | null)[] = [null, null]
+  const abrir = (b: Blob) => {
+    const u = URL.createObjectURL(b)
+    abiertas.push(u)
+    return u
+  }
+  return {
+    id: f.id,
+    date: f.date,
+    pose: f.pose,
+    get url() {
+      grande ??= abrir(f.imagen)
+      return grande
+    },
+    get mini() {
+      if (!f.mini) return this.url
+      pequena ??= abrir(f.mini)
+      return pequena
+    },
+  }
+}
+
 function ponerFotos(lista: FotoGuardada[]) {
-  for (const f of fotos.value) URL.revokeObjectURL(f.url)
-  fotos.value = lista
-    .map(({ id, date, pose, imagen }): FotoVista => ({ id, date, pose, url: URL.createObjectURL(imagen) }))
-    .sort((a, b) => a.date.localeCompare(b.date))
+  for (const u of abiertas.splice(0)) URL.revokeObjectURL(u)
+  fotos.value = lista.map(vistaDe).sort((a, b) => a.date.localeCompare(b.date))
+}
+
+let completando = false
+/** Las fotos de antes sin miniatura la reciben de fondo, una a una (sin parar la pantalla). */
+async function completarMiniaturas(lista: FotoGuardada[]): Promise<void> {
+  const sin = lista.filter((f) => !f.mini)
+  if (completando || !sin.length) return
+  completando = true
+  try {
+    const db = await getDb()
+    for (const f of sin) {
+      const mini = await reducirImagen(f.imagen, LADO_MINI).catch(() => null)
+      if (mini) await db.put('photos', { ...f, mini })
+    }
+    ponerFotos((await db.getAll('photos')) as FotoGuardada[])
+  } catch (error) {
+    logError(error, 'hacer las miniaturas de tus fotos')
+  } finally {
+    completando = false
+  }
 }
 
 /** Carga Progreso cada vez que se abre (lo de Comida y Entreno puede haber cambiado). */
@@ -100,13 +149,16 @@ export async function cargarProgreso(): Promise<void> {
   else logError(e.reason, 'leer lo de Entreno para Progreso')
   if (m.status === 'fulfilled') medidas.value = m.value.map(soloMedidas)
   else logError(m.reason, 'leer tus medidas')
-  if (f.status === 'fulfilled') ponerFotos(f.value)
-  else logError(f.reason, 'leer tus fotos')
+  if (f.status === 'fulfilled') {
+    ponerFotos(f.value)
+    void completarMiniaturas(f.value)
+  } else logError(f.reason, 'leer tus fotos')
   if (a.status === 'fulfilled' && a.value)
     ajustesCuerpo.value = {
       calibracion: a.value.calibracion ?? null,
       objetivo: a.value.objetivo ?? null,
       diaMedidas: a.value.diaMedidas ?? null,
+      pesoObjetivo: a.value.pesoObjetivo ?? null,
     }
   else if (a.status === 'rejected') logError(a.reason, 'leer tus ajustes de la composición')
   if (s.status === 'fulfilled')
@@ -160,9 +212,17 @@ export async function guardarFotos(nuevas: Partial<Record<Pose, Blob>>, date = h
     for (const [pose, archivo] of Object.entries(nuevas) as [Pose, Blob][]) {
       // Si el móvil no sabe reducirla (un formato raro), se guarda tal cual
       const imagen = await reducirImagen(archivo, LADO).catch(() => archivo)
+      const mini = await reducirImagen(archivo, LADO_MINI).catch(() => undefined)
       for (const vieja of todas.filter((x) => x.date === date && x.pose === pose))
         await db.delete('photos', vieja.id)
-      await db.put('photos', { id: nuevoId(), date, pose, imagen, createdAt: at } satisfies FotoGuardada)
+      await db.put('photos', {
+        id: nuevoId(),
+        date,
+        pose,
+        imagen,
+        mini,
+        createdAt: at,
+      } satisfies FotoGuardada)
     }
     ponerFotos((await db.getAll('photos')) as FotoGuardada[])
     return true
@@ -206,6 +266,11 @@ export async function quitarCalibracion(): Promise<void> {
 /** Tu objetivo de grasa (en %). */
 export async function elegirObjetivoGrasa(pct: number): Promise<void> {
   await guardarAjustes({ ...ajustesCuerpo.value, objetivo: pct })
+}
+
+/** Tu peso objetivo en volumen (kg; null lo quita): al llegar, tu premio. */
+export async function elegirPesoObjetivo(kg: number | null): Promise<void> {
+  await guardarAjustes({ ...ajustesCuerpo.value, pesoObjetivo: kg })
 }
 
 /** El día del mes que eliges para tus medidas y fotos (null: a los 28 días de la última vez). */

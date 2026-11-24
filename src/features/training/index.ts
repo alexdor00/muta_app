@@ -1,5 +1,4 @@
 // API pública del área Entreno: lo único que otras áreas pueden usar.
-export { TuMaterial } from './screens/material/TuMaterial.tsx'
 import type { PesoEnTramo } from './use-cases/forProgreso.ts'
 export type { FuerzaBasicos } from './domain/strengthTrend.ts'
 export type { Rendimiento } from './domain/rendimiento.ts'
@@ -71,4 +70,9 @@ export async function empezarMesociclo(nombre: string, hoy: string) {
 }
 export async function volverAUsarMesociclo(id: string, hoy: string) {
   return (await import('./use-cases/mesocycles.ts')).volverAUsarMesociclo(id, hoy)
+}
+
+/** Para la revisión semanal de Nutrición: si vuelves de un parón y cuándo te subió series el entrenador. */
+export async function entrenoParaNutricion(hoy: string) {
+  return (await import('./use-cases/forComida.ts')).entrenoParaNutricion(hoy)
 }

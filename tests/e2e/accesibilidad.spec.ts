@@ -219,9 +219,9 @@ test('foto de la sesión (desde Editar rutina) y el «···» de un ejercicio c
   await sinFallos(page)
 })
 
-test('Perfil · Tu material y la ficha', async ({ page }) => {
+test('Perfil · tu copia de seguridad y la ficha', async ({ page }) => {
   await page.goto('/perfil')
-  await page.getByRole('switch', { name: 'Máquinas' }).click()
+  await expect(page.getByRole('heading', { name: 'Copia de seguridad' })).toBeVisible()
   await sinFallos(page)
   await page.goto('/entreno/ejercicio/peso_muerto_rumano')
   await expect(page.getByRole('heading', { name: 'Peso muerto rumano' })).toBeVisible()

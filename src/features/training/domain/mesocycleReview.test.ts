@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { balanceDe, comparar, veredictoComparado } from './mesocycleReview.ts'
+import { balanceDe } from './mesocycleReview.ts'
 import { resumenDe, type Mesociclo } from './mesocycles.ts'
 import type { MuscleId } from './muscles.ts'
 import type { Entreno } from './workoutHistory.ts'
@@ -54,7 +54,7 @@ const lista = [
 ]
 const HOY = '2026-11-17'
 
-describe('balance y comparación', () => {
+describe('balance', () => {
   it('sin 3 sesiones no hay balance; con ellas, el peso frente al objetivo', () => {
     const r = resumenDe(meso('2026-11-02', null), lista, HOY)
     expect(
@@ -125,12 +125,5 @@ describe('balance y comparación', () => {
     expect(con(0, 0)).toMatchObject({ tono: 'normal', texto: expect.stringContaining('RIR') })
     // Con menos de 3 ejercicios repetidos no se juzga el progreso
     expect(con(0, 0, 2)).toBeUndefined()
-  })
-
-  it('casi igual por debajo del 2 % y la frase de lo que dicen los datos', () => {
-    const barras = [comparar('A', 10, 10.1, '', ''), comparar('B', 5, 3, '', ''), comparar('C', 1, 2, '', '')]
-    expect(barras.map((x) => x.gana)).toEqual([null, 'a', 'b'])
-    expect(veredictoComparado(barras, 'Uno', 'Dos')).toBe('Van parejos: cada uno gana en lo suyo.')
-    expect(veredictoComparado(barras.slice(0, 2), 'Uno', 'Dos')).toBe('Uno sale mejor en 1 de 1 medidas.')
   })
 })

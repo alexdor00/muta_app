@@ -984,3 +984,65 @@ El usuario pide todas las pantallas de Nutrición como el Word (`Desktop/MUTA-Nu
 - **2026-11-22 · La revisión semanal, como un entrenador.** Decisión del usuario (cuestionario 1–16 y 19, todo «A»; sin fotos ni analíticas: «no es capaz de analizar fotos»; con tus perímetros). Además del peso: una semana sola fuera no basta (regla 7); en definición, lento pero con la cintura −0,5 cm o más, nada (regla 5); con 2 señales de cómo estás (sueño, energía, hambre, estrés, de ¿Cómo estás hoy?), no se aprieta y da consejos (§ 5 y regla 8); fines de semana de más, no se baja; comer menos del 75 % de lo que gastas, no se baja más (§ 5); más del 1,2 % por semana, +150 (§ 5; entre tu margen y eso, vas bien); fuerza −3 % en tus básicos, +150 en hidratos (regla 4); fase final en la semana 9 o a 3 puntos de tu grasa objetivo (regla 6); al llegar a tu objetivo, propone salir de la definición; 3 semanas con señales y lento, una pausa en mantenimiento (la guía, § 7; las 3 semanas, sugerido); te dice cuántas semanas te quedan; y al empezar otra definición, cómo fue la anterior. Consejos: proteína bajo 1,4 g/kg, digestiones, brazos y muslos. Lo de tu cuerpo lo da Progreso (`cuerpoParaComida`); las reglas, en `domain/senales.ts` y `domain/review.ts`; lo calculado, en `state/entrenador.ts`.
 
 - **2026-11-23 · Comida rápida de cadenas, aproximada.** Decisión del usuario («para el día libre… con los nombres reales»; fuentes por orden: Open Food Facts, BEDCA/USDA para lo genérico y, si no, FatSecret España marcado «aproximado»). Lo genérico (kebab, pizza, hamburguesas…) ya estaba en `foods.json` («Comida rápida»). Los productos de cada cadena (McDonald's, Burger King, KFC, Telepizza, Domino's, Taco Bell, Five Guys) van en `foods-rapida.json`, generado por `scripts/foods-rapida.cjs` desde `private/rapida/fatsecret.json` (fuera de git): con su peso, por 100 g; sin él, por ración (`porRacion`: solo se apunta en raciones). Al apuntarlos se dice «Cifras aproximadas (FatSecret España)». Las webs oficiales de las cadenas no dejaron leer sus tablas.
+
+- **2026-11-23 · El entrenador de Entreno, igual de potente que el nutricionista y en equipo con él.** Decisión del usuario
+  (cuestionario de 13 puntos, «libre elección», todo «A»; propuesta `MUTA-Entrenador-propuesta.png`; «que hagan equipo»).
+  Antes de mirar músculo a músculo, manda la semana, en este orden (`domain/coach/semana.ts`): vuelves de un parón (14
+  días o más sin entrenar, sugerido) → una serie menos por músculo, con «Deshacer», y Nutrición propone mantenimiento con
+  sus dos mesetas (guía § 10); sin el RIR apuntado en la mitad de las series (sugerido) no se lee la semana; RIR 2 o más
+  por encima de la pauta → acércate antes de cambiar series; durante la recarga y la semana siguiente no se lee el
+  rendimiento; al final de la definición con la fuerza bajando, la recarga y no quitar series; con señales de cómo estás
+  (las mismas reglas que el nutricionista), esa semana no se sube. Por músculo (`revision.ts`): por debajo de tu rango →
+  +1 sin esperar 3 semanas; por encima y yendo peor → −1 a la primera; en definición solo se sube en Prioridad; con tus kcal
+  recién cambiadas, una semana sin quitar series; «revisa la comida» pasa a decir qué falla, con su cifra
+  (`comidaParaEntreno`: proteína, ritmo o déficit). Además: «no toques lo que funciona», las sesiones que faltan, comprobar
+  tu RIR cada 4 vueltas y el aviso de técnicas de intensidad en definición. Nutrición, a su vez, no sube kcal en volumen
+  los 10 días después de que el entrenador te suba series, y su revisión enseña tu fuerza («bajas de peso y mantienes tus
+  marcas: vas bien»). La constancia no para las propuestas (quien entrena menos días también progresa): se dice.
+  Los dos informes usan el mismo componente (`shared/ui/Informe`).
+
+- **2026-11-23 · Lo que quedaba de los documentos para los dos entrenadores.** Pedido del usuario («indistinguible de dos
+  expertos reales, sin inventar nada»). Volumen: antes de subir kcal, los hidratos alrededor del entreno y, sin
+  «Hidratos según el día», más hidratos los días de entreno (guía § 6 y § 13). Vuelta de un parón: actividad
+  moderada-alta, más los días de descanso (guía § 10). Entreno: con el RIR de media 1,5 o más por debajo de la pauta,
+  «vas más al fallo de lo que toca» (guía § 3; 02-reglas § 5). Las señales de dolor articular y motivación de 02-reglas
+  § 5 no se usan: «¿Cómo estás hoy?» no las pregunta (añadirlas sería una pregunta nueva, a decidir). Todos los casos y
+  sus respuestas, en `Desktop/MUTA-Entrenadores-casos.docx`.
+
+- **2026-11-23 · Problemas con el tiempo de uso (MUTA para años).** Revisión pedida por el usuario («cómo funcionarían las
+  pantallas durante mucho tiempo»), con un perfil de prueba de 3 años: todo en
+  [problemas-con-el-tiempo.md](problemas-con-el-tiempo.md), con opciones para cada uno. Hechos: guardar un día no leído
+  conserva lo que tenía; al volver a la app otro día, Nutrición se recarga con hoy; Progreso lee toda tu comida; la racha
+  de días redondos no tiene tope; más de 30 min sin apuntar ninguna serie (sugerido) no cuenta como entreno y una sesión
+  de otro día pregunta al entrar; un ejercicio se reconoce por su ejercicio de la biblioteca (la vez anterior y el motor,
+  primero por su nombre exacto: una serie top no toma la de descarga) y la gráfica de una sesión va por rutina.
+- **2026-11-23 · Terminar la rutina y comparar tus vueltas.** Decisión del usuario (opción A; PNG
+  `Desktop/MUTA-Fin-de-rutina-propuesta.png`, sin pantalla nueva). Las rutinas con semanas contadas (las del catálogo)
+  dicen «Terminaste tu rutina» al hacer la última sesión de su última semana, en el resumen y en Tu plan, con «Repetirla»
+  (una etapa nueva, «… · vuelta 2»), «Cambiar de rutina» y «Ahora no». Las de una semana que se repite (MUTA y CSV) no
+  terminan nunca. Solo se comparan etapas de la misma rutina («no tiene sentido comparar dos rutinas distintas»), a la
+  misma semana (semana 4 con semana 4), sesión con sesión y ejercicio con ejercicio; de serie, con la última de la misma
+  rutina y el mismo objetivo (volumen con volumen). Se llega desde la hoja de la etapa («Frente a «…» ›»). Un CSV que se
+  llama igual o lleva los mismos ejercicios que una rutina tuya pregunta «¿Es tu rutina de antes?» («preguntar en la
+  duda»). No se propone descarga al acabar: solo si la rutina la pauta (decisión 2026-11-02).
+
+- **2026-11-24 · Copia de seguridad en un archivo, recordada cada mes; fuera «Tu material».** Decisión del usuario (opción
+  A del problema 10; PNG `Desktop/MUTA-Copia-de-seguridad-propuesta.png`, simplificado: «¿qué es lo realmente útil?»).
+  Perfil es tu copia: «Guardar copia» (un `.json` con todo, también las fotos, por el menú de compartir: iCloud, Drive,
+  WhatsApp…) y «Recuperar una copia» (enseña qué trae; lo de ahora se guarda aparte y se sustituye). El recordatorio es un cuadro al
+  abrir la app, una vez al mes («que al iniciar la aplicación te salga un cuadro»; sin ninguna, a la semana de empezar;
+  «Ahora no», un mes; ni en la bienvenida ni en una sesión). Si una pantalla no carga, la app se recarga sola una vez y,
+  si sigue, lo dice con el detalle (antes se quedaba quieta: «no se abre el perfil»). «Recuperar una copia» también en la pantalla de
+  error, «por si falla la aplicación». Sin servidor ni cuentas: la copia automática en Google Drive, cuando la app esté
+  publicada. «Tu material» se quita (usuario: «borrarlo»): poco útil en un gimnasio completo; los discos del gimnasio
+  siguen en la calculadora de discos.
+
+- **2026-11-24 · Tu logro y tu premio, para Instagram.** Decisión del usuario («que esté muy chulo y que te den ganas de
+  subirlo a Instagram»; «las dos cosas sí»; PNG `Desktop/MUTA-Logro-Instagram-propuesta.png` y
+  `Desktop/MUTA-Premio-objetivo-propuesta.png`). El **logro**, al acabar una etapa y cada 6 meses de la que llevas, con la foto de
+  una de tus sesiones; el **premio**, solo al cumplir tu objetivo («como premio»): en definición, tu grasa objetivo; en volumen,
+  un peso objetivo nuevo en «Tu composición» (02-reglas § 8 ya usa un peso objetivo). Cifras de lo que la app mide (02-reglas § 9:
+  grasa de la Marina, masa magra, FFMI; perímetros), distintas en definición y volumen; lo estimado lo dice. Tus fotos del cuerpo
+  solo salen si las eliges. Imagen 1080 × 1920 en la letra de MUTA (sin la estrecha), cifras centradas; naranja solo en lo que es
+  logro. Sale solo, uno cada vez; lo de antes de la función no se celebra de golpe. «6 meses» y el «ejercicio estrella» (3 veces o
+  más), sugeridos.

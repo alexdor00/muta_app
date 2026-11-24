@@ -7,7 +7,7 @@ import { suggestFor, type Sugerencia } from '../domain/progression.ts'
 import { historialDe, ultimaVez } from '../domain/workoutHistory.ts'
 import { rangoDe, sugerenciaDe } from '../domain/workoutPlan.ts'
 import type { SerieHecha } from '../domain/workoutSet.ts'
-import { entrenos, enTuPlan } from './plan.ts'
+import { claveEjercicio, entrenos, enTuPlan } from './plan.ts'
 
 /** Lo que toca hoy, para enseñarlo: «62,5 kg × 6–10» y su etiqueta («↑ Sube», «+1 rep», «Mantén»…). */
 function vistaSugerencia(sugerencia: Sugerencia, antes: SerieHecha | null) {
@@ -33,7 +33,7 @@ function vistaSugerencia(sugerencia: Sugerencia, antes: SerieHecha | null) {
  */
 export function fichaDe(ex: LibraryExercise, deRutina: { reps: Range; rir: number | null } | null = null) {
   const plan = enTuPlan(ex.name)
-  const ultima = ultimaVez(entrenos.value, ex.name)
+  const ultima = ultimaVez(entrenos.value, ex.name, claveEjercicio.value)
   const rango = (plan && rangoDe(plan.e.reps)) ?? deRutina?.reps ?? ex.reps
   const rir = plan ? plan.e.rir : (deRutina?.rir ?? ex.rir)
   const fuente: 'plan' | 'rutina' | 'biblioteca' = plan ? 'plan' : deRutina ? 'rutina' : 'biblioteca'
@@ -54,6 +54,6 @@ export function fichaDe(ex: LibraryExercise, deRutina: { reps: Range; rir: numbe
     rir,
     pesoCorporal,
     sugerencia: vistaSugerencia(sugerencia, ultima[0] ?? null),
-    progreso: progresoDe(historialDe(entrenos.value, ex.name), rir),
+    progreso: progresoDe(historialDe(entrenos.value, ex.name, claveEjercicio.value, true), rir),
   }
 }

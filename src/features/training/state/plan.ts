@@ -11,6 +11,7 @@ import {
   historialDe,
   semanaDe,
   ultimaVez,
+  type Clave,
   type Entreno,
   type PlanSemana,
 } from '../domain/workoutHistory.ts'
@@ -45,6 +46,12 @@ export const tuPlan = signal<EstadoPlan>({ status: 'loading' })
 /** Los entrenos terminados (almacén `workouts`), en cualquier orden. */
 export const entrenos = signal<Entreno[]>([])
 
+/**
+ * Cómo se reconoce un ejercicio entre rutinas: por su ejercicio de la biblioteca (lo pone `cargarPlan`) o por su nombre
+ * (usuario, 2026-11-23: el historial sigue aunque en otra rutina se llame distinto).
+ */
+export const claveEjercicio = signal<Clave>((n) => n)
+
 /** Las sesiones de la semana con lo que hiciste la última vez en cada ejercicio. */
 export const sesiones = computed<SesionPlan[]>(() => {
   const plan = tuPlan.value
@@ -53,8 +60,8 @@ export const sesiones = computed<SesionPlan[]>(() => {
     ...s,
     ejercicios: s.ejercicios.map((e) => ({
       ...e,
-      ultima: ultimaVez(entrenos.value, e.nombre),
-      mejorDeSiempre: mejorDeSiempre(entrenos.value, e.nombre),
+      ultima: ultimaVez(entrenos.value, e.nombre, claveEjercicio.value),
+      mejorDeSiempre: mejorDeSiempre(entrenos.value, e.nombre, claveEjercicio.value),
     })),
   }))
 })
@@ -119,7 +126,8 @@ export function diasPrevistos(hoy: string, inicio: string, n: number) {
 }
 
 /** Cuánto cambió un ejercicio la última vez frente a la anterior (máximo estimado o repeticiones); null si no hay dos. */
-export const cambioDe = (e: EjercicioPlan) => cambioUltimaVez(historialDe(entrenos.value, e.nombre), e.rir)
+export const cambioDe = (e: EjercicioPlan) =>
+  cambioUltimaVez(historialDe(entrenos.value, e.nombre, claveEjercicio.value), e.rir)
 
 /** Días de descanso que deja tu semana (7 menos sus sesiones), para la racha. */
 export const descansosPorSemana = computed(() => Math.max(0, 7 - sesiones.value.length))

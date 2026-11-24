@@ -34,13 +34,15 @@ import styles from './Dia.module.css'
  * cambio y una tabla, serie a serie, frente a la vez anterior. Si ese día hubo dos entrenos, salen los dos.
  */
 export function DiaScreen({ fecha }: { fecha: string }) {
+  // Siempre se vuelve a leer (usuario, 2026-11-23): si acabas de entrenar, el día tiene que traer lo de hoy, igual que Hoy
+  // y Tu plan (sin esto, con Progreso ya abierto antes, salía sin la sesión recién hecha)
   useEffect(() => {
-    if (estado.value !== 'listo') void cargarProgreso()
+    void cargarProgreso()
   }, [])
   // Desde Hoy, «‹» vuelve a Hoy; si no, a Días de ese mes
   const deHoy = vieneDeHoy(useLocation().query)
   const volver = deHoy ? paths.today : `${paths.progress}?mes=${fecha.slice(0, 7)}&ver=dias`
-  const etiqueta = deHoy ? 'Volver a Hoy' : 'Volver a Progreso'
+  const etiqueta = deHoy ? 'Volver a Hoy' : 'Volver'
   const delDia =
     estado.value === 'listo' ? (entreno.value?.entrenos ?? []).filter((x) => x.fecha === fecha) : []
   const [primero] = delDia
@@ -88,10 +90,11 @@ export function DiaScreen({ fecha }: { fecha: string }) {
         backLabel={etiqueta}
       />
       <div class={styles.panel}>
-        {como && <p class={styles.como}>Cómo estabas: {como.charAt(0).toLowerCase() + como.slice(1)}</p>}
+        {/* Arriba la gráfica, debajo los ejercicios (usuario, 2026-11-23); cómo estabas, al final */}
         {delDia.map((x) => (
           <ElEntreno key={x.id} x={x} varios={delDia.length > 1} />
         ))}
+        {como && <p class={styles.como}>Cómo estabas: {como.charAt(0).toLowerCase() + como.slice(1)}</p>}
       </div>
     </div>
   )
