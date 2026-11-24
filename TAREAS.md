@@ -46,6 +46,10 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
 
 ## Hecho
 
+- **Las gráficas por meses y un solo desplegable** (2026-11-24, problema 11; misma rama, sin commit): cada gráfica
+  (`SessionProgress`: Ver sesión, un día, la ficha y Progreso) con «3 meses ▾» (3 meses, 6 meses, 1 año, Todo) si hay más de
+  3 meses de datos, y el cambio del tramo; los 10 `<select>` y las filas de Superserie, Técnica y la sesión de la foto,
+  con `MenuDesplegable` / `FilaDesplegable` de `shared/ui`.
 - **MUTA para años y tu logro** (2026-11-23/24): el entrenador de Entreno igual de potente que el nutricionista y en equipo
   con él; la sesión (casillas, «Seguir», «Hecha hoy», descansos revisados, tiempo muerto y sesión de otro día); terminar
   la rutina («Repetirla») y comparar tus vueltas a la misma semana (solo la misma rutina); un CSV repetido pregunta si es
@@ -288,8 +292,8 @@ Se actualiza al terminar cada tarea (ver «Mantenimiento de la documentación» 
    el peso y tu punto flojo. PNG antes de programar; el punto flojo no sale de ningún documento (regla a decidir) y se
    pisa con la 7: decidir si van las dos.
 
-9. Problemas con el tiempo de uso: hechos todos menos el **11, las gráficas por meses** («3 m · 6 m · 1 año · Todo»; PNG
-   antes de programar): [docs/problemas-con-el-tiempo.md](docs/problemas-con-el-tiempo.md).
+9. Problemas con el tiempo de uso: hechos todos ([docs/problemas-con-el-tiempo.md](docs/problemas-con-el-tiempo.md)); queda
+   por decidir la 1 B (ver más de 7 días en el carrusel de Tu día).
 
 ## Dudas abiertas
 

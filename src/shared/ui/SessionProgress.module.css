@@ -39,8 +39,16 @@
   color: var(--improve);
 }
 
-.date {
+/* A la derecha: la fecha y, debajo, el tramo, centrados uno sobre otro (usuario, 2026-11-24) */
+.derecha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
   margin-left: auto;
+}
+
+.date {
   font: var(--text-subhead);
   color: var(--label-2);
 }

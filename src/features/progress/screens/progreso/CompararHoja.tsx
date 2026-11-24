@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
 import { formatChange, formatDecimal } from '../../../../shared/lib/format.ts'
+import { MenuDesplegable } from '../../../../shared/ui/MenuDesplegable.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { curva } from '../../../../shared/ui/SessionProgress.tsx'
 import type { Comparacion, DetalleMeso, SerieHecha } from '../../../training/index.ts'
@@ -40,18 +41,13 @@ export function CompararHoja({ d, onClose }: { d: DetalleMeso; onClose: () => vo
           {d.meso.rutina}
         </p>
         {d.comparables.length > 1 && (
-          <select
-            class={styles.select}
-            aria-label="Etapa con la que comparas"
-            value={otra}
-            onChange={(ev) => setOtra(ev.currentTarget.value)}
-          >
-            {d.comparables.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.nombre}
-              </option>
-            ))}
-          </select>
+          <MenuDesplegable
+            etiqueta="Etapa con la que comparas"
+            valor={otra}
+            opciones={d.comparables.map((m) => ({ value: m.id, label: m.nombre }))}
+            onChange={setOtra}
+            lado="izquierda"
+          />
         )}
         {c && <Vueltas c={c} />}
       </div>

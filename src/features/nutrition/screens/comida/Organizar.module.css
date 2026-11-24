@@ -410,20 +410,6 @@
   padding-block: var(--space-2);
 }
 
-/* Un desplegable pequeño y gris, como la hora */
-.desplegable {
-  flex: none;
-  max-width: 70%;
-  height: var(--control-sm);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--surface-2);
-  color: var(--label);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
-}
-
 /* Tus próximos días: dos semanas de casillas; la de cocinar, en negro (una acción que eliges, no un logro) */
 .calendario {
   gap: var(--space-3);

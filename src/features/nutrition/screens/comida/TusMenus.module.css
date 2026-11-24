@@ -253,14 +253,3 @@
   text-align: left;
   cursor: pointer;
 }
-
-.desplegable {
-  min-height: var(--control-sm);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--surface-2);
-  color: var(--label);
-  font: var(--text-subhead);
-  font-weight: var(--weight-semibold);
-}

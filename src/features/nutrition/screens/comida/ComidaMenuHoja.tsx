@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { PlusIcon } from '../../../../shared/ui/icons.tsx'
+import { MenuDesplegable } from '../../../../shared/ui/MenuDesplegable.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { PlatoFoto } from '../../components/Platos.tsx'
 import { hoy, type ComidaId } from '../../state/comida.ts'
@@ -121,20 +122,20 @@ export function ComidaMenuHoja(props: Props) {
           <label class={p.que} for="dias-comida">
             Qué días va
           </label>
-          <select
+          <MenuDesplegable<Dias>
             id="dias-comida"
-            class={p.valor}
-            value={diasDeComida(m, menuId, c)}
-            onChange={async (e) => {
-              const d = e.currentTarget.value as Dias
+            etiqueta="Qué días va"
+            valor={diasDeComida(m, menuId, c)}
+            opciones={[
+              { value: 'todos', label: 'Todos' },
+              { value: 'entreno', label: 'Solo entreno' },
+              { value: 'descanso', label: 'Solo descanso' },
+            ]}
+            onChange={async (d) => {
               const antes = await diasDeLaComida(menuId, c, d)
               avisar(d === 'todos' ? 'Va todos los días' : `Solo los días de ${d}`, deshacer(antes))
             }}
-          >
-            <option value="todos">Todos</option>
-            <option value="entreno">Solo entreno</option>
-            <option value="descanso">Solo descanso</option>
-          </select>
+          />
         </li>
       </ul>
 

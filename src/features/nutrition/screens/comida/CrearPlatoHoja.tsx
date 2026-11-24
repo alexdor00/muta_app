@@ -3,6 +3,7 @@ import { parseDecimal } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
 import { Deslizable } from '../../../../shared/ui/Deslizable.tsx'
+import { MenuDesplegable } from '../../../../shared/ui/MenuDesplegable.tsx'
 import { GripIcon, PlusIcon } from '../../../../shared/ui/icons.tsx'
 import { useReordenar } from '../../../../shared/ui/useReordenar.ts'
 import { recetario } from '../../state/recetas.ts'
@@ -136,54 +137,40 @@ export function CrearPlatoHoja({ onClose, onCreado, avisar }: Props) {
 
         {/* Sus datos, en pastillas con desplegable */}
         <div class={s.datos}>
-          <select
-            class={s.dato}
-            aria-label="Categoría"
-            value={categoria}
-            onChange={(e) => setCategoria(e.currentTarget.value)}
-          >
-            <option value="tuyos">Sin categoría</option>
-            {categorias.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-          <select
-            class={s.dato}
-            aria-label="Tiempo"
-            value={minutos ?? ''}
-            onChange={(e) => setMinutos(e.currentTarget.value ? Number(e.currentTarget.value) : null)}
-          >
-            <option value="">Tiempo</option>
-            {MINUTOS.map((m) => (
-              <option key={m} value={m}>
-                {m} min
-              </option>
-            ))}
-          </select>
-          <select
-            class={s.dato}
-            aria-label="Dificultad"
-            value={dificultad}
-            onChange={(e) => setDificultad(e.currentTarget.value)}
-          >
-            {DIFICULTADES.map((d) => (
-              <option key={d}>{d}</option>
-            ))}
-          </select>
-          <select
-            class={s.dato}
-            aria-label="Raciones"
-            value={raciones}
-            onChange={(e) => setRaciones(Number(e.currentTarget.value))}
-          >
-            {Array.from({ length: 10 }, (_, k) => k + 1).map((n) => (
-              <option key={n} value={n}>
-                {n} {n === 1 ? 'ración' : 'raciones'}
-              </option>
-            ))}
-          </select>
+          <MenuDesplegable
+            etiqueta="Categoría"
+            valor={categoria}
+            opciones={[
+              { value: 'tuyos', label: 'Sin categoría' },
+              ...categorias.map((c) => ({ value: c.id, label: c.nombre })),
+            ]}
+            onChange={setCategoria}
+            lado="izquierda"
+          />
+          <MenuDesplegable
+            etiqueta="Tiempo"
+            valor={minutos === null ? '' : String(minutos)}
+            opciones={[
+              { value: '', label: 'Tiempo' },
+              ...MINUTOS.map((m) => ({ value: String(m), label: `${m} min` })),
+            ]}
+            onChange={(v) => setMinutos(v ? Number(v) : null)}
+          />
+          <MenuDesplegable
+            etiqueta="Dificultad"
+            valor={dificultad}
+            opciones={DIFICULTADES.map((d) => ({ value: d, label: d }))}
+            onChange={setDificultad}
+          />
+          <MenuDesplegable
+            etiqueta="Raciones"
+            valor={String(raciones)}
+            opciones={Array.from({ length: 10 }, (_, k) => ({
+              value: String(k + 1),
+              label: `${k + 1} ${k === 0 ? 'ración' : 'raciones'}`,
+            }))}
+            onChange={(v) => setRaciones(Number(v))}
+          />
         </div>
 
         {lista.length > 0 && (

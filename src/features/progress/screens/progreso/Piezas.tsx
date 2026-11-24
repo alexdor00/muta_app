@@ -20,6 +20,8 @@ export function Grafica(props: {
   resumen: string
   /** Cómo se escribe un punto al pasar el dedo («62,5 kg»). */
   texto?: (v: number) => string
+  /** Los valores son un % desde que empezaste (tus básicos). */
+  enPorcentaje?: boolean
 }) {
   return (
     <SessionProgress
@@ -34,6 +36,7 @@ export function Grafica(props: {
       puntos={props.puntos.map((x) => ({ fecha: x.date, valor: x.v }))}
       resumen={props.resumen}
       texto={props.texto}
+      enPorcentaje={props.enPorcentaje}
     />
   )
 }

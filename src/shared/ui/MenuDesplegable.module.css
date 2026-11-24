@@ -1,0 +1,116 @@
+/* El desplegable de MUTA: un botón pequeño (lo elegido y ▾) y, al tocarlo, un menú flotante con ✓ en lo elegido. */
+
+.envoltura {
+  position: relative;
+  display: inline-flex;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--label);
+  font: var(--text-subhead);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.boton svg {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+}
+
+/* Tocar fuera lo cierra */
+.fuera {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  min-width: max(100%, calc(var(--space-10) * 3));
+  padding: var(--space-1);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  box-shadow: var(--float-shadow);
+}
+
+.izquierda {
+  right: auto;
+  left: 0;
+}
+
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4) 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--label);
+  font: var(--text-body);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.opcion[aria-selected='true'] {
+  background: var(--bg);
+  font-weight: var(--weight-semibold);
+}
+
+.marca {
+  width: var(--space-4);
+  text-align: center;
+}
+
+/* La fila con título (Editar ejercicio, foto de la sesión) */
+.fila {
+  border-bottom: var(--hairline) solid var(--separator);
+  padding-bottom: var(--space-2);
+}
+
+.linea {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--row);
+  font: var(--text-body);
+}
+
+.explica {
+  display: block;
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* Sin sitio debajo, hacia arriba */
+.arriba {
+  top: auto;
+  bottom: calc(100% + var(--space-1));
+}
+
+/* Pequeño, como las pastillas de una gráfica (Tonelaje · Repeticiones) */
+.pequeno {
+  min-height: calc(var(--control-sm) - var(--space-1));
+  padding: 0 var(--space-3);
+  font: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+}

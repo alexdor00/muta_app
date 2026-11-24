@@ -59,6 +59,7 @@ export function FuerzaPorGrupo({ mes, onEjercicio }: { mes: string; onEjercicio:
           texto={(v) => (Math.round(v) === 0 ? '=' : `${conSigno(Math.round(v))} %`)}
           cambio={basicos === null ? null : `frente a ${anterior}`}
           puntos={linea}
+          enPorcentaje
           resumen={`Tu fuerza en tus básicos hasta ${formatMonthName(mes).toLowerCase()}, en % desde que empezaste`}
         />
       )}

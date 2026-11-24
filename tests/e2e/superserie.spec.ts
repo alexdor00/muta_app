@@ -52,11 +52,11 @@ test('en Editar rutina: cada serie distinta («4 · 6 · 8») y la superserie un
   // Deshacer la superserie
   await page.getByRole('button', { name: /^Superserie A1: Press francés/ }).click()
   const press = page.getByRole('dialog', { name: 'A1: Press francés' })
-  await expect(press.locator('summary', { hasText: 'Superserie con' })).toContainText(
-    'Con A2: Curl con barra Z',
-  )
-  await press.locator('summary', { hasText: 'Superserie con' }).click()
-  await press.getByText('Ninguno', { exact: true }).click()
+  const con = press.getByRole('button', { name: /^Superserie con:/ })
+  await expect(con).toContainText('Con A2: Curl con barra Z')
+  await con.click()
+  await page.screenshot({ path: 'tests/e2e/capturas/menu-desplegable.png' })
+  await press.getByRole('option', { name: 'Ninguno' }).click()
   await press.getByRole('button', { name: 'Brazos' }).click()
   await expect(lista).not.toContainText('Superserie')
 })
@@ -87,10 +87,10 @@ test('técnica de intensidad: se pone a cualquier ejercicio en Editar rutina y s
   await page.getByRole('button', { name: /^Sentadilla hack/ }).click()
   const hack = page.getByRole('dialog', { name: 'Sentadilla hack' })
   await hack.getByRole('button', { name: 'Más opciones' }).click()
-  const tecnica = hack.locator('summary', { hasText: 'Técnica' })
+  const tecnica = hack.getByRole('button', { name: /^Técnica:/ })
   await expect(tecnica).toContainText('Ninguna')
   await tecnica.click()
-  await hack.getByText('Rest-pause', { exact: true }).click()
+  await hack.getByRole('option', { name: 'Rest-pause' }).click()
   await expect(tecnica).toContainText('Rest-pause')
   await hack.getByRole('button', { name: 'Brazos' }).click()
 

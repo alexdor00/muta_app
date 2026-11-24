@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks'
 import { formatDecimal, parseDecimal } from '../../../../shared/lib/format.ts'
 import { Deslizable } from '../../../../shared/ui/Deslizable.tsx'
+import { MenuDesplegable } from '../../../../shared/ui/MenuDesplegable.tsx'
 import { BarcodeIcon, PlusIcon, SearchIcon } from '../../../../shared/ui/icons.tsx'
 import { nombreRacion, unidadDe, type Alimento, type Modo } from '../../state/comida.ts'
 import { buscar } from '../../use-cases/foodLog.ts'
@@ -72,24 +73,24 @@ export function IngredientesReceta(props: {
                       value={formatDecimal(i.cantidad)}
                       onInput={(e) => poner(k, { cantidad: parseDecimal(e.currentTarget.value) ?? 0 })}
                     />
-                    <select
-                      class={s.unidad}
-                      aria-label={`Unidad de ${i.alimento.name}`}
-                      value={i.modo}
-                      onChange={(e) => {
-                        const m = e.currentTarget.value === 'racion' ? 'racion' : 'gramos'
+                    <MenuDesplegable<Modo>
+                      etiqueta={`Unidad de ${i.alimento.name}`}
+                      valor={i.modo}
+                      opciones={[
+                        { value: 'gramos', label: u },
+                        {
+                          value: 'racion',
+                          label: nombreRacion(i.alimento, enUnidades ? i.cantidad : 2).replace(/^[^ ]+ /, ''),
+                        },
+                      ]}
+                      onChange={(m) => {
                         const g = gramosDeIngrediente(i)
                         poner(k, {
                           modo: m,
                           cantidad: m === 'racion' ? Math.max(1, Math.round(g / i.alimento.servingG)) : g,
                         })
                       }}
-                    >
-                      <option value="gramos">{u}</option>
-                      <option value="racion">
-                        {nombreRacion(i.alimento, enUnidades ? i.cantidad : 2).replace(/^[^ ]+ /, '')}
-                      </option>
-                    </select>
+                    />
                   </span>
                 </div>
               </Deslizable>

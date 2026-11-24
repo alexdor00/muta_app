@@ -3,7 +3,7 @@ import { formatRange, formatRest } from '../../../shared/lib/format.ts'
 import { ChevronDownIcon, MinusIcon, PlusIcon, SwapIcon } from '../../../shared/ui/icons.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
 import { Switch } from '../../../shared/ui/Switch.tsx'
-import { ChoiceList } from '../../../shared/ui/Choice.tsx'
+import { FilaDesplegable } from '../../../shared/ui/MenuDesplegable.tsx'
 import { Desplegable } from './Desplegable.tsx'
 import styles from './EditExerciseSheet.module.css'
 
@@ -104,9 +104,6 @@ export function EditExerciseSheet(props: {
     props.onCambio(nueva)
   }
   const [min, max] = p.reps
-  const superserie =
-    props.superserie.opciones.find((o) => o.value === props.superserie.valor)?.label ?? 'Ninguno'
-  const tecnica = props.tecnica.opciones.find((o) => o.value === props.tecnica.valor)?.label ?? 'Ninguna'
   return (
     <Sheet
       alta
@@ -223,48 +220,23 @@ export function EditExerciseSheet(props: {
       {mas && (
         <section id="mas-opciones" class={styles.card} aria-label="Más opciones">
           {props.superserie.opciones.length > 1 && (
-            <Desplegable
+            <FilaDesplegable
               titulo="Superserie con"
-              valor={superserie}
-              abierto={abierto === 'superserie'}
-              onAbrir={abre('superserie')}
-            >
-              <small class={styles.hint}>
-                Se hacen alternos: 20 s entre los dos y el descanso al terminar la pareja.
-              </small>
-              <ChoiceList
-                name="superserie"
-                legend="Superserie con"
-                options={props.superserie.opciones}
-                value={props.superserie.valor}
-                onChange={(v) => {
-                  props.onSuperserie(v)
-                  setAbierto(null)
-                }}
-              />
-            </Desplegable>
-          )}
-          <Desplegable
-            titulo="Técnica"
-            valor={tecnica}
-            abierto={abierto === 'tecnica'}
-            onAbrir={abre('tecnica')}
-          >
-            <small class={styles.hint}>
-              {props.tecnica.explica && `${props.tecnica.explica} `}
-              Mejor en la última serie del último ejercicio de un músculo.
-            </small>
-            <ChoiceList
-              name="tecnica"
-              legend="Técnica"
-              options={props.tecnica.opciones}
-              value={props.tecnica.valor}
-              onChange={(v) => {
-                props.onTecnica(v)
-                setAbierto(null)
-              }}
+              etiqueta="Superserie con"
+              valor={props.superserie.valor}
+              opciones={props.superserie.opciones}
+              onChange={props.onSuperserie}
+              explica="Se hacen alternos: 20 s entre los dos y el descanso al terminar la pareja."
             />
-          </Desplegable>
+          )}
+          <FilaDesplegable
+            titulo="Técnica"
+            etiqueta="Técnica"
+            valor={props.tecnica.valor}
+            opciones={props.tecnica.opciones}
+            onChange={props.onTecnica}
+            explica={`${props.tecnica.explica ? `${props.tecnica.explica} ` : ''}Mejor en la última serie del último ejercicio de un músculo.`}
+          />
         </section>
       )}
 

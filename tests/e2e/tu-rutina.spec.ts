@@ -33,7 +33,7 @@ test('foto de la sesión (en Editar rutina): se pone, sale en la tarjeta, sigue 
   const hoja = await editar(page)
   await hoja.getByRole('button', { name: /foto (a|de) Isquios, glúteo y pecho/ }).click()
   const foto = page.getByRole('dialog', { name: 'Foto de la sesión' })
-  await expect(foto.locator('summary', { hasText: 'Sesión' })).toContainText('Isquios, glúteo y pecho')
+  await expect(foto.getByRole('button', { name: /^Sesión:/ })).toContainText('Isquios, glúteo y pecho')
   await foto.getByText('Elegir de la galería').locator('input').setInputFiles({
     name: 'foto.png',
     mimeType: 'image/png',

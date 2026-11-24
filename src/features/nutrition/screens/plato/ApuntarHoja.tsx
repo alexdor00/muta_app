@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { ChoiceSegmented } from '../../../../shared/ui/Choice.tsx'
+import { MenuDesplegable } from '../../../../shared/ui/MenuDesplegable.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { LetraMenu } from '../../components/LetraMenu.tsx'
 import { COMIDAS, type ComidaId } from '../../state/comida.ts'
@@ -130,18 +131,13 @@ export function ApuntarHoja({
             <label class={p.que} for="apuntar-comida">
               En qué comida
             </label>
-            <select
+            <MenuDesplegable
               id="apuntar-comida"
-              class={p.valor}
-              value={comida}
-              onChange={(e) => setComida(e.currentTarget.value as ComidaId)}
-            >
-              {COMIDAS.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre}
-                </option>
-              ))}
-            </select>
+              etiqueta="En qué comida"
+              valor={comida}
+              opciones={COMIDAS.map((c) => ({ value: c.id, label: c.nombre }))}
+              onChange={setComida}
+            />
           </li>
         </ul>
         {enMenu && otro && (

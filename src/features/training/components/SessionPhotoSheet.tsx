@@ -1,8 +1,6 @@
-import { useState } from 'preact/hooks'
-import { ChoiceList } from '../../../shared/ui/Choice.tsx'
 import { FotoEditable } from '../../../shared/ui/FotoEditable.tsx'
 import { Sheet } from '../../../shared/ui/Sheet.tsx'
-import { Desplegable } from './Desplegable.tsx'
+import { FilaDesplegable } from '../../../shared/ui/MenuDesplegable.tsx'
 import styles from './SessionPhotoSheet.module.css'
 
 /**
@@ -26,22 +24,16 @@ export function SessionPhotoSheet(props: {
   onQuitar: () => void
   onClose: () => void
 }) {
-  const [abierto, setAbierto] = useState(false)
   const nombre = props.sesiones.find((s) => s.value === props.sigla)?.label ?? props.sigla
   return (
     <Sheet title="Foto de la sesión" onClose={props.onClose} large>
-      <Desplegable titulo="Sesión" valor={nombre} abierto={abierto} onAbrir={setAbierto}>
-        <ChoiceList
-          name="foto-sesion"
-          legend="Sesión"
-          options={props.sesiones}
-          value={props.sigla}
-          onChange={(s) => {
-            props.onSigla(s)
-            setAbierto(false)
-          }}
-        />
-      </Desplegable>
+      <FilaDesplegable
+        titulo="Sesión"
+        etiqueta="Sesión"
+        valor={props.sigla}
+        opciones={props.sesiones}
+        onChange={props.onSigla}
+      />
       <FotoEditable
         foto={props.foto ?? props.deSerie}
         alt={props.foto ? `Tu foto de ${nombre}` : `Foto de ${nombre}`}

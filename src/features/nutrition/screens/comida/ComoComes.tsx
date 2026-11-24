@@ -1,3 +1,4 @@
+import { MenuDesplegable } from '../../../../shared/ui/MenuDesplegable.tsx'
 import { type ComoComes as Como } from '../../state/recetas.ts'
 import styles from './TusMenus.module.css'
 
@@ -19,18 +20,13 @@ export function ElegirComoComes(props: { valor: Como; onCambiar: (c: Como) => vo
         <b>Comida fuerte</b>
         <span>Tus platos se reparten según esto</span>
       </label>
-      <select
+      <MenuDesplegable
         id="comida-fuerte"
-        class={styles.desplegable}
-        value={props.valor}
-        onChange={(e) => props.onCambiar(e.currentTarget.value as Como)}
-      >
-        {OPCIONES.map((x) => (
-          <option key={x.id} value={x.id}>
-            {x.nombre}
-          </option>
-        ))}
-      </select>
+        etiqueta="Comida fuerte"
+        valor={props.valor}
+        opciones={OPCIONES.map((x) => ({ value: x.id, label: x.nombre }))}
+        onChange={props.onCambiar}
+      />
     </li>
   )
 }

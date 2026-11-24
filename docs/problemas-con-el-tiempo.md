@@ -179,7 +179,9 @@ no caben en un JSON (se guardarían vacías). Comprobado en el código.
 - **B.** Lo mismo sin fotos, en un JSON. Más simple; las fotos se perderían.
 - **C.** Copia en la nube (cuenta, servidor). Lo más cómodo; necesita servidor y cuentas, y la app hoy no tiene ninguno.
 
-### 11. Las gráficas acaban siendo un serrucho
+### 11. Las gráficas acaban siendo un serrucho (hecho)
+
+**Hecho (2026-11-24), opción A** con un solo botón (usuario: «son muchos botones»; `Desktop/MUTA-Graficas-por-meses-propuesta.png`): arriba a la derecha de la gráfica, «3 meses ▾» abre un menú con 3 meses, 6 meses, 1 año y Todo. Solo sale con más de 3 meses de datos; el cambio dice el del tramo («+9 % en 3 meses»); cada gráfica recuerda el suyo en ese móvil. En todas a la vez (`SessionProgress`). De paso, todos los desplegables de la app son ese menú (`MenuDesplegable`).
 
 **Qué pasa.** Ver sesión, la ficha y las de peso pintan todo desde el principio. Con 150 sesiones la línea queda apretada y
 el cambio de los últimos meses no se ve. No falla. Comprobado en el móvil simulado.

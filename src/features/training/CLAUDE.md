@@ -106,7 +106,7 @@ constancia de cada mes de una etapa (`constanciaPorMes`: cada semana cuenta en e
   unida por una raya entre los círculos, y «Añadir ejercicio» como última fila. Un ejercicio (`EditExerciseSheet`): series,
   mínimo y máximo de repeticiones, **descanso entre series** (de 15 en 15 s; se llama así para no confundirlo con el día de
   descanso) y RIR (0–5, con «Terminas con N en reserva») con − / +; «Más opciones» plegado (abierto si ya usas alguna): cada
-  serie distinta, superserie y técnica. Cada toque se guarda solo. «Cambiar por otro» (`SwapSheet soloPlan`) y «Quitar» (con
+  serie distinta, superserie y técnica (las dos, `FilaDesplegable` de `shared/ui`, con su explicación siempre a la vista; `Desplegable` queda para «Serie k», con contadores). Cada toque se guarda solo. «Cambiar por otro» (`SwapSheet soloPlan`) y «Quitar» (con
   «Deshacer»: `edicionDe`). «Volver esta sesión a la original» (también su nombre) y, en «Tu semana», «Volver a la rutina
   original» (todas: también orden, descansos, sesiones tuyas, nombres y músculos). Se guarda en `plans/current.ediciones` por
   sigla (`domain/routineEdit.ts · aplicarEdicion`, para todas las semanas); el descanso, en `descansosElegidos`, y el cambio de

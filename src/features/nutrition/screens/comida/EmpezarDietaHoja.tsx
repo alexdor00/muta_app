@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks'
 import { formatInt } from '../../../../shared/lib/format.ts'
 import { Button } from '../../../../shared/ui/Button.tsx'
 import { CheckIcon } from '../../../../shared/ui/icons.tsx'
+import { MenuDesplegable } from '../../../../shared/ui/MenuDesplegable.tsx'
 import { Sheet } from '../../../../shared/ui/Sheet.tsx'
 import { resumenDeDieta, type Dieta } from '../../state/dieta.ts'
 import { empezar, vistaPrevia } from '../../use-cases/diet.ts'
@@ -141,18 +142,13 @@ export function EmpezarDietaHoja({ dieta, onClose, avisar, alPlan }: Props) {
             <label class={p.que} for="dia-del-ciclo">
               Hoy es el día
             </label>
-            <select
+            <MenuDesplegable
               id="dia-del-ciclo"
-              class={p.valor}
-              value={dia}
-              onChange={(e) => setDia(Number(e.currentTarget.value))}
-            >
-              {r.ciclo.map((_, i) => (
-                <option key={i} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
+              etiqueta="Hoy es el día"
+              valor={String(dia)}
+              opciones={r.ciclo.map((_, i) => ({ value: String(i + 1), label: String(i + 1) }))}
+              onChange={(n) => setDia(Number(n))}
+            />
           </li>
         </ul>
       </div>

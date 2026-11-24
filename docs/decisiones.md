@@ -1046,3 +1046,10 @@ El usuario pide todas las pantallas de Nutrición como el Word (`Desktop/MUTA-Nu
   solo salen si las eliges. Imagen 1080 × 1920 en la letra de MUTA (sin la estrecha), cifras centradas; naranja solo en lo que es
   logro. Sale solo, uno cada vez; lo de antes de la función no se celebra de golpe. «6 meses» y el «ejercicio estrella» (3 veces o
   más), sugeridos.
+- **2026-11-24 · Las gráficas por meses y un solo desplegable en toda la app.** Decisión del usuario (problema 11; PNG
+  aprobado: «está perfecto, prográmalo así, y pon todos los desplegables de toda la aplicación así de bonitos»). Un solo botón
+  «3 meses ▾» arriba a la derecha de cada gráfica, no cuatro pastillas («son muchos botones»); de serie, 3 meses; solo con más
+  de 3 meses de datos; se recuerda por gráfica en el móvil (`localStorage`, sin poder, 3 meses). Todos los desplegables son
+  `shared/ui/MenuDesplegable` (un botón gris con lo elegido y ▾, un menú flotante con ✓; hacia arriba si no cabe; Escape
+  cierra el menú, no la hoja) en lugar del `<select>` del sistema, distinto en cada móvil (regla 11). La fila de «Serie k»
+  de Editar ejercicio sigue plegable: lleva contadores, no una lista.

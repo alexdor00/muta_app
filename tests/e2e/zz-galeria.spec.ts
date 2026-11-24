@@ -139,7 +139,7 @@ conPlan('galería · Entreno con tu plan', async ({ page }) => {
     .first()
     .click()
   const ej = page.getByRole('dialog', { name: 'Peso muerto rumano' })
-  await ej.locator('summary', { hasText: 'Técnica' }).click()
+  await ej.getByRole('button', { name: /^Técnica:/ }).click()
   await shot(
     page,
     '14-editar-ejercicio',

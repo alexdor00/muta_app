@@ -1,7 +1,8 @@
 import type { ComponentChildren } from 'preact'
-import { useId } from 'preact/hooks'
-import { formatDayDate, formatDecimal, formatShortDate } from '../lib/format.ts'
+import { useId, useState } from 'preact/hooks'
+import { formatChange, formatDayDate, formatDecimal, formatShortDate } from '../lib/format.ts'
 import { ChoiceSegmented } from './Choice.tsx'
+import { MenuDesplegable } from './MenuDesplegable.tsx'
 import { useTocarGrafica } from './useTocarGrafica.ts'
 import styles from './SessionProgress.module.css'
 
@@ -38,6 +39,44 @@ type Props<M extends string> = {
   texto?: (v: number) => string
   /** Lo que va debajo de la gráfica, dentro de la tarjeta («Tu récord · 127 kg» en la ficha). */
   pie?: ComponentChildren
+  /** Los valores ya son un % desde el principio (tus básicos): el cambio de un tramo se calcula sobre 100 + el valor. */
+  enPorcentaje?: boolean
+}
+
+/** Los tramos de la gráfica (meses hacia atrás desde el último punto, o todo). */
+type Tramo = '3' | '6' | '12' | 'todo'
+const TRAMOS: readonly { value: Tramo; label: string }[] = [
+  { value: '3', label: '3 meses' },
+  { value: '6', label: '6 meses' },
+  { value: '12', label: '1 año' },
+  { value: 'todo', label: 'Todo' },
+]
+
+/** La fecha de `meses` meses antes (AAAA-MM-DD; si el día no existe, el último del mes). */
+function mesesAntes(fecha: string, meses: number): string {
+  const [a, m, d] = fecha.split('-').map(Number)
+  const total = a * 12 + (m - 1) - meses
+  const [ano, mes] = [Math.floor(total / 12), (total % 12) + 1]
+  const ultimo = new Date(Date.UTC(ano, mes, 0)).getUTCDate()
+  return `${ano}-${String(mes).padStart(2, '0')}-${String(Math.min(d, ultimo)).padStart(2, '0')}`
+}
+
+/** El tramo que elegiste en esta gráfica (se recuerda en este móvil; sin poder leerlo, 3 meses). */
+function tramoGuardado(grafica: string): Tramo {
+  try {
+    const v = localStorage.getItem(`muta-tramo:${grafica}`)
+    return TRAMOS.some((t) => t.value === v) ? (v as Tramo) : '3'
+  } catch {
+    return '3'
+  }
+}
+
+function guardarTramo(grafica: string, t: Tramo): void {
+  try {
+    localStorage.setItem(`muta-tramo:${grafica}`, t)
+  } catch {
+    // Sin almacenamiento (privado): se queda solo mientras la ves
+  }
 }
 
 /** Marcas del eje vertical: números redondos (1, 2, 5…) que abarcan todos los puntos, con dos tramos como poco. */
@@ -101,12 +140,13 @@ export function SessionProgress<M extends string>({
   etiqueta,
   vacio,
   valor,
-  cambio,
+  cambio: cambioTodo,
   fecha,
-  puntos,
+  puntos: todos,
   metrica,
   onMetrica,
-  otroPuesto = [],
+  otroPuesto: otroPuestoTodos = [],
+  enPorcentaje = false,
   aviso = null,
   titulo,
   resumen,
@@ -115,6 +155,21 @@ export function SessionProgress<M extends string>({
 }: Props<M>) {
   const degradado = useId()
   const nombre = metricas.find((m) => m.value === metrica)?.label ?? ''
+  // El tramo (usuario, 2026-11-24, problema 11): de serie, los últimos 3 meses; solo si hay más de 3 meses de datos
+  const [tramo, setTramo] = useState<Tramo>(() => tramoGuardado(etiqueta))
+  const ultimaFecha = todos.at(-1)?.fecha ?? ''
+  const conTramo = todos.length > 1 && todos[0].fecha < mesesAntes(ultimaFecha, 3)
+  const desde = conTramo && tramo !== 'todo' ? mesesAntes(ultimaFecha, Number(tramo)) : ''
+  const dentro = todos.map((p) => p.fecha >= desde)
+  const puntos = todos.filter((_, i) => dentro[i])
+  const otroPuesto = otroPuestoTodos.filter((_, i) => dentro[i])
+  const base = enPorcentaje ? 100 : 0
+  const [inicioTramo, finTramo] = [puntos[0]?.valor + base, (puntos.at(-1)?.valor ?? 0) + base]
+  const enTramo =
+    desde && puntos.length > 1 && inicioTramo > 0
+      ? `${formatChange(finTramo / inicioTramo - 1)} en ${TRAMOS.find((x) => x.value === tramo)?.label}`
+      : null
+  const cambio = enTramo ?? cambioTodo
   const { bajo, alto, lista } = marcas(puntos.length ? puntos.map((p) => p.valor) : [0])
   const y = (v: number) => ((alto - v) / (alto - bajo)) * H
   const xy = puntos.map(
@@ -136,8 +191,25 @@ export function SessionProgress<M extends string>({
         ) : (
           cambio && <p class={styles.change}>{conCifraVerde(cambio)}</p>
         )}
-        {(elegido !== null || fecha) && (
-          <p class={styles.date}>{elegido !== null ? formatDayDate(puntos[elegido].fecha) : fecha}</p>
+        {/* La fecha y, debajo, el tramo, alineados a la derecha (usuario, 2026-11-24) */}
+        {(elegido !== null || fecha || conTramo) && (
+          <div class={styles.derecha}>
+            {(elegido !== null || fecha) && (
+              <p class={styles.date}>{elegido !== null ? formatDayDate(puntos[elegido].fecha) : fecha}</p>
+            )}
+            {conTramo && (
+              <MenuDesplegable
+                etiqueta="Qué tramo enseña la gráfica"
+                valor={tramo}
+                opciones={TRAMOS}
+                pequeno
+                onChange={(x) => {
+                  setTramo(x)
+                  guardarTramo(etiqueta, x)
+                }}
+              />
+            )}
+          </div>
         )}
       </div>
       {aviso && (
